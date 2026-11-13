@@ -310,7 +310,7 @@
       document.getElementById('merktippLabel').textContent = t.merktippLabel;
       document.getElementById('merktippText').textContent = t.merktippText;
       document.querySelectorAll('.sprache-btn').forEach(b => b.classList.remove('aktiv'));
-      document.getElementById('lang' + lang.charAt(0).toUpperCase() + lang.slice(1)).classList.add('aktiv');
+      var lb = document.getElementById('lang' + lang.charAt(0).toUpperCase() + lang.slice(1)); if (lb) lb.classList.add('aktiv');
     }
     function setLang(l) {
       lang = l;
@@ -371,6 +371,7 @@
     document.getElementById('jahr').textContent = new Date().getFullYear();
     wendeSpracheAn(); neueAufgaben();
   </script>
+<script src="msm-i18n.js"></script>
 <script src="/home-button.js"></script>
 </body>
 </html>

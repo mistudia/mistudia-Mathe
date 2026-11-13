@@ -36,10 +36,12 @@
   .sub { margin: 0 0 12px; color: var(--muted); font-size: 15px; }
   .langs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 0 0 18px; }
   .langs button {
-    font: 700 14px/1 system-ui, sans-serif; padding: 8px 12px; border-radius: 999px; cursor: pointer;
-    background: #ffffff; color: var(--blue); border: 2px solid #9db8e0;
+    width: 54px; height: 42px; border-radius: 10px; cursor: pointer; font-size: 24px; line-height: 1;
+    background: #1f74e0; border: 0; box-shadow: 0 2px 0 #1452b0; padding: 0;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   }
-  .langs button[aria-pressed="true"] { background: var(--blue); color: #ffffff; border-color: var(--blue); }
+  .langs button[aria-pressed="true"] { outline: 4px solid #ffcc4d; outline-offset: 2px; background: #1452b0; }
+  .langs button:focus-visible { outline: 3px solid #ffb300; outline-offset: 2px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
   .tile {
     display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 18px; text-decoration: none;
@@ -67,15 +69,19 @@
 <body>
 <main>
   <header>
-    <img class="logo" src="/img/mistudia-logo.png" alt="miStudia – Lernen mit Spaß" width="700" height="363">
+    <img class="logo" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game" width="900" height="467">
     <h1 id="title">Mathe</h1>
     <p class="sub" id="sub"></p>
     <div class="langs" role="group" aria-label="Sprache / Language">
-      <button type="button" data-l="de">DE</button>
-      <button type="button" data-l="en">EN</button>
-      <button type="button" data-l="es">ES</button>
-      <button type="button" data-l="fr">FR</button>
-      <button type="button" data-l="zh">中文</button>
+      <button type="button" data-l="de" title="Deutsch">🇩🇪</button>
+      <button type="button" data-l="en" title="English">🇺🇸</button>
+      <button type="button" data-l="es" title="Español">🇪🇸</button>
+      <button type="button" data-l="zh" title="中文">🇨🇳</button>
+      <button type="button" data-l="fr" title="Français">🇫🇷</button>
+      <button type="button" data-l="ru" title="Русский">🇷🇺</button>
+      <button type="button" data-l="ar" title="العربية">🇸🇦</button>
+      <button type="button" data-l="ja" title="日本語">🇯🇵</button>
+      <button type="button" data-l="pt" title="Português">🇧🇷</button>
     </div>
   </header>
   <nav class="grid" id="grid"></nav>
@@ -88,40 +94,44 @@
 <script>
 var APPS = [
   { slug: "einmaleins", badge: "7×8", color: "#ff8a00",
-    name: { de: "Einmaleins-Diplom", en: "Times Table Diploma", es: "Diploma de tablas", fr: "Diplôme des tables", zh: "乘法表证书" },
-    desc: { de: "Alle Reihen von 2 bis 10 – schaffst du das Diplom?", en: "All tables from 2 to 10 – can you earn the diploma?", es: "Todas las tablas del 2 al 10 – ¿consigues el diploma?", fr: "Toutes les tables de 2 à 10 – obtiendras-tu le diplôme ?", zh: "2到10的全部乘法表——你能拿到证书吗？" },
-    grade: { de: "Klasse 2–4", en: "Grade 2–4", es: "Curso 2–4", fr: "CE1–CM1", zh: "2–4年级" } },
+    name: { de: "Einmaleins-Diplom", en: "Times Table Diploma", es: "Diploma de tablas", zh: "乘法表证书", fr: "Diplôme des tables", ru: "Диплом по таблице умножения", ar: "شهادة جدول الضرب", ja: "九九の賞状", pt: "Diploma da tabuada" },
+    desc: { de: "Alle Reihen von 2 bis 10 – schaffst du das Diplom?", en: "All tables from 2 to 10 – can you earn the diploma?", es: "Todas las tablas del 2 al 10 – ¿consigues el diploma?", zh: "2到10的全部乘法表——你能拿到证书吗？", fr: "Toutes les tables de 2 à 10 – obtiendras-tu le diplôme ?", ru: "Все ряды от 2 до 10 – получишь диплом?", ar: "كل الجداول من 2 إلى 10 – هل تحصل على الشهادة؟", ja: "2の段から10の段まで――賞状をもらえるかな？", pt: "Todas as tabuadas de 2 a 10 – você consegue o diploma?" },
+    grade: { de: "Klasse 2–4", en: "Grade 2–4", es: "Curso 2–4", zh: "2–4年级", fr: "CE1–CM1", ru: "2–4 класс", ar: "الصف 2–4", ja: "2〜4年生", pt: "2º–4º ano" } },
   { slug: "schriftlich", badge: "+ −", color: "#2fbf55",
-    name: { de: "Schriftlich rechnen", en: "Written Calculation", es: "Cálculo escrito", fr: "Calcul posé", zh: "竖式计算" },
-    desc: { de: "Plus, minus, mal und geteilt untereinander rechnen", en: "Column addition, subtraction, multiplication, division", es: "Sumar, restar, multiplicar y dividir en columna", fr: "Additions, soustractions, multiplications, divisions posées", zh: "列竖式做加减乘除" },
-    grade: { de: "Klasse 3–5", en: "Grade 3–5", es: "Curso 3–5", fr: "CE2–6e", zh: "3–5年级" } },
+    name: { de: "Schriftlich rechnen", en: "Written Calculation", es: "Cálculo escrito", zh: "竖式计算", fr: "Calcul posé", ru: "Письменные вычисления", ar: "الحساب الكتابي", ja: "筆算", pt: "Contas armadas" },
+    desc: { de: "Plus, minus, mal und geteilt untereinander rechnen", en: "Column addition, subtraction, multiplication, division", es: "Sumar, restar, multiplicar y dividir en columna", zh: "列竖式做加减乘除", fr: "Additions, soustractions, multiplications, divisions posées", ru: "Сложение, вычитание, умножение и деление столбиком", ar: "الجمع والطرح والضرب والقسمة عموديًا", ja: "たし算・ひき算・かけ算・わり算を筆算で", pt: "Somar, subtrair, multiplicar e dividir armando a conta" },
+    grade: { de: "Klasse 3–5", en: "Grade 3–5", es: "Curso 3–5", zh: "3–5年级", fr: "CE2–6e", ru: "3–5 класс", ar: "الصف 3–5", ja: "3〜5年生", pt: "3º–5º ano" } },
   { slug: "groessen", badge: "cm", color: "#14b8b0",
-    name: { de: "Größen umwandeln", en: "Unit Converter", es: "Convertir unidades", fr: "Conversions d’unités", zh: "单位换算" },
-    desc: { de: "Länge, Fläche, Volumen, Gewicht und Zeit", en: "Length, area, volume, weight and time", es: "Longitud, área, volumen, peso y tiempo", fr: "Longueurs, aires, volumes, masses et durées", zh: "长度、面积、体积、重量和时间" },
-    grade: { de: "Klasse 3–7", en: "Grade 3–7", es: "Curso 3–7", fr: "CE2–5e", zh: "3–7年级" } },
+    name: { de: "Größen umwandeln", en: "Unit Converter", es: "Convertir unidades", zh: "单位换算", fr: "Conversions d’unités", ru: "Перевод величин", ar: "تحويل الوحدات", ja: "単位の換算", pt: "Converter unidades" },
+    desc: { de: "Länge, Fläche, Volumen, Gewicht und Zeit", en: "Length, area, volume, weight and time", es: "Longitud, área, volumen, peso y tiempo", zh: "长度、面积、体积、重量和时间", fr: "Longueurs, aires, volumes, masses et durées", ru: "Длина, площадь, объём, масса и время", ar: "الطول والمساحة والحجم والوزن والوقت", ja: "長さ・面積・体積・重さ・時間", pt: "Comprimento, área, volume, massa e tempo" },
+    grade: { de: "Klasse 3–7", en: "Grade 3–7", es: "Curso 3–7", zh: "3–7年级", fr: "CE2–5e", ru: "3–7 класс", ar: "الصف 3–7", ja: "3〜7年生", pt: "3º–7º ano" } },
   { slug: "brueche", badge: "¾", color: "#ff4f9a",
-    name: { de: "Bruchrechnen", en: "Fractions", es: "Fracciones", fr: "Fractions", zh: "分数计算" },
-    desc: { de: "Kürzen, addieren, multiplizieren und mehr", en: "Simplify, add, multiply and more", es: "Simplificar, sumar, multiplicar y más", fr: "Simplifier, additionner, multiplier et plus", zh: "约分、加法、乘法等" },
-    grade: { de: "Klasse 5–7", en: "Grade 5–7", es: "Curso 5–7", fr: "6e–4e", zh: "5–7年级" } },
+    name: { de: "Bruchrechnen", en: "Fractions", es: "Fracciones", zh: "分数计算", fr: "Fractions", ru: "Дроби", ar: "الكسور", ja: "分数の計算", pt: "Frações" },
+    desc: { de: "Kürzen, addieren, multiplizieren und mehr", en: "Simplify, add, multiply and more", es: "Simplificar, sumar, multiplicar y más", zh: "约分、加法、乘法等", fr: "Simplifier, additionner, multiplier et plus", ru: "Сокращение, сложение, умножение и многое другое", ar: "الاختصار والجمع والضرب والمزيد", ja: "約分・たし算・かけ算など", pt: "Simplificar, somar, multiplicar e mais" },
+    grade: { de: "Klasse 5–7", en: "Grade 5–7", es: "Curso 5–7", zh: "5–7年级", fr: "6e–4e", ru: "5–7 класс", ar: "الصف 5–7", ja: "5〜7年生", pt: "5º–7º ano" } },
   { slug: "prozent", badge: "%", color: "#a855f7",
-    name: { de: "Prozente & Dezimalzahlen", en: "Percent & Decimals", es: "Porcentajes y decimales", fr: "Pourcentages et décimaux", zh: "百分数与小数" },
-    desc: { de: "Dezimalzahl, Prozent und Bruch umwandeln", en: "Convert decimals, percentages and fractions", es: "Convertir decimales, porcentajes y fracciones", fr: "Convertir décimaux, pourcentages et fractions", zh: "小数、百分数和分数互相转换" },
-    grade: { de: "Klasse 6–7", en: "Grade 6–7", es: "Curso 6–7", fr: "5e–4e", zh: "6–7年级" } },
+    name: { de: "Prozente & Dezimalzahlen", en: "Percent & Decimals", es: "Porcentajes y decimales", zh: "百分数与小数", fr: "Pourcentages et décimaux", ru: "Проценты и десятичные дроби", ar: "النسب المئوية والكسور العشرية", ja: "百分率と小数", pt: "Porcentagem e decimais" },
+    desc: { de: "Dezimalzahl, Prozent und Bruch umwandeln", en: "Convert decimals, percentages and fractions", es: "Convertir decimales, porcentajes y fracciones", zh: "小数、百分数和分数互相转换", fr: "Convertir décimaux, pourcentages et fractions", ru: "Переводить десятичные дроби, проценты и обыкновенные дроби", ar: "التحويل بين الكسور العشرية والنسب المئوية والكسور", ja: "小数・百分率・分数を変換", pt: "Converter decimais, porcentagens e frações" },
+    grade: { de: "Klasse 6–7", en: "Grade 6–7", es: "Curso 6–7", zh: "6–7年级", fr: "5e–4e", ru: "6–7 класс", ar: "الصف 6–7", ja: "6〜7年生", pt: "6º–7º ano" } },
   { slug: "waage", badge: "⚖", color: "#5b7cfa",
-    name: { de: "Mathe-Waage", en: "Equation Balance", es: "Balanza de ecuaciones", fr: "Balance des équations", zh: "方程天平" },
-    desc: { de: "Gleichungen lösen mit der Waage", en: "Solve equations with a balance", es: "Resolver ecuaciones con una balanza", fr: "Résoudre des équations avec une balance", zh: "用天平解方程" },
-    grade: { de: "Klasse 7–8", en: "Grade 7–8", es: "Curso 7–8", fr: "4e–3e", zh: "7–8年级" } },
+    name: { de: "Mathe-Waage", en: "Equation Balance", es: "Balanza de ecuaciones", zh: "方程天平", fr: "Balance des équations", ru: "Весы уравнений", ar: "ميزان المعادلات", ja: "方程式てんびん", pt: "Balança de equações" },
+    desc: { de: "Gleichungen lösen mit der Waage", en: "Solve equations with a balance", es: "Resolver ecuaciones con una balanza", zh: "用天平解方程", fr: "Résoudre des équations avec une balance", ru: "Решать уравнения с помощью весов", ar: "حل المعادلات بالميزان", ja: "てんびんで方程式を解こう", pt: "Resolver equações com uma balança" },
+    grade: { de: "Klasse 7–8", en: "Grade 7–8", es: "Curso 7–8", zh: "7–8年级", fr: "4e–3e", ru: "7–8 класс", ar: "الصف 7–8", ja: "中1〜中2", pt: "7º–8º ano" } },
   { slug: "binome", badge: "(a+b)²", color: "#1565c0",
-    name: { de: "Binomische Formeln", en: "Binomial Formulas", es: "Fórmulas binómicas", fr: "Identités remarquables", zh: "二项式公式" },
-    desc: { de: "Klammern ausmultiplizieren Schritt für Schritt", en: "Expand brackets step by step", es: "Multiplicar paréntesis paso a paso", fr: "Développer pas à pas", zh: "一步步展开括号" },
-    grade: { de: "Klasse 8–9", en: "Grade 8–9", es: "Curso 8–9", fr: "3e–2nde", zh: "8–9年级" } }
+    name: { de: "Binomische Formeln", en: "Binomial Formulas", es: "Fórmulas binómicas", zh: "二项式公式", fr: "Identités remarquables", ru: "Формулы сокращённого умножения", ar: "المتطابقات الشهيرة", ja: "乗法公式", pt: "Produtos notáveis" },
+    desc: { de: "Klammern ausmultiplizieren Schritt für Schritt", en: "Expand brackets step by step", es: "Multiplicar paréntesis paso a paso", zh: "一步步展开括号", fr: "Développer pas à pas", ru: "Раскрывать скобки шаг за шагом", ar: "فك الأقواس خطوة بخطوة", ja: "かっこの展開をステップごとに", pt: "Expandir parênteses passo a passo" },
+    grade: { de: "Klasse 8–9", en: "Grade 8–9", es: "Curso 8–9", zh: "8–9年级", fr: "3e–2nde", ru: "8–9 класс", ar: "الصف 8–9", ja: "中2〜中3", pt: "8º–9º ano" } }
 ];
 var UI = {
   de: { title: "Mathe", sub: "Üben mit Spaß – such dir eine App aus!", privacy: "Datenschutz", imprint: "Impressum" },
   en: { title: "Math", sub: "Practise with fun – pick an app!", privacy: "Privacy", imprint: "Legal notice" },
   es: { title: "Matemáticas", sub: "Practica con diversión – ¡elige una app!", privacy: "Privacidad", imprint: "Aviso legal" },
+  zh: { title: "数学", sub: "快乐练习——选一个应用吧！", privacy: "隐私政策", imprint: "法律声明" },
   fr: { title: "Maths", sub: "S’entraîner en s’amusant – choisis une appli !", privacy: "Confidentialité", imprint: "Mentions légales" },
-  zh: { title: "数学", sub: "快乐练习——选一个应用吧！", privacy: "隐私政策", imprint: "法律声明" }
+  ru: { title: "Математика", sub: "Учись с удовольствием – выбери приложение!", privacy: "Конфиденциальность", imprint: "Выходные данные" },
+  ar: { title: "الرياضيات", sub: "تعلّم بمتعة – اختر تطبيقًا!", privacy: "الخصوصية", imprint: "بيانات قانونية" },
+  ja: { title: "算数・数学", sub: "楽しく練習――アプリを選んでね！", privacy: "プライバシー", imprint: "運営者情報" },
+  pt: { title: "Matemática", sub: "Pratique se divertindo – escolha um app!", privacy: "Privacidade", imprint: "Aviso legal" }
 };
 var lang = "de";
 try {
@@ -133,6 +143,7 @@ function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&": 
 function render(){
   var u = UI[lang];
   document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
   document.title = "miStudia " + u.title;
   document.getElementById("title").textContent = u.title;
   document.getElementById("sub").textContent = u.sub;

@@ -1172,7 +1172,7 @@ function sprache(s){
 
     document.querySelectorAll(".lang-btn").forEach(function(b){ b.classList.remove("active"); });
     const langIds = { de:"btnDe", en:"btnEn", es:"btnEs", zh:"btnZh" };
-    document.getElementById(langIds[s]).classList.add("active");
+    if(document.getElementById(langIds[s])) document.getElementById(langIds[s]).classList.add("active");
 
     const t = texte[s];
 
@@ -2203,6 +2203,7 @@ sprache("de");
 
 </script>
 
+<script src="msm-i18n.js"></script>
 <script src="/home-button.js"></script>
 </body>
 </html>

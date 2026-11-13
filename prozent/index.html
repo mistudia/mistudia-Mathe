@@ -530,9 +530,8 @@ function spracheWaehlen(sprache) {
     button.classList.remove("aktiv");
   });
 
-  document
-    .querySelector(`[data-sprache="${sprache}"]`)
-    .classList.add("aktiv");
+  var sb = document.querySelector(`[data-sprache="${sprache}"]`);
+  if (sb) sb.classList.add("aktiv");
 
   texteAktualisieren();
   neueAufgaben();
@@ -612,7 +611,7 @@ function zufallsWert(array) {
 
 
 function zahlAnzeigen(zahl) {
-  if (aktuelleSprache === "en") {
+  if (["en", "zh", "ja"].includes(aktuelleSprache)) {
     return zahl.toString();
   }
 
@@ -1045,6 +1044,7 @@ bottom:25px;
     ">
 
 
+<script src="msm-i18n.js"></script>
 <script src="/home-button.js"></script>
 </body>
 </html>

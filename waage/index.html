@@ -1122,7 +1122,7 @@ function loadEquation(){
         Number.isNaN(parsedRight.x) ||
         Number.isNaN(parsedRight.c)
     ){
-        alert("Bitte eine gültige Gleichung eingeben, z.B. 2x-4x+7");
+        alert(msW("invalid","Bitte eine gültige Gleichung eingeben, z.B. 2x-4x+7"));
         return;
     }
 
@@ -1981,7 +1981,7 @@ function swapSides(){
 function applyDivide(val){
 
     if(!val || Number.isNaN(val)){
-        alert("Division durch 0 ist nicht erlaubt.");
+        alert(msW("div0","Division durch 0 ist nicht erlaubt."));
         return;
     }
 
@@ -2042,7 +2042,7 @@ function applyXMultiply(val){
 function applyXDivide(val){
 
     if(!val || Number.isNaN(val)){
-        alert("Division durch 0 ist nicht erlaubt.");
+        alert(msW("div0","Division durch 0 ist nicht erlaubt."));
         return;
     }
 
@@ -2422,7 +2422,7 @@ function showProbe(){
         equation.right.c - equation.left.c;
 
     if(a === 0){
-        alert("x lässt sich hier nicht eindeutig bestimmen (x fällt auf beiden Seiten weg).");
+        alert(msW("noX","x lässt sich hier nicht eindeutig bestimmen (x fällt auf beiden Seiten weg)."));
         return;
     }
 
@@ -2506,30 +2506,30 @@ let rightPlain = prettyEquation(rightOriginal);
     let ok = Math.abs(leftValue-rightValue) < 0.0001;
 
     document.getElementById("probeContent").innerHTML = `
-        <div class="probeTitle">🔍 Probe</div>
+        <div class="probeTitle">${msW("probe","🔍 Probe")}</div>
 
         <div class="probeRow step1">
-            <span class="probeLabel">Lösung einsetzen</span>
+            <span class="probeLabel">${msW("insertSol","Lösung einsetzen")}</span>
             x = <span class="xVal">${fracHtml(x)}</span>
         </div>
 
         <div class="probeRow step1">
-            <span class="probeLabel">Ursprungsgleichung</span>
+            <span class="probeLabel">${msW("original","Ursprungsgleichung")}</span>
             ${leftPlain} &thinsp;=&thinsp; ${rightPlain}
         </div>
 
         <div class="probeRow step2">
-            <span class="probeLabel">Einsetzen</span>
+            <span class="probeLabel">${msW("insert","Einsetzen")}</span>
             ${leftInserted} &thinsp;=&thinsp; ${rightInserted}
         </div>
 
         <div class="probeRow ${ok ? "ok" : "bad"}">
-            <span class="probeLabel">Ergebnis</span>
+            <span class="probeLabel">${msW("result","Ergebnis")}</span>
             <span class="resultBig">
                 ${fracHtml(leftValue)} &thinsp;=&thinsp; ${fracHtml(rightValue)}
             </span>
             <div class="verdict" style="color:${ok ? "#16a34a" : "#dc2626"};">
-                ${ok ? "✅ Die Probe stimmt" : "❌ Die Probe stimmt nicht"}
+                ${ok ? msW("probeOk","✅ Die Probe stimmt") : msW("probeBad","❌ Die Probe stimmt nicht")}
             </div>
         </div>
     `;
@@ -2553,8 +2553,8 @@ function showSolution(){
 
         resultHtml =
             b === 0
-            ? "Jede Zahl ist eine Lösung (0 = 0)."
-            : "Keine Lösung möglich (Widerspruch).";
+            ? msW("allX","Jede Zahl ist eine Lösung (0 = 0).")
+            : msW("noSol","Keine Lösung möglich (Widerspruch).");
 
     }else{
 
@@ -2564,10 +2564,10 @@ function showSolution(){
     }
 
     document.getElementById("probeContent").innerHTML = `
-        <div class="probeTitle" style="color:#15803d;">💡 Lösung</div>
+        <div class="probeTitle" style="color:#15803d;">${msW("solution","💡 Lösung")}</div>
 
         <div class="probeRow ok">
-            <span class="probeLabel">Ergebnis</span>
+            <span class="probeLabel">${msW("result","Ergebnis")}</span>
             <span class="resultBig">${resultHtml}</span>
         </div>
     `;
@@ -2578,6 +2578,7 @@ function showSolution(){
 
 </script>
 
+<script src="msm-i18n.js"></script>
 <script src="/home-button.js"></script>
 </body>
 </html>
