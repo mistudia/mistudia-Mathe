@@ -148,12 +148,13 @@
   function kanteProj(p){ var l = gdLokal(p); return gdWelt(Math.max(-80, Math.min(80, l.x)), 0); }
   function kanteAbstand(p){ var l = gdLokal(p); return Math.abs(l.x) <= 80 ? Math.abs(l.y) : Infinity; }
   function kantePunkt(p){ var f = fang(p); if(f && kanteAbstand(f) < 1.2) return { p: { x: f.x, y: f.y }, f: f }; return { p: kanteProj(p), f: null }; }
-  var GRIFF = { zieh: [0, -27], dreh: [0, -68] };
+  var GRIFF = { zieh: [0, 64], drehL: [-64, 11], drehR: [64, 11] };
   function gdGriff(p){
     if(!GD.on) return null;
     var tol = 22 / ppm();
-    for(var k in GRIFF){ var q = gdWelt(GRIFF[k][0], GRIFF[k][1]); if(dist(p, q) < tol) return k; }
-    return null;
+    var best = null;
+    for(var k in GRIFF){ var q = gdWelt(GRIFF[k][0], GRIFF[k][1]), d = dist(p, q); if(d < tol){ tol = d; best = k; } }
+    return best;
   }
   function gdZiehen(p){
     tmp.info = null;
@@ -161,7 +162,7 @@
       var nx = p.x + tmp.gd.ox, ny = p.y + tmp.gd.oy, f = fang({ x: nx, y: ny });
       GD.x = f ? f.x : nx; GD.y = f ? f.y : ny;
     } else {
-      var w = Math.atan2(p.y - GD.y, p.x - GD.x) + Math.PI / 2;
+      var gh = GRIFF[tmp.gd.art], w = Math.atan2(p.y - GD.y, p.x - GD.x) - Math.atan2(gh[1], gh[0]);
       w = Math.round(w * 180 / Math.PI) * Math.PI / 180;
       if(hilfen){
         var bd = 2 * Math.PI / 180, best = null;
@@ -171,40 +172,67 @@
       GD.w = w;
       var g = Math.round(normWinkel(-w) * 180 / Math.PI) % 180;
       tmp.info = tmp.info || { sym: "" }; tmp.info.sym = (tmp.info.sym ? tmp.info.sym + "  " : "") + g + "°";
-      tmp.infoPos = gdWelt(0, -68);
+      tmp.infoPos = gdWelt(gh[0], gh[1]);
     }
     zeichne();
   }
   function zeichneGeo(){
     if(!GD.on) return;
     var k = 1 / ppm(), g = el("g", { "class": "gd", transform: "translate(" + GD.x + " " + GD.y + ") rotate(" + (GD.w * 180 / Math.PI) + ")" });
-    g.appendChild(el("polygon", { points: "-80,0 80,0 0,-80", "class": "gdkoerper", "vector-effect": "non-scaling-stroke" }));
-    var d = "";
-    for(var j = 5; j < 80; j += 5) d += "M" + (-(80 - j) + 1.5) + " " + (-j) + "H" + (80 - j - 1.5);
-    d += "M0 -6V-78";
-    g.appendChild(el("path", { d: d, "class": "gdpar", "vector-effect": "non-scaling-stroke" }));
-    var tk = "";
-    for(var m = -79; m <= 79; m++){ var len = m % 10 === 0 ? 4 : m % 5 === 0 ? 2.6 : 1.5; tk += "M" + m + " 0V" + (-len); }
-    for(var a = 0; a <= 180; a++){
-      var rad = a * Math.PI / 180, r1 = a % 10 === 0 ? 48 : a % 5 === 0 ? 49.6 : 50.6;
-      tk += "M" + (52 * Math.cos(rad)) + " " + (-52 * Math.sin(rad)) + "L" + (r1 * Math.cos(rad)) + " " + (-r1 * Math.sin(rad));
+    var P = function(r, th){ return (r * Math.cos(th)).toFixed(3) + " " + (r * Math.sin(th)).toFixed(3); };
+    var add = function(n, a, txt){ var e = el(n, a, txt); g.appendChild(e); return e; };
+    var txt = function(x, y, s, gr, cls, rot){ var a = { x: x, y: y, "class": "gdzahl" + (cls ? " " + cls : ""), "font-size": gr }; if(rot) a.transform = "rotate(" + rot + " " + x + " " + y + ")"; return add("text", a, s); };
+    // Körper (Hypotenuse oben auf y = 0, Spitze unten bei y = 80)
+    add("polygon", { points: "-80,0 80,0 0,80", "class": "gdkoerper", "vector-effect": "non-scaling-stroke" });
+    var hell = "", sk = "", th, i, r, len;
+    // Hilfslinien: Mittellinie, Parallelen, 45°-Hilfen, 10°-Strahlen bis zum Rand
+    hell += "M0 1V78";
+    for(i = 5; i <= 30; i += 5) hell += "M" + (-(i % 10 ? 16 : 21)) + " " + i + "H-6M6 " + i + "H" + (i % 10 ? 16 : 21);
+    hell += "M-5 5L-17 17M5 5L17 17";
+    for(i = 10; i <= 170; i += 10){
+      if(i === 90) continue;
+      th = i * Math.PI / 180; r = 80 / (Math.abs(Math.cos(th)) + Math.sin(th));
+      hell += "M" + P(55, th) + "L" + P(r - 5.5, th);
     }
-    g.appendChild(el("path", { d: tk, "class": "gdskala", "vector-effect": "non-scaling-stroke" }));
-    for(var c = -7; c <= 7; c++) g.appendChild(el("text", { x: c * 10, y: -6, "class": "gdzahl", "font-size": 3 }, String(Math.abs(c))));
-    for(a = 0; a <= 180; a += 10){
-      if(a === 90) continue;
-      rad = a * Math.PI / 180;
-      g.appendChild(el("text", { x: 45 * Math.cos(rad), y: -45 * Math.sin(rad) + 1, "class": "gdzahl", "font-size": 2.6 }, String(a)));
-      g.appendChild(el("text", { x: 40.5 * Math.cos(rad), y: -40.5 * Math.sin(rad) + 1, "class": "gdzahl klein", "font-size": 2 }, String(180 - a)));
+    add("path", { d: hell, "class": "gdlinie", "vector-effect": "non-scaling-stroke" });
+    // mm-Skala an der Hypotenuse
+    for(i = -79; i <= 79; i++){ len = i % 10 === 0 ? 4 : i % 5 === 0 ? 2.6 : 1.5; sk += "M" + i + " 0V" + len; }
+    // senkrechte Abstandsskalen (Abstand zur Kante in cm)
+    [-22, 22].forEach(function(x){ for(var j = 2; j <= 28; j++){ var l2 = j % 10 === 0 ? 2.4 : j % 5 === 0 ? 1.6 : 1; sk += "M" + (x - l2 / 2) + " " + j + "H" + (x + l2 / 2); } sk += "M" + x + " 2V28"; });
+    // Gradkreis mit Strichen
+    for(i = 0; i <= 180; i++){ th = i * Math.PI / 180; len = i % 10 === 0 ? 3.4 : i % 5 === 0 ? 2.3 : 1.3; sk += "M" + P(36, th) + "L" + P(36 + len, th); }
+    // Gradstriche an den Schenkeln (Strahl vom Nullpunkt)
+    for(i = 1; i < 180; i++){
+      if(i === 90) continue;
+      th = i * Math.PI / 180; r = 80 / (Math.abs(Math.cos(th)) + Math.sin(th)); len = i % 10 === 0 ? 5 : i % 5 === 0 ? 3 : 1.7;
+      sk += "M" + P(r, th) + "L" + P(r - len, th);
     }
-    // Griffe (Bildschirmgröße)
-    [["zieh", "M0 -8V8M-8 0H8M0 -8l-3 3M0 -8l3 3M0 8l-3 -3M0 8l3 -3M-8 0l3 -3M-8 0l3 3M8 0l-3 -3M8 0l-3 3"],
-     ["dreh", "M5.5 -4A7 7 0 1 0 7 2M5.5 -4l0.5 -4.5M5.5 -4l-4.3 -1"]].forEach(function(h){
-      var q = el("g", { transform: "translate(" + GRIFF[h[0]][0] + " " + GRIFF[h[0]][1] + ") scale(" + k + ")", "class": "gdgriff" });
-      q.appendChild(el("circle", { r: 14 })); q.appendChild(el("path", { d: h[1] })); g.appendChild(q);
-    });
+    add("path", { d: sk, "class": "gdskala", "vector-effect": "non-scaling-stroke" });
+    // gelbes Band für die äußere Gradzahl-Reihe und die 90
+    add("path", { d: "M" + P(50, 7.5 * Math.PI / 180) + "A50 50 0 0 1 " + P(50, 172.5 * Math.PI / 180), "class": "gdband" });
+    add("circle", { cx: 0, cy: 50, r: 4.3, "class": "gdneunzig" });
+    // Zahlen
+    for(i = 1; i <= 7; i++){ txt(i * 10, 5.8, String(i), 3.2); txt(-i * 10, 5.8, String(i), 3.2); }
+    txt(0, 5.8, "0", 3.2);
+    [-1, 1].forEach(function(sg){ for(var j = 1; j <= 2; j++) txt(sg * 18, j * 10 + 1.1, String(j), 2.8); });
+    for(i = 10; i <= 170; i += 10){
+      if(i === 90) continue;
+      th = i * Math.PI / 180;
+      var ix = 42.5 * Math.cos(th), iy = 42.5 * Math.sin(th) + 0.8, bx = 50 * Math.cos(th), by = 50 * Math.sin(th) + 1;
+      txt(ix, iy, String(i), 2.3, "klein", i - 90);
+      txt(bx, by, String(180 - i), 2.9, "", i - 90);
+    }
+    txt(0, 51.6, "90", 4.4, "gross");
+    // Griffe (Bildschirmgröße): Verschieben (Kreuz) und Drehen (Pfeil)
+    var icon = { zieh: "M0 -8V8M-8 0H8M0 -8l-3 3M0 -8l3 3M0 8l-3 -3M0 8l3 -3M-8 0l3 -3M-8 0l3 3M8 0l-3 -3M8 0l-3 3",
+      drehL: "M5.5 -4A7 7 0 1 0 7 2M5.5 -4l0.5 -4.5M5.5 -4l-4.3 -1", drehR: "M5.5 -4A7 7 0 1 0 7 2M5.5 -4l0.5 -4.5M5.5 -4l-4.3 -1" };
+    for(var h in GRIFF){
+      var q = el("g", { transform: "translate(" + GRIFF[h][0] + " " + GRIFF[h][1] + ") scale(" + k + ")", "class": "gdgriff" });
+      q.appendChild(el("circle", { r: 14 })); q.appendChild(el("path", { d: icon[h] })); g.appendChild(q);
+    }
     svg.appendChild(g);
   }
+
 
   // ---------- Kopieren (kongruente Figuren) ----------
   function inDreieck(p, P){
@@ -1062,7 +1090,7 @@
   document.getElementById("hilfen").addEventListener("change", function(){ hilfen = this.checked; });
   document.getElementById("gdBtn").addEventListener("click", function(){
     GD.on = !GD.on; this.setAttribute("aria-pressed", GD.on ? "true" : "false");
-    if(GD.on){ GD.w = 0; GD.x = view.x + view.w / 2; GD.y = view.y + view.h / 2 + Math.min(40, view.h / 4); }
+    if(GD.on){ GD.w = 0; GD.x = view.x + view.w / 2; GD.y = view.y + view.h / 2 - Math.min(40, view.h / 4); }
     zeichne();
     var h = document.getElementById("hinweis"); h.classList.remove("warn"); h.textContent = GD.on ? t("hGeo") : ""; if(!GD.on) hinweis();
   });
