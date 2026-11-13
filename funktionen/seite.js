@@ -36,7 +36,7 @@ var FS = (function(){
   function vollPunkt(lbl, z, y){ return FK.punkt(lbl, FK.xtxt(z), FK.ytxt(y)); }
   // Sprache: Startmenü → home-button.js → MS_LANG.apply
   function sprache(render){
-    window.MS_LANG = { apply: function(l){ FK.setLang(l); document.documentElement.lang = l; document.documentElement.dir = l === "ar" ? "rtl" : "ltr"; render(); lexKnopf(); } };
+    window.MS_LANG = { apply: function(l){ FK.setLang(l); document.documentElement.lang = l; document.documentElement.dir = l === "ar" ? "rtl" : "ltr"; render(); lexKnopf(); if(window.FA) FA.texte(); } };
   }
   function lexKnopf(){
     var fuss = document.querySelector(".footer"); if(!fuss) return;
@@ -107,6 +107,17 @@ var FS = (function(){
       return '<li><span class="rw-h">' + t(s[0]) + "</span><div>" + s[1] + "</div></li>";
     }).join("") + '</ol><div class="klein-text">' + t("rwFarbe") + "</div></details>";
   }
+  // Allgemeine Form + eingesetzte Werte, beide farbig.
+  // vorlage: "f(x) = {a}·x² + {b}·x + {c}", werte: { a: [Bruch, Farbe], … }
+  function formLive(vorlage, werte){
+    var z1 = vorlage.replace(/\{(\w)\}/g, function(m, k){ return ein(k, werte[k][1]); });
+    var z2 = vorlage.replace(/(= |\()?\{(\w)\}/g, function(m, vor, k){
+      var w = werte[k][0], s = FK.btxt(w);
+      if(w.n < 0 && !vor) s = "(" + s + ")";
+      return (vor || "") + ein(s, werte[k][1]);
+    });
+    return f(z1) + "<br>" + f(z2);
+  }
   function xListe(nst){ return nst.length ? "x = " + nst.map(FK.xtxt).join("; ") : "–"; }
 
   // ---------- Eingabehilfe + Live-Vorschau ----------
@@ -140,5 +151,5 @@ var FS = (function(){
     if(FK.grad(p) > 0) throw { code: "errParse" };
     return p[0];
   }
-  return { ein: ein, xEin: xEin, einsetzen: einsetzen, einsetzenBruch: einsetzenBruch, rechenweg: rechenweg, xListe: xListe, mathe: mathe, eingabeHilfe: eingabeHilfe, vorschau: vorschau, FARBE: FARBE, karte: karte, f: f, fleck: fleck, abschnitte: abschnitte, label: label, vollPunkt: vollPunkt, yKurz: yKurz, sprache: sprache, zahlEingabe: zahlEingabe };
+  return { formLive: formLive, ein: ein, xEin: xEin, einsetzen: einsetzen, einsetzenBruch: einsetzenBruch, rechenweg: rechenweg, xListe: xListe, mathe: mathe, eingabeHilfe: eingabeHilfe, vorschau: vorschau, FARBE: FARBE, karte: karte, f: f, fleck: fleck, abschnitte: abschnitte, label: label, vollPunkt: vollPunkt, yKurz: yKurz, sprache: sprache, zahlEingabe: zahlEingabe };
 })();

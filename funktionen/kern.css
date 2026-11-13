@@ -122,3 +122,9 @@ h1 { text-align: center; color: var(--blue); margin: 0 0 14px; font-size: 28px; 
 .rw .rw-h { font-size: 14px; color: var(--muted); }
 .rw .f { line-height: 2; }
 .ein { font-weight: 700; }
+
+/* ---------- Allgemeine Form über den Reglern ---------- */
+.form-live { text-align: center; background: #ffffff; border: 2px solid var(--kartenrand); border-radius: 12px; padding: 8px 10px; margin-bottom: 10px; line-height: 1.9; }
+.form-live .f { font: 21px "Cambria Math", Cambria, "Times New Roman", serif; }
+.regler-hinweis { font-size: 14px; color: var(--muted); text-align: center; margin: -4px 0 8px; }
+.regler.aus .regel { opacity: 0.5; }

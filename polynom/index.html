@@ -35,7 +35,12 @@
       <div class="legende"><label><input type="checkbox" id="zeigeAbl"> <span id="tAbl"></span></label></div>
       <p class="tipp" id="tipp"></p>
     </div>
-    <div class="analyse" id="analyse"></div>
+    <div>
+      <div class="form-live" id="formLive"></div>
+      <div class="regler-hinweis" id="reglerHinweis"></div>
+      <div class="regler" id="regler"></div>
+      <div class="analyse" id="analyse"></div>
+    </div>
   </div>
   </div>
   <div id="ueben" class="ueben" hidden></div>
@@ -45,6 +50,7 @@
 <script src="/funktionen/texte.js"></script>
 <script src="/funktionen/kern.js"></script>
 <script src="/funktionen/lexikon.js"></script>
+<script src="/funktionen/alltag.js"></script>
 <script src="/funktionen/seite.js"></script>
 <script>
 (function(){
@@ -60,6 +66,45 @@
     document.getElementById("beispiele").appendChild(b);
   });
   document.getElementById("form").addEventListener("submit", function(e){ e.preventDefault(); rechne(true); });
+
+  // ---------- Schieberegler für f(x) = ax³ + bx² + cx + d ----------
+  var B = FK.B, Bz = FK.Bz;
+  var RK = { a: [-2, 2, 0.1], b: [-6, 6, 0.5], c: [-10, 10, 0.5], d: [-10, 10, 0.5] };
+  var FARBE_K = { a: "#2563eb", b: "#d97706", c: "#0d9488", d: "#c026d3" };
+  var WK = { a: 1, b: -6, c: 9, d: 0 }, reglerAktiv = true;
+  (function(){
+    var box = document.getElementById("regler");
+    box.innerHTML = Object.keys(RK).map(function(k){
+      var r = RK[k];
+      return '<div class="regel"><label for="r' + k + '"><span><span class="m" style="color:' + FARBE_K[k] + '">' + k + '</span></span><output id="o' + k + '"></output></label>' +
+        '<div class="zeile"><button class="klein" type="button" data-k="' + k + '" data-s="-1" aria-label="' + FK.MINUS + '">' + FK.MINUS + '</button>' +
+        '<input type="range" id="r' + k + '" min="' + r[0] + '" max="' + r[1] + '" step="' + r[2] + '" value="' + WK[k] + '">' +
+        '<button class="klein" type="button" data-k="' + k + '" data-s="1" aria-label="+">+</button></div></div>';
+    }).join("");
+    Object.keys(RK).forEach(function(k){ document.getElementById("r" + k).addEventListener("input", function(){ setzeK(k, parseFloat(this.value)); }); });
+    box.querySelectorAll(".klein").forEach(function(b){
+      b.addEventListener("click", function(){ var k = b.dataset.k, r = RK[k]; setzeK(k, Math.min(r[1], Math.max(r[0], Math.round((WK[k] + r[2] * b.dataset.s) / r[2]) * r[2]))); });
+    });
+  })();
+  function bzK(v){ return FK.parse(String(Math.round(v * 1000) / 1000))[0]; }
+  function setzeK(k, v){
+    WK[k] = Math.round(v * 100) / 100;
+    var q = FK.trim([bzK(WK.d), bzK(WK.c), bzK(WK.b), bzK(WK.a)]);
+    document.getElementById("eingabe").value = FK.ptxt(q).replace(/−/g, "-");
+    rechne(false);
+  }
+  function zeigeReglerK(){
+    var p = A && !fehlerCode ? A.p : null, fl = document.getElementById("formLive"), box = document.getElementById("regler");
+    reglerAktiv = !!p && FK.grad(p) <= 3;
+    box.classList.toggle("aus", !reglerAktiv);
+    box.querySelectorAll("input, button").forEach(function(e){ e.disabled = !reglerAktiv; });
+    document.getElementById("reglerHinweis").textContent = p && !reglerAktiv ? t("reglerGrad3") : "";
+    if(!reglerAktiv){ fl.innerHTML = ""; fl.hidden = true; return; }
+    fl.hidden = false;
+    var k4 = { a: p[3] || B(0), b: p[2] || B(0), c: p[1] || B(0), d: p[0] || B(0) };
+    Object.keys(RK).forEach(function(k){ WK[k] = Bz.num(k4[k]); document.getElementById("r" + k).value = WK[k]; document.getElementById("o" + k).textContent = FK.btxt(k4[k]); });
+    fl.innerHTML = FS.formLive("f(x) = {a}·x³ + {b}·x² + {c}·x + {d}", { a: [k4.a, FARBE_K.a], b: [k4.b, FARBE_K.b], c: [k4.c, FARBE_K.c], d: [k4.d, FARBE_K.d] });
+  }
   document.getElementById("zeigeAbl").addEventListener("change", function(){ graph.zeichne(); });
   window.addEventListener("resize", function(){ graph.zeichne(); });
 
@@ -95,7 +140,7 @@
     A.wp.forEach(function(w){ g.punkt(w.z.x, w.y.v, C.W, FS.label(t(w.sattel ? "lblS" : "lblW"), w.z, w.y), "oben"); });
   }
   function texte(){
-    FS.vorschau();
+    FS.vorschau(); zeigeReglerK();
     document.title = "miStudia – " + t("polTitle");
     document.getElementById("titel").textContent = t("polTitle");
     document.getElementById("zeichnen").textContent = t("draw");
@@ -172,6 +217,11 @@
   FS.sprache(function(){ texte(); graph.zeichne(); });
   FS.eingabeHilfe({ text: function(s){ return "f(x) = " + FK.ptxt(FK.parse(s)); },
     zeilen: [["x^3 - 2x", "hHoch"], ["3x^2 + 2*x", "hMal"], ["1/3 x^3 - x", "hBruch"], ["0,25x^4 - 1.5x^2", "hDez"], ["(x - 1)(x + 2)^2", "hKlammer"], ["-x^3 + 4x", "hMinus"]] });
+  FA.einbauen("polynom", document.getElementById("form"), function(e){
+    var tMB = document.getElementById("tabMB"); if(tMB && tMB.getAttribute("aria-selected") !== "true") tMB.click();
+    document.getElementById("eingabe").value = e; FS.vorschau();
+    var form = document.getElementById("form"); if(form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event("submit", { cancelable: true }));
+  }, function(e){ return "f(x) = " + FK.ptxt(FK.parse(e)); });
   rechne(true);
 })();
 </script>

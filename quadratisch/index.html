@@ -39,6 +39,7 @@
       <p class="tipp" id="tipp"></p>
     </div>
     <div>
+      <div class="form-live" id="formLive"></div>
       <div class="regler" id="regler"></div>
       <div class="analyse" id="analyse"></div>
     </div>
@@ -51,6 +52,7 @@
 <script src="/funktionen/texte.js"></script>
 <script src="/funktionen/kern.js"></script>
 <script src="/funktionen/lexikon.js"></script>
+<script src="/funktionen/alltag.js"></script>
 <script src="/funktionen/seite.js"></script>
 <script>
 (function(){
@@ -61,6 +63,7 @@
     SF:  { a: [-3, 3, 0.1], d: [-8, 8, 0.5], e: [-10, 10, 0.5] }
   };
   var W = { a: 1, b: -2, c: -3, d: 1, e: -4 };
+  var FARBE_K = { a: "#2563eb", b: "#d97706", c: "#0d9488", d: "#c026d3", e: "#16a34a" };
   var p = null, A = null, fehlerCode = null, eingegeben = false;
   var graph = new FK.Graph(document.getElementById("graph"), { zeichnen: zeichneInhalt });
   var titelZoom = FK.knoepfe(document.getElementById("zoom"), graph, passend);
@@ -76,7 +79,7 @@
     var box = document.getElementById("regler"), keys = Object.keys(R[modus]);
     box.innerHTML = keys.map(function(k){
       var r = R[modus][k];
-      return '<div class="regel"><label for="r' + k + '"><span><span class="m">' + k + '</span></span><output id="o' + k + '"></output></label>' +
+      return '<div class="regel"><label for="r' + k + '"><span><span class="m" style="color:' + FARBE_K[k] + '">' + k + '</span></span><output id="o' + k + '"></output></label>' +
         '<div class="zeile"><button class="klein" type="button" data-k="' + k + '" data-s="-1" aria-label="' + FK.MINUS + '">' + FK.MINUS + '</button>' +
         '<input type="range" id="r' + k + '" min="' + r[0] + '" max="' + r[1] + '" step="' + r[2] + '" value="' + W[k] + '">' +
         '<button class="klein" type="button" data-k="' + k + '" data-s="1" aria-label="+">+</button></div></div>';
@@ -104,6 +107,10 @@
       var el = document.getElementById("r" + k); if(!el) return;
       el.value = W[k]; document.getElementById("o" + k).textContent = FK.zahl(W[k]);
     });
+    var fl = document.getElementById("formLive");
+    if(!p || fehlerCode){ fl.innerHTML = ""; }
+    else if(modus === "ABC") fl.innerHTML = FS.formLive("f(x) = {a}·x² + {b}·x + {c}", { a: [p[2], FARBE_K.a], b: [p[1], FARBE_K.b], c: [p[0], FARBE_K.c] });
+    else { var s = scheitel(); fl.innerHTML = FS.formLive("f(x) = {a}·(x − {d})² + {e}", { a: [p[2], FARBE_K.a], d: [s.x, FARBE_K.d], e: [s.y, FARBE_K.e] }); }
   }
   document.getElementById("form").addEventListener("submit", function(e){
     e.preventDefault(); fehlerCode = null;
@@ -146,7 +153,7 @@
   }
   function klammer(a){ return a.n < 0 ? "(" + FK.btxt(a) + ")" : FK.btxt(a); }
   // a, b, c beim Einsetzen immer in derselben Farbe
-  var CA = "#2563eb", CB = "#d97706", CC = "#0d9488";
+  var CA = FARBE_K.a, CB = FARBE_K.b, CC = FARBE_K.c;
   function kA(v){ return FS.ein(klammer(v), CA); } function kB(v){ return FS.ein(klammer(v), CB); } function kC(v){ return FS.ein(klammer(v), CC); }
   function xMinus(z){ // (x − z) bzw. (x + |z|)
     if(z.b){ if(Bz.null(z.b)) return "x"; return z.b.n > 0 ? "(x " + FK.MINUS + " " + FK.btxt(z.b) + ")" : "(x + " + FK.btxt(Bz.neg(z.b)) + ")"; }
@@ -191,7 +198,7 @@
     var D = Bz.sub(Bz.mul(b, b), Bz.mul(B(4), Bz.mul(a, c))), Dv = Bz.num(D);
     var dh = f("D = b² " + FK.MINUS + " 4ac = " + kB(b) + "² " + FK.MINUS + " 4 · " + kA(a) + " · " + kC(c) + " = " + FK.btxt(D)) + "<br><b>" + t(Dv > 0 ? "d2" : Dv === 0 ? "d1" : "d0") + "</b>";
     if(Dv >= 0){
-      dh += "<br>" + t("abc") + ": " + f("x<sub>1,2</sub> = (" + FK.MINUS + "b ± √D) / (2a) = (" + FK.MINUS + kB(b) + " ± √" + klammer(D) + ") / (2 · " + kA(a) + ")");
+      dh += "<br>" + FB.wort("mitternacht", t("abc")) + ": " + f("x<sub>1,2</sub> = (" + FK.MINUS + "b ± √D) / (2a) = (" + FK.MINUS + kB(b) + " ± √" + klammer(D) + ") / (2 · " + kA(a) + ")");
     }
     h += FS.karte(t("diskr"), dh);
     h += FS.karte(t("nst"), A.nst.length ? "<ul>" + A.nst.map(function(z, i){
@@ -204,6 +211,11 @@
   FS.sprache(function(){ texte(); graph.zeichne(); });
   FS.eingabeHilfe({ text: function(s){ return "f(x) = " + FK.ptxt(FK.parse(s)); },
     zeilen: [["x^2 - 3x", "hHoch"], ["2*x² + x", "hMal"], ["1/2 x^2 - 4", "hBruch"], ["0,5x^2 - 1.5", "hDez"], ["(x - 1)(x + 2)", "hKlammer"], ["-x^2 + 4", "hMinus"]] });
+  FA.einbauen("quadratisch", document.getElementById("form"), function(e){
+    var tMB = document.getElementById("tabMB"); if(tMB && tMB.getAttribute("aria-selected") !== "true") tMB.click();
+    document.getElementById("eingabe").value = e; FS.vorschau();
+    var form = document.getElementById("form"); if(form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event("submit", { cancelable: true }));
+  }, function(e){ return "f(x) = " + FK.ptxt(FK.parse(e)); });
   baueRegler();
   p = ausReglern(); document.getElementById("eingabe").value = FK.ptxt(p).replace(/−/g, "-");
   rechne(true);

@@ -40,6 +40,26 @@
   .tabs { display: flex; gap: 8px; justify-content: center; margin: 4px 0 12px; flex-wrap: wrap; }
   .tabs button { font: 700 15px system-ui, sans-serif; padding: 9px 16px; border-radius: 999px; border: 2px solid var(--blue); background: #ffffff; color: var(--blue); cursor: pointer; }
   .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  /* Übungsmodus */
+  .ueb-box { display: grid; gap: 10px; margin-bottom: 12px; }
+  .u-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 15px; color: #4f5b6e; }
+  .u-typ { display: inline-flex; gap: 4px; background: #e3eefc; border-radius: 999px; padding: 3px; }
+  .u-typ button { font: 700 14px system-ui, sans-serif; padding: 6px 12px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .u-typ button[aria-pressed="true"] { background: var(--blue); color: #ffffff; }
+  .u-auftrag { margin: 0; font-size: 16px; color: #1a2233; background: #fff7ed; border: 2px solid #f97316; border-radius: 12px; padding: 8px 10px; }
+  .u-schritt { border: 2px solid #c9d6ea; border-radius: 12px; padding: 8px 10px; background: #ffffff; }
+  .u-schritt h3 { margin: 0 0 6px; font-size: 16px; color: #1a2233; }
+  .u-schritt.u-ok { border-color: #2e9d57; background: #effaf2; }
+  .u-schritt.u-gez { border-color: #d08a00; background: #fff8e8; }
+  .u-zeile input { font: 19px "Cambria Math", Cambria, "Times New Roman", serif; width: 160px; max-width: 100%; padding: 7px 10px; border: 2px solid #b0b0b8; border-radius: 10px; color: #1a2233; background: #ffffff; }
+  .u-knoepfe { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .u-knoepfe .knopf { padding: 8px 14px; font-size: 15px; }
+  .u-meldung { margin-top: 6px; font-weight: 700; } .u-meldung.gut, .u-liste .gut { color: #1d7a3f; } .u-meldung.schlecht, .u-liste .schlecht { color: #b91c1c; }
+  .u-liste { margin: 4px 0 0; padding-inline-start: 18px; font-weight: 600; }
+  .u-tipp { margin-top: 6px; background: #fffbe6; border: 1px solid #e6c84a; border-radius: 10px; padding: 7px 10px; font-size: 15px; color: #4a3b00; }
+  .u-loesung { margin-top: 6px; color: #7a4d00; font-weight: 700; }
+  .u-ende { text-align: center; border: 2px solid var(--blue); border-radius: 12px; padding: 10px; background: #ffffff; }
+  .u-ende .u-knoepfe { justify-content: center; }
   .haupt { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
   .graph-wrap { border: 2px solid #c9d6ea; border-radius: 14px; padding: 6px; background: #ffffff; }
   svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
@@ -101,6 +121,7 @@
   <div class="tabs" role="tablist">
     <button type="button" role="tab" id="tabRegler" aria-selected="true"></button>
     <button type="button" role="tab" id="tabBsp" aria-selected="false"></button>
+    <button type="button" role="tab" id="tabUeb" aria-selected="false"></button>
   </div>
 
   <div class="haupt">
@@ -111,6 +132,7 @@
     </div>
 
     <div>
+      <div class="ueb-box" id="uebBox" hidden></div>
       <div class="regler" id="reglerBox">
         <div class="regel a"><label for="ra"><span><span class="m ka">a</span> <span id="tLabA"></span></span><output id="oa"></output></label>
           <div class="zeile"><button class="klein" data-r="a" data-s="-1" aria-label="−">−</button><input type="range" id="ra" min="-3" max="3" step="0.1" value="1"><button class="klein" data-r="a" data-s="1" aria-label="+">+</button></div></div>
@@ -145,6 +167,7 @@
 </div>
 
 <script src="/funktionen/lexikon.js"></script>
+<script src="/funktionen/alltag.js"></script>
 <script>
 var L = {
   de: { title:"Parameter bei Sinusfunktionen", vergleich:"im Vergleich zu", effA:"streckt/staucht entlang y-Achse", effB:"streckt/staucht entlang x-Achse", effC:"verschiebt entlang x-Achse", effD:"verschiebt entlang y-Achse",
@@ -196,6 +219,8 @@ var L2 = {
   pt: { skala:"Eixo x em:", piSkala:"múltiplos de π", dezSkala:"decimais" }
 };
 for(var l2 in L2) for(var k2 in L2[l2]) L[l2][k2] = L2[l2][k2];
+var L3 = {"de": {"tabU": "Üben", "uAbl": "Ablesen", "uNach": "Nachbauen", "uAufgAbl": "Lies an der orangen Kurve ab.", "uAufgNach": "Stelle die Regler so ein, dass deine blaue Kurve genau auf der orangen Zielkurve liegt.", "qA": "Wie groß ist a?", "hA": "a ist der Abstand von der Mittellinie bis zum Hochpunkt. Geht die Kurve bei x = 0 von der Mittellinie aus zuerst nach unten, ist a negativ.", "qD": "Wo liegt die Mittellinie? d = ?", "hD": "d liegt genau in der Mitte zwischen Hoch- und Tiefpunkt: d = (y_max + y_min) / 2.", "qP": "Wie lang ist eine Periode p?", "hP": "Miss den Abstand zwischen zwei Hochpunkten. Du kannst mit π rechnen, z. B. 2pi/3.", "qB": "Wie groß ist b?", "hB": "b = 2π / p", "chkA": "Amplitude", "chkD": "Mittellinie", "chkP": "Periode", "chkC": "Verschiebung", "uPruefen": "Prüfen", "uTipp": "Tipp", "uZeigen": "Lösung zeigen", "uNeu": "Neue Aufgabe", "uPunkte": "Punkte", "uRichtig": "Richtig!", "uFalsch": "Noch nicht richtig – versuch es noch einmal.", "uLeer": "Bitte zuerst etwas eingeben.", "uLesen": "Das kann ich nicht lesen. Beispiel: 1,5 oder 2pi/3", "uLoesung": "Lösung:", "uFertig": "Geschafft! {r} von {n} beim ersten Versuch richtig.", "uTreffer": "Treffer! Deine Kurve liegt genau auf der Zielkurve.", "uNochNicht": "Noch nicht ganz:", "uZiel": "Zielkurve:"}, "en": {"tabU": "Practice", "uAbl": "Read off", "uNach": "Rebuild", "uAufgAbl": "Read the values off the orange curve.", "uAufgNach": "Set the sliders so that your blue curve lies exactly on the orange target curve.", "qA": "What is a?", "hA": "a is the distance from the middle line to the maximum. If the curve first goes down from the middle line at x = 0, a is negative.", "qD": "Where is the middle line? d = ?", "hD": "d lies exactly halfway between maximum and minimum: d = (y_max + y_min) / 2.", "qP": "How long is one period p?", "hP": "Measure the distance between two maxima. You can use π, e.g. 2pi/3.", "qB": "What is b?", "hB": "b = 2π / p", "chkA": "Amplitude", "chkD": "Middle line", "chkP": "Period", "chkC": "Shift", "uPruefen": "Check", "uTipp": "Hint", "uZeigen": "Show solution", "uNeu": "New task", "uPunkte": "Points", "uRichtig": "Correct!", "uFalsch": "Not quite – try again.", "uLeer": "Please type something first.", "uLesen": "I can’t read that. Example: 1.5 or 2pi/3", "uLoesung": "Solution:", "uFertig": "Done! {r} of {n} right at the first try.", "uTreffer": "Hit! Your curve lies exactly on the target curve.", "uNochNicht": "Not quite yet:", "uZiel": "Target curve:"}, "es": {"tabU": "Practicar", "uAbl": "Leer", "uNach": "Reconstruir", "uAufgAbl": "Lee los valores en la curva naranja.", "uAufgNach": "Ajusta los deslizadores para que tu curva azul quede justo sobre la curva naranja.", "qA": "¿Cuánto vale a?", "hA": "a es la distancia de la línea media al máximo. Si en x = 0 la curva baja primero desde la línea media, a es negativo.", "qD": "¿Dónde está la línea media? d = ?", "hD": "d está justo a mitad de camino entre máximo y mínimo: d = (y_max + y_min) / 2.", "qP": "¿Cuánto mide un periodo p?", "hP": "Mide la distancia entre dos máximos. Puedes usar π, p. ej. 2pi/3.", "qB": "¿Cuánto vale b?", "hB": "b = 2π / p", "chkA": "Amplitud", "chkD": "Línea media", "chkP": "Periodo", "chkC": "Desplazamiento", "uPruefen": "Comprobar", "uTipp": "Pista", "uZeigen": "Ver solución", "uNeu": "Nueva tarea", "uPunkte": "Puntos", "uRichtig": "¡Correcto!", "uFalsch": "Todavía no – inténtalo otra vez.", "uLeer": "Escribe algo primero.", "uLesen": "No lo entiendo. Ejemplo: 1,5 o 2pi/3", "uLoesung": "Solución:", "uFertig": "¡Hecho! {r} de {n} correctas al primer intento.", "uTreffer": "¡Acierto! Tu curva está justo sobre la curva objetivo.", "uNochNicht": "Todavía no del todo:", "uZiel": "Curva objetivo:"}, "zh": {"tabU": "练习", "uAbl": "读图", "uNach": "还原", "uAufgAbl": "从橙色曲线上读出数值。", "uAufgNach": "调节滑块，让你的蓝色曲线正好落在橙色目标曲线上。", "qA": "a 是多少？", "hA": "a 是中线到最高点的距离。如果曲线在 x = 0 处从中线先向下走，a 就是负数。", "qD": "中线在哪里？d = ?", "hD": "d 正好在最高点和最低点的中间：d = (y_max + y_min) / 2。", "qP": "一个周期 p 有多长？", "hP": "量出两个最高点之间的距离。可以用 π 表示，例如 2pi/3。", "qB": "b 是多少？", "hB": "b = 2π / p", "chkA": "振幅", "chkD": "中线", "chkP": "周期", "chkC": "平移", "uPruefen": "检查", "uTipp": "提示", "uZeigen": "显示答案", "uNeu": "新题目", "uPunkte": "得分", "uRichtig": "正确！", "uFalsch": "还不对——再试一次。", "uLeer": "请先输入内容。", "uLesen": "无法识别。例如：1.5 或 2pi/3", "uLoesung": "答案：", "uFertig": "完成！{n} 题中第一次就答对 {r} 题。", "uTreffer": "命中！你的曲线正好落在目标曲线上。", "uNochNicht": "还差一点：", "uZiel": "目标曲线："}, "fr": {"tabU": "S’entraîner", "uAbl": "Lire", "uNach": "Reconstruire", "uAufgAbl": "Lis les valeurs sur la courbe orange.", "uAufgNach": "Règle les curseurs pour que ta courbe bleue se pose exactement sur la courbe orange.", "qA": "Combien vaut a ?", "hA": "a est la distance entre la ligne médiane et le maximum. Si en x = 0 la courbe descend d’abord à partir de la ligne médiane, a est négatif.", "qD": "Où est la ligne médiane ? d = ?", "hD": "d se trouve exactement entre le maximum et le minimum : d = (y_max + y_min) / 2.", "qP": "Quelle est la longueur d’une période p ?", "hP": "Mesure la distance entre deux maximums. Tu peux utiliser π, p. ex. 2pi/3.", "qB": "Combien vaut b ?", "hB": "b = 2π / p", "chkA": "Amplitude", "chkD": "Ligne médiane", "chkP": "Période", "chkC": "Décalage", "uPruefen": "Vérifier", "uTipp": "Indice", "uZeigen": "Voir la solution", "uNeu": "Nouvel exercice", "uPunkte": "Points", "uRichtig": "Juste !", "uFalsch": "Pas encore – essaie encore une fois.", "uLeer": "Écris d’abord quelque chose.", "uLesen": "Je ne peux pas lire cela. Exemple : 1,5 ou 2pi/3", "uLoesung": "Solution :", "uFertig": "Bravo ! {r} sur {n} justes du premier coup.", "uTreffer": "Dans le mille ! Ta courbe est exactement sur la courbe cible.", "uNochNicht": "Pas encore tout à fait :", "uZiel": "Courbe cible :"}, "ru": {"tabU": "Тренировка", "uAbl": "Прочитать", "uNach": "Построить", "uAufgAbl": "Определи значения по оранжевой кривой.", "uAufgNach": "Настрой ползунки так, чтобы твоя синяя кривая точно легла на оранжевую.", "qA": "Чему равно a?", "hA": "a — расстояние от средней линии до максимума. Если при x = 0 кривая сначала идёт от средней линии вниз, a отрицательно.", "qD": "Где средняя линия? d = ?", "hD": "d лежит ровно посередине между максимумом и минимумом: d = (y_max + y_min) / 2.", "qP": "Какова длина периода p?", "hP": "Измерь расстояние между двумя максимумами. Можно писать π, например 2pi/3.", "qB": "Чему равно b?", "hB": "b = 2π / p", "chkA": "Амплитуда", "chkD": "Средняя линия", "chkP": "Период", "chkC": "Сдвиг", "uPruefen": "Проверить", "uTipp": "Подсказка", "uZeigen": "Показать решение", "uNeu": "Новое задание", "uPunkte": "Очки", "uRichtig": "Верно!", "uFalsch": "Пока неверно — попробуй ещё раз.", "uLeer": "Сначала введи что-нибудь.", "uLesen": "Не могу прочитать. Пример: 1,5 или 2pi/3", "uLoesung": "Решение:", "uFertig": "Готово! {r} из {n} верно с первой попытки.", "uTreffer": "Попадание! Твоя кривая точно на целевой.", "uNochNicht": "Ещё не совсем:", "uZiel": "Целевая кривая:"}, "ar": {"tabU": "تمرين", "uAbl": "قراءة", "uNach": "إعادة البناء", "uAufgAbl": "اقرأ القيم من المنحنى البرتقالي.", "uAufgNach": "اضبط المنزلقات حتى يقع منحناك الأزرق تمامًا على المنحنى البرتقالي.", "qA": "كم قيمة a؟", "hA": "a هي المسافة من الخط الأوسط إلى القمة. إذا نزل المنحنى أولًا من الخط الأوسط عند x = 0 فإن a سالبة.", "qD": "أين الخط الأوسط؟ d = ?", "hD": "d في المنتصف تمامًا بين القمة والقاع: d = (y_max + y_min) / 2.", "qP": "كم طول الدورة p؟", "hP": "قِس المسافة بين قمتين. يمكنك كتابة π، مثل 2pi/3.", "qB": "كم قيمة b؟", "hB": "b = 2π / p", "chkA": "السعة", "chkD": "الخط الأوسط", "chkP": "الدورة", "chkC": "الإزاحة", "uPruefen": "تحقق", "uTipp": "تلميح", "uZeigen": "أظهر الحل", "uNeu": "مسألة جديدة", "uPunkte": "النقاط", "uRichtig": "صحيح!", "uFalsch": "ليس بعد – حاول مرة أخرى.", "uLeer": "اكتب شيئًا أولًا.", "uLesen": "لا أستطيع قراءة ذلك. مثال: 1.5 أو 2pi/3", "uLoesung": "الحل:", "uFertig": "أحسنت! {r} من {n} صحيحة من المحاولة الأولى.", "uTreffer": "إصابة! منحناك يقع تمامًا على المنحنى الهدف.", "uNochNicht": "ليس تمامًا بعد:", "uZiel": "المنحنى الهدف:"}, "ja": {"tabU": "練習", "uAbl": "読み取る", "uNach": "再現する", "uAufgAbl": "オレンジのグラフから値を読み取ろう。", "uAufgNach": "スライダーを動かして、青いグラフをオレンジの目標グラフにぴったり重ねよう。", "qA": "a はいくつ？", "hA": "a は中心線から山の頂点までの距離。x = 0 で中心線から先に下がるなら a は負。", "qD": "中心線はどこ？ d = ?", "hD": "d は山と谷のちょうど真ん中：d = (y_max + y_min) / 2。", "qP": "1 周期 p の長さは？", "hP": "山から次の山までの距離を測ろう。π を使って書けます（例 2pi/3）。", "qB": "b はいくつ？", "hB": "b = 2π / p", "chkA": "振幅", "chkD": "中心線", "chkP": "周期", "chkC": "ずらし", "uPruefen": "確認", "uTipp": "ヒント", "uZeigen": "答えを見る", "uNeu": "新しい問題", "uPunkte": "得点", "uRichtig": "正解！", "uFalsch": "まだ違います。もう一度やってみよう。", "uLeer": "まず入力してください。", "uLesen": "読み取れません。例：1.5 や 2pi/3", "uLoesung": "答え：", "uFertig": "できた！ {n} 問中 {r} 問を 1 回目で正解。", "uTreffer": "ぴったり！目標のグラフに重なりました。", "uNochNicht": "あと少し：", "uZiel": "目標のグラフ："}, "pt": {"tabU": "Praticar", "uAbl": "Ler", "uNach": "Reconstruir", "uAufgAbl": "Leia os valores na curva laranja.", "uAufgNach": "Ajuste os controles para que sua curva azul fique exatamente sobre a curva laranja.", "qA": "Quanto vale a?", "hA": "a é a distância da linha média até o máximo. Se em x = 0 a curva desce primeiro a partir da linha média, a é negativo.", "qD": "Onde fica a linha média? d = ?", "hD": "d fica exatamente no meio entre máximo e mínimo: d = (y_max + y_min) / 2.", "qP": "Qual é o comprimento de um período p?", "hP": "Meça a distância entre dois máximos. Você pode usar π, p. ex. 2pi/3.", "qB": "Quanto vale b?", "hB": "b = 2π / p", "chkA": "Amplitude", "chkD": "Linha média", "chkP": "Período", "chkC": "Deslocamento", "uPruefen": "Verificar", "uTipp": "Dica", "uZeigen": "Ver solução", "uNeu": "Nova tarefa", "uPunkte": "Pontos", "uRichtig": "Certo!", "uFalsch": "Ainda não – tente de novo.", "uLeer": "Digite algo primeiro.", "uLesen": "Não consigo ler isso. Exemplo: 1,5 ou 2pi/3", "uLoesung": "Solução:", "uFertig": "Pronto! {r} de {n} certas na primeira tentativa.", "uTreffer": "Acertou! Sua curva está exatamente sobre a curva alvo.", "uNochNicht": "Ainda não totalmente:", "uZiel": "Curva alvo:"}};
+for(var l3 in L3) for(var k3 in L3[l3]) L[l3][k3] = L3[l3][k3];
 var lang = "de";
 var LOC = { de:"de-DE", en:"en-US", es:"es-ES", zh:"zh-CN", fr:"fr-FR", ru:"ru-RU", ar:"ar-u-nu-latn", ja:"ja-JP", pt:"pt-BR" };
 function t(k){ return (L[lang] && L[lang][k]) || L.de[k]; }
@@ -227,6 +252,7 @@ var X0 = -Math.PI, X1 = 2.25 * Math.PI;
 function yBereich(){
   var m = 1.6;
   var liste = (modus === "bsp" && alleZeigen) ? Object.keys(BSP).map(function(k){ return BSP[k]; }) : [P];
+  if(modus === "ueben" && UE.ziel){ liste = UE.typ === "nach" ? [P, UE.ziel] : [UE.ziel]; }
   liste.forEach(function(q){ m = Math.max(m, Math.abs(q.a) + Math.abs(q.d) + 0.4); });
   return Math.ceil(m * 2) / 2;
 }
@@ -316,6 +342,11 @@ function zeichne(){
     schild(svg, sx(-1), sy(-YM + 0.35), "x = −1", "#00a3e0");
     schild(svg, sx(-1.05), sy(0.55), "c = 1", "#00a3e0", "end");
     schild(svg, sx(0.2), sy(0.95), "d = " + zahl(0.5), "#e91ee0", "start");
+  } else if(modus === "ueben" && UE.ziel){
+    // Übungsmodus: orange Zielkurve, beim Nachbauen zusätzlich die eigene Kurve
+    svg.appendChild(kurve(UE.ziel, "#f97316", 5, "14 8"));
+    if(UE.typ === "nach") svg.appendChild(kurve(P, "#1a2b6b", 3.5));
+    schild(svg, W - MR - 6, MT + 14, t("uZiel"), "#ea580c", "end");
   } else {
     var q = P;
     // Grundfunktion
@@ -359,7 +390,7 @@ function live(){
           (q.c < 0 ? '− ' : '+ ') + '<span class="kc">' + xTxt(Math.abs(q.c)) + '</span>) ' +
           (q.d < 0 ? '− ' : '+ ') + '<span class="kd">' + zahl(Math.abs(q.d)) + '</span>';
   var box = document.getElementById("live");
-  box.innerHTML = (modus === "bsp" && alleZeigen) ? "" : s;
+  box.innerHTML = (modus === "bsp" && alleZeigen) || (modus === "ueben" && UE.typ === "abl") ? "" : s;
   ["a", "b", "c", "d"].forEach(function(k){ document.getElementById("o" + k).textContent = k === "c" ? xTxt(q[k]) : zahl(q[k]); document.getElementById("r" + k).value = q[k]; });
   document.getElementById("tAmp").innerHTML = t("amp") + " – " + t("here") + ': <b class="ka">a = ' + zahl(Math.abs(q.a)) + '</b>';
   document.getElementById("tPer").innerHTML = t("per") + " – " + t("here") + ': <b style="color:var(--cp)">p ' + (piModus && piBruch(2 * Math.PI / q.b) ? "= " + piBruch(2 * Math.PI / q.b) + " " : "") + '≈ ' + zahl(2 * Math.PI / q.b) + '</b>';
@@ -374,6 +405,8 @@ function texte(){
   ["A", "B", "C", "D"].forEach(function(K){ document.getElementById("tEff" + K).textContent = t("eff" + K); document.getElementById("tLab" + K).textContent = t("lab" + K); });
   document.getElementById("tabRegler").textContent = t("tabR");
   document.getElementById("tabBsp").textContent = t("tabB");
+  document.getElementById("tabUeb").textContent = t("tabU");
+  if(modus === "ueben") UE.render();
   document.getElementById("reset").textContent = t("reset");
   document.getElementById("alle").textContent = alleZeigen ? t("eins") : t("alle");
   document.getElementById("tAmpTxt").textContent = t("ampTxt");
@@ -389,6 +422,7 @@ function texte(){
   var lk = document.getElementById("lexKnopf");
   if(!lk){ lk = document.createElement("button"); lk.type = "button"; lk.id = "lexKnopf"; lk.className = "b-alle lex-knopf"; lk.setAttribute("data-lex", "1"); var fu = document.querySelector(".footer"); fu.parentNode.insertBefore(lk, fu); }
   lk.textContent = FB.ui("lex");
+  FA.texte();
   var dez = zahl(0.5).indexOf(",") >= 0 ? "0,5" : "0.5";
   document.querySelectorAll(".bsp .kasten").forEach(function(k){ if(/0[.,]5/.test(k.textContent)) k.textContent = dez; });
   document.querySelectorAll(".bsp .m").forEach(function(m){ if(m.textContent.indexOf("f(x)") === 0) m.textContent = "f(x) = sin(x) = 1 · sin(1 · x + 0) + 0"; });
@@ -399,7 +433,12 @@ function zeigeModus(m){
   modus = m;
   document.getElementById("tabRegler").setAttribute("aria-selected", m === "regler");
   document.getElementById("tabBsp").setAttribute("aria-selected", m === "bsp");
-  document.getElementById("reglerBox").hidden = m !== "regler";
+  document.getElementById("tabUeb").setAttribute("aria-selected", m === "ueben");
+  if(m === "ueben" && !UE.ziel) UE.neu(UE.typ);
+  document.getElementById("uebBox").hidden = m !== "ueben";
+  document.getElementById("reglerBox").hidden = !(m === "regler" || (m === "ueben" && UE.typ === "nach"));
+  document.getElementById("reset").hidden = m === "ueben";
+  if(m === "ueben") UE.render();
   document.getElementById("bspBox").hidden = m !== "bsp";
   zeichne();
 }
@@ -435,6 +474,109 @@ document.getElementById("alle").addEventListener("click", function(){
   this.setAttribute("aria-pressed", alleZeigen); this.textContent = alleZeigen ? t("eins") : t("alle");
   markiereBsp(); zeichne();
 });
+document.getElementById("tabUeb").addEventListener("click", function(){ zeigeModus("ueben"); });
+
+// ---------- Übungsmodus ----------
+// Zahl mit π lesen: "2pi/3", "π", "-1,5", "3/2", "0.5π"
+function zahlPi(str){
+  var s = String(str || "").trim().toLowerCase().replace(/\s+/g, "").replace(/^[a-z]\s*=/, "").replace(/π|pi/g, "P").replace(/,/g, ".").replace(/−/g, "-");
+  if(!s) throw "uLeer";
+  if(!/^[-+]?[0-9.P*\/()+-]+$/.test(s)) throw "uLesen";
+  s = s.replace(/(\d|\))P/g, "$1*P").replace(/P(\d|\()/g, "P*$1").replace(/P/g, "(" + Math.PI + ")");
+  var v; try { v = Function('"use strict"; return (' + s + ');')(); } catch(e){ throw "uLesen"; }
+  if(typeof v !== "number" || !isFinite(v)) throw "uLesen";
+  return v;
+}
+function wahl(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+function gleich(a, b){ return Math.abs(a - b) <= 0.02 * Math.max(1, Math.abs(b)); }
+function esc(x){ return String(x == null ? "" : x).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+function pTxt(v){ var pb = piBruch(v); return pb != null ? pb : zahl(v); }
+var UE = { typ: "abl", ziel: null, richtig: 0, gesamt: 0 };
+UE.neu = function(typ){
+  UE.typ = typ || UE.typ;
+  var a = wahl([0.5, 1, 1.5, 2]) * wahl([1, -1]), d = wahl([-1, -0.5, 0, 0.5, 1]);
+  if(UE.typ === "abl"){
+    var b = wahl([1, 1.5, 2, 3, 4]);
+    UE.ziel = { a: a, b: b, c: 0, d: d };
+    UE.schritte = [ { q: "qA", h: "hA", soll: a, txt: zahl(a) }, { q: "qD", h: "hD", soll: d, txt: zahl(d) },
+                    { q: "qP", h: "hP", soll: 2 * Math.PI / b, txt: pTxt(2 * Math.PI / b) }, { q: "qB", h: "hB", soll: b, txt: zahl(b) } ];
+  } else {
+    UE.ziel = { a: a, b: wahl([0.5, 1, 1.5, 2, 3]), c: wahl([-3, -2, -1, 1, 2, 3]) * Math.PI / 4, d: d };
+    UE.schritte = [ { nach: true } ];
+    P.a = 1; P.b = 1; P.c = 0; P.d = 0;
+  }
+  UE.zust = UE.schritte.map(function(){ return { w: "", versuche: 0, fertig: false, ok: false, meldung: null, tipp: false, gezeigt: false, liste: null }; });
+  document.getElementById("reglerBox").hidden = UE.typ !== "nach";
+  UE.render(); zeichne();
+};
+UE.aktuell = function(){ for(var i = 0; i < UE.zust.length; i++) if(!UE.zust[i].fertig) return i; return UE.zust.length; };
+UE.render = function(){
+  var box = document.getElementById("uebBox"), h = "", ak = UE.aktuell();
+  h += '<div class="u-kopf"><div class="u-typ"><button type="button" data-typ="abl" aria-pressed="' + (UE.typ === "abl") + '">' + t("uAbl") + '</button><button type="button" data-typ="nach" aria-pressed="' + (UE.typ === "nach") + '">' + t("uNach") + "</button></div>" +
+       "<span>" + t("uPunkte") + ": <b>" + UE.richtig + " / " + UE.gesamt + "</b></span></div>";
+  h += '<p class="u-auftrag">' + t(UE.typ === "abl" ? "uAufgAbl" : "uAufgNach") + "</p>";
+  UE.schritte.forEach(function(st, i){
+    if(i > ak) return;
+    var z = UE.zust[i], dis = z.fertig ? " disabled" : "";
+    h += '<section class="u-schritt' + (z.fertig ? (z.ok ? " u-ok" : " u-gez") : "") + '" data-i="' + i + '">';
+    if(!st.nach) h += "<h3>" + (i + 1) + ". " + t(st.q) + '</h3><div class="u-zeile" dir="ltr"><input data-i="' + i + '" value="' + esc(z.w) + '"' + dis + ' autocomplete="off" autocapitalize="off" spellcheck="false"></div>';
+    if(!z.fertig) h += '<div class="u-knoepfe"><button type="button" class="knopf" data-u="pruefen">' + t("uPruefen") + "</button>" +
+      (st.nach ? "" : '<button type="button" class="knopf hell" data-u="tipp">' + t("uTipp") + "</button>") +
+      '<button type="button" class="knopf hell" data-u="zeigen">' + t("uZeigen") + "</button></div>";
+    if(z.meldung) h += '<div class="u-meldung ' + (z.ok ? "gut" : "schlecht") + '">' + t(z.meldung) + "</div>";
+    if(z.liste) h += '<ul class="u-liste">' + z.liste.map(function(e){ return '<li class="' + (e[1] ? "gut" : "schlecht") + '">' + (e[1] ? "✓ " : "✗ ") + t(e[0]) + "</li>"; }).join("") + "</ul>";
+    if(z.tipp && !z.fertig) h += '<div class="u-tipp">' + t(st.h) + "</div>";
+    if(z.gezeigt) h += '<div class="u-loesung">' + t("uLoesung") + " " + (st.nach ? zielTxt() : esc(st.txt)) + "</div>";
+    h += "</section>";
+  });
+  if(ak >= UE.schritte.length){
+    var erst = UE.zust.filter(function(z){ return z.ok && z.versuche === 1; }).length;
+    h += '<section class="u-ende"><b>' + t("uFertig").replace("{r}", erst).replace("{n}", UE.schritte.length) + '</b><br>' + zielTxt() +
+         '<div class="u-knoepfe"><button type="button" class="knopf" data-u="neu">' + t("uNeu") + "</button></div></section>";
+  } else h += '<div class="u-knoepfe"><button type="button" class="knopf hell" data-u="neu">' + t("uNeu") + "</button></div>";
+  box.innerHTML = h;
+  box.querySelectorAll("[data-typ]").forEach(function(b){ b.addEventListener("click", function(){ UE.neu(b.dataset.typ); zeigeModus("ueben"); }); });
+  box.querySelectorAll("input").forEach(function(inp){
+    inp.addEventListener("input", function(){ UE.zust[+inp.dataset.i].w = inp.value; });
+    inp.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); UE.pruefen(+inp.dataset.i); } });
+  });
+  box.querySelectorAll("[data-u]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var u = b.dataset.u, sec = b.closest(".u-schritt"), i = sec ? +sec.dataset.i : -1;
+      if(u === "neu") UE.neu();
+      else if(u === "pruefen") UE.pruefen(i);
+      else if(u === "tipp"){ UE.zust[i].tipp = true; UE.render(); }
+      else if(u === "zeigen"){ var z = UE.zust[i]; z.gezeigt = true; z.fertig = true; z.ok = false; z.meldung = null; if(!z.versuche){ z.versuche = 1; UE.gesamt++; }
+        if(UE.schritte[i].nach){ P.a = UE.ziel.a; P.b = UE.ziel.b; P.c = UE.ziel.c; P.d = UE.ziel.d; zeichne(); } UE.render(); }
+    });
+  });
+  if(UE.fokus){ var o = box.querySelector(".u-schritt:not(.u-ok):not(.u-gez) input"); if(o) o.focus(); UE.fokus = false; }
+};
+function zielTxt(){
+  var q = UE.ziel;
+  return '<span class="m">f(x) = ' + zahl(q.a) + " · sin(" + zahl(q.b) + " · x" + (Math.abs(q.c) > 1e-9 ? (q.c < 0 ? " − " : " + ") + pTxt(Math.abs(q.c)) : "") + ")" + (q.d ? (q.d < 0 ? " − " : " + ") + zahl(Math.abs(q.d)) : "") + "</span>";
+}
+UE.pruefen = function(i){
+  var st = UE.schritte[i], z = UE.zust[i], ok;
+  if(st.nach){
+    // Kurven vergleichen: gleich, wenn sie überall (fast) übereinstimmen – egal, wie a und c gewählt sind
+    var max = 0, q = UE.ziel;
+    for(var k = 0; k <= 400; k++){ var x = X0 + (X1 - X0) * k / 400; max = Math.max(max, Math.abs(P.a * Math.sin(P.b * x + P.c) + P.d - (q.a * Math.sin(q.b * x + q.c) + q.d))); }
+    ok = max < 0.12;
+    z.liste = null;
+    if(!ok){
+      z.liste = [["chkA", gleich(Math.abs(P.a), Math.abs(q.a))], ["chkD", gleich(P.d, q.d)], ["chkP", gleich(P.b, q.b)]];
+      if(z.liste.every(function(e){ return e[1]; })) z.liste.push(["chkC", false]); // nur noch die Verschiebung (oder das Vorzeichen von a) passt nicht
+    }
+  } else {
+    try { ok = gleich(zahlPi(z.w), st.soll); } catch(e){ z.meldung = e; z.ok = false; UE.fokus = true; UE.render(); return; }
+  }
+  z.versuche++; if(z.versuche === 1) UE.gesamt++;
+  if(ok){ z.ok = true; z.fertig = true; z.meldung = st.nach ? "uTreffer" : "uRichtig"; z.liste = null; if(z.versuche === 1) UE.richtig++; }
+  else { z.meldung = st.nach ? "uNochNicht" : "uFalsch"; if(z.versuche >= 2) z.tipp = true; }
+  UE.fokus = true; UE.render();
+};
+
 // π-Skala: x-Achse und Regler c in Vielfachen von π (c in Schritten von π/12)
 function setzeSkala(pi){
   piModus = pi;
@@ -447,6 +589,7 @@ function setzeSkala(pi){
 }
 document.getElementById("skPi").addEventListener("click", function(){ setzeSkala(true); });
 document.getElementById("skDez").addEventListener("click", function(){ setzeSkala(false); });
+FA.einbauen("sinus", document.querySelector(".skala"), null, null);
 FB.liste(["sinus", "pi", "amplitude", "periode", "fx", "zahlen", "defb", "wertb", "nst", "extrem", "sym", "abl", "wende", "beruehren", "exponent", "wurzel"]);
 var rzT; window.addEventListener("resize", function(){ clearTimeout(rzT); rzT = setTimeout(zeichne, 150); });
 window.MS_LANG = { apply: function(l){ if(L[l]){ lang = l; texte(); } } };

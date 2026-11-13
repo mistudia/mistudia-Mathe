@@ -45,6 +45,7 @@
 <script src="/funktionen/texte.js"></script>
 <script src="/funktionen/kern.js"></script>
 <script src="/funktionen/lexikon.js"></script>
+<script src="/funktionen/alltag.js"></script>
 <script src="/funktionen/seite.js"></script>
 <script src="/funktionen/rational.js"></script>
 <script>
@@ -133,7 +134,7 @@
     h += FS.karte("f(x)", fh);
     // Definitionsbereich & Lücken
     var lt = A.luecken.map(function(z){ return FK.xtxt(z); }).join("; ");
-    h += FS.karte(t("dom"), f("D = " + FK.R + (A.luecken.length ? " \\ {" + lt + "}" : "")));
+    h += FS.karte(t("dom"), f("D = " + FK.R + (A.luecken.length ? " \\ {" + lt + "}" : "")) + '<div class="klein-text">' + t("dNote") + "</div>");
     var lh = '<div class="klein-text">' + t("nennerNull") + ": " + f(FK.ptxt(A.n) + " = 0") + "</div>";
     if(!A.luecken.length) lh += t("noLuecke");
     else lh += "<ul>" + A.pole.map(function(p){
@@ -195,6 +196,11 @@
   FS.sprache(function(){ texte(); graph.zeichne(); });
   FS.eingabeHilfe({ text: function(s){ var r = FR.parse(s); return "f(x) = " + bruch(r.z, r.n); },
     zeilen: [["(x^2 - 1)/(x - 2)", "hBruchF"], ["1/(x^2 - 4)", "hHoch"], ["3x/(x^2 + 1)", "hMal"], ["(0,5x + 1)/(x - 1)", "hDez"], ["(x - 1)(x + 2)/(x + 3)", "hKlammer"]] });
+  FA.einbauen("rational", document.getElementById("form"), function(e){
+    var tMB = document.getElementById("tabMB"); if(tMB && tMB.getAttribute("aria-selected") !== "true") tMB.click();
+    document.getElementById("eingabe").value = e; FS.vorschau();
+    var form = document.getElementById("form"); if(form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event("submit", { cancelable: true }));
+  }, function(e){ var r = FR.parse(e); return "f(x) = " + bruch(r.z, r.n); });
   rechne();
 })();
 </script>

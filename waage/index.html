@@ -2578,7 +2578,23 @@ function showSolution(){
 
 </script>
 
+<script src="/funktionen/lexikon.js"></script>
+<script src="/funktionen/alltag.js"></script>
 <script src="msm-i18n.js"></script>
+<script>
+// Alltags-Textaufgaben: Gleichung auf die Waage legen
+FA.einbauen("waage", document.querySelector(".top"), function(e){
+  document.getElementById("leftEquationInput").value = e[0];
+  document.getElementById("rightEquationInput").value = e[1];
+  loadEquation();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, function(e){ return (e[0] + " = " + e[1]).replace(/\+/g, " + ").replace(/-/g, " − ").replace(/(\d),(\d)/g, "$1,$2"); });
+(function(){
+  var basis = window.MS_LANG && window.MS_LANG.apply;
+  window.MS_LANG = window.MS_LANG || {};
+  window.MS_LANG.apply = function(l){ document.documentElement.lang = l; if(basis) basis(l); FA.texte(); };
+})();
+</script>
 <script src="/home-button.js"></script>
 </body>
 </html>

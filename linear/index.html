@@ -39,11 +39,12 @@
       <p class="tipp" id="tipp"></p>
     </div>
     <div>
+      <div class="form-live" id="formLive"></div>
       <div class="regler" id="regler">
-        <div class="regel"><label for="rm"><span><span class="m">m</span> <span id="tm"></span></span><output id="om"></output></label>
+        <div class="regel"><label for="rm"><span><span class="m" style="color:#2563eb">m</span> <span id="tm"></span></span><output id="om"></output></label>
           <div class="zeile"><button class="klein" type="button" data-k="m" data-s="-1" aria-label="−">−</button><input type="range" id="rm" min="-5" max="5" step="0.25"><button class="klein" type="button" data-k="m" data-s="1" aria-label="+">+</button></div></div>
-        <div class="regel"><label for="rb"><span><span class="m">b</span> <span id="tb"></span></span><output id="ob"></output></label>
-          <div class="zeile"><button class="klein" type="button" data-k="b" data-s="-1" aria-label="−">−</button><input type="range" id="rb" min="-10" max="10" step="0.5"><button class="klein" type="button" data-k="b" data-s="1" aria-label="+">+</button></div></div>
+        <div class="regel"><label for="rt"><span><span class="m" style="color:#d97706">t</span> <span id="tt"></span></span><output id="ot"></output></label>
+          <div class="zeile"><button class="klein" type="button" data-k="t" data-s="-1" aria-label="−">−</button><input type="range" id="rt" min="-10" max="10" step="0.5"><button class="klein" type="button" data-k="t" data-s="1" aria-label="+">+</button></div></div>
       </div>
       <form class="punkte" id="punkte" hidden dir="ltr">
         <fieldset><legend id="tp1"></legend><label>x₁ <input id="x1" value="-1" inputmode="text"></label><label>y₁ <input id="y1" value="1" inputmode="text"></label></fieldset>
@@ -61,6 +62,7 @@
 <script src="/funktionen/texte.js"></script>
 <script src="/funktionen/kern.js"></script>
 <script src="/funktionen/lexikon.js"></script>
+<script src="/funktionen/alltag.js"></script>
 <script src="/funktionen/seite.js"></script>
 <script>
 (function(){
@@ -68,7 +70,7 @@
   var modus = "MB", M = B(1, 2), Bb = B(1), P = null, fehlerCode = null;
   var graph = new FK.Graph(document.getElementById("graph"), { zeichnen: zeichneInhalt });
   var titelZoom = FK.knoepfe(document.getElementById("zoom"), graph, passend);
-  var R = { m: [-5, 5, 0.25], b: [-10, 10, 0.5] };
+  var R = { m: [-5, 5, 0.25], t: [-10, 10, 0.5] };
 
   function poly(){ return FK.trim([Bb, M]); }
   function bz(v){ return FK.parse(String(Math.round(v * 1000) / 1000))[0]; }
@@ -78,7 +80,7 @@
     P = null; fehlerCode = null; eingabeAusWerten(); rechne(false);
   }
   function eingabeAusWerten(){ document.getElementById("eingabe").value = FK.ptxt(poly()).replace(/−/g, "-"); }
-  ["m", "b"].forEach(function(k){ document.getElementById("r" + k).addEventListener("input", function(){ setze(k, parseFloat(this.value)); }); });
+  ["m", "t"].forEach(function(k){ document.getElementById("r" + k).addEventListener("input", function(){ setze(k, parseFloat(this.value)); }); });
   document.querySelectorAll("#regler .klein").forEach(function(btn){
     btn.addEventListener("click", function(){ var k = btn.dataset.k, r = R[k], cur = Bz.num(k === "m" ? M : Bb);
       setze(k, Math.min(r[1], Math.max(r[0], Math.round((cur + r[2] * btn.dataset.s) / r[2]) * r[2]))); });
@@ -116,7 +118,8 @@
   function rechne(einpassen){
     var mv = Bz.num(M), bv = Bz.num(Bb);
     document.getElementById("rm").value = mv; document.getElementById("om").textContent = FK.btxt(M);
-    document.getElementById("rb").value = bv; document.getElementById("ob").textContent = FK.btxt(Bb);
+    document.getElementById("rt").value = bv; document.getElementById("ot").textContent = FK.btxt(Bb);
+    document.getElementById("formLive").innerHTML = FS.formLive("f(x) = {m}·x + {t}", { m: [M, "#2563eb"], t: [Bb, "#d97706"] });
     texte();
     if(einpassen) passend();
     graph.zeichne();
@@ -159,7 +162,7 @@
     document.getElementById("zeichnen").textContent = t("draw");
     document.getElementById("zeichnen2").textContent = t("draw");
     document.getElementById("eingabe").setAttribute("aria-label", t("eingabe"));
-    document.getElementById("tm").textContent = t("m"); document.getElementById("tb").textContent = t("b");
+    document.getElementById("tm").textContent = t("m"); document.getElementById("tt").textContent = t("b");
     document.getElementById("tp1").textContent = t("p1"); document.getElementById("tp2").textContent = t("p2");
     document.getElementById("tipp").textContent = t("tipp");
     document.getElementById("graph").setAttribute("aria-label", t("linTitle"));
@@ -173,7 +176,7 @@
         '<div class="klein-text">' + t("rwM") + "</div>" +
         f("m = (" + FS.ein("y₂", C2) + " " + FK.MINUS + " " + FS.ein("y₁", C1) + ") / (" + FS.ein("x₂", C2) + " " + FK.MINUS + " " + FS.ein("x₁", C1) + ") = (" + k2(P.y2) + " " + FK.MINUS + " " + k1(P.y1) + ") / (" + k2(P.x2) + " " + FK.MINUS + " " + k1(P.x1) + ") = " + FK.btxt(M)) +
         '<div class="klein-text" style="margin-top:6px">' + t("rwB") + "</div>" +
-        f("b = " + FS.ein("y₁", C1) + " " + FK.MINUS + " m · " + FS.ein("x₁", C1) + " = " + k1(P.y1) + " " + FK.MINUS + " " + kl(M) + " · " + k1(P.x1) + " = " + FK.btxt(Bb)));
+        f("t = " + FS.ein("y₁", C1) + " " + FK.MINUS + " m · " + FS.ein("x₁", C1) + " = " + k1(P.y1) + " " + FK.MINUS + " " + kl(M) + " · " + k1(P.x1) + " = " + FK.btxt(Bb)));
     }
     h += FS.karte("f(x)", f("f(x) = " + FK.ptxt(p)));
     var sh = f("m = " + FK.btxt(M));
@@ -187,7 +190,7 @@
     var nh;
     if(mv !== 0){
       var x0 = Bz.div(Bz.neg(Bb), M);
-      nh = '<span class="klein-text">' + t("nstRech") + "</span><br>" + f("0 = " + FK.ptxt(p)) + "<br>" + f("x = " + FK.MINUS + "b / m = " + FK.MINUS + kl(Bb) + " / " + kl(M) + " = " + FK.btxt(x0)) + "<br>" + FS.fleck(C.N) + f(FK.punkt(t("lblN"), FK.btxt(x0), "0"));
+      nh = '<span class="klein-text">' + t("nstRech") + "</span><br>" + f("0 = " + FK.ptxt(p)) + "<br>" + f("x = " + FK.MINUS + "t / m = " + FK.MINUS + kl(Bb) + " / " + kl(M) + " = " + FK.btxt(x0)) + "<br>" + FS.fleck(C.N) + f(FK.punkt(t("lblN"), FK.btxt(x0), "0"));
     } else nh = Bz.null(Bb) ? t("alleNst") : t("keineNstW");
     h += FS.karte(t("nst"), nh);
     h += FS.karte(t("mon"), mv > 0 ? t("steigt") : mv < 0 ? t("faellt") : t("konst"));
@@ -197,6 +200,11 @@
   FS.sprache(function(){ texte(); graph.zeichne(); });
   FS.eingabeHilfe({ text: function(s){ return "f(x) = " + FK.ptxt(FK.parse(s)); },
     zeilen: [["2x + 1", "hMal"], ["1/2 x - 3", "hBruch"], ["-0,5x + 1.5", "hDez"], ["3(x - 2)", "hKlammer"]] });
+  FA.einbauen("linear", document.getElementById("form"), function(e){
+    var tMB = document.getElementById("tabMB"); if(tMB && tMB.getAttribute("aria-selected") !== "true") tMB.click();
+    document.getElementById("eingabe").value = e; FS.vorschau();
+    var form = document.getElementById("form"); if(form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event("submit", { cancelable: true }));
+  }, function(e){ return "f(x) = " + FK.ptxt(FK.parse(e)); });
   eingabeAusWerten();
   rechne(true);
 })();
