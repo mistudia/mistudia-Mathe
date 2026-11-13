@@ -148,7 +148,7 @@
   function kanteProj(p){ var l = gdLokal(p); return gdWelt(Math.max(-80, Math.min(80, l.x)), 0); }
   function kanteAbstand(p){ var l = gdLokal(p); return Math.abs(l.x) <= 80 ? Math.abs(l.y) : Infinity; }
   function kantePunkt(p){ var f = fang(p); if(f && kanteAbstand(f) < 1.2) return { p: { x: f.x, y: f.y }, f: f }; return { p: kanteProj(p), f: null }; }
-  var GRIFF = { zieh: [0, 64], drehL: [-64, 11], drehR: [64, 11] };
+  var GRIFF = { zieh: [0, 61.5], drehL: [-64, 12], drehR: [64, 12] };
   function gdGriff(p){
     if(!GD.on) return null;
     var tol = 22 / ppm();
@@ -176,53 +176,15 @@
     }
     zeichne();
   }
+  // Bild des Geodreiecks (geodreieck.png, 1036 × 522 px, 6,475 px/mm; Nullpunkt der Kante bei x = 518, y = 2; kleines Logo entfernt)
+  var GD_BILD = { src: "geodreieck.png", pxmm: 6.475, x0: 518, y0: 2, w: 1036, h: 522 };
   function zeichneGeo(){
     if(!GD.on) return;
-    var k = 1 / ppm(), g = el("g", { "class": "gd", transform: "translate(" + GD.x + " " + GD.y + ") rotate(" + (GD.w * 180 / Math.PI) + ")" });
-    var P = function(r, th){ return (r * Math.cos(th)).toFixed(3) + " " + (r * Math.sin(th)).toFixed(3); };
-    var add = function(n, a, txt){ var e = el(n, a, txt); g.appendChild(e); return e; };
-    var txt = function(x, y, s, gr, cls, rot){ var a = { x: x, y: y, "class": "gdzahl" + (cls ? " " + cls : ""), "font-size": gr }; if(rot) a.transform = "rotate(" + rot + " " + x + " " + y + ")"; return add("text", a, s); };
-    // Körper (Hypotenuse oben auf y = 0, Spitze unten bei y = 80)
-    add("polygon", { points: "-80,0 80,0 0,80", "class": "gdkoerper", "vector-effect": "non-scaling-stroke" });
-    var hell = "", sk = "", th, i, r, len;
-    // Hilfslinien: Mittellinie, Parallelen, 45°-Hilfen, 10°-Strahlen bis zum Rand
-    hell += "M0 1V78";
-    for(i = 5; i <= 30; i += 5) hell += "M" + (-(i % 10 ? 16 : 21)) + " " + i + "H-6M6 " + i + "H" + (i % 10 ? 16 : 21);
-    hell += "M-5 5L-17 17M5 5L17 17";
-    for(i = 10; i <= 170; i += 10){
-      if(i === 90) continue;
-      th = i * Math.PI / 180; r = 80 / (Math.abs(Math.cos(th)) + Math.sin(th));
-      hell += "M" + P(55, th) + "L" + P(r - 5.5, th);
-    }
-    add("path", { d: hell, "class": "gdlinie", "vector-effect": "non-scaling-stroke" });
-    // mm-Skala an der Hypotenuse
-    for(i = -79; i <= 79; i++){ len = i % 10 === 0 ? 4 : i % 5 === 0 ? 2.6 : 1.5; sk += "M" + i + " 0V" + len; }
-    // senkrechte Abstandsskalen (Abstand zur Kante in cm)
-    [-22, 22].forEach(function(x){ for(var j = 2; j <= 28; j++){ var l2 = j % 10 === 0 ? 2.4 : j % 5 === 0 ? 1.6 : 1; sk += "M" + (x - l2 / 2) + " " + j + "H" + (x + l2 / 2); } sk += "M" + x + " 2V28"; });
-    // Gradkreis mit Strichen
-    for(i = 0; i <= 180; i++){ th = i * Math.PI / 180; len = i % 10 === 0 ? 3.4 : i % 5 === 0 ? 2.3 : 1.3; sk += "M" + P(36, th) + "L" + P(36 + len, th); }
-    // Gradstriche an den Schenkeln (Strahl vom Nullpunkt)
-    for(i = 1; i < 180; i++){
-      if(i === 90) continue;
-      th = i * Math.PI / 180; r = 80 / (Math.abs(Math.cos(th)) + Math.sin(th)); len = i % 10 === 0 ? 5 : i % 5 === 0 ? 3 : 1.7;
-      sk += "M" + P(r, th) + "L" + P(r - len, th);
-    }
-    add("path", { d: sk, "class": "gdskala", "vector-effect": "non-scaling-stroke" });
-    // gelbes Band für die äußere Gradzahl-Reihe und die 90
-    add("path", { d: "M" + P(50, 7.5 * Math.PI / 180) + "A50 50 0 0 1 " + P(50, 172.5 * Math.PI / 180), "class": "gdband" });
-    add("circle", { cx: 0, cy: 50, r: 4.3, "class": "gdneunzig" });
-    // Zahlen
-    for(i = 1; i <= 7; i++){ txt(i * 10, 5.8, String(i), 3.2); txt(-i * 10, 5.8, String(i), 3.2); }
-    txt(0, 5.8, "0", 3.2);
-    [-1, 1].forEach(function(sg){ for(var j = 1; j <= 2; j++) txt(sg * 18, j * 10 + 1.1, String(j), 2.8); });
-    for(i = 10; i <= 170; i += 10){
-      if(i === 90) continue;
-      th = i * Math.PI / 180;
-      var ix = 42.5 * Math.cos(th), iy = 42.5 * Math.sin(th) + 0.8, bx = 50 * Math.cos(th), by = 50 * Math.sin(th) + 1;
-      txt(ix, iy, String(i), 2.3, "klein", i - 90);
-      txt(bx, by, String(180 - i), 2.9, "", i - 90);
-    }
-    txt(0, 51.6, "90", 4.4, "gross");
+    var k = 1 / ppm(), B = GD_BILD, g = el("g", { "class": "gd", transform: "translate(" + GD.x + " " + GD.y + ") rotate(" + (GD.w * 180 / Math.PI) + ")" });
+    g.appendChild(el("polygon", { points: "-80,0 80,0 0,80", "class": "gdkoerper" }));
+    var bild = el("image", { x: -B.x0 / B.pxmm, y: -B.y0 / B.pxmm, width: B.w / B.pxmm, height: B.h / B.pxmm, preserveAspectRatio: "none" });
+    bild.setAttribute("href", B.src); bild.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", B.src);
+    g.appendChild(bild);
     // Griffe (Bildschirmgröße): Verschieben (Kreuz) und Drehen (Pfeil)
     var icon = { zieh: "M0 -8V8M-8 0H8M0 -8l-3 3M0 -8l3 3M0 8l-3 -3M0 8l3 -3M-8 0l3 -3M-8 0l3 3M8 0l-3 -3M8 0l-3 3",
       drehL: "M5.5 -4A7 7 0 1 0 7 2M5.5 -4l0.5 -4.5M5.5 -4l-4.3 -1", drehR: "M5.5 -4A7 7 0 1 0 7 2M5.5 -4l0.5 -4.5M5.5 -4l-4.3 -1" };
@@ -232,6 +194,7 @@
     }
     svg.appendChild(g);
   }
+
 
 
   // ---------- Kopieren (kongruente Figuren) ----------
