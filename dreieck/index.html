@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     dreieck/index.html – Dreiecke konstruieren (miStudia Mathe)
+     Zeichenblatt mit Lineal, Zirkel und Geodreieck wie auf Papier;
+     Aufgaben SSS, SWS, WSW, SsW mit Prüfung. Logik: dreieck.js,
+     Texte: texte.js. Sprache aus dem Startmenü (home-button.js).
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Dreiecke konstruieren</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --zirkel: #c2410c; --geo: #0d9488; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1100px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 10px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .aufgabe { border: 2px solid var(--zirkel); background: #fff7ed; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
+  .auftrag { margin: 0 0 6px; font-size: 17px; } .auftrag b { font-family: "Cambria Math", Cambria, "Times New Roman", serif; font-size: 19px; white-space: normal; }
+  .typ { color: var(--muted); font-size: 14px; }
+  .schritte summary { cursor: pointer; color: var(--blue); font-weight: 700; }
+  .schritte ol { margin: 6px 0; padding-inline-start: 22px; } .schritte li { margin: 3px 0; }
+  .knoepfe { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .knopf { font: 700 15px system-ui, sans-serif; padding: 9px 16px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .meldung { margin: 8px 0 0; font-weight: 700; } .meldung.gut { color: #1d7a3f; } .meldung.schlecht { color: #b91c1c; }
+  .werkzeuge { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 8px; }
+  .wz { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border-radius: 12px; border: 2px solid var(--line); background: #ffffff; color: var(--text); cursor: pointer; font: 600 12px system-ui, sans-serif; min-width: 0; }
+  .wz svg { width: 26px; height: 26px; }
+  .wz span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .wz[aria-pressed="true"] { border-color: var(--blue); background: #e3eefc; color: var(--blue); }
+  .zeile2 { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 6px; min-height: 40px; }
+  .feldbox { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+  .feldbox input { width: 90px; font: 18px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; }
+  .feldbox input:focus { outline: none; border-color: var(--blue); }
+  .hinweis { margin: 0 0 8px; font-size: 15px; color: var(--muted); min-height: 1.4em; }
+  .hinweis.warn { color: #b45309; font-weight: 700; }
+  .blattbox { position: relative; border: 2px solid #9cc0e8; border-radius: 12px; overflow: hidden; background: #ffffff; }
+  #blatt { display: block; width: 100%; height: 62vh; height: 62dvh; min-height: 320px; touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; }
+  .zoomknoepfe { position: absolute; top: 8px; inset-inline-end: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .zoomknoepfe button, .aktionen button { width: 42px; height: 42px; border-radius: 10px; border: 2px solid var(--line); background: rgba(255,255,255,0.92); color: var(--text); font: 700 20px system-ui; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .aktionen { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .aktionen button { width: auto; padding: 0 12px; gap: 6px; font-size: 15px; }
+  .aktionen label { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; margin-inline-start: auto; }
+  .messung { font: 700 17px system-ui; color: var(--geo); min-height: 1.3em; margin: 6px 0 0; }
+  /* SVG-Inhalt */
+  .strecke { stroke: #1a2233; stroke-width: 2.2; stroke-linecap: round; }
+  .strecke.vor { stroke: var(--blue); stroke-dasharray: 6 4; }
+  .bogen { fill: none; stroke: #6b7280; stroke-width: 1.6; }
+  .bogen.vor { stroke: var(--zirkel); stroke-width: 2.4; }
+  .hilfskreis { fill: none; stroke: var(--zirkel); stroke-width: 1; stroke-dasharray: 3 5; opacity: 0.6; }
+  .zirkel { fill: none; stroke: var(--zirkel); stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; }
+  .gelenk { fill: var(--zirkel); } .mine { fill: #1a2233; } .einstich { fill: var(--zirkel); }
+  .punkt path { stroke: #1a2233; stroke-width: 2.4; stroke-linecap: round; fill: none; }
+  .pname, .mass, .live { paint-order: stroke; stroke: #ffffff; stroke-linejoin: round; font-family: system-ui, sans-serif; }
+  .pname { fill: #1a2233; font-weight: 800; }
+  .mass { fill: var(--blue); font-weight: 700; text-anchor: middle; } .mass.winkel { fill: var(--geo); }
+  .live { fill: var(--zirkel); font-weight: 800; }
+  .dreieck { fill: rgba(21, 101, 192, 0.10); stroke: none; }
+  .fang { fill: rgba(21, 101, 192, 0.15); stroke: var(--blue); stroke-width: 2; }
+  .basis { stroke: var(--geo); stroke-width: 3; }
+  .winkelbogen { fill: none; stroke: var(--geo); stroke-width: 2.5; }
+  .geo { fill: rgba(13, 148, 136, 0.06); stroke: rgba(13, 148, 136, 0.5); stroke-width: 1.2; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .werkzeuge { grid-template-columns: repeat(4, 1fr); }
+    #blatt { height: 56vh; height: 56dvh; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Dreiecke konstruieren</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tabFrei" aria-selected="true"></button>
+    <button type="button" role="tab" id="tabAufg" aria-selected="false"></button>
+  </div>
+  <div class="aufgabe" id="aufgabe" hidden></div>
+  <div class="werkzeuge" role="toolbar">
+    <button type="button" class="wz" data-t="punkt"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="lineal"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4" stroke="currentColor" stroke-width="1.6"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="zirkel"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 6L6 20M12 6l6 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/><circle cx="12" cy="6" r="2" fill="currentColor"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="geo"><svg viewBox="0 0 24 24"><path d="M2 19h20L12 7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 19a4 4 0 0 1 8 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="messen"><svg viewBox="0 0 24 24"><path d="M4 18L20 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M3 14l3 5M17 3l4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="radieren"><svg viewBox="0 0 24 24"><path d="M4 15l8-8 7 7-6 6H8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 20h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="hand"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg><span></span></button>
+  </div>
+  <div class="zeile2">
+    <label class="feldbox" id="feldbox"><span id="feldlabel"></span><input id="feld" type="text" inputmode="decimal" autocomplete="off"><span id="einheit">cm</span></label>
+    <button type="button" class="knopf hell" id="neuEinstich" hidden></button>
+  </div>
+  <p class="hinweis" id="hinweis"></p>
+  <div class="blattbox">
+    <svg id="blatt" role="img"></svg>
+    <div class="zoomknoepfe">
+      <button type="button" id="zplus">+</button>
+      <button type="button" id="zminus">−</button>
+      <button type="button" id="fit">⤢</button>
+    </div>
+  </div>
+  <p class="messung" id="messung" aria-live="polite"></p>
+  <div class="aktionen">
+    <button type="button" id="rueck">↶ <span></span></button>
+    <button type="button" id="leer"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg> <span></span></button>
+    <label><input type="checkbox" id="masse" checked> <span id="tMasse"></span></label>
+  </div>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="dreieck.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>

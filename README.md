@@ -13,6 +13,7 @@ Startmenü (`index.html`) + 7 Mathe-Apps als Unterordner, eine Domain → eine A
 | `binome/` | BINOME |
 | `linear/`, `quadratisch/`, `polynom/`, `rational/` | neu, nur hier – gemeinsamer Kern in `funktionen/` (kern.js: Brüche, Parser, Nullstellen exakt/Näherung, Kurvendiskussion, Graph mit Zoom; texte.js: 9 Sprachen; seite.js; kern.css; rational.js für Z/N; ueben.js: Übungsmodus mit Zufallsaufgaben, Reiter „Untersuchen | Üben“; lexikon.js: Formelsatz (Brüche waagerecht, Wurzelstrich), Popups, Begriffs-Lexikon mit Wortherkunft in 9 Sprachen – auch von sinus/ genutzt; alltag.js: Alltagsbeispiele für Funktionen, Sinus und Mathe-Waage) |
 | `sinus/` | neu, nur hier (aus der Folie „Parameter bei Sinusfunktionen“) |
+| `dreieck/` | neu, nur hier – Dreiecke konstruieren wie auf Papier: Lineal, Zirkel (Bögen schlagen), Geodreieck, Messen, Radieren; Fang an Punkten/Schnittpunkten; Aufgaben SSS, SWS, WSW, SsW mit Prüfung (dreieck.js, texte.js mit 9 Sprachen) |
 
 Die Unterordner sind **Kopien**. Änderungen an einer App bitte hier übernehmen
 (oder die App hier weiterentwickeln). Unterschiede zu den Einzel-Repos:
