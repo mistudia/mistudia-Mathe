@@ -448,10 +448,14 @@ var FK = (function(){
     this.inhalt = inhalt;
     if(this.opts.zeichnen) this.opts.zeichnen(this);
   };
-  Graph.prototype.kurve = function(f, farbe, breite, strich){
-    var v = this.v, n = Math.max(400, this.W), d = "", an = false, hgt = v.y1 - v.y0;
+  // brueche: x-Stellen (Polstellen/Lücken), an denen die Linie unterbrochen wird
+  Graph.prototype.kurve = function(f, farbe, breite, strich, brueche){
+    var v = this.v, n = Math.max(400, this.W), d = "", an = false, hgt = v.y1 - v.y0, xAlt = null;
+    brueche = brueche || [];
     for(var i = 0; i <= n; i++){
       var x = v.x0 + (v.x1 - v.x0) * i / n, y = f(x);
+      if(xAlt !== null && brueche.some(function(b){ return b > xAlt - 1e-12 && b <= x + 1e-12; })) an = false;
+      xAlt = x;
       if(!isFinite(y) || y > v.y1 + 50 * hgt || y < v.y0 - 50 * hgt){ an = false; continue; }
       d += (an ? "L" : "M") + this.X(x).toFixed(1) + " " + this.Y(y).toFixed(1); an = true;
     }
@@ -477,6 +481,12 @@ var FK = (function(){
       this.inhalt.appendChild(E("text", { x: px, y: py + dy, fill: farbe, "font-size": 13, "font-weight": 700, "font-family": "system-ui, sans-serif", "text-anchor": anker, "dominant-baseline": "middle", "paint-order": "stroke", stroke: "#fff", "stroke-width": 4, direction: "ltr", "unicode-bidi": "embed" }, label));
     }
   };
+  // Lücke: leerer Kreis
+  Graph.prototype.loch = function(x, y, farbe, label){
+    var px = this.X(x), py = this.Y(y);
+    this.inhalt.appendChild(E("circle", { cx: px, cy: py, r: 6, fill: "#fff", stroke: farbe, "stroke-width": 3 }));
+    if(label) this.inhalt.appendChild(E("text", { x: px, y: py - 16, fill: farbe, "font-size": 13, "font-weight": 700, "font-family": "system-ui, sans-serif", "text-anchor": "middle", "dominant-baseline": "middle", "paint-order": "stroke", stroke: "#fff", "stroke-width": 4, direction: "ltr", "unicode-bidi": "embed" }, label));
+  };
   Graph.prototype.polygon = function(pts, fuell, rand){
     var self = this;
     this.inhalt.appendChild(E("polygon", { points: pts.map(function(p){ return self.X(p[0]).toFixed(1) + "," + self.Y(p[1]).toFixed(1); }).join(" "), fill: fuell, stroke: rand || "none", "stroke-width": 2 }));
@@ -493,7 +503,7 @@ var FK = (function(){
     titel(); return titel;
   }
 
-  return { B: B, Bz: Bz, btxt: btxt, zahl: zahl, t: t, setLang: setLang, getLang: getLang, parse: parse, ptxt: ptxt, grad: grad, ableitung: ableitung,
+  return { padd: padd, pmul: pmul, pneg: pneg, hornerDiv: hornerDiv, wurzelZerlegen: wurzelZerlegen, B: B, Bz: Bz, btxt: btxt, zahl: zahl, t: t, setLang: setLang, getLang: getLang, parse: parse, ptxt: ptxt, grad: grad, ableitung: ableitung,
            wertB: wertB, wertN: wertN, nullstellen: nullstellen, analyse: analyse, xtxt: xtxt, xtxtKurz: xtxtKurz, ytxt: ytxt, ywert: ywert,
            punkt: punkt, intervall: intervall, R: R, INF: INF, MINUS: MINUS, Graph: Graph, knoepfe: knoepfe, trim: trim, kommaSprache: kommaSprache };
 })();

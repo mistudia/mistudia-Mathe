@@ -22,7 +22,8 @@ de: {
   scheitel:"Scheitelpunkt", achse:"Symmetrieachse", form:"Öffnung und Form", oeffO:"nach oben geöffnet (a > 0)", oeffU:"nach unten geöffnet (a < 0)",
   gestreckt:"gestreckt (|a| > 1) – schmaler als die Normalparabel", gestaucht:"gestaucht (|a| < 1) – breiter als die Normalparabel", normalpar:"so breit wie die Normalparabel (|a| = 1)",
   diskr:"Diskriminante", d2:"D > 0 → zwei Nullstellen", d1:"D = 0 → eine doppelte Nullstelle", d0:"D < 0 → keine Nullstelle", abc:"abc-Formel", aNull:"a darf nicht 0 sein – sonst ist es keine Parabel.", lblV:"S",
-  polTitle:"Polynomfunktionen – Kurvendiskussion"
+  polTitle:"Polynomfunktionen – Kurvendiskussion",
+  ratTitle:"Gebrochen-rationale Funktionen", errRatDeg:"Zähler und Nenner bitte höchstens Grad 6.", luecken:"Definitionslücken", noLuecke:"keine Definitionslücken", nennerNull:"Nenner = 0 setzen", polst:"Polstelle", mitVzw:"mit Vorzeichenwechsel", ohneVzw:"ohne Vorzeichenwechsel", hebbar:"hebbare Lücke", asym:"Asymptoten", senkr:"senkrechte Asymptote", waagr:"waagerechte Asymptote", schief:"schräge Asymptote", naeher:"Näherungskurve", keineAsym:"keine Asymptoten – nach dem Kürzen bleibt eine Polynomfunktion (mit Lücke)", anPol:"Verhalten an den Polstellen", vonL:"von links", vonR:"von rechts", gekuerzt:"gekürzt", polyDiv:"Polynomdivision", zgrad:"Zählergrad {z}, Nennergrad {n}", lblL:"L", vielf:"{n}-fach"
 },
 en: {
   draw:"Plot", bsp:"Examples:", eingabe:"Enter a function",
@@ -45,7 +46,8 @@ en: {
   scheitel:"Vertex", achse:"Axis of symmetry", form:"Opening and shape", oeffO:"opens upwards (a > 0)", oeffU:"opens downwards (a < 0)",
   gestreckt:"stretched (|a| > 1) – narrower than y = x²", gestaucht:"compressed (|a| < 1) – wider than y = x²", normalpar:"as wide as y = x² (|a| = 1)",
   diskr:"Discriminant", d2:"D > 0 → two zeros", d1:"D = 0 → one double zero", d0:"D < 0 → no zeros", abc:"Quadratic formula", aNull:"a must not be 0 – otherwise it is not a parabola.", lblV:"V",
-  polTitle:"Polynomial Functions – Curve Sketching"
+  polTitle:"Polynomial Functions – Curve Sketching",
+  ratTitle:"Rational Functions", errRatDeg:"Please use degree 6 at most for numerator and denominator.", luecken:"Points not in the domain", noLuecke:"no excluded points", nennerNull:"Set denominator = 0", polst:"Pole", mitVzw:"with sign change", ohneVzw:"without sign change", hebbar:"removable discontinuity (hole)", asym:"Asymptotes", senkr:"vertical asymptote", waagr:"horizontal asymptote", schief:"oblique (slant) asymptote", naeher:"approximating curve", keineAsym:"no asymptotes – after cancelling, a polynomial function remains (with a hole)", anPol:"Behaviour at the poles", vonL:"from the left", vonR:"from the right", gekuerzt:"simplified", polyDiv:"Polynomial division", zgrad:"numerator degree {z}, denominator degree {n}", lblL:"hole", vielf:"multiplicity {n}"
 },
 es: {
   draw:"Dibujar", bsp:"Ejemplos:", eingabe:"Escribe una función",
@@ -68,7 +70,8 @@ es: {
   scheitel:"Vértice", achse:"Eje de simetría", form:"Apertura y forma", oeffO:"abre hacia arriba (a > 0)", oeffU:"abre hacia abajo (a < 0)",
   gestreckt:"más estrecha que y = x² (|a| > 1)", gestaucht:"más ancha que y = x² (|a| < 1)", normalpar:"igual de ancha que y = x² (|a| = 1)",
   diskr:"Discriminante", d2:"D > 0 → dos ceros", d1:"D = 0 → un cero doble", d0:"D < 0 → sin ceros", abc:"Fórmula general", aNull:"a no puede ser 0 – si no, no es una parábola.", lblV:"V",
-  polTitle:"Funciones polinómicas – Estudio de la función"
+  polTitle:"Funciones polinómicas – Estudio de la función",
+  ratTitle:"Funciones racionales", errRatDeg:"Numerador y denominador como máximo de grado 6.", luecken:"Puntos fuera del dominio", noLuecke:"ningún punto excluido", nennerNull:"Igualar el denominador a 0", polst:"Polo", mitVzw:"con cambio de signo", ohneVzw:"sin cambio de signo", hebbar:"discontinuidad evitable (agujero)", asym:"Asíntotas", senkr:"asíntota vertical", waagr:"asíntota horizontal", schief:"asíntota oblicua", naeher:"curva de aproximación", keineAsym:"sin asíntotas – al simplificar queda una función polinómica (con agujero)", anPol:"Comportamiento en los polos", vonL:"por la izquierda", vonR:"por la derecha", gekuerzt:"simplificada", polyDiv:"División de polinomios", zgrad:"grado del numerador {z}, del denominador {n}", lblL:"ag.", vielf:"multiplicidad {n}"
 },
 zh: {
   draw:"画图", bsp:"例子：", eingabe:"输入函数",
@@ -91,7 +94,8 @@ zh: {
   scheitel:"顶点", achse:"对称轴", form:"开口和形状", oeffO:"开口向上（a > 0）", oeffU:"开口向下（a < 0）",
   gestreckt:"比 y = x² 窄（|a| > 1）", gestaucht:"比 y = x² 宽（|a| < 1）", normalpar:"和 y = x² 一样宽（|a| = 1）",
   diskr:"判别式", d2:"D > 0 → 两个零点", d1:"D = 0 → 一个二重零点", d0:"D < 0 → 没有零点", abc:"求根公式", aNull:"a 不能为 0——否则就不是抛物线。", lblV:"顶点",
-  polTitle:"多项式函数——函数性质分析"
+  polTitle:"多项式函数——函数性质分析",
+  ratTitle:"分式函数", errRatDeg:"分子和分母的次数最多为 6。", luecken:"无定义的点", noLuecke:"没有无定义的点", nennerNull:"令分母 = 0", polst:"极点", mitVzw:"两侧变号", ohneVzw:"两侧不变号", hebbar:"可去间断点（空心点）", asym:"渐近线", senkr:"竖直渐近线", waagr:"水平渐近线", schief:"斜渐近线", naeher:"渐近曲线", keineAsym:"没有渐近线——约分后是多项式函数（有一个空心点）", anPol:"在极点附近的趋势", vonL:"从左侧", vonR:"从右侧", gekuerzt:"约分后", polyDiv:"多项式除法", zgrad:"分子次数 {z}，分母次数 {n}", lblL:"空心", vielf:"{n} 重"
 },
 fr: {
   draw:"Tracer", bsp:"Exemples :", eingabe:"Saisir une fonction",
@@ -114,7 +118,8 @@ fr: {
   scheitel:"Sommet", achse:"Axe de symétrie", form:"Ouverture et forme", oeffO:"tournée vers le haut (a > 0)", oeffU:"tournée vers le bas (a < 0)",
   gestreckt:"plus étroite que y = x² (|a| > 1)", gestaucht:"plus large que y = x² (|a| < 1)", normalpar:"aussi large que y = x² (|a| = 1)",
   diskr:"Discriminant", d2:"D > 0 → deux zéros", d1:"D = 0 → un zéro double", d0:"D < 0 → aucun zéro", abc:"Formule du discriminant", aNull:"a ne doit pas être 0 – sinon ce n’est pas une parabole.", lblV:"S",
-  polTitle:"Fonctions polynômes – Étude de fonction"
+  polTitle:"Fonctions polynômes – Étude de fonction",
+  ratTitle:"Fonctions rationnelles", errRatDeg:"Numérateur et dénominateur de degré 6 au maximum.", luecken:"Valeurs interdites", noLuecke:"aucune valeur interdite", nennerNull:"Résoudre dénominateur = 0", polst:"Pôle", mitVzw:"avec changement de signe", ohneVzw:"sans changement de signe", hebbar:"discontinuité effaçable (trou)", asym:"Asymptotes", senkr:"asymptote verticale", waagr:"asymptote horizontale", schief:"asymptote oblique", naeher:"courbe asymptote", keineAsym:"pas d’asymptote – après simplification il reste une fonction polynôme (avec un trou)", anPol:"Comportement aux pôles", vonL:"à gauche", vonR:"à droite", gekuerzt:"simplifiée", polyDiv:"Division euclidienne", zgrad:"degré du numérateur {z}, du dénominateur {n}", lblL:"trou", vielf:"multiplicité {n}"
 },
 ru: {
   draw:"Построить", bsp:"Примеры:", eingabe:"Введи функцию",
@@ -137,7 +142,8 @@ ru: {
   scheitel:"Вершина", achse:"Ось симметрии", form:"Направление и форма", oeffO:"ветви направлены вверх (a > 0)", oeffU:"ветви направлены вниз (a < 0)",
   gestreckt:"уже, чем y = x² (|a| > 1)", gestaucht:"шире, чем y = x² (|a| < 1)", normalpar:"такая же ширина, как у y = x² (|a| = 1)",
   diskr:"Дискриминант", d2:"D > 0 → два нуля", d1:"D = 0 → один двойной нуль", d0:"D < 0 → нулей нет", abc:"Формула корней", aNull:"a не может быть 0 – иначе это не парабола.", lblV:"В",
-  polTitle:"Многочлены – исследование функции"
+  polTitle:"Многочлены – исследование функции",
+  ratTitle:"Дробно-рациональные функции", errRatDeg:"Степень числителя и знаменателя – не выше 6.", luecken:"Точки, не входящие в область определения", noLuecke:"таких точек нет", nennerNull:"Приравнять знаменатель к 0", polst:"Полюс", mitVzw:"со сменой знака", ohneVzw:"без смены знака", hebbar:"устранимый разрыв (выколотая точка)", asym:"Асимптоты", senkr:"вертикальная асимптота", waagr:"горизонтальная асимптота", schief:"наклонная асимптота", naeher:"асимптотическая кривая", keineAsym:"асимптот нет – после сокращения остаётся многочлен (с выколотой точкой)", anPol:"Поведение у полюсов", vonL:"слева", vonR:"справа", gekuerzt:"после сокращения", polyDiv:"Деление многочленов", zgrad:"степень числителя {z}, знаменателя {n}", lblL:"выкол.", vielf:"кратность {n}"
 },
 ar: {
   draw:"ارسم", bsp:"أمثلة:", eingabe:"أدخل دالة",
@@ -160,7 +166,8 @@ ar: {
   scheitel:"الرأس", achse:"محور التناظر", form:"الاتجاه والشكل", oeffO:"مفتوحة للأعلى (a > 0)", oeffU:"مفتوحة للأسفل (a < 0)",
   gestreckt:"أضيق من y = x² (|a| > 1)", gestaucht:"أعرض من y = x² (|a| < 1)", normalpar:"بعرض y = x² نفسه (|a| = 1)",
   diskr:"المميّز", d2:"D > 0 → صفران", d1:"D = 0 → صفر مزدوج", d0:"D < 0 → لا أصفار", abc:"القانون العام", aNull:"لا يجوز أن تكون a صفرًا – وإلا فليست قطعًا مكافئًا.", lblV:"الرأس",
-  polTitle:"كثيرات الحدود – دراسة الدالة"
+  polTitle:"كثيرات الحدود – دراسة الدالة",
+  ratTitle:"الدوال الكسرية", errRatDeg:"درجة البسط والمقام 6 على الأكثر من فضلك.", luecken:"نقاط خارج مجال التعريف", noLuecke:"لا توجد نقاط مستبعدة", nennerNull:"نضع المقام = 0", polst:"قطب", mitVzw:"مع تغيّر الإشارة", ohneVzw:"دون تغيّر الإشارة", hebbar:"انقطاع قابل للإزالة (ثقب)", asym:"خطوط التقارب", senkr:"خط تقارب رأسي", waagr:"خط تقارب أفقي", schief:"خط تقارب مائل", naeher:"منحنى تقارب", keineAsym:"لا توجد خطوط تقارب – بعد الاختصار تبقى كثيرة حدود (مع ثقب)", anPol:"السلوك عند الأقطاب", vonL:"من اليسار", vonR:"من اليمين", gekuerzt:"بعد الاختصار", polyDiv:"قسمة كثيرات الحدود", zgrad:"درجة البسط {z}، درجة المقام {n}", lblL:"ثقب", vielf:"تكرار {n}"
 },
 ja: {
   draw:"グラフをかく", bsp:"例：", eingabe:"関数を入力",
@@ -183,7 +190,8 @@ ja: {
   scheitel:"頂点", achse:"軸", form:"向きと形", oeffO:"下に凸（a > 0）", oeffU:"上に凸（a < 0）",
   gestreckt:"y = x² より細い（|a| > 1）", gestaucht:"y = x² より太い（|a| < 1）", normalpar:"y = x² と同じ幅（|a| = 1）",
   diskr:"判別式", d2:"D > 0 → 零点が2つ", d1:"D = 0 → 重解（零点が1つ）", d0:"D < 0 → 零点はない", abc:"解の公式", aNull:"a は 0 にできません – 放物線ではなくなります。", lblV:"頂点",
-  polTitle:"多項式関数 – グラフの調べ方"
+  polTitle:"多項式関数 – グラフの調べ方",
+  ratTitle:"分数関数", errRatDeg:"分子と分母の次数は 6 までにしてね。", luecken:"定義されない点", noLuecke:"定義されない点はない", nennerNull:"分母 = 0 とおく", polst:"極", mitVzw:"符号が変わる", ohneVzw:"符号が変わらない", hebbar:"除去可能な不連続点（穴）", asym:"漸近線", senkr:"垂直な漸近線", waagr:"水平な漸近線", schief:"斜めの漸近線", naeher:"漸近曲線", keineAsym:"漸近線はない – 約分すると多項式関数になる（穴がある）", anPol:"極の近くのようす", vonL:"左から", vonR:"右から", gekuerzt:"約分すると", polyDiv:"多項式のわり算", zgrad:"分子の次数 {z}、分母の次数 {n}", lblL:"穴", vielf:"{n}重"
 },
 pt: {
   draw:"Desenhar", bsp:"Exemplos:", eingabe:"Digite uma função",
@@ -206,6 +214,7 @@ pt: {
   scheitel:"Vértice", achse:"Eixo de simetria", form:"Abertura e forma", oeffO:"concavidade para cima (a > 0)", oeffU:"concavidade para baixo (a < 0)",
   gestreckt:"mais estreita que y = x² (|a| > 1)", gestaucht:"mais larga que y = x² (|a| < 1)", normalpar:"tão larga quanto y = x² (|a| = 1)",
   diskr:"Discriminante", d2:"D > 0 → dois zeros", d1:"D = 0 → um zero duplo", d0:"D < 0 → sem zeros", abc:"Fórmula de Bhaskara", aNull:"a não pode ser 0 – senão não é uma parábola.", lblV:"V",
-  polTitle:"Funções polinomiais – Estudo da função"
+  polTitle:"Funções polinomiais – Estudo da função",
+  ratTitle:"Funções racionais", errRatDeg:"Numerador e denominador com grau 6 no máximo, por favor.", luecken:"Pontos fora do domínio", noLuecke:"nenhum ponto excluído", nennerNull:"Fazer denominador = 0", polst:"Polo", mitVzw:"com mudança de sinal", ohneVzw:"sem mudança de sinal", hebbar:"descontinuidade removível (buraco)", asym:"Assíntotas", senkr:"assíntota vertical", waagr:"assíntota horizontal", schief:"assíntota oblíqua", naeher:"curva de aproximação", keineAsym:"sem assíntotas – após simplificar resta uma função polinomial (com buraco)", anPol:"Comportamento nos polos", vonL:"pela esquerda", vonR:"pela direita", gekuerzt:"simplificada", polyDiv:"Divisão de polinômios", zgrad:"grau do numerador {z}, do denominador {n}", lblL:"buraco", vielf:"multiplicidade {n}"
 }
 };

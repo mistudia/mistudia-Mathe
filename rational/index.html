@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<!-- rational/index.html – Gebrochen-rationale Funktionen (miStudia Mathe)
+     Rechnen: /funktionen/rational.js (+ kern.js), Texte: /funktionen/texte.js -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Gebrochen-rationale Funktionen</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<link rel="stylesheet" href="/funktionen/kern.css">
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel"></h1>
+  <form class="eingabe-zeile" id="form" dir="ltr">
+    <label for="eingabe">f(x) =</label>
+    <input type="text" id="eingabe" value="(x^2 - 1)/(x - 2)" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button type="submit" class="knopf" id="zeichnen"></button>
+  </form>
+  <div class="fehler" id="fehler" role="alert"></div>
+  <div class="beispiele" id="beispiele" dir="ltr"><span id="tBsp"></span></div>
+
+  <div class="haupt">
+    <div class="graph-box">
+      <div class="graph-wrap"><svg id="graph" role="img"></svg><div class="zoom" id="zoom"></div></div>
+      <div class="legende"><label><input type="checkbox" id="zeigeAbl"> <span id="tAbl"></span></label></div>
+      <p class="tipp" id="tipp"></p>
+    </div>
+    <div class="analyse" id="analyse"></div>
+  </div>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+
+<script src="/funktionen/texte.js"></script>
+<script src="/funktionen/kern.js"></script>
+<script src="/funktionen/seite.js"></script>
+<script src="/funktionen/rational.js"></script>
+<script>
+(function(){
+  var t = FK.t, C = FS.FARBE, f = FS.f, Bz = FK.Bz, M = FK.MINUS;
+  var BSP = ["(x^2 - 1)/(x - 2)", "1/x", "(x + 1)/(x - 1)", "x/(x^2 + 1)", "2x^2/(x^2 - 1)", "(x^2 + 1)/x", "1/x^2", "(x^2 - 4)/(x - 2)", "(x - 1)/(x^2 - 1)", "x^3/(x^2 - 4)"];
+  var POL = "#b91c1c", ASY = "#ea580c";
+  var A = null, fehlerCode = null;
+  var graph = new FK.Graph(document.getElementById("graph"), { zeichnen: zeichneInhalt });
+  var titelZoom = FK.knoepfe(document.getElementById("zoom"), graph, passend);
+
+  BSP.forEach(function(s){
+    var b = document.createElement("button"); b.type = "button"; b.textContent = s.replace(/\^2/g, "²").replace(/\^3/g, "³").replace(/-/g, M);
+    b.addEventListener("click", function(){ document.getElementById("eingabe").value = s; rechne(); });
+    document.getElementById("beispiele").appendChild(b);
+  });
+  document.getElementById("form").addEventListener("submit", function(e){ e.preventDefault(); rechne(); });
+  document.getElementById("zeigeAbl").addEventListener("change", function(){ graph.zeichne(); });
+  window.addEventListener("resize", function(){ graph.zeichne(); });
+
+  function rechne(){
+    fehlerCode = null;
+    try {
+      var w = FR.parse(document.getElementById("eingabe").value);
+      if(FK.grad(w.z) > 6 || FK.grad(w.n) > 6) throw { code: "errRatDeg" };
+      A = FR.analyse(w.z, w.n);
+    } catch(e){ fehlerCode = e.code || "errParse"; }
+    texte();
+    if(!fehlerCode) passend();
+    graph.zeichne();
+  }
+  function fx(x){ return FR.wert(A.Zr, A.Nr, x); }
+  function passend(){
+    if(!A) return;
+    var xs = [];
+    A.luecken.forEach(function(z){ xs.push(z.x); }); A.nst.forEach(function(z){ xs.push(z.x); });
+    A.ext.forEach(function(e){ xs.push(e.z.x); }); A.wp.forEach(function(w){ xs.push(w.z.x); });
+    var fns = [function(x){ return A.inD(x) ? fx(x) : NaN; }];
+    if(A.asym.art === "W") fns.push(function(){ return FK.wertN(A.asym.q, 0); });
+    graph.passend(xs, fns);
+  }
+  function zeichneInhalt(g){
+    if(!A) return;
+    var br = A.luecken.map(function(z){ return z.x; });
+    A.pole.forEach(function(p){ g.linie(p.z.x, g.v.y0, p.z.x, g.v.y1, POL, 2, "8 6"); });
+    if(A.asym.art !== "P") g.kurve(function(x){ return FK.wertN(A.asym.q, x); }, ASY, 2.5, "10 7");
+    if(document.getElementById("zeigeAbl").checked){
+      g.kurve(A.f1, C.a1, 2.5, "8 6", br);
+      g.kurve(A.f2, C.a2, 2.5, "3 5", br);
+    }
+    g.kurve(fx, C.f, 3.5, null, br);
+    if(A.y0) g.punkt(0, A.y0.v, C.Y, null);
+    A.nst.forEach(function(z, i){ g.punkt(z.x, 0, C.N, t("lblN") + (A.nst.length > 1 ? "₁₂₃₄₅₆"[i] : ""), "unten"); });
+    A.ext.forEach(function(e){ g.punkt(e.z.x, e.y.v, e.art === "H" ? C.H : C.T, FS.label(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y), e.art === "H" ? "oben" : "unten"); });
+    A.wp.forEach(function(w){ g.punkt(w.z.x, w.y.v, C.W, FS.label(t(w.sattel ? "lblS" : "lblW"), w.z, w.y), "oben"); });
+    A.hebbar.forEach(function(h){ g.loch(h.z.x, h.y.v, POL, FS.label(t("lblL"), h.z, h.y)); });
+  }
+  function klammerP(p){ var s = FK.ptxt(p); return FK.grad(p) >= 1 && (/ [+−] /.test(s)) ? "(" + s + ")" : s; }
+  function bruch(z, n){ return FK.grad(n) <= 0 && Bz.num(n[0]) === 1 ? FK.ptxt(z) : klammerP(z) + " / " + klammerP(n); }
+  function iv(s){
+    var l = s.l ? FK.xtxt(s.l.z) : M + FK.INF, r = s.r ? FK.xtxt(s.r.z) : FK.INF;
+    return FK.intervall(l, r, !!s.l && !s.l.luecke, !!s.r && !s.r.luecke);
+  }
+  function abschn(liste, plus, minus, null_){
+    return "<ul>" + liste.map(function(s){ return "<li>" + (s.s > 0 ? plus : s.s < 0 ? minus : null_) + " " + t("auf") + " " + f(iv(s)) + "</li>"; }).join("") + "</ul>";
+  }
+  function unendl(v){ return v > 0 ? "+" + FK.INF : M + FK.INF; }
+  function texte(){
+    document.title = "miStudia – " + t("ratTitle");
+    document.getElementById("titel").textContent = t("ratTitle");
+    document.getElementById("zeichnen").textContent = t("draw");
+    document.getElementById("eingabe").setAttribute("aria-label", t("eingabe"));
+    document.getElementById("tBsp").textContent = t("bsp");
+    document.getElementById("tAbl").innerHTML = t("showAbl").replace("f′", '<b style="color:' + C.a1 + '">f′</b>').replace("f″", '<b style="color:' + C.a2 + '">f″</b>');
+    document.getElementById("tipp").textContent = t("tipp");
+    document.getElementById("graph").setAttribute("aria-label", t("ratTitle"));
+    titelZoom();
+    document.getElementById("fehler").textContent = fehlerCode ? t(fehlerCode) : "";
+    var box = document.getElementById("analyse");
+    if(fehlerCode || !A){ box.innerHTML = ""; return; }
+    var h = "";
+    var fh = f("f(x) = " + bruch(A.z, A.n));
+    if(A.gekuerzt) fh += "<br>" + t("gekuerzt") + ": " + f("f(x) = " + bruch(A.Zr, A.Nr)) + ' <span class="klein-text">(x ∉ {' + A.hebbar.map(function(l){ return FK.xtxt(l.z); }).join("; ") + "})</span>";
+    fh += '<div class="klein-text">' + t("zgrad", { z: Math.max(FK.grad(A.Zr), 0), n: Math.max(FK.grad(A.Nr), 0) }) + "</div>";
+    h += FS.karte("f(x)", fh);
+    // Definitionsbereich & Lücken
+    var lt = A.luecken.map(function(z){ return FK.xtxt(z); }).join("; ");
+    h += FS.karte(t("dom"), f("D = " + FK.R + (A.luecken.length ? " \\ {" + lt + "}" : "")));
+    var lh = '<div class="klein-text">' + t("nennerNull") + ": " + f(FK.ptxt(A.n) + " = 0") + "</div>";
+    if(!A.luecken.length) lh += t("noLuecke");
+    else lh += "<ul>" + A.pole.map(function(p){
+      return "<li>" + FS.fleck(POL) + f("x = " + FK.xtxt(p.z)) + ": <b>" + t("polst") + "</b> " + t(p.vzw ? "mitVzw" : "ohneVzw") + (p.z.m > 1 ? ' <span class="klein-text">(' + t("vielf", { n: p.z.m }) + ")</span>" : "") + "</li>";
+    }).join("") + A.hebbar.map(function(l){
+      return "<li>" + FS.fleck(POL) + f("x = " + FK.xtxt(l.z)) + ": <b>" + t("hebbar") + "</b> " + f(FS.vollPunkt(t("lblL"), l.z, l.y)) + "</li>";
+    }).join("") + "</ul>";
+    h += FS.karte(t("luecken"), lh);
+    h += FS.karte(t("sym"), t(A.sym === "Y" ? "symY" : A.sym === "O" ? "symO" : "symN").replace(/ \(.*\)$/, ""));
+    h += FS.karte(t("ySchn"), A.y0 ? FS.fleck(C.Y) + f(FK.punkt(t("lblY"), "0", FK.ytxt(A.y0))) : f("0 ∉ D"));
+    h += FS.karte(t("nst"), A.nst.length ? "<ul>" + A.nst.map(function(z, i){
+      return "<li>" + FS.fleck(C.N) + f(FK.punkt(t("lblN") + (A.nst.length > 1 ? "₁₂₃₄₅₆"[i] : ""), FK.xtxt(z), "0")) + (z.m > 1 ? ' <span class="klein-text">(' + t("fachN", { n: z.m }) + ")</span>" : "") + "</li>";
+    }).join("") + "</ul>" : t("noNst"));
+    // Asymptoten
+    var ah = "";
+    if(A.pole.length) ah += "<ul>" + A.pole.map(function(p){ return "<li>" + FS.fleck(POL) + t("senkr") + ": " + f("x = " + FK.xtxt(p.z)) + "</li>"; }).join("") + "</ul>";
+    if(A.asym.art === "P") ah += t("keineAsym");
+    else {
+      if(A.dz >= A.dn && A.dn > 0) ah += '<div class="klein-text">' + t("polyDiv") + ": " + f("f(x) = " + FK.ptxt(A.div.q) + (FK.grad(A.div.r) >= 0 ? " + " + bruch(A.div.r, A.Nr) : "")) + "</div>";
+      var name = A.asym.art === "W" ? "waagr" : A.asym.art === "S" ? "schief" : "naeher";
+      ah += FS.fleck(ASY) + t(name) + ": " + f("y = " + FK.ptxt(A.asym.q));
+    }
+    h += FS.karte(t("asym"), ah);
+    if(A.pole.length) h += FS.karte(t("anPol"), "<ul>" + A.pole.map(function(p){
+      var x = FK.xtxt(p.z);
+      return "<li>" + f("x → " + x + "⁻") + " (" + t("vonL") + "): " + f("f(x) → " + unendl(p.links)) + "<br>" + f("x → " + x + "⁺") + " (" + t("vonR") + "): " + f("f(x) → " + unendl(p.rechts)) + "</li>";
+    }).join("") + "</ul>");
+    var uh;
+    if(A.unendl) uh = "<ul><li>" + f(t("unendl", { r: "+" + FK.INF, g: unendl(A.unendl.plus) })) + "</li><li>" + f(t("unendl", { r: M + FK.INF, g: unendl(A.unendl.minus) })) + "</li></ul>";
+    else uh = f(t("unendl", { r: "±" + FK.INF, g: FK.ptxt(A.asym.q) }));
+    h += FS.karte(t("inf"), uh);
+    // Ableitungen
+    var nq = klammerP(A.Nr);
+    h += FS.karte(t("abl"), FK.grad(A.Nr) > 0
+      ? f("f′(x) = " + klammerP(A.P) + " / " + nq + "²") + "<br>" + f("f″(x) = " + klammerP(A.Q) + " / " + nq + "³")
+      : f("f′(x) = " + FK.ptxt(FK.ableitung(A.Zr))) + "<br>" + f("f″(x) = " + FK.ptxt(FK.ableitung(FK.ableitung(A.Zr)))));
+    var eh = '<div class="klein-text">' + t("notw1") + "</div>";
+    if(A.ext.length || A.sattel.length){
+      eh += "<ul>" + A.ext.map(function(e){
+        var vz = Math.abs(e.f2) < 1e-9 ? "= 0" : e.f2 < 0 ? "< 0" : "> 0";
+        return "<li>" + FS.fleck(e.art === "H" ? C.H : C.T) + f("x = " + FK.xtxt(e.z) + ": f″(x) " + (e.f2ex ? "= " + e.f2ex + " " : "") + vz) + " → <b>" + t(e.art === "H" ? "hp" : "tp") + "</b> " + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + "</li>";
+      }).join("") + A.sattel.map(function(s){ return "<li>" + FS.fleck(C.S) + t("sp") + " " + f(FS.vollPunkt(t("lblS"), s.z, s.y)) + "</li>"; }).join("") + "</ul>";
+    } else eh += t("noExt");
+    h += FS.karte(t("ext"), eh);
+    var wh = '<div class="klein-text">' + t("notw2") + "</div>";
+    wh += A.wp.length ? "<ul>" + A.wp.map(function(w){ return "<li>" + FS.fleck(C.W) + f(FS.vollPunkt(t(w.sattel ? "lblS" : "lblW"), w.z, w.y)) + (w.sattel ? ' <span class="klein-text">– ' + t("sp") + "</span>" : "") + "</li>"; }).join("") + "</ul>" : t("noWp");
+    h += FS.karte(t("wp"), wh);
+    h += FS.karte(t("mon"), abschn(A.mon, t("steigt"), t("faellt"), t("konst")));
+    h += FS.karte(t("kr"), abschn(A.kr, t("links"), t("rechts"), ""));
+    h += '<div class="klein-text" style="text-align:center">' + t("note") + "</div>";
+    box.innerHTML = h;
+  }
+  FS.sprache(function(){ texte(); graph.zeichne(); });
+  rechne();
+})();
+</script>
+<script src="/home-button.js"></script>
+</body>
+</html>
