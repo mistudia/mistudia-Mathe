@@ -9,3 +9,15 @@
 .ms-home-btn:focus-visible { outline: 3px solid #ffb300; outline-offset: 2px; }
 .ms-home-btn svg { width: 24px; height: 24px; display: block; }
 @media print { .ms-home-btn { display: none !important; } }
+
+/* Einheitliches miStudia-Logo oben in allen Mathe-Apps:
+   gleiche Größe wie beim Einmaleins-Diplom (#logoOben: bis 320px breit, zentriert) */
+#logoOben, .logo-link > img.logo, .leftHeader > img.logo {
+  display: block !important; width: 100% !important; max-width: 320px !important; height: auto !important;
+  margin: 0 auto 15px !important;
+}
+.logo-link:has(> img.logo) { display: block; width: 100%; max-width: 320px; margin: 0 auto; }
+/* Mathe-Waage: Logo über dem Titel statt in der linken Spalte, wie in den anderen Apps */
+.header:has(> .leftHeader > img.logo) { grid-template-columns: 1fr !important; row-gap: 6px; }
+.header:has(> .leftHeader > img.logo) > .leftHeader { justify-self: center; width: 100%; }
+.header:has(> .leftHeader > img.logo) > .rightHeader { display: none; }
