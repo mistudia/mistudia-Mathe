@@ -16,6 +16,11 @@
 <div class="app">
   <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
   <h1 id="titel"></h1>
+  <div class="modus" role="tablist">
+    <button type="button" role="tab" id="modErk" aria-selected="true"></button>
+    <button type="button" role="tab" id="modUeb" aria-selected="false"></button>
+  </div>
+  <div id="erkunden">
   <form class="eingabe-zeile" id="form" dir="ltr">
     <label for="eingabe">f(x) =</label>
     <input type="text" id="eingabe" value="x^3 - 6x^2 + 9x" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text">
@@ -32,6 +37,8 @@
     </div>
     <div class="analyse" id="analyse"></div>
   </div>
+  </div>
+  <div id="ueben" class="ueben" hidden></div>
   <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
 </div>
 
@@ -151,6 +158,8 @@
   rechne(true);
 })();
 </script>
+<script src="/funktionen/ueben.js"></script>
+<script>FU.einbauen("polynom");</script>
 <script src="/home-button.js"></script>
 </body>
 </html>

@@ -17,6 +17,11 @@
 <div class="app">
   <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
   <h1 id="titel"></h1>
+  <div class="modus" role="tablist">
+    <button type="button" role="tab" id="modErk" aria-selected="true"></button>
+    <button type="button" role="tab" id="modUeb" aria-selected="false"></button>
+  </div>
+  <div id="erkunden">
   <div class="tabs" role="tablist">
     <button type="button" role="tab" id="tabMB" aria-selected="true"></button>
     <button type="button" role="tab" id="tab2P" aria-selected="false"></button>
@@ -48,6 +53,8 @@
       <div class="analyse" id="analyse"></div>
     </div>
   </div>
+  </div>
+  <div id="ueben" class="ueben" hidden></div>
   <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
 </div>
 
@@ -186,6 +193,8 @@
   rechne(true);
 })();
 </script>
+<script src="/funktionen/ueben.js"></script>
+<script>FU.einbauen("linear");</script>
 <script src="/home-button.js"></script>
 </body>
 </html>

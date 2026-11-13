@@ -59,3 +59,36 @@ h1 { text-align: center; color: var(--blue); margin: 0 0 14px; font-size: 28px; 
   .graph-box { position: static; }
   .graph-wrap svg { height: min(56vh, 420px); height: min(56dvh, 420px); }
 }
+
+/* ---------- Reiter Untersuchen | Üben ---------- */
+.modus { display: flex; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; }
+.modus button { font: 700 16px system-ui, sans-serif; padding: 9px 22px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+.modus button[aria-selected="true"] { background: var(--blue); color: #ffffff; box-shadow: 0 2px 6px rgba(21,101,192,0.3); }
+
+/* ---------- Übungsmodus ---------- */
+.ueben { max-width: 720px; margin: 0 auto; display: grid; gap: 10px; }
+.u-kopf { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px; color: var(--muted); }
+.u-kopf b { color: var(--text); }
+.u-aufgabe { text-align: center; background: #ffffff; border: 2px solid var(--blue); border-radius: 14px; padding: 14px 12px; font-size: 18px; color: var(--text); }
+.u-aufgabe .f { font: 24px "Cambria Math", Cambria, "Times New Roman", serif; }
+.u-hilfe { text-align: center; font-size: 13px; color: var(--muted); }
+.u-schritt.u-ok { border-color: #2e9d57; background: #effaf2; }
+.u-schritt.u-gez { border-color: #d08a00; background: #fff8e8; }
+.u-zeile { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 6px 0; }
+.u-zeile label { display: inline-flex; align-items: center; gap: 6px; font: italic 20px "Cambria Math", Cambria, "Times New Roman", serif; color: var(--text); }
+.u-zeile input { font: 19px "Cambria Math", Cambria, "Times New Roman", serif; width: 130px; max-width: 100%; padding: 7px 10px; border: 2px solid var(--line); border-radius: 10px; background: #ffffff; color: var(--text); }
+.u-zeile input.u-breit { width: min(300px, 70vw); }
+.u-zeile input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(21,101,192,0.18); }
+.u-zeile input:disabled { background: #f3f5f9; color: var(--text); }
+.u-wahl { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+.u-wahl .u-gewaehlt { outline: 3px solid var(--blue); }
+.u-knoepfe { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.u-knoepfe .knopf { padding: 8px 14px; font-size: 15px; }
+.u-meldung { margin-top: 6px; font-weight: 700; }
+.u-meldung.gut { color: #1d7a3f; }
+.u-meldung.schlecht { color: #b91c1c; }
+.u-tipp { margin-top: 6px; background: #fffbe6; border: 1px solid #e6c84a; border-radius: 10px; padding: 7px 10px; font-size: 15px; color: #4a3b00; }
+.u-loesung { margin-top: 6px; color: #7a4d00; font-weight: 700; }
+.u-ende { text-align: center; border-color: var(--blue); }
+.u-ende .u-knoepfe { justify-content: center; }
+@media (max-width: 860px) { .u-aufgabe .f { font-size: 21px; } .modus button { padding: 8px 18px; } }
