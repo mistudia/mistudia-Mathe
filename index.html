@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     miStudia Mathe – Startmenü
+     ------------------------------------------------------------
+     Bündelt die Mathe-Apps von miStudia unter einer Adresse (eine
+     Domain → eine Android-App ohne Adressleiste). Jede App liegt als
+     Unterordner (einmaleins/, schriftlich/, groessen/, brueche/,
+     prozent/, waage/, binome/) und bekommt über home-button.js einen
+     runden Knopf oben links zurück hierher.
+     Sprachauswahl: localStorage "msMathLang" (nur dieses Menü und der
+     Hinweistext des Zurück-Knopfs; jede App hat ihre eigene Auswahl).
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia Mathe</title>
+<meta name="description" content="Mathe üben mit miStudia: Einmaleins, schriftlich rechnen, Größen, Brüche, Prozente, Gleichungen und binomische Formeln.">
+<meta name="theme-color" content="#1565c0">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<style>
+  :root { --blue: #1565c0; --bg: #eef5ff; --card: #ffffff; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding: 0 16px; padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  main { max-width: 900px; margin: 0 auto; }
+  header { text-align: center; padding-top: max(16px, env(safe-area-inset-top)); }
+  .logo { width: min(300px, 70vw); height: auto; display: block; margin: 4px auto 0; border-radius: 16px; }
+  h1 { font-size: 28px; margin: 8px 0 2px; color: var(--blue); }
+  .sub { margin: 0 0 12px; color: var(--muted); font-size: 15px; }
+  .langs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 0 0 18px; }
+  .langs button {
+    font: 700 14px/1 system-ui, sans-serif; padding: 8px 12px; border-radius: 999px; cursor: pointer;
+    background: #ffffff; color: var(--blue); border: 2px solid #9db8e0;
+  }
+  .langs button[aria-pressed="true"] { background: var(--blue); color: #ffffff; border-color: var(--blue); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .tile {
+    display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 18px; text-decoration: none;
+    background: var(--card); color: var(--text); border: 2px solid #d3def0;
+    box-shadow: 0 2px 8px rgba(21,101,192,0.10); transition: transform .12s ease, box-shadow .12s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tile:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(21,101,192,0.18); }
+  .tile:focus-visible { outline: 3px solid #ffb300; outline-offset: 2px; }
+  .badge {
+    flex: 0 0 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    color: #ffffff; font: 900 22px/1 system-ui, sans-serif; text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.12);
+  }
+  .tile b { display: block; font-size: 18px; margin-bottom: 2px; color: var(--text); }
+  .tile span.desc { display: block; font-size: 14px; color: var(--muted); line-height: 1.3; }
+  .tile span.grade {
+    display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--blue);
+    background: #e3eefc; border-radius: 999px; padding: 2px 8px;
+  }
+  footer { text-align: center; font-size: 13px; color: var(--muted); padding: 22px 0 8px; }
+  footer a { color: var(--blue); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img class="logo" src="/img/mistudia-logo.png" alt="miStudia – Lernen mit Spaß" width="700" height="363">
+    <h1 id="title">Mathe</h1>
+    <p class="sub" id="sub"></p>
+    <div class="langs" role="group" aria-label="Sprache / Language">
+      <button type="button" data-l="de">DE</button>
+      <button type="button" data-l="en">EN</button>
+      <button type="button" data-l="es">ES</button>
+      <button type="button" data-l="fr">FR</button>
+      <button type="button" data-l="zh">中文</button>
+    </div>
+  </header>
+  <nav class="grid" id="grid"></nav>
+  <footer>
+    <a id="privacy" href="/privacy.html">Datenschutz</a> ·
+    <a id="imprint" href="https://mistudia.com/impressum" target="_blank" rel="noopener">Impressum</a> ·
+    <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a>
+  </footer>
+</main>
+<script>
+var APPS = [
+  { slug: "einmaleins", badge: "7×8", color: "#ff8a00",
+    name: { de: "Einmaleins-Diplom", en: "Times Table Diploma", es: "Diploma de tablas", fr: "Diplôme des tables", zh: "乘法表证书" },
+    desc: { de: "Alle Reihen von 2 bis 10 – schaffst du das Diplom?", en: "All tables from 2 to 10 – can you earn the diploma?", es: "Todas las tablas del 2 al 10 – ¿consigues el diploma?", fr: "Toutes les tables de 2 à 10 – obtiendras-tu le diplôme ?", zh: "2到10的全部乘法表——你能拿到证书吗？" },
+    grade: { de: "Klasse 2–4", en: "Grade 2–4", es: "Curso 2–4", fr: "CE1–CM1", zh: "2–4年级" } },
+  { slug: "schriftlich", badge: "+ −", color: "#2fbf55",
+    name: { de: "Schriftlich rechnen", en: "Written Calculation", es: "Cálculo escrito", fr: "Calcul posé", zh: "竖式计算" },
+    desc: { de: "Plus, minus, mal und geteilt untereinander rechnen", en: "Column addition, subtraction, multiplication, division", es: "Sumar, restar, multiplicar y dividir en columna", fr: "Additions, soustractions, multiplications, divisions posées", zh: "列竖式做加减乘除" },
+    grade: { de: "Klasse 3–5", en: "Grade 3–5", es: "Curso 3–5", fr: "CE2–6e", zh: "3–5年级" } },
+  { slug: "groessen", badge: "cm", color: "#14b8b0",
+    name: { de: "Größen umwandeln", en: "Unit Converter", es: "Convertir unidades", fr: "Conversions d’unités", zh: "单位换算" },
+    desc: { de: "Länge, Fläche, Volumen, Gewicht und Zeit", en: "Length, area, volume, weight and time", es: "Longitud, área, volumen, peso y tiempo", fr: "Longueurs, aires, volumes, masses et durées", zh: "长度、面积、体积、重量和时间" },
+    grade: { de: "Klasse 3–7", en: "Grade 3–7", es: "Curso 3–7", fr: "CE2–5e", zh: "3–7年级" } },
+  { slug: "brueche", badge: "¾", color: "#ff4f9a",
+    name: { de: "Bruchrechnen", en: "Fractions", es: "Fracciones", fr: "Fractions", zh: "分数计算" },
+    desc: { de: "Kürzen, addieren, multiplizieren und mehr", en: "Simplify, add, multiply and more", es: "Simplificar, sumar, multiplicar y más", fr: "Simplifier, additionner, multiplier et plus", zh: "约分、加法、乘法等" },
+    grade: { de: "Klasse 5–7", en: "Grade 5–7", es: "Curso 5–7", fr: "6e–4e", zh: "5–7年级" } },
+  { slug: "prozent", badge: "%", color: "#a855f7",
+    name: { de: "Prozente & Dezimalzahlen", en: "Percent & Decimals", es: "Porcentajes y decimales", fr: "Pourcentages et décimaux", zh: "百分数与小数" },
+    desc: { de: "Dezimalzahl, Prozent und Bruch umwandeln", en: "Convert decimals, percentages and fractions", es: "Convertir decimales, porcentajes y fracciones", fr: "Convertir décimaux, pourcentages et fractions", zh: "小数、百分数和分数互相转换" },
+    grade: { de: "Klasse 6–7", en: "Grade 6–7", es: "Curso 6–7", fr: "5e–4e", zh: "6–7年级" } },
+  { slug: "waage", badge: "⚖", color: "#5b7cfa",
+    name: { de: "Mathe-Waage", en: "Equation Balance", es: "Balanza de ecuaciones", fr: "Balance des équations", zh: "方程天平" },
+    desc: { de: "Gleichungen lösen mit der Waage", en: "Solve equations with a balance", es: "Resolver ecuaciones con una balanza", fr: "Résoudre des équations avec une balance", zh: "用天平解方程" },
+    grade: { de: "Klasse 7–8", en: "Grade 7–8", es: "Curso 7–8", fr: "4e–3e", zh: "7–8年级" } },
+  { slug: "binome", badge: "(a+b)²", color: "#1565c0",
+    name: { de: "Binomische Formeln", en: "Binomial Formulas", es: "Fórmulas binómicas", fr: "Identités remarquables", zh: "二项式公式" },
+    desc: { de: "Klammern ausmultiplizieren Schritt für Schritt", en: "Expand brackets step by step", es: "Multiplicar paréntesis paso a paso", fr: "Développer pas à pas", zh: "一步步展开括号" },
+    grade: { de: "Klasse 8–9", en: "Grade 8–9", es: "Curso 8–9", fr: "3e–2nde", zh: "8–9年级" } }
+];
+var UI = {
+  de: { title: "Mathe", sub: "Üben mit Spaß – such dir eine App aus!", privacy: "Datenschutz", imprint: "Impressum" },
+  en: { title: "Math", sub: "Practise with fun – pick an app!", privacy: "Privacy", imprint: "Legal notice" },
+  es: { title: "Matemáticas", sub: "Practica con diversión – ¡elige una app!", privacy: "Privacidad", imprint: "Aviso legal" },
+  fr: { title: "Maths", sub: "S’entraîner en s’amusant – choisis une appli !", privacy: "Confidentialité", imprint: "Mentions légales" },
+  zh: { title: "数学", sub: "快乐练习——选一个应用吧！", privacy: "隐私政策", imprint: "法律声明" }
+};
+var lang = "de";
+try {
+  var saved = localStorage.getItem("msMathLang");
+  if(saved && UI[saved]) lang = saved;
+  else { var nl = (navigator.language || "de").slice(0, 2).toLowerCase(); if(UI[nl]) lang = nl; }
+} catch(e){}
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+function render(){
+  var u = UI[lang];
+  document.documentElement.lang = lang;
+  document.title = "miStudia " + u.title;
+  document.getElementById("title").textContent = u.title;
+  document.getElementById("sub").textContent = u.sub;
+  document.getElementById("privacy").textContent = u.privacy;
+  document.getElementById("imprint").textContent = u.imprint;
+  document.querySelectorAll(".langs button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.l === lang ? "true" : "false"); });
+  document.getElementById("grid").innerHTML = APPS.map(function(a){
+    return '<a class="tile" href="/' + a.slug + '/">' +
+      '<span class="badge" style="background:' + a.color + ';font-size:' + (a.badge.length > 4 ? 15 : a.badge.length > 2 ? 19 : 26) + 'px">' + esc(a.badge) + '</span>' +
+      '<span><b>' + esc(a.name[lang]) + '</b><span class="desc">' + esc(a.desc[lang]) + '</span>' +
+      '<span class="grade">' + esc(a.grade[lang]) + '</span></span></a>';
+  }).join("");
+}
+document.querySelectorAll(".langs button").forEach(function(b){
+  b.addEventListener("click", function(){
+    lang = b.dataset.l;
+    try { localStorage.setItem("msMathLang", lang); } catch(e){}
+    render();
+  });
+});
+render();
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){ navigator.serviceWorker.register("/sw.js").catch(function(){}); });
+}
+</script>
+</body>
+</html>

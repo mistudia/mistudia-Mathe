@@ -1,0 +1,2208 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>miStudia – Einmaleins-Diplom</title>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+body{
+font-family:Arial,sans-serif;
+margin:0;
+background:linear-gradient(#eef5ff,#dfefff);
+}
+
+header,main,footer{max-width:900px;margin:auto}
+
+header{
+background:white;
+padding:25px;
+text-align:center;
+}
+
+h1{
+margin:0;
+font-size:38px;
+color:#1565c0;
+}
+
+.toolbar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+
+button{
+background:#1976d2;
+color:white;
+border:none;
+border-radius:10px;
+padding:12px 22px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+transition:.25s;
+box-shadow:0 4px 10px rgba(0,0,0,.18);
+}
+
+button:hover{
+background:#1565c0;
+transform:translateY(-2px);
+box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
+
+button:active{
+transform:scale(.98);
+}
+
+button:disabled{
+opacity:.5;
+cursor:default;
+transform:none;
+box-shadow:none;
+}
+
+.lang-btn{
+background:#1976d2;
+border:3px solid transparent;
+border-radius:10px;
+padding:8px 16px;
+font-size:24px;
+line-height:1;
+cursor:pointer;
+transition:.2s;
+box-shadow:0 4px 10px rgba(0,0,0,.18);
+}
+
+.lang-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
+
+.lang-btn.active{
+border-color:#ffd54f;
+background:#1565c0;
+}
+
+.modus-btn{
+background:#1976d2;
+color:white;
+border:3px solid transparent;
+border-radius:10px;
+padding:10px 20px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+transition:.2s;
+box-shadow:0 4px 10px rgba(0,0,0,.18);
+}
+
+.modus-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
+
+.modus-btn.active{
+border-color:#ffd54f;
+background:#1565c0;
+}
+
+.modus-symbol{
+color:#ffd54f;
+font-size:20px;
+font-weight:900;
+}
+
+main{
+background:white;
+margin-top:25px;
+margin-bottom:0;
+padding:30px 30px 6px;
+border-radius:18px;
+box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+
+#logoOben{
+display:block;
+margin:0 auto 15px;
+max-width:320px;
+width:100%;
+height:auto;
+transition:.25s;
+}
+
+#logoOben:hover{transform:scale(1.03);}
+
+#logoUnten{
+display:block;
+margin:0 auto 10px;
+max-width:140px;
+height:auto;
+opacity:.9;
+transition:.25s;
+}
+
+#logoUnten:hover{transform:scale(1.03);}
+
+footer{
+margin-top:0;
+text-align:center;
+padding:8px 25px;
+color:#666;
+font-size:15px;
+border-top:1px solid #ddd;
+}
+
+footer a{
+color:#1565c0;
+font-weight:bold;
+text-decoration:none;
+}
+
+footer a:hover{text-decoration:underline;}
+
+#anleitung{
+text-align:center;
+font-size:18px;
+color:#333;
+margin:0 0 22px;
+}
+
+.statusZeile{
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:10px;
+margin-bottom:8px;
+font-weight:bold;
+}
+
+#aufgabeLabel{
+color:#1565c0;
+font-size:17px;
+}
+
+#timerAnzeige{
+font-size:20px;
+color:#1565c0;
+background:#eef5ff;
+padding:6px 16px;
+border-radius:10px;
+min-width:90px;
+text-align:center;
+}
+
+#timerAnzeige.warnung{
+color:#c62828;
+background:#ffebee;
+}
+
+#fehlerAnzeige{
+font-size:14px;
+color:#c62828;
+background:#ffebee;
+padding:6px 12px;
+border-radius:10px;
+white-space:nowrap;
+}
+
+#fehlerAnzeige.keineFehler{
+color:#2e7d32;
+background:#e8f5e9;
+}
+
+.progressBar{
+width:100%;
+height:10px;
+background:#e3ecfb;
+border-radius:6px;
+overflow:hidden;
+margin-bottom:10px;
+}
+
+#progressFill{
+height:100%;
+width:0%;
+background:#1976d2;
+transition:width .3s;
+}
+
+.fragenZeitZeile{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:26px;
+}
+
+.fragenZeitBar{
+flex:1;
+width:100%;
+height:10px;
+background:#e3ecfb;
+border-radius:6px;
+overflow:hidden;
+}
+
+#fragenZeitFill{
+height:100%;
+width:100%;
+background:#1976d2;
+transition:width 1s linear, background .3s;
+}
+
+#fragenZeitFill.warnung{
+background:#c62828;
+}
+
+#fragenZeitZahl{
+font-weight:bold;
+font-size:15px;
+color:#1976d2;
+min-width:34px;
+text-align:right;
+transition:color .3s;
+}
+
+#fragenZeitZahl.warnung{
+color:#c62828;
+}
+
+#ergebnisMsg{
+text-align:center;
+font-weight:bold;
+font-size:17px;
+min-height:26px;
+margin-bottom:10px;
+}
+
+#ergebnisMsg.gut{color:#1ea64b;}
+#ergebnisMsg.schlecht{color:#c62828;}
+
+#aufgabeBereich{
+text-align:center;
+padding:20px 0 30px;
+}
+
+.aufgabeKarte{
+font-size:46px;
+font-weight:bold;
+color:#1565c0;
+margin-bottom:26px;
+letter-spacing:1px;
+}
+
+#aktuelleEingabe{
+font-size:34px;
+width:120px;
+padding:10px 6px;
+text-align:center;
+border:3px solid #90caf9;
+border-radius:10px;
+outline:none;
+transition:.2s;
+color:#000;
+background:white;
+}
+
+#aktuelleEingabe:focus{
+border-color:#1976d2;
+box-shadow:0 0 10px rgba(25,118,210,.35);
+}
+
+.eingabeZeile{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+}
+
+.mikro-btn{
+width:52px;
+height:52px;
+border-radius:50%;
+border:3px solid #90caf9;
+background:white;
+font-size:24px;
+cursor:pointer;
+transition:.2s;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:0;
+}
+
+.mikro-btn:hover{
+border-color:#1976d2;
+}
+
+.mikro-btn.aktiv{
+background:#c62828;
+border-color:#c62828;
+animation:mikroPuls 1s infinite;
+}
+
+.mikro-btn.stumm{
+opacity:.45;
+border-color:#bdbdbd;
+}
+
+@keyframes mikroPuls{
+0%{ box-shadow:0 0 0 0 rgba(198,40,40,.5); }
+70%{ box-shadow:0 0 0 12px rgba(198,40,40,0); }
+100%{ box-shadow:0 0 0 0 rgba(198,40,40,0); }
+}
+
+.mikro-btn[hidden]{
+display:none;
+}
+
+#loesungAnzeige{
+margin-top:14px;
+font-size:20px;
+font-weight:bold;
+color:#c62828;
+min-height:28px;
+}
+
+#wiederholungBereich{
+margin:20px 0;
+padding:18px;
+background:#fff8e1;
+border-radius:14px;
+border:2px solid #ffe082;
+text-align:left;
+}
+
+#wiederholungTitel{
+margin:0 0 12px 0;
+color:#e65100;
+text-align:center;
+}
+
+.wiederholungAufgabe{
+display:inline-block;
+background:white;
+border-radius:8px;
+padding:8px 14px;
+margin:5px;
+font-size:17px;
+font-weight:bold;
+color:#1565c0;
+box-shadow:0 2px 6px rgba(0,0,0,.12);
+}
+
+.toolbar-aktionen{
+display:flex;
+justify-content:center;
+gap:14px;
+flex-wrap:wrap;
+margin:20px 0 0;
+}
+
+.btn-weiter{background:#3367d6;}
+.btn-weiter:hover{background:#2b57b5;}
+
+.btn-pause{background:#616161;}
+.btn-pause:hover{background:#484848;}
+.btn-pause.fortsetzen{background:#2e7d32;}
+.btn-pause.fortsetzen:hover{background:#255f28;}
+
+.btn-neu{background:#f59e0b;}
+.btn-neu:hover{background:#d88906;}
+
+#pauseHinweis{
+text-align:center;
+color:#c62828;
+font-size:14px;
+font-weight:bold;
+margin-top:10px;
+min-height:18px;
+}
+
+/* ------------------------------
+   Zertifikat
+------------------------------ */
+
+#diplomAussenBereich{
+display:none;
+margin-top:34px;
+}
+
+#diplomBereich{
+position:relative;
+background:#ffffff;
+border:12px solid #0d2352;
+border-radius:22px;
+padding:26px 26px 30px;
+box-shadow:0 0 0 4px #d9ac36 inset, 0 14px 34px rgba(0,0,0,.18);
+overflow:hidden;
+}
+
+#diplomBereich::before{
+content:"";
+position:absolute;
+inset:9px;
+border:2px solid #d9ac36;
+border-radius:14px;
+pointer-events:none;
+}
+
+.diplomStern{
+position:absolute;
+color:#dbe6fb;
+opacity:.55;
+font-size:22px;
+pointer-events:none;
+}
+
+#diplomLogo{
+position:absolute;
+top:16px;
+right:22px;
+max-width:130px;
+width:32%;
+height:auto;
+z-index:3;
+}
+
+.diplomMedaille{
+position:absolute;
+top:14px;
+left:22px;
+width:100px;
+z-index:3;
+}
+
+#diplomInnen{
+position:relative;
+z-index:2;
+padding:6px 8px 0;
+}
+
+.diplomSterneZeile{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+margin:8px auto 4px;
+max-width:360px;
+}
+
+.diplomSterneZeile .linie{
+flex:1;
+height:1px;
+background:linear-gradient(to right, transparent, #d9ac36);
+}
+
+.diplomSterneZeile .linie.re{
+background:linear-gradient(to left, transparent, #d9ac36);
+}
+
+.diplomSterneZeile span.stern{
+color:#d9ac36;
+font-size:20px;
+}
+
+#diplomTitel{
+text-align:center;
+font-family:'Playfair Display', Georgia, serif;
+font-weight:900;
+font-size:56px;
+letter-spacing:5px;
+color:#0d2352;
+margin:2px 0 8px;
+}
+
+#diplomText1{
+text-align:center;
+font-size:16px;
+color:#555;
+margin:0 0 4px;
+}
+
+#diplomNameInput{
+display:block;
+margin:2px auto 6px;
+font-family:'Dancing Script', cursive;
+font-weight:700;
+font-size:46px;
+text-align:center;
+color:#1565c0;
+border:none;
+border-bottom:2px dashed #d9ac36;
+background:transparent;
+padding:4px 10px;
+width:80%;
+max-width:440px;
+outline:none;
+}
+
+.diplomTrenner{
+width:70%;
+max-width:480px;
+height:1px;
+background:#e3c878;
+margin:6px auto 14px;
+border:none;
+}
+
+#diplomText2{
+text-align:center;
+font-size:15px;
+color:#444;
+line-height:1.5;
+max-width:560px;
+margin:0 auto 18px;
+}
+
+#diplomText2 .marke{
+color:#f59e0b;
+font-weight:bold;
+}
+
+.diplomBadges{
+display:flex;
+justify-content:center;
+gap:12px;
+flex-wrap:wrap;
+margin:0 auto 18px;
+}
+
+.diplomBadge{
+border:2px solid #ccc;
+border-radius:12px;
+padding:10px 12px;
+min-width:96px;
+text-align:center;
+background:#fff;
+}
+
+.diplomBadge .icon{font-size:24px;line-height:1;margin-bottom:4px;}
+.diplomBadge .wert{font-weight:900;font-size:19px;color:#0d2352;}
+.diplomBadge .label{font-size:11px;color:#666;margin-top:2px;line-height:1.2;}
+
+.badge-blau{border-color:#1976d2;}
+.badge-blau .wert{color:#1565c0;}
+
+.badge-gruen{border-color:#2e7d32;}
+.badge-gruen .wert{color:#2e7d32;}
+
+.badge-orange{border-color:#f57c00;}
+.badge-orange .wert{color:#e65100;}
+
+.badge-cyan{border-color:#0097a7;}
+.badge-cyan .wert{color:#00838f;}
+
+.badge-lila{border-color:#8e24aa;}
+.badge-lila .wert{color:#7b1fa2;}
+
+.diplomLevelZeile{
+display:flex;
+justify-content:center;
+margin:0 auto 20px;
+}
+
+.diplomLevel{
+display:flex;
+align-items:center;
+gap:10px;
+background:#0d2352;
+color:#fff;
+border:2px solid #d9ac36;
+border-radius:999px;
+padding:9px 26px;
+font-weight:bold;
+letter-spacing:1px;
+font-size:14px;
+}
+
+.diplomLevel .levelWert{
+font-size:20px;
+color:#f5cf5b;
+letter-spacing:2px;
+}
+
+.diplomFuss{
+display:flex;
+justify-content:space-between;
+align-items:flex-end;
+flex-wrap:wrap;
+gap:14px;
+margin-top:10px;
+}
+
+.diplomFussLinks{
+display:flex;
+align-items:center;
+gap:10px;
+font-size:12px;
+color:#444;
+text-align:left;
+}
+
+.diplomSiegel{
+width:44px;
+height:44px;
+border-radius:50%;
+border:2px solid #d9ac36;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+color:#d9ac36;
+flex:0 0 auto;
+background:#fffdf3;
+}
+
+.diplomFussMitte{
+text-align:center;
+font-size:13px;
+color:#333;
+}
+
+#diplomDatum{
+color:#1565c0;
+font-weight:bold;
+font-size:14px;
+}
+
+.diplomFussRechts{
+text-align:right;
+font-size:13px;
+color:#333;
+}
+
+.diplomUnterschrift{
+font-family:'Dancing Script', cursive;
+font-weight:700;
+font-size:26px;
+color:#1565c0;
+border-bottom:1px solid #999;
+padding-bottom:4px;
+margin-bottom:2px;
+display:inline-block;
+}
+
+#elefantZertifikat{
+position:absolute;
+left:8px;
+bottom:6px;
+width:110px;
+z-index:3;
+pointer-events:none;
+}
+
+.diplomAktionen{
+text-align:center;
+margin-top:18px;
+}
+
+.no-print{}
+
+@media print{
+body *{visibility:hidden;}
+#diplomAussenBereich, #diplomAussenBereich *{visibility:visible;}
+#diplomAussenBereich{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+margin:0;
+}
+.no-print{display:none !important;}
+}
+
+@media (max-width:560px){
+#diplomTitel{font-size:36px;letter-spacing:2px;}
+#diplomNameInput{font-size:30px;}
+.diplomMedaille{width:70px;}
+#diplomLogo{width:28%;}
+#elefantZertifikat{width:80px;}
+}
+
+#jubelElefant{
+display:none;
+position:fixed;
+right:25px;
+bottom:25px;
+width:180px;
+z-index:10000;
+pointer-events:none;
+}
+
+</style>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+</head>
+<body>
+
+<header>
+
+<a href="https://mistudia.com" target="_blank" rel="noopener noreferrer">
+    <img src="/img/mistudia-logo-learnbygame.png" id="logoOben" alt="miStudia – Lernen mit Spaß!">
+</a>
+
+<h1 id="titel">Einmaleins-Diplom</h1>
+
+<div class="toolbar">
+<button id="btnDe" class="lang-btn active" onclick="sprache('de')">🇩🇪</button>
+<button id="btnEn" class="lang-btn" onclick="sprache('en')">🇺🇸</button>
+<button id="btnEs" class="lang-btn" onclick="sprache('es')">🇪🇸</button>
+<button id="btnZh" class="lang-btn" onclick="sprache('zh')">🇨🇳</button>
+</div>
+
+<div class="toolbar">
+<button id="btnModusMal" class="modus-btn active" onclick="modus('mal')"><span class="modus-symbol">×</span> <span id="modusMalLabel">Malnehmen</span></button>
+<button id="btnModusGeteilt" class="modus-btn" onclick="modus('geteilt')"><span class="modus-symbol">÷</span> <span id="modusGeteiltLabel">Geteilt</span></button>
+<button id="btnModusPlus" class="modus-btn" onclick="modus('plus')"><span class="modus-symbol">+</span> <span id="modusPlusLabel">Plus</span></button>
+<button id="btnModusMinus" class="modus-btn" onclick="modus('minus')"><span class="modus-symbol">−</span> <span id="modusMinusLabel">Minus</span></button>
+</div>
+
+</header>
+
+<main>
+
+<p id="anleitung">Löse alle 45 Aufgaben aus den Einmaleinsreihen 2 bis 10 fehlerfrei in 7 Minuten, um dein Diplom zu bekommen!</p>
+
+<div class="statusZeile">
+<span id="aufgabeLabel"></span>
+<span id="fehlerAnzeige"></span>
+<span id="timerAnzeige">08:00</span>
+</div>
+
+<div class="progressBar"><div id="progressFill"></div></div>
+<div class="fragenZeitZeile">
+    <div class="fragenZeitBar"><div id="fragenZeitFill"></div></div>
+    <span id="fragenZeitZahl">7s</span>
+</div>
+
+<div id="ergebnisMsg"></div>
+
+<div id="wiederholungBereich" style="display:none">
+    <h3 id="wiederholungTitel"></h3>
+    <div id="wiederholungListe"></div>
+</div>
+
+<div id="aufgabeBereich">
+    <div class="aufgabeKarte" id="aufgabeKarte"></div>
+    <div class="eingabeZeile">
+        <input type="text" inputmode="numeric" id="aktuelleEingabe" autocomplete="off">
+        <button type="button" id="mikroBtn" class="mikro-btn stumm" title="Antwort sprechen">🔇</button>
+    </div>
+    <div id="loesungAnzeige"></div>
+</div>
+
+<div class="toolbar toolbar-aktionen">
+<button id="weiter" class="btn-weiter">Weiter ➜</button>
+<button id="pauseBtn" class="btn-pause">⏸️ Pause</button>
+<button id="neu" class="btn-neu">🔄 Neu starten</button>
+</div>
+
+<div id="pauseHinweis"></div>
+
+<div id="diplomAussenBereich">
+
+    <div id="diplomBereich">
+
+        <span class="diplomStern" style="top:18px;left:150px;">★</span>
+        <span class="diplomStern" style="top:70px;right:170px;font-size:16px;">★</span>
+        <span class="diplomStern" style="bottom:40px;left:140px;font-size:16px;">★</span>
+        <span class="diplomStern" style="bottom:90px;right:60px;">★</span>
+        <span class="diplomStern" style="top:120px;left:40%;font-size:14px;">★</span>
+
+        <img class="diplomMedaille" src="medaille.png" alt="Medaille" onerror="this.style.display='none'">
+        <img id="diplomLogo" src="/img/mistudia-logo-learnbygame.png" alt="miStudia">
+
+        <img id="elefantZertifikat" src="/img/elefant.png" alt="miStudia Elefant">
+
+        <div id="diplomInnen">
+
+            <div class="diplomSterneZeile">
+                <span class="linie"></span>
+                <span class="stern">★</span>
+                <span class="stern">★</span>
+                <span class="stern">★</span>
+                <span class="linie re"></span>
+            </div>
+
+            <div id="diplomTitel">ZERTIFIKAT</div>
+
+            <div id="diplomText1">Hiermit wird bestätigt, dass</div>
+
+            <input type="text" id="diplomNameInput" placeholder="Dein Name">
+
+            <hr class="diplomTrenner">
+
+            <div id="diplomText2">erfolgreich am<br><span class="marke">miStudia</span> Einmaleins-Diplom teilgenommen hat.</div>
+
+            <div class="diplomBadges">
+
+                <div class="diplomBadge badge-blau">
+                    <div class="icon">⭐</div>
+                    <div class="wert" id="badgePunkte">0</div>
+                    <div class="label" id="badgePunkteLabel">Punkte</div>
+                </div>
+
+                <div class="diplomBadge badge-gruen">
+                    <div class="icon">✅</div>
+                    <div class="wert" id="badgeAufgaben">40/40</div>
+                    <div class="label" id="badgeAufgabenLabel">Aufgaben richtig</div>
+                </div>
+
+                <div class="diplomBadge badge-orange">
+                    <div class="icon">🔢</div>
+                    <div class="wert" id="badgeReihen">2–10</div>
+                    <div class="label" id="badgeReihenLabel">Einmaleinsreihen</div>
+                </div>
+
+                <div class="diplomBadge badge-cyan">
+                    <div class="icon">⏱</div>
+                    <div class="wert" id="badgeZeit">00:00</div>
+                    <div class="label" id="badgeZeitLabel">Benötigte Zeit</div>
+                </div>
+
+                <div class="diplomBadge badge-lila">
+                    <div class="icon">🏆</div>
+                    <div class="wert" id="badgeStatus">Bestanden</div>
+                    <div class="label" id="badgeStatusLabel">Ergebnis</div>
+                </div>
+
+            </div>
+
+            <div class="diplomLevelZeile">
+                <div class="diplomLevel">
+                    🏆<span id="levelLabel">GESAMTLEVEL</span>
+                    <span class="levelWert" id="levelWert">★ GOLD ★</span>
+                </div>
+            </div>
+
+            <div class="diplomFuss">
+
+                <div class="diplomFussLinks">
+                    <div class="diplomSiegel">🎓</div>
+                    <div>
+                        <div id="zertifikatIdLabel">Zertifikat-ID</div>
+                        <div id="zertifikatId">MS-0000-0000</div>
+                    </div>
+                </div>
+
+                <div class="diplomFussMitte">
+                    <div id="ausgestelltLabel">Ausgestellt am</div>
+                    <div id="diplomDatum"></div>
+                </div>
+
+                <div class="diplomFussRechts">
+                    <div class="diplomUnterschrift">miStudia Team</div>
+                    <div>mistudia.de</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="diplomAktionen">
+        <button id="drucken" class="no-print">🖨️ Diplom drucken</button>
+    </div>
+
+</div>
+
+</main>
+
+<footer>
+
+<a href="https://mistudia.com" target="_blank" rel="noopener noreferrer">
+    <img src="/img/mistudia-logo-learnbygame.png" id="logoUnten" alt="miStudia – Lernen mit Spaß!">
+</a>
+
+<div>
+© <span id="jahr"></span> miStudia |
+<a href="https://mistudia.com" target="_blank" rel="noopener noreferrer">
+mistudia.com
+</a>
+</div>
+
+</footer>
+
+<img
+    id="jubelElefant"
+    src="/img/elefant.png"
+    alt="Jubel-Elefant">
+
+<script>
+document.getElementById("jahr").textContent = new Date().getFullYear();
+
+const GESAMTZEIT_NORMAL = 5 * 60;
+const GESAMTZEIT_PLUSMINUS = 10 * 60;
+const FRAGENZEIT_NORMAL = 7;
+const FRAGENZEIT_PLUSMINUS = 15;
+
+let GESAMTZEIT = GESAMTZEIT_NORMAL;
+let FRAGENZEIT = FRAGENZEIT_NORMAL;
+let aktivSprache = "de";
+let aktivModus = "mal";
+let aufgaben = [];
+let aktuellerIndex = 0;
+let richtigCount = 0;
+let falscheAufgaben = [];
+let timerSekunden = GESAMTZEIT;
+let timerInterval = null;
+let testAktiv = false;
+let fragenAblaufTimeout = null;
+let fragenSekundenInterval = null;
+let fragenSekundenUebrig = FRAGENZEIT;
+let pausiert = false;
+let diplomGesperrt = false;
+let renderZeitpunkt = 0;
+const MIN_ANTWORT_VERZOEGERUNG = 300;
+
+const texte = {
+
+de:{
+titel:"Einmaleins-Diplom",
+anleitungMal:"Löse alle 45 Aufgaben aus den Einmaleinsreihen 2 bis 10 fehlerfrei in 5 Minuten, um dein Diplom zu bekommen!",
+anleitungGeteilt:"Löse alle 45 Geteiltaufgaben aus den Reihen 2 bis 10 fehlerfrei in 5 Minuten, um dein Diplom zu bekommen!",
+anleitungPlus:"Löse alle 45 (schweren) Plusaufgaben mit Zehnerübergang im Zahlenraum bis 100 fehlerfrei in 10 Minuten, um dein Diplom zu bekommen!",
+anleitungMinus:"Löse alle 45 (schweren) Minusaufgaben mit Übertrag im Zahlenraum bis 100 fehlerfrei in 10 Minuten, um dein Diplom zu bekommen!",
+modusMalLabel:"Malnehmen",
+modusGeteiltLabel:"Geteilt",
+modusPlusLabel:"Plus",
+modusMinusLabel:"Minus",
+weiter:"Weiter ➜",
+neu:"🔄 Neu starten",
+aufgabeLabel:function(n,g){ return "Aufgabe "+n+" von "+g; },
+alleRichtig:"🎉 Super gemacht! Du hast alle Aufgaben richtig gelöst!",
+nichtBestanden:function(r,g){ return "Du hast "+r+" von "+g+" Aufgaben richtig gelöst. Für das Diplom müssen alle "+g+" Aufgaben richtig sein. Versuch es noch einmal!"; },
+zeitAbgelaufen:function(r,g){ return "⏰ Die Zeit ist abgelaufen! Du hast "+r+" von "+g+" Aufgaben rechtzeitig richtig gelöst. Versuch es noch einmal!"; },
+drucken:"🖨️ Diplom drucken",
+diplomTitel:"ZERTIFIKAT",
+diplomText1:"Hiermit wird bestätigt, dass",
+diplomText2Vor:"erfolgreich am",
+diplomText2Marke:"miStudia",
+diplomText2NachMal:"Einmaleins-Diplom teilgenommen hat.",
+diplomText2NachGeteilt:"Geteilt-Diplom teilgenommen hat.",
+diplomText2NachPlus:"Plus-Diplom teilgenommen hat.",
+diplomText2NachMinus:"Minus-Diplom teilgenommen hat.",
+namePlatzhalter:"Dein Name",
+badgePunkteLabel:"Punkte",
+badgeAufgabenLabel:"Aufgaben richtig",
+badgeReihenLabel:"Einmaleinsreihen",
+badgeZahlenraumLabel:"Zahlenraum",
+loesungLabel:"Richtige Lösung:",
+wiederholungTitel:"Diese Aufgaben hattest du falsch:",
+mikroTitel:"Antwort sprechen",
+pauseLabel:"Pause",
+fortsetzenLabel:"Fortsetzen",
+pauseHinweisText:"Bei einer Pause gibt es für diesen Versuch kein Diplom.",
+diplomGesperrtNachricht:"Super, alles richtig! Da du pausiert hast, gibt es diesmal aber kein Diplom.",
+fehlerLabel:function(n){ return n === 0 ? "Bisher keine Fehler" : "Fehler bisher: " + n; },
+sprachCode:"de-DE",
+badgeZeitLabel:"Benötigte Zeit",
+badgeStatusLabel:"Ergebnis",
+badgeStatusWert:"Bestanden",
+levelLabel:"GESAMTLEVEL",
+levelGold:"GOLD",
+levelSilber:"SILBER",
+levelBronze:"BRONZE",
+zertifikatIdLabel:"Zertifikat-ID",
+ausgestelltLabel:"Ausgestellt am",
+datumLabel:""
+},
+
+en:{
+titel:"Times Tables Diploma",
+anleitungMal:"Solve all 45 tasks from the times tables 2 to 10 without mistakes in 5 minutes to earn your diploma!",
+anleitungGeteilt:"Solve all 45 division tasks from the times tables 2 to 10 without mistakes in 5 minutes to earn your diploma!",
+anleitungPlus:"Solve all 45 (hard) addition tasks with carrying up to 100 without mistakes in 10 minutes to earn your diploma!",
+anleitungMinus:"Solve all 45 (hard) subtraction tasks with borrowing up to 100 without mistakes in 10 minutes to earn your diploma!",
+modusMalLabel:"Multiply",
+modusGeteiltLabel:"Divide",
+modusPlusLabel:"Add",
+modusMinusLabel:"Subtract",
+weiter:"Next ➜",
+neu:"🔄 Restart",
+aufgabeLabel:function(n,g){ return "Task "+n+" of "+g; },
+alleRichtig:"🎉 Great job! You solved all tasks correctly!",
+nichtBestanden:function(r,g){ return "You solved "+r+" of "+g+" tasks correctly. All "+g+" tasks must be correct for the diploma. Try again!"; },
+zeitAbgelaufen:function(r,g){ return "⏰ Time's up! You correctly solved "+r+" of "+g+" tasks in time. Try again!"; },
+drucken:"🖨️ Print diploma",
+diplomTitel:"CERTIFICATE",
+diplomText1:"This certifies that",
+diplomText2Vor:"successfully took part in the",
+diplomText2Marke:"miStudia",
+diplomText2NachMal:"Times Tables Diploma.",
+diplomText2NachGeteilt:"Division Diploma.",
+diplomText2NachPlus:"Addition Diploma.",
+diplomText2NachMinus:"Subtraction Diploma.",
+namePlatzhalter:"Your name",
+badgePunkteLabel:"Points",
+badgeAufgabenLabel:"Tasks correct",
+badgeReihenLabel:"Times tables",
+badgeZahlenraumLabel:"Number range",
+loesungLabel:"Correct answer:",
+wiederholungTitel:"Tasks you got wrong:",
+mikroTitel:"Speak your answer",
+pauseLabel:"Pause",
+fortsetzenLabel:"Resume",
+pauseHinweisText:"If you pause, there's no diploma for this attempt.",
+diplomGesperrtNachricht:"Great, all correct! But since you paused, there's no diploma this time.",
+fehlerLabel:function(n){ return n === 0 ? "No mistakes yet" : "Mistakes so far: " + n; },
+sprachCode:"en-US",
+badgeZeitLabel:"Time taken",
+badgeStatusLabel:"Result",
+badgeStatusWert:"Passed",
+levelLabel:"OVERALL LEVEL",
+levelGold:"GOLD",
+levelSilber:"SILVER",
+levelBronze:"BRONZE",
+zertifikatIdLabel:"Certificate ID",
+ausgestelltLabel:"Issued on",
+datumLabel:""
+},
+
+es:{
+titel:"Diploma de las Tablas de Multiplicar",
+anleitungMal:"¡Resuelve las 45 tareas de las tablas del 2 al 10 sin errores en 5 minutos para obtener tu diploma!",
+anleitungGeteilt:"¡Resuelve las 45 tareas de división de las tablas del 2 al 10 sin errores en 5 minutos para obtener tu diploma!",
+anleitungPlus:"¡Resuelve las 45 tareas (difíciles) de suma con acarreo hasta 100 sin errores en 10 minutos para obtener tu diploma!",
+anleitungMinus:"¡Resuelve las 45 tareas (difíciles) de resta con préstamo hasta 100 sin errores en 10 minutos para obtener tu diploma!",
+modusMalLabel:"Multiplicar",
+modusGeteiltLabel:"Dividir",
+modusPlusLabel:"Sumar",
+modusMinusLabel:"Restar",
+weiter:"Siguiente ➜",
+neu:"🔄 Reiniciar",
+aufgabeLabel:function(n,g){ return "Tarea "+n+" de "+g; },
+alleRichtig:"🎉 ¡Muy bien! ¡Resolviste todas las tareas correctamente!",
+nichtBestanden:function(r,g){ return "Resolviste "+r+" de "+g+" tareas correctamente. Para el diploma se necesitan las "+g+" correctas. ¡Inténtalo de nuevo!"; },
+zeitAbgelaufen:function(r,g){ return "⏰ ¡Se acabó el tiempo! Resolviste correctamente "+r+" de "+g+" tareas a tiempo. ¡Inténtalo de nuevo!"; },
+drucken:"🖨️ Imprimir diploma",
+diplomTitel:"CERTIFICADO",
+diplomText1:"Por la presente se certifica que",
+diplomText2Vor:"participó con éxito en el",
+diplomText2Marke:"miStudia",
+diplomText2NachMal:"Diploma de las Tablas de Multiplicar.",
+diplomText2NachGeteilt:"Diploma de División.",
+diplomText2NachPlus:"Diploma de Suma.",
+diplomText2NachMinus:"Diploma de Resta.",
+namePlatzhalter:"Tu nombre",
+badgePunkteLabel:"Puntos",
+badgeAufgabenLabel:"Tareas correctas",
+badgeReihenLabel:"Tablas de multiplicar",
+badgeZahlenraumLabel:"Rango numérico",
+loesungLabel:"Respuesta correcta:",
+wiederholungTitel:"Tareas que tuviste mal:",
+mikroTitel:"Di tu respuesta",
+pauseLabel:"Pausa",
+fortsetzenLabel:"Continuar",
+pauseHinweisText:"Si pausas, no podrás obtener el diploma en este intento.",
+diplomGesperrtNachricht:"¡Genial, todo correcto! Pero como pausaste, no hay diploma esta vez.",
+fehlerLabel:function(n){ return n === 0 ? "Sin errores por ahora" : "Errores hasta ahora: " + n; },
+sprachCode:"es-ES",
+badgeZeitLabel:"Tiempo empleado",
+badgeStatusLabel:"Resultado",
+badgeStatusWert:"Aprobado",
+levelLabel:"NIVEL GENERAL",
+levelGold:"ORO",
+levelSilber:"PLATA",
+levelBronze:"BRONCE",
+zertifikatIdLabel:"ID del certificado",
+ausgestelltLabel:"Emitido el",
+datumLabel:""
+},
+
+zh:{
+titel:"乘法表证书",
+anleitungMal:"请在5分钟内正确解答2到10乘法表的全部45道题目，即可获得证书！",
+anleitungGeteilt:"请在5分钟内正确解答2到10除法表的全部45道题目，即可获得证书！",
+anleitungPlus:"请在10分钟内正确解答100以内需要进位的全部45道（较难）加法题目，即可获得证书！",
+anleitungMinus:"请在10分钟内正确解答100以内需要借位的全部45道（较难）减法题目，即可获得证书！",
+modusMalLabel:"乘法",
+modusGeteiltLabel:"除法",
+modusPlusLabel:"加法",
+modusMinusLabel:"减法",
+weiter:"下一题 ➜",
+neu:"🔄 重新开始",
+aufgabeLabel:function(n,g){ return "第 "+n+" / "+g+" 题"; },
+alleRichtig:"🎉 太棒了！你全部答对了！",
+nichtBestanden:function(r,g){ return "你正确解答了 "+r+" / "+g+" 题。获得证书需要全部 "+g+" 题正确。请再试一次！"; },
+zeitAbgelaufen:function(r,g){ return "⏰ 时间到！你在规定时间内正确解答了 "+r+" / "+g+" 题。请再试一次！"; },
+drucken:"🖨️ 打印证书",
+diplomTitel:"证书",
+diplomText1:"兹证明",
+diplomText2Vor:"成功参加了",
+diplomText2Marke:"miStudia",
+diplomText2NachMal:"乘法表证书。",
+diplomText2NachGeteilt:"除法表证书。",
+diplomText2NachPlus:"加法证书。",
+diplomText2NachMinus:"减法证书。",
+namePlatzhalter:"你的名字",
+badgePunkteLabel:"积分",
+badgeAufgabenLabel:"正确题数",
+badgeReihenLabel:"乘法表范围",
+badgeZahlenraumLabel:"数字范围",
+loesungLabel:"正确答案：",
+wiederholungTitel:"你做错的题目：",
+mikroTitel:"说出你的答案",
+pauseLabel:"暂停",
+fortsetzenLabel:"继续",
+pauseHinweisText:"暂停后，本次将无法获得证书。",
+diplomGesperrtNachricht:"太棒了，全部正确！但因为你暂停过，这次没有证书。",
+fehlerLabel:function(n){ return n === 0 ? "目前没有错误" : "目前错误：" + n; },
+sprachCode:"zh-CN",
+badgeZeitLabel:"所用时间",
+badgeStatusLabel:"结果",
+badgeStatusWert:"通过",
+levelLabel:"总等级",
+levelGold:"金牌",
+levelSilber:"银牌",
+levelBronze:"铜牌",
+zertifikatIdLabel:"证书编号",
+ausgestelltLabel:"颁发日期",
+datumLabel:""
+}
+
+};
+
+function sprache(s){
+
+    aktivSprache = s;
+
+    document.querySelectorAll(".lang-btn").forEach(function(b){ b.classList.remove("active"); });
+    const langIds = { de:"btnDe", en:"btnEn", es:"btnEs", zh:"btnZh" };
+    document.getElementById(langIds[s]).classList.add("active");
+
+    const t = texte[s];
+
+    document.getElementById("titel").textContent = t.titel;
+    document.getElementById("anleitung").textContent = aktuelleAnleitung(t);
+    document.getElementById("modusMalLabel").textContent = t.modusMalLabel;
+    document.getElementById("modusGeteiltLabel").textContent = t.modusGeteiltLabel;
+    document.getElementById("modusPlusLabel").textContent = t.modusPlusLabel;
+    document.getElementById("modusMinusLabel").textContent = t.modusMinusLabel;
+    document.getElementById("wiederholungTitel").textContent = t.wiederholungTitel;
+    document.getElementById("mikroBtn").title = t.mikroTitel;
+    document.getElementById("pauseBtn").textContent =
+        (pausiert ? "▶️ " + t.fortsetzenLabel : "⏸️ " + t.pauseLabel);
+    if(diplomGesperrt)
+        document.getElementById("pauseHinweis").textContent = t.pauseHinweisText;
+    document.getElementById("weiter").textContent = t.weiter;
+    document.getElementById("neu").textContent = t.neu;
+    document.getElementById("drucken").textContent = t.drucken;
+
+    document.getElementById("diplomTitel").textContent = t.diplomTitel;
+    document.getElementById("diplomText1").textContent = t.diplomText1;
+    document.getElementById("diplomNameInput").placeholder = t.namePlatzhalter;
+
+    document.getElementById("diplomText2").innerHTML =
+        t.diplomText2Vor + "<br><span class=\"marke\">" + t.diplomText2Marke + "</span> " + aktuellerDiplomText2Nach(t);
+
+    document.getElementById("badgePunkteLabel").textContent = t.badgePunkteLabel;
+    document.getElementById("badgeAufgabenLabel").textContent = t.badgeAufgabenLabel;
+    document.getElementById("badgeReihenLabel").textContent = aktuellesBereichLabel(t);
+    document.getElementById("badgeZeitLabel").textContent = t.badgeZeitLabel;
+    document.getElementById("badgeStatusLabel").textContent = t.badgeStatusLabel;
+    document.getElementById("badgeStatus").textContent = t.badgeStatusWert;
+
+    document.getElementById("levelLabel").textContent = t.levelLabel;
+    document.getElementById("zertifikatIdLabel").textContent = t.zertifikatIdLabel;
+    document.getElementById("ausgestelltLabel").textContent = t.ausgestelltLabel;
+
+    aktualisiereStatus();
+    aktualisiereLevelText();
+    aktualisiereDatum();
+
+}
+
+function aktuelleAnleitung(t){
+
+    if(aktivModus === "geteilt") return t.anleitungGeteilt;
+    if(aktivModus === "plus") return t.anleitungPlus;
+    if(aktivModus === "minus") return t.anleitungMinus;
+    return t.anleitungMal;
+
+}
+
+function aktuellesBereichLabel(t){
+
+    return (aktivModus === "plus" || aktivModus === "minus")
+        ? t.badgeZahlenraumLabel
+        : t.badgeReihenLabel;
+
+}
+
+function aktuellerDiplomText2Nach(t){
+
+    if(aktivModus === "geteilt") return t.diplomText2NachGeteilt;
+    if(aktivModus === "plus") return t.diplomText2NachPlus;
+    if(aktivModus === "minus") return t.diplomText2NachMinus;
+    return t.diplomText2NachMal;
+
+}
+
+function modus(m){
+
+    aktivModus = m;
+
+    document.querySelectorAll(".modus-btn").forEach(function(b){ b.classList.remove("active"); });
+    const modusIds = { mal:"btnModusMal", geteilt:"btnModusGeteilt", plus:"btnModusPlus", minus:"btnModusMinus" };
+    document.getElementById(modusIds[m]).classList.add("active");
+
+    const t = texte[aktivSprache];
+    document.getElementById("anleitung").textContent = aktuelleAnleitung(t);
+    document.getElementById("badgeReihenLabel").textContent = aktuellesBereichLabel(t);
+    document.getElementById("diplomText2").innerHTML =
+        t.diplomText2Vor + "<br><span class=\"marke\">" + t.diplomText2Marke + "</span> " + aktuellerDiplomText2Nach(t);
+
+    neueAufgaben();
+
+}
+
+// ------------------------------
+// Aufgaben erzeugen
+// ------------------------------
+
+function mische(array){
+
+    for(let i = array.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = array[i];
+        array[i] = array[j];
+        array[j] = tmp;
+    }
+
+    return array;
+}
+
+function erzeugePlusAufgaben(anzahl){
+
+    const liste = [];
+    const genutzt = new Set();
+    let versuche = 0;
+
+    while(liste.length < anzahl && versuche < 20000){
+
+        versuche++;
+
+        const a = 10 + Math.floor(Math.random() * 81);
+        const maxB = 100 - a;
+        const b = 10 + Math.floor(Math.random() * (maxB - 9));
+
+        const zehnerUebergang = (a % 10) + (b % 10) >= 10;
+
+        if(!zehnerUebergang)
+            continue;
+
+        const schluessel = Math.min(a,b) + "_" + Math.max(a,b);
+
+        if(genutzt.has(schluessel))
+            continue;
+
+        genutzt.add(schluessel);
+        liste.push({ typ:"plus", x:a, y:b, ergebnis:a + b });
+
+    }
+
+    return liste;
+
+}
+
+function erzeugeMinusAufgaben(anzahl){
+
+    const liste = [];
+    const genutzt = new Set();
+    let versuche = 0;
+
+    while(liste.length < anzahl && versuche < 20000){
+
+        versuche++;
+
+        const m = 11 + Math.floor(Math.random() * 90);
+        const s = 1 + Math.floor(Math.random() * (m - 1));
+
+        const uebertragNoetig = (m % 10) < (s % 10);
+
+        if(!uebertragNoetig)
+            continue;
+
+        const schluessel = m + "_" + s;
+
+        if(genutzt.has(schluessel))
+            continue;
+
+        genutzt.add(schluessel);
+        liste.push({ typ:"minus", x:m, y:s, ergebnis:m - s });
+
+    }
+
+    return liste;
+
+}
+
+function neueAufgaben(){
+
+    clearInterval(timerInterval);
+
+    if(aktivModus === "plus"){
+
+        aufgaben = erzeugePlusAufgaben(45);
+
+    } else if(aktivModus === "minus"){
+
+        aufgaben = erzeugeMinusAufgaben(45);
+
+    } else {
+
+        aufgaben = [];
+
+        for(let a = 2; a <= 10; a++){
+            for(let b = a; b <= 10; b++){
+
+                if(aktivModus === "geteilt")
+                    aufgaben.push({ typ:"geteilt", x:a * b, y:b, ergebnis:a });
+                else if(Math.random() < 0.5)
+                    aufgaben.push({ typ:"mal", x:a, y:b, ergebnis:a * b });
+                else
+                    aufgaben.push({ typ:"mal", x:b, y:a, ergebnis:a * b });
+
+            }
+        }
+
+    }
+
+    aufgaben = mische(aufgaben);
+
+    aktuellerIndex = 0;
+    richtigCount = 0;
+    falscheAufgaben = [];
+    GESAMTZEIT = (aktivModus === "plus" || aktivModus === "minus") ? GESAMTZEIT_PLUSMINUS : GESAMTZEIT_NORMAL;
+    FRAGENZEIT = (aktivModus === "plus" || aktivModus === "minus") ? FRAGENZEIT_PLUSMINUS : FRAGENZEIT_NORMAL;
+    timerSekunden = GESAMTZEIT;
+    testAktiv = true;
+    pausiert = false;
+    diplomGesperrt = false;
+
+    document.getElementById("diplomAussenBereich").style.display = "none";
+    document.getElementById("ergebnisMsg").textContent = "";
+    document.getElementById("ergebnisMsg").className = "";
+    document.getElementById("wiederholungBereich").style.display = "none";
+    document.getElementById("aufgabeBereich").style.display = "block";
+    document.getElementById("weiter").disabled = false;
+    document.getElementById("pauseBtn").disabled = false;
+    document.getElementById("pauseBtn").classList.remove("fortsetzen");
+    document.getElementById("pauseBtn").textContent = "⏸️ " + texte[aktivSprache].pauseLabel;
+    document.getElementById("pauseHinweis").textContent = "";
+
+    aktualisiereTimerAnzeige();
+    renderAufgabe();
+
+    timerInterval = setInterval(tick, 1000);
+
+}
+
+function tick(){
+
+    timerSekunden--;
+
+    aktualisiereTimerAnzeige();
+
+    if(timerSekunden <= 0){
+        clearInterval(timerInterval);
+        zeitAbgelaufenFn();
+    }
+
+}
+
+function aktualisiereTimerAnzeige(){
+
+    const m = Math.max(0, Math.floor(timerSekunden / 60));
+    const s = Math.max(0, timerSekunden % 60);
+
+    const text = String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+
+    const anzeige = document.getElementById("timerAnzeige");
+    anzeige.textContent = text;
+
+    if(timerSekunden <= 60)
+        anzeige.classList.add("warnung");
+    else
+        anzeige.classList.remove("warnung");
+
+}
+
+const SYMBOLE = { mal:" × ", geteilt:" ÷ ", plus:" + ", minus:" − " };
+
+function renderAufgabe(){
+
+    const auf = aufgaben[aktuellerIndex];
+
+    document.getElementById("aufgabeKarte").textContent =
+        auf.x + SYMBOLE[auf.typ] + auf.y + " = ?";
+
+    const eingabe = document.getElementById("aktuelleEingabe");
+    eingabe.value = "";
+    eingabe.style.background = "white";
+    eingabe.style.color = "#000";
+    eingabe.disabled = false;
+    eingabe.focus();
+
+    document.getElementById("loesungAnzeige").textContent = "";
+
+    frageId++;
+    renderZeitpunkt = Date.now();
+
+    if(SpeechRecognitionAPI){
+        if(aktiveErkennung)
+            aktiveErkennung.abort();
+        else
+            starteZuhoeren();
+    }
+
+    starteFragenTimer();
+
+    aktualisiereStatus();
+
+}
+
+function starteFragenTimer(){
+
+    fragenSekundenUebrig = FRAGENZEIT;
+
+    const fill = document.getElementById("fragenZeitFill");
+    fill.style.transition = "none";
+    fill.classList.remove("warnung");
+    fill.style.width = "100%";
+    fill.offsetHeight; // Reflow erzwingen, damit die Transition danach wieder greift
+
+    planeFragenAblauf(fragenSekundenUebrig);
+
+}
+
+function planeFragenAblauf(sekunden){
+
+    clearTimeout(fragenAblaufTimeout);
+    clearInterval(fragenSekundenInterval);
+
+    const fill = document.getElementById("fragenZeitFill");
+    const zahl = document.getElementById("fragenZeitZahl");
+
+    fill.style.transition = "width " + sekunden + "s linear, background .3s";
+    fill.style.width = "0%";
+
+    zahl.textContent = fragenSekundenUebrig + "s";
+
+    if(fragenSekundenUebrig <= 3){
+        fill.classList.add("warnung");
+        zahl.classList.add("warnung");
+    } else {
+        fill.classList.remove("warnung");
+        zahl.classList.remove("warnung");
+    }
+
+    fragenSekundenInterval = setInterval(function(){
+
+        fragenSekundenUebrig--;
+        zahl.textContent = Math.max(fragenSekundenUebrig, 0) + "s";
+
+        if(fragenSekundenUebrig <= 3){
+            fill.classList.add("warnung");
+            zahl.classList.add("warnung");
+        }
+
+        if(fragenSekundenUebrig <= 0)
+            clearInterval(fragenSekundenInterval);
+
+    }, 1000);
+
+    fragenAblaufTimeout = setTimeout(function(){
+        antwortPruefen();
+    }, sekunden * 1000);
+
+}
+
+function stoppeFragenTimer(){
+
+    clearTimeout(fragenAblaufTimeout);
+    clearInterval(fragenSekundenInterval);
+
+    const fill = document.getElementById("fragenZeitFill");
+    const aktuelleBreite = getComputedStyle(fill).width;
+
+    fill.style.transition = "none";
+    fill.style.width = aktuelleBreite;
+
+}
+
+function fortsetzeFragenTimer(){
+
+    if(fragenSekundenUebrig <= 0){
+        antwortPruefen();
+        return;
+    }
+
+    const fill = document.getElementById("fragenZeitFill");
+    fill.offsetHeight; // Reflow, damit die eingefrorene Breite als Startpunkt übernommen wird
+
+    planeFragenAblauf(fragenSekundenUebrig);
+
+}
+
+function aktualisiereFehlerAnzeige(){
+
+    const anzeige = document.getElementById("fehlerAnzeige");
+    anzeige.textContent = texte[aktivSprache].fehlerLabel(falscheAufgaben.length);
+    anzeige.classList.toggle("keineFehler", falscheAufgaben.length === 0);
+
+}
+
+function aktualisiereStatus(){
+
+    document.getElementById("aufgabeLabel").textContent =
+        texte[aktivSprache].aufgabeLabel(Math.min(aktuellerIndex + 1, aufgaben.length), aufgaben.length);
+
+    aktualisiereFehlerAnzeige();
+
+    const prozent = aufgaben.length ? (aktuellerIndex / aufgaben.length) * 100 : 0;
+    document.getElementById("progressFill").style.width = prozent + "%";
+
+}
+
+function aktualisiereDatum(){
+
+    const heute = new Date();
+    const tag = String(heute.getDate()).padStart(2,"0");
+    const monat = String(heute.getMonth()+1).padStart(2,"0");
+    const jahr = heute.getFullYear();
+
+    document.getElementById("diplomDatum").textContent =
+        tag + "." + monat + "." + jahr;
+
+}
+
+let aktuellesLevel = "gold";
+
+function aktualisiereLevelText(){
+
+    const t = texte[aktivSprache];
+    let text = t.levelGold;
+
+    if(aktuellesLevel === "silber")
+        text = t.levelSilber;
+    else if(aktuellesLevel === "bronze")
+        text = t.levelBronze;
+
+    document.getElementById("levelWert").textContent = "★ " + text + " ★";
+
+}
+
+function erzeugeZertifikatId(){
+
+    const heute = new Date();
+    const jahr = heute.getFullYear();
+    const monat = String(heute.getMonth()+1).padStart(2,"0");
+    const tag = String(heute.getDate()).padStart(2,"0");
+    const zufall = Math.floor(1000 + Math.random()*9000);
+
+    return "ME-" + jahr + monat + tag + "-" + zufall;
+
+}
+
+// ------------------------------
+// Konfetti / Jubel-Elefant
+// ------------------------------
+
+function konfettiAusRuessel(){
+
+    const elefant = document.getElementById("jubelElefant");
+    const rect = elefant.getBoundingClientRect();
+
+    const startX = rect.left + 20;
+    const startY = rect.top + 70;
+
+    for(let i = 0; i < 40; i++){
+
+        const k = document.createElement("div");
+
+        k.style.position = "fixed";
+        k.style.left = startX + "px";
+        k.style.top = startY + "px";
+
+        k.style.width = "8px";
+        k.style.height = "8px";
+        k.style.borderRadius = "50%";
+        k.style.background = "hsl(" + (Math.random()*360) + ",100%,50%)";
+        k.style.zIndex = "10001";
+
+        document.body.appendChild(k);
+
+        const x = -(120 + Math.random()*260);
+        const y = Math.random()*180 - 90;
+
+        k.animate([
+            { transform:"translate(0,0)", opacity:1 },
+            { transform:"translate(" + x + "px," + y + "px)", opacity:0 }
+        ],{
+            duration:1200 + Math.random()*500,
+            easing:"ease-out"
+        });
+
+        setTimeout(function(){ k.remove(); }, 1700);
+
+    }
+
+}
+
+function jubel(){
+
+    const elefant = document.getElementById("jubelElefant");
+
+    elefant.style.display = "block";
+
+    const interval = setInterval(konfettiAusRuessel, 300);
+
+    setTimeout(function(){
+
+        clearInterval(interval);
+        elefant.style.display = "none";
+
+    }, 4000);
+
+}
+
+// ------------------------------
+// Antwort prüfen & weiter
+// ------------------------------
+
+function antwortPruefen(){
+
+    if(!testAktiv || pausiert)
+        return;
+
+    if(Date.now() - renderZeitpunkt < MIN_ANTWORT_VERZOEGERUNG)
+        return;
+
+    const eingabe = document.getElementById("aktuelleEingabe");
+
+    if(eingabe.disabled)
+        return;
+
+    stoppeFragenTimer();
+
+    if(SpeechRecognitionAPI)
+        stoppeZuhoeren();
+
+    const auf = aufgaben[aktuellerIndex];
+    const wert = parseInt(eingabe.value.trim());
+
+    const korrekt = !isNaN(wert) && wert === auf.ergebnis;
+
+    if(korrekt)
+        richtigCount++;
+
+    eingabe.style.background = korrekt ? "#2e7d32" : "#c62828";
+    eingabe.style.color = "#ffffff";
+    eingabe.disabled = true;
+    document.getElementById("weiter").disabled = true;
+
+    if(!korrekt){
+        falscheAufgaben.push(auf);
+        document.getElementById("loesungAnzeige").textContent =
+            texte[aktivSprache].loesungLabel + " " + auf.x + SYMBOLE[auf.typ] + auf.y + " = " + auf.ergebnis;
+        aktualisiereFehlerAnzeige();
+    }
+
+    setTimeout(function(){
+
+        aktuellerIndex++;
+
+        if(aktuellerIndex >= aufgaben.length){
+            beendeTest();
+        } else {
+            document.getElementById("weiter").disabled = false;
+            renderAufgabe();
+        }
+
+    }, korrekt ? 400 : 2200);
+
+}
+
+function zeigeWiederholung(){
+
+    const bereich = document.getElementById("wiederholungBereich");
+    const liste = document.getElementById("wiederholungListe");
+
+    if(falscheAufgaben.length === 0){
+        bereich.style.display = "none";
+        return;
+    }
+
+    liste.innerHTML = "";
+
+    falscheAufgaben.forEach(function(auf){
+
+        const eintrag = document.createElement("span");
+        eintrag.className = "wiederholungAufgabe";
+        eintrag.textContent = auf.x + SYMBOLE[auf.typ] + auf.y + " = ?";
+
+        liste.appendChild(eintrag);
+
+    });
+
+    bereich.style.display = "block";
+
+}
+
+function beendeTest(){
+
+    testAktiv = false;
+    clearInterval(timerInterval);
+    stoppeFragenTimer();
+
+    document.getElementById("aufgabeBereich").style.display = "none";
+    document.getElementById("weiter").disabled = true;
+    document.getElementById("pauseBtn").disabled = true;
+
+    aktualisiereStatus();
+
+    const gesamt = aufgaben.length;
+    const msg = document.getElementById("ergebnisMsg");
+
+    if(richtigCount === gesamt && !diplomGesperrt){
+
+        msg.textContent = texte[aktivSprache].alleRichtig;
+        msg.className = "gut";
+
+        zeigeDiplom();
+
+        jubel();
+
+    } else if(richtigCount === gesamt && diplomGesperrt){
+
+        msg.textContent = texte[aktivSprache].diplomGesperrtNachricht;
+        msg.className = "schlecht";
+
+    } else {
+
+        msg.textContent = texte[aktivSprache].nichtBestanden(richtigCount, gesamt);
+        msg.className = "schlecht";
+
+    }
+
+    zeigeWiederholung();
+
+}
+
+function zeigeDiplom(){
+
+    const gesamt = aufgaben.length;
+    const benutzteSekunden = GESAMTZEIT - timerSekunden;
+
+    const m = Math.floor(benutzteSekunden / 60);
+    const s = benutzteSekunden % 60;
+
+    document.getElementById("badgeZeit").textContent =
+        String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+
+    document.getElementById("badgeAufgaben").textContent = richtigCount + "/" + gesamt;
+    document.getElementById("badgeReihen").textContent =
+        (aktivModus === "plus" || aktivModus === "minus") ? "1–100" : "2–10";
+
+    const punkte = Math.max(0, 1000 - benutzteSekunden) + richtigCount * 5;
+    document.getElementById("badgePunkte").textContent = punkte;
+
+    if(benutzteSekunden <= GESAMTZEIT * 4/7)
+        aktuellesLevel = "gold";
+    else if(benutzteSekunden <= GESAMTZEIT * 6/7)
+        aktuellesLevel = "silber";
+    else
+        aktuellesLevel = "bronze";
+
+    aktualisiereLevelText();
+
+    document.getElementById("zertifikatId").textContent = erzeugeZertifikatId();
+
+    aktualisiereDatum();
+
+    document.getElementById("diplomAussenBereich").style.display = "block";
+    document.getElementById("diplomAussenBereich").scrollIntoView({ behavior:"smooth", block:"center" });
+
+}
+
+function zeitAbgelaufenFn(){
+
+    testAktiv = false;
+    stoppeFragenTimer();
+
+    document.getElementById("aktuelleEingabe").disabled = true;
+    document.getElementById("weiter").disabled = true;
+    document.getElementById("pauseBtn").disabled = true;
+    document.getElementById("aufgabeBereich").style.display = "none";
+
+    const gesamt = aufgaben.length;
+    const msg = document.getElementById("ergebnisMsg");
+
+    msg.textContent = texte[aktivSprache].zeitAbgelaufen(richtigCount, gesamt);
+    msg.className = "schlecht";
+
+    zeigeWiederholung();
+
+}
+
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+const mikroBtn = document.getElementById("mikroBtn");
+let aktiveErkennung = null;
+let hoertGeradeZu = false;
+let sprachmodusAktiv = false;
+let frageId = 0;
+
+if(!SpeechRecognitionAPI){
+
+    mikroBtn.hidden = true;
+
+} else {
+
+    sprachmodusAktiv = false;
+    mikroBtn.classList.add("stumm");
+    mikroBtn.textContent = "🔇";
+
+    mikroBtn.addEventListener("click", function(){
+
+        sprachmodusAktiv = !sprachmodusAktiv;
+
+        if(sprachmodusAktiv){
+            mikroBtn.classList.remove("stumm");
+            mikroBtn.textContent = "🎤";
+            starteZuhoeren();
+        } else {
+            mikroBtn.classList.add("stumm");
+            mikroBtn.textContent = "🔇";
+            if(aktiveErkennung)
+                aktiveErkennung.abort();
+        }
+
+    });
+
+}
+
+function stoppeZuhoeren(){
+
+    if(aktiveErkennung){
+        aktiveErkennung.abort();
+        aktiveErkennung = null;
+    }
+
+    hoertGeradeZu = false;
+
+}
+
+function deWortZuZahl(text){
+
+    text = text.toLowerCase()
+        .replace(/ß/g, "ss")
+        .replace(/ü/g, "ue")
+        .replace(/ö/g, "oe")
+        .replace(/ä/g, "ae")
+        .replace(/\s+/g, "");
+
+    const einer = { "null":0,"eins":1,"ein":1,"zwei":2,"zwo":2,"drei":3,"vier":4,"fuenf":5,"sechs":6,"sieben":7,"acht":8,"neun":9 };
+    const teen = { "zehn":10,"elf":11,"zwoelf":12,"dreizehn":13,"vierzehn":14,"fuenfzehn":15,"sechzehn":16,"siebzehn":17,"achtzehn":18,"neunzehn":19 };
+    const zehner = { "zwanzig":20,"dreissig":30,"vierzig":40,"fuenfzig":50,"sechzig":60,"siebzig":70,"achtzig":80,"neunzig":90 };
+
+    if(text === "hundert" || text === "einhundert")
+        return 100;
+
+    if(einer.hasOwnProperty(text)) return einer[text];
+    if(teen.hasOwnProperty(text)) return teen[text];
+    if(zehner.hasOwnProperty(text)) return zehner[text];
+
+    for(const wort in zehner){
+        if(text.endsWith(wort)){
+            const rest = text.slice(0, text.length - wort.length);
+            if(rest.endsWith("und")){
+                const einerWort = rest.slice(0, rest.length - 3);
+                if(einerWort === "ein") return zehner[wort] + 1;
+                if(einer.hasOwnProperty(einerWort)) return zehner[wort] + einer[einerWort];
+            }
+        }
+    }
+
+    return null;
+
+}
+
+function enWortZuZahl(text){
+
+    const ones = { "zero":0,"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9 };
+    const teens = { "ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15,"sixteen":16,"seventeen":17,"eighteen":18,"nineteen":19 };
+    const tens = { "twenty":20,"thirty":30,"forty":40,"fifty":50,"sixty":60,"seventy":70,"eighty":80,"ninety":90 };
+
+    const words = text.toLowerCase().split(/\s+/).filter(function(w){ return w && w !== "and"; });
+
+    if(words.length === 1){
+        const w = words[0];
+        if(w === "hundred") return 100;
+        if(ones.hasOwnProperty(w)) return ones[w];
+        if(teens.hasOwnProperty(w)) return teens[w];
+        if(tens.hasOwnProperty(w)) return tens[w];
+        return null;
+    }
+
+    if(words.length === 2){
+        if(words[0] === "one" && words[1] === "hundred") return 100;
+        if(tens.hasOwnProperty(words[0]) && ones.hasOwnProperty(words[1]))
+            return tens[words[0]] + ones[words[1]];
+    }
+
+    return null;
+
+}
+
+function esWortZuZahl(text){
+
+    const zahlen = {
+        "cero":0,"uno":1,"un":1,"dos":2,"tres":3,"cuatro":4,"cinco":5,"seis":6,"siete":7,"ocho":8,"nueve":9,
+        "diez":10,"once":11,"doce":12,"trece":13,"catorce":14,"quince":15,
+        "dieciseis":16,"diecisiete":17,"dieciocho":18,"diecinueve":19,
+        "veinte":20,"veintiuno":21,"veintidos":22,"veintitres":23,"veinticuatro":24,"veinticinco":25,
+        "veintiseis":26,"veintisiete":27,"veintiocho":28,"veintinueve":29,
+        "treinta":30,"cuarenta":40,"cincuenta":50,"sesenta":60,"setenta":70,"ochenta":80,"noventa":90,
+        "cien":100,"ciento":100
+    };
+
+    const normalizado = text.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Akzente entfernen (á->a usw.)
+
+    if(zahlen.hasOwnProperty(normalizado))
+        return zahlen[normalizado];
+
+    const match = normalizado.match(/^(treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa) y (uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)$/);
+
+    if(match)
+        return zahlen[match[1]] + zahlen[match[2]];
+
+    return null;
+
+}
+
+function zhWortZuZahl(text){
+
+    const ziffern = { "零":0,"一":1,"二":2,"两":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9 };
+
+    text = text.trim();
+
+    if(text === "十") return 10;
+    if(text === "百" || text === "一百") return 100;
+
+    if(ziffern.hasOwnProperty(text))
+        return ziffern[text];
+
+    if(text.indexOf("十") !== -1){
+
+        const teile = text.split("十");
+        const vorne = teile[0];
+        const hinten = teile[1] || "";
+
+        let zehner = 1;
+        if(vorne !== ""){
+            if(!ziffern.hasOwnProperty(vorne)) return null;
+            zehner = ziffern[vorne];
+        }
+
+        let einer = 0;
+        if(hinten !== ""){
+            if(!ziffern.hasOwnProperty(hinten)) return null;
+            einer = ziffern[hinten];
+        }
+
+        return zehner * 10 + einer;
+
+    }
+
+    return null;
+
+}
+
+function transkriptZuZahl(transkript, sprache){
+
+    const bereinigt = transkript.trim();
+    const digitMatch = bereinigt.match(/\d+/);
+
+    if(digitMatch)
+        return parseInt(digitMatch[0], 10);
+
+    if(sprache === "de") return deWortZuZahl(bereinigt);
+    if(sprache === "en") return enWortZuZahl(bereinigt);
+    if(sprache === "es") return esWortZuZahl(bereinigt);
+    if(sprache === "zh") return zhWortZuZahl(bereinigt);
+
+    return null;
+
+}
+
+function starteZuhoeren(){
+
+    if(!SpeechRecognitionAPI || !sprachmodusAktiv || hoertGeradeZu || !testAktiv || pausiert)
+        return;
+
+    const erkennung = new SpeechRecognitionAPI();
+
+    erkennung.lang = texte[aktivSprache].sprachCode;
+    erkennung.continuous = false;
+    erkennung.interimResults = false;
+    erkennung.maxAlternatives = 1;
+
+    erkennung.onresult = function(event){
+
+        const transkript = event.results[0][0].transcript;
+        const zahl = transkriptZuZahl(transkript, aktivSprache);
+
+        if(zahl !== null && !isNaN(zahl)){
+            const eingabe = document.getElementById("aktuelleEingabe");
+            eingabe.value = zahl;
+            eingabe.focus();
+            antwortPruefen();
+        }
+
+    };
+
+    erkennung.onerror = function(event){
+
+        hoertGeradeZu = false;
+        mikroBtn.classList.remove("aktiv");
+
+        if(event.error === "not-allowed" || event.error === "audio-capture" || event.error === "service-not-allowed"){
+            sprachmodusAktiv = false;
+            mikroBtn.classList.add("stumm");
+            mikroBtn.textContent = "🔇";
+        }
+
+    };
+
+    erkennung.onend = function(){
+
+        hoertGeradeZu = false;
+
+        if(aktiveErkennung === erkennung)
+            aktiveErkennung = null;
+
+        mikroBtn.classList.remove("aktiv");
+
+        const eingabe = document.getElementById("aktuelleEingabe");
+
+        if(sprachmodusAktiv && testAktiv && !pausiert && eingabe && !eingabe.disabled){
+            // kleine Pause vor dem Neustart, damit der Browser die Erkennung nicht drosselt
+            setTimeout(function(){
+                if(sprachmodusAktiv && testAktiv && !pausiert && !hoertGeradeZu){
+                    const eingabeJetzt = document.getElementById("aktuelleEingabe");
+                    if(eingabeJetzt && !eingabeJetzt.disabled)
+                        starteZuhoeren();
+                }
+            }, 400);
+        }
+
+    };
+
+    try{
+        erkennung.start();
+        aktiveErkennung = erkennung;
+        hoertGeradeZu = true;
+        mikroBtn.classList.add("aktiv");
+    }catch(e){
+        // Start ist eventuell noch zu früh nach vorherigem Abbruch -> kurz später erneut versuchen
+        setTimeout(function(){
+            if(!hoertGeradeZu && sprachmodusAktiv && testAktiv && !pausiert){
+                const eingabeJetzt = document.getElementById("aktuelleEingabe");
+                if(eingabeJetzt && !eingabeJetzt.disabled)
+                    starteZuhoeren();
+            }
+        }, 400);
+    }
+
+}
+
+function pausieren(){
+
+    if(!testAktiv || pausiert)
+        return;
+
+    pausiert = true;
+    diplomGesperrt = true;
+
+    clearInterval(timerInterval);
+    stoppeFragenTimer();
+
+    if(SpeechRecognitionAPI)
+        stoppeZuhoeren();
+
+    document.getElementById("aktuelleEingabe").disabled = true;
+    document.getElementById("weiter").disabled = true;
+
+    const pauseBtn = document.getElementById("pauseBtn");
+    pauseBtn.textContent = "▶️ " + texte[aktivSprache].fortsetzenLabel;
+    pauseBtn.classList.add("fortsetzen");
+
+    document.getElementById("pauseHinweis").textContent = texte[aktivSprache].pauseHinweisText;
+
+}
+
+function fortsetzen(){
+
+    if(!testAktiv || !pausiert)
+        return;
+
+    pausiert = false;
+
+    document.getElementById("aktuelleEingabe").disabled = false;
+    document.getElementById("weiter").disabled = false;
+
+    const pauseBtn = document.getElementById("pauseBtn");
+    pauseBtn.textContent = "⏸️ " + texte[aktivSprache].pauseLabel;
+    pauseBtn.classList.remove("fortsetzen");
+
+    timerInterval = setInterval(tick, 1000);
+    fortsetzeFragenTimer();
+
+    if(SpeechRecognitionAPI)
+        starteZuhoeren();
+
+    document.getElementById("aktuelleEingabe").focus();
+
+}
+
+document.getElementById("pauseBtn").onclick = function(){
+    if(pausiert)
+        fortsetzen();
+    else
+        pausieren();
+};
+
+document.getElementById("weiter").onclick = function(){
+    antwortPruefen();
+};
+
+document.getElementById("aktuelleEingabe").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+        e.preventDefault();
+        if(!e.repeat)
+            antwortPruefen();
+    }
+});
+
+document.getElementById("neu").onclick = function(){
+    neueAufgaben();
+};
+
+document.getElementById("drucken").onclick = function(){
+    window.print();
+};
+
+neueAufgaben();
+sprache("de");
+
+</script>
+
+<script src="/home-button.js"></script>
+</body>
+</html>

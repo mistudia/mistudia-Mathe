@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>miStudia - Prozentumformung</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #f2f6ff;
+      color: #1f2937;
+      display: flex;
+      justify-content: center;
+      padding: 25px 15px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 950px;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.1);
+    }
+
+    .logo-link {
+      display: block;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .logo {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+      display: block;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2563eb;
+    }
+
+    .info {
+      text-align: center;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .sprache-box {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .sprache {
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      color: #475569;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .sprache.aktiv {
+      background: #1e40af;
+      border-color: #1e40af;
+      color: white;
+    }
+
+    .level-box {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 20px 0 25px;
+    }
+
+    .level {
+      border: 2px solid #cbd5e1;
+      background: white;
+      color: #475569;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+
+    .level.aktiv {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+    }
+
+    .kopf,
+    .aufgabe {
+      display: grid;
+      grid-template-columns: 1fr 35px 1fr 35px 1fr;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kopf {
+      padding: 0 15px 10px;
+      font-weight: bold;
+      text-align: center;
+      color: #475569;
+    }
+
+    .aufgabe {
+      padding: 13px;
+      margin-bottom: 9px;
+      background: #f8fafc;
+      border-radius: 12px;
+    }
+
+    .gleich {
+      text-align: center;
+      font-size: 21px;
+      font-weight: bold;
+      color: #64748b;
+    }
+
+    input,
+    .vorgegeben {
+      width: 100%;
+      min-height: 47px;
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    input {
+      border: 2px solid #cbd5e1;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #2563eb;
+    }
+
+    input.richtig {
+      border-color: #16a34a;
+      background: #dcfce7;
+    }
+
+    input.falsch {
+      border-color: #dc2626;
+      background: #fee2e2;
+    }
+
+    .vorgegeben {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #2563eb;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-weight: bold;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    button {
+      border: none;
+      padding: 12px 20px;
+      border-radius: 9px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .pruefen {
+      background: #2563eb;
+      color: white;
+    }
+
+    .loesung {
+      background: #16a34a;
+      color: white;
+    }
+
+    .neu {
+      background: #f59e0b;
+      color: white;
+    }
+
+    #ergebnis {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .footer {
+      margin-top: 35px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+.footer-logo{
+    width:170px;
+    max-width:70%;
+    display:block;
+    margin:0 auto 12px;
+}
+
+.footer-text{
+    font-size:15px;
+}
+
+.footer a{
+    color:#2563eb;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.footer a:hover{
+    text-decoration:underline;
+}
+
+
+.prozent-eingabe{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+}
+
+.prozent-eingabe input{
+    flex:1;
+    min-width:80px;
+    text-align:center;
+}
+
+.prozent-eingabe span{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:47px;
+    font-size:18px;
+    font-weight:bold;
+    color:#475569;
+    flex-shrink:0;
+}
+
+
+
+
+    @media (max-width: 650px) {
+      .app { padding: 18px 8px; }
+
+      h1 { font-size: 22px; }
+
+      .kopf { font-size: 12px; }
+
+      .kopf,
+      .aufgabe {
+        grid-template-columns: 1fr 18px 1fr 18px 1fr;
+        gap: 3px;
+      }
+
+      input,
+      .vorgegeben {
+        font-size: 14px;
+        padding: 5px;
+      }
+
+      .gleich {
+        font-size: 15px;
+      }
+    }
+
+input.hinweis{
+    border-color:#facc15;
+    background:#fef9c3;
+}
+
+
+
+  </style>
+
+
+
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <a
+    href="https://mistudia.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="logo-link"
+  >
+    <img
+      src="/img/mistudia-logo.png"
+      alt="miStudia – Lernen mit Spaß!"
+      class="logo"
+    >
+  </a>
+
+  <h1 id="titel">miStudia - Prozentumformung</h1>
+
+  <p class="info">
+    <span id="anleitung"></span><br>
+    <b id="blauText"></b><br>
+    <span id="beispiel"></span>
+  </p>
+
+  <div class="sprache-box">
+    <button class="sprache aktiv" data-sprache="de"
+      onclick="spracheWaehlen('de')">🇩🇪 Deutsch</button>
+
+    <button class="sprache" data-sprache="en"
+      onclick="spracheWaehlen('en')">🇺🇸 English</button>
+
+    <button class="sprache" data-sprache="es"
+      onclick="spracheWaehlen('es')">🇪🇸 Español</button>
+  </div>
+
+  <div class="level-box">
+    <button class="level" data-level="leicht"
+      onclick="levelWaehlen('leicht')">
+      😊 <span id="leichtText">Leicht</span>
+    </button>
+
+    <button class="level aktiv" data-level="mittel"
+      onclick="levelWaehlen('mittel')">
+      🧠 <span id="mittelText">Mittel</span>
+    </button>
+
+    <button class="level" data-level="schwer"
+      onclick="levelWaehlen('schwer')">
+      🔥 <span id="schwerText">Schwer</span>
+    </button>
+  </div>
+
+  <div class="kopf">
+    <div id="dezimalKopf">Dezimalzahl</div>
+    <div></div>
+    <div id="prozentKopf">Prozent</div>
+    <div></div>
+    <div id="bruchKopf">Bruch</div>
+  </div>
+
+  <div id="aufgaben"></div>
+
+  <div class="buttons">
+    <button class="pruefen" onclick="pruefen()">
+      ✓ <span id="pruefenText">Prüfen</span>
+    </button>
+
+    <button class="loesung" onclick="loesungZeigen()">
+      💡 <span id="loesungText">Lösung</span>
+    </button>
+
+    <button class="neu" onclick="neueAufgaben()">
+      🔄 <span id="neuText">Neue Aufgaben</span>
+    </button>
+  </div>
+
+  <div id="ergebnis"></div>
+
+<footer class="footer">
+
+  <a
+    href="https://mistudia.com"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <img
+src="/img/mistudia-logo.png"
+      alt="miStudia"
+      class="footer-logo"
+    >
+  </a>
+
+  <div class="footer-text">
+    © <span id="copyright-jahr"></span> miStudia ·
+    <a
+      href="https://mistudia.com"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      mistudia.com
+    </a>
+  </div>
+
+</footer>
+
+
+</div>
+
+
+<script>
+
+const texte = {
+  de: {
+    titel: "miStudia - Prozentumformung",
+    anleitung: "Ergänze die beiden fehlenden Darstellungen.",
+    blau: "Blau = vorgegeben",
+    beispiel: "Beispiel: 0,5 = 50 % = 1/2",
+    leicht: "Leicht",
+    mittel: "Mittel",
+    schwer: "Schwer",
+    dezimal: "Dezimalzahl",
+    prozent: "Prozent",
+    bruch: "Bruch",
+    pruefen: "Prüfen",
+    loesung: "Lösung",
+    neu: "Neue Aufgaben",
+    ergebnis: "Du hast {richtig} von {gesamt} Aufgaben vollständig richtig.",
+    loesungen: "💡 Die Lösungen werden angezeigt.",
+    copyright: "Alle Rechte vorbehalten."
+  },
+
+  en: {
+    titel: "miStudia - Percentage Conversion",
+    anleitung: "Complete the two missing representations.",
+    blau: "Blue = given",
+    beispiel: "Example: 0.5 = 50% = 1/2",
+    leicht: "Easy",
+    mittel: "Medium",
+    schwer: "Hard",
+    dezimal: "Decimal",
+    prozent: "Percentage",
+    bruch: "Fraction",
+    pruefen: "Check",
+    loesung: "Solution",
+    neu: "New exercises",
+    ergebnis: "You got {richtig} out of {gesamt} exercises completely correct.",
+    loesungen: "💡 The solutions are displayed.",
+    copyright: "All rights reserved."
+  },
+
+  es: {
+    titel: "miStudia - Conversión de porcentajes",
+    anleitung: "Completa las dos representaciones que faltan.",
+    blau: "Azul = valor dado",
+    beispiel: "Ejemplo: 0,5 = 50 % = 1/2",
+    leicht: "Fácil",
+    mittel: "Medio",
+    schwer: "Difícil",
+    dezimal: "Número decimal",
+    prozent: "Porcentaje",
+    bruch: "Fracción",
+    pruefen: "Comprobar",
+    loesung: "Solución",
+    neu: "Nuevos ejercicios",
+    ergebnis: "Has resuelto correctamente {richtig} de {gesamt} ejercicios.",
+    loesungen: "💡 Se muestran las soluciones.",
+    copyright: "Todos los derechos reservados."
+  }
+};
+
+
+const leichtWerte = [
+  10, 20, 25, 30, 40, 50,
+  60, 70, 75, 80, 90, 100
+];
+
+const mittelWerte = [
+  10, 12.5, 15, 20, 25, 30, 35,
+  37.5, 40, 45, 50, 55, 60, 62.5,
+  65, 70, 75, 80, 85, 87.5,
+  90, 95, 100
+];
+
+const schwerGrosseWerte = [
+  10, 12.5, 15, 17.5, 20, 22.5,
+  25, 30, 32.5, 35, 37.5, 40,
+  42.5, 45, 47.5, 50, 52.5,
+  55, 60, 62.5, 65, 67.5,
+  70, 72.5, 75, 80, 85,
+  87.5, 90, 95, 100
+];
+
+const kleineWerte = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9
+];
+
+const sehrKleineWerte = [
+  0.1, 0.2, 0.25, 0.4,
+  0.45, 0.5, 0.75, 0.8
+];
+
+const ueberHundertWerte = [
+  105, 110, 120, 125,
+  130, 140, 150, 175, 200
+];
+
+
+let aktuelleSprache = "de";
+let aktuellesLevel = "mittel";
+let aktuelleAufgaben = [];
+
+
+function spracheWaehlen(sprache) {
+  aktuelleSprache = sprache;
+
+  document.documentElement.lang = sprache;
+
+  document.querySelectorAll(".sprache").forEach(button => {
+    button.classList.remove("aktiv");
+  });
+
+  document
+    .querySelector(`[data-sprache="${sprache}"]`)
+    .classList.add("aktiv");
+
+  texteAktualisieren();
+  neueAufgaben();
+}
+
+
+function texteAktualisieren() {
+  const t = texte[aktuelleSprache];
+
+  document.title = t.titel;
+  document.getElementById("titel").textContent = t.titel;
+  document.getElementById("anleitung").textContent = t.anleitung;
+  document.getElementById("blauText").textContent = t.blau;
+  document.getElementById("beispiel").textContent = t.beispiel;
+
+  document.getElementById("leichtText").textContent = t.leicht;
+  document.getElementById("mittelText").textContent = t.mittel;
+  document.getElementById("schwerText").textContent = t.schwer;
+
+  document.getElementById("dezimalKopf").textContent = t.dezimal;
+  document.getElementById("prozentKopf").textContent = t.prozent;
+  document.getElementById("bruchKopf").textContent = t.bruch;
+
+  document.getElementById("pruefenText").textContent = t.pruefen;
+  document.getElementById("loesungText").textContent = t.loesung;
+  document.getElementById("neuText").textContent = t.neu;
+}
+
+
+function ggt(a, b) {
+  a = Math.abs(a);
+  b = Math.abs(b);
+
+  while (b !== 0) {
+    const rest = b;
+    b = a % b;
+    a = rest;
+  }
+
+  return a;
+}
+
+
+function nachkommastellen(zahl) {
+  const text = zahl.toString();
+
+  if (!text.includes(".")) return 0;
+
+  return text.split(".")[1].length;
+}
+
+
+function bruchBerechnen(prozent) {
+  const stellen = nachkommastellen(prozent);
+  const faktor = Math.pow(10, stellen);
+
+  let zaehler = Math.round(prozent * faktor);
+  let nenner = 100 * faktor;
+
+  const teiler = ggt(zaehler, nenner);
+
+  return {
+    zaehler: zaehler / teiler,
+    nenner: nenner / teiler
+  };
+}
+
+
+function mischen(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+
+function zufallsWert(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+
+function zahlAnzeigen(zahl) {
+  if (aktuelleSprache === "en") {
+    return zahl.toString();
+  }
+
+  return zahl.toString().replace(".", ",");
+}
+
+
+function prozentAnzeigen(zahl) {
+  return zahlAnzeigen(zahl) + " %";
+}
+
+
+function dezimalAnzeigen(prozent) {
+  return zahlAnzeigen(prozent / 100);
+}
+
+
+function bruchAnzeigen(prozent) {
+  const bruch = bruchBerechnen(prozent);
+
+  return bruch.zaehler + "/" + bruch.nenner;
+}
+
+
+function levelWaehlen(level) {
+  aktuellesLevel = level;
+
+  document.querySelectorAll(".level").forEach(button => {
+    button.classList.remove("aktiv");
+  });
+
+  document
+    .querySelector(`[data-level="${level}"]`)
+    .classList.add("aktiv");
+
+  neueAufgaben();
+}
+
+function aufgabenWerteErstellen() {
+
+  let werte = [];
+
+  // 😊 Leicht
+  if (aktuellesLevel === "leicht") {
+
+    // 7 typische Prozentwerte
+    werte =
+      mischen(leichtWerte)
+        .slice(0, 7);
+
+  }
+
+  // 🧠 Mittel
+  if (aktuellesLevel === "mittel") {
+
+    // 5 typische Werte
+    werte =
+      mischen(mittelWerte)
+        .slice(0, 5);
+
+    // 1 kleiner Wert
+    werte.push(
+      zufallsWert(kleineWerte)
+    );
+
+    // 1 Wert über 100 %
+    werte.push(
+      zufallsWert(ueberHundertWerte)
+    );
+
+  }
+
+  // 🔥 Schwer
+  if (aktuellesLevel === "schwer") {
+
+    // 4 typische Werte
+    werte =
+      mischen(schwerGrosseWerte)
+        .slice(0, 4);
+
+    // 1 kleiner Wert
+    werte.push(
+      zufallsWert(kleineWerte)
+    );
+
+    // 1 sehr kleiner Kommawert
+    werte.push(
+      zufallsWert(sehrKleineWerte)
+    );
+
+    // 1 Wert über 100 %
+    werte.push(
+      zufallsWert(ueberHundertWerte)
+    );
+
+  }
+
+  return mischen(werte);
+
+}
+
+function neueAufgaben() {
+  const werte = aufgabenWerteErstellen();
+
+  aktuelleAufgaben = werte.map(prozent => ({
+    prozent,
+    vorgabe: Math.floor(Math.random() * 3)
+  }));
+
+  const container = document.getElementById("aufgaben");
+
+  container.innerHTML = "";
+
+  aktuelleAufgaben.forEach((aufgabe, index) => {
+    const t = texte[aktuelleSprache];
+
+ const prozentFeld = aufgabe.vorgabe === 0
+  ? `<div class="vorgegeben">${prozentAnzeigen(aufgabe.prozent)}</div>`
+  : `
+    <div class="prozent-eingabe">
+      <input
+        id="prozent-${index}"
+placeholder="${t.prozent}"
+        autocomplete="off"
+      >
+      <span>%</span>
+    </div>
+  `;
+
+
+    const bruchFeld = aufgabe.vorgabe === 1
+      ? `<div class="vorgegeben">${bruchAnzeigen(aufgabe.prozent)}</div>`
+      : `<input id="bruch-${index}" placeholder="${t.bruch}" autocomplete="off">`;
+
+    const dezimalFeld = aufgabe.vorgabe === 2
+      ? `<div class="vorgegeben">${dezimalAnzeigen(aufgabe.prozent)}</div>`
+      : `<input id="dezimal-${index}" placeholder="${t.dezimal}" autocomplete="off">`;
+
+    const zeile = document.createElement("div");
+
+    zeile.className = "aufgabe";
+
+    zeile.innerHTML = `
+      ${dezimalFeld}
+      <div class="gleich">=</div>
+      ${prozentFeld}
+      <div class="gleich">=</div>
+      ${bruchFeld}
+    `;
+
+    container.appendChild(zeile);
+  });
+
+  document.getElementById("ergebnis").textContent = "";
+}
+
+
+function zahlAusText(text) {
+  return Number(
+    text
+      .trim()
+      .replace("%", "")
+      .replace(",", ".")
+  );
+}
+
+
+function bruchWert(text) {
+  const teile = text.replace(/\s/g, "").split("/");
+
+  if (teile.length !== 2) return null;
+
+  const zaehler = Number(teile[0].replace(",", "."));
+  const nenner = Number(teile[1].replace(",", "."));
+
+  if (
+    !Number.isFinite(zaehler) ||
+    !Number.isFinite(nenner) ||
+    nenner === 0
+  ) {
+    return null;
+  }
+
+  return zaehler / nenner;
+}
+
+function bruchIstGekuerzt(text){
+
+    const teile = text.replace(/\s/g,"").split("/");
+
+    if(teile.length !== 2){
+        return false;
+    }
+
+    const zaehler = Math.abs(
+        Number(teile[0].replace(",","."))
+    );
+
+    const nenner = Math.abs(
+        Number(teile[1].replace(",","."))
+    );
+
+    if(
+        !Number.isFinite(zaehler) ||
+        !Number.isFinite(nenner) ||
+        nenner===0
+    ){
+        return false;
+    }
+
+    return ggt(zaehler,nenner)===1;
+
+}
+
+
+function feldPruefen(feld, richtig) {
+  feld.className = richtig ? "richtig" : "falsch";
+}
+
+
+function pruefen() {
+  let komplettRichtig = 0;
+
+  aktuelleAufgaben.forEach((aufgabe, index) => {
+    const erwarteterWert = aufgabe.prozent / 100;
+
+    let allesRichtig = true;
+
+    if (aufgabe.vorgabe !== 0) {
+      const feld = document.getElementById(`prozent-${index}`);
+      const wert = zahlAusText(feld.value);
+
+      const richtig =
+        feld.value.trim() !== "" &&
+        Number.isFinite(wert) &&
+        Math.abs(wert - aufgabe.prozent) < 0.0000000001;
+
+      feldPruefen(feld, richtig);
+
+      if (!richtig) allesRichtig = false;
+    }
+
+if (aufgabe.vorgabe !== 1) {
+
+  const feld =
+    document.getElementById(`bruch-${index}`);
+
+  const wert =
+    bruchWert(feld.value);
+
+  const richtig =
+    wert !== null &&
+    Math.abs(
+      wert - erwarteterWert
+    ) < 0.0000000001;
+
+  if (richtig) {
+
+    if (bruchIstGekuerzt(feld.value)) {
+
+      feld.className = "richtig";
+
+    } else {
+
+      // mathematisch richtig,
+      // aber nicht vollständig gekürzt
+
+      feld.className = "hinweis";
+
+      allesRichtig = false;
+
+    }
+
+  } else {
+
+    feld.className = "falsch";
+
+    allesRichtig = false;
+
+  }
+
+}
+
+
+    if (aufgabe.vorgabe !== 2) {
+      const feld = document.getElementById(`dezimal-${index}`);
+      const wert = zahlAusText(feld.value);
+
+      const richtig =
+        feld.value.trim() !== "" &&
+        Number.isFinite(wert) &&
+        Math.abs(wert - erwarteterWert) < 0.0000000001;
+
+      feldPruefen(feld, richtig);
+
+      if (!richtig) allesRichtig = false;
+    }
+
+    if (allesRichtig) komplettRichtig++;
+  });
+
+  document.getElementById("ergebnis").textContent =
+    texte[aktuelleSprache].ergebnis
+      .replace("{richtig}", komplettRichtig)
+      .replace("{gesamt}", aktuelleAufgaben.length);
+
+if (komplettRichtig === aktuelleAufgaben.length) {
+
+    setTimeout(jubelChoreo,400);
+
+}
+}
+
+function konfettiAusRüssel(){
+
+    const elefant = document.getElementById("jubelElefant");
+    const rect = elefant.getBoundingClientRect();
+
+const startX = rect.left + 20;
+const startY = rect.top + 70;
+
+    for(let i=0;i<40;i++){
+
+        const k = document.createElement("div");
+
+        k.style.position="fixed";
+        k.style.left=startX+"px";
+        k.style.top=startY+"px";
+
+        k.style.width="8px";
+        k.style.height="8px";
+
+        k.style.borderRadius="50%";
+
+        k.style.background=`hsl(${Math.random()*360},100%,50%)`;
+
+        k.style.zIndex="10001";
+
+        document.body.appendChild(k);
+
+const x = -(120 + Math.random()*260);
+const y = Math.random()*180 - 90;
+
+        k.animate([
+            {
+                transform:"translate(0,0)",
+                opacity:1
+            },
+            {
+                transform:`translate(${x}px,${y}px)`,
+                opacity:0
+            }
+        ],{
+            duration:1200+Math.random()*500,
+            easing:"ease-out"
+        });
+
+        setTimeout(()=>k.remove(),1700);
+
+    }
+
+}
+
+function jubelChoreo(){
+
+    const elefant =
+        document.getElementById("jubelElefant");
+
+    elefant.style.display="block";
+
+    const interval =
+        setInterval(konfettiAusRüssel,300);
+
+    setTimeout(()=>{
+
+        clearInterval(interval);
+
+        elefant.style.display="none";
+
+    },4000);
+
+}
+
+function loesungZeigen() {
+  aktuelleAufgaben.forEach((aufgabe, index) => {
+    if (aufgabe.vorgabe !== 0) {
+      const feld = document.getElementById(`prozent-${index}`);
+feld.value = zahlAnzeigen(aufgabe.prozent);
+      feld.className = "richtig";
+    }
+
+    if (aufgabe.vorgabe !== 1) {
+      const feld = document.getElementById(`bruch-${index}`);
+      feld.value = bruchAnzeigen(aufgabe.prozent);
+      feld.className = "richtig";
+    }
+
+    if (aufgabe.vorgabe !== 2) {
+      const feld = document.getElementById(`dezimal-${index}`);
+      feld.value = dezimalAnzeigen(aufgabe.prozent);
+      feld.className = "richtig";
+    }
+  });
+
+  document.getElementById("ergebnis").textContent =
+    texte[aktuelleSprache].loesungen;
+}
+
+
+document.getElementById("copyright-jahr").textContent =
+  new Date().getFullYear();
+
+texteAktualisieren();
+neueAufgaben();
+
+</script>
+
+<img
+    id="jubelElefant"
+    src="/img/elefant.png"
+    alt="Jubel-Elefant"
+    style="
+        display:none;
+        position:fixed;
+   right:25px;
+bottom:25px;
+        width:180px;
+        z-index:10000;
+        pointer-events:none;
+    ">
+
+
+<script src="/home-button.js"></script>
+</body>
+</html>

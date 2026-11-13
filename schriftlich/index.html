@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>miStudia – Schriftlich rechnen</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root { --blau:#2563eb; --hellblau:#dbeafe; --grau:#64748b; }
+    body { margin:0; min-height:100vh; padding:25px 15px; font-family:Arial,sans-serif; color:#1f2937; background:#f2f6ff; }
+    .app { width:100%; max-width:950px; margin:auto; padding:30px; background:#fff; border-radius:20px; box-shadow:0 10px 35px rgba(0,0,0,.1); }
+    .logo-link { display:block; max-width:500px; margin:0 auto 15px; } .logo { display:block; width:100%; height:auto; }
+    h1 { margin:12px 0 8px; color:var(--blau); text-align:center; font-size:clamp(25px,4vw,34px); }
+    .info { margin:0 auto 20px; max-width:700px; color:var(--grau); text-align:center; line-height:1.6; } .info b { color:var(--blau); }
+    .art-box, .stufe-box, .lang-box { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin:20px 0 25px; }
+    .art, .stufe, .lang { padding:10px 17px; border:2px solid #cbd5e1; border-radius:30px; background:#fff; color:#475569; font-size:16px; font-weight:bold; cursor:pointer; }
+    .art.aktiv, .stufe.aktiv, .lang.aktiv { border-color:var(--blau); background:var(--blau); color:#fff; }
+    .aufgaben-box { padding:22px; border-radius:15px; background:#f8fafc; }
+    .aufgaben { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .aufgaben.einspaltig { grid-template-columns:1fr; }
+    .aufgabe { position:relative; display:flex; align-items:stretch; gap:11px; min-width:0; padding:40px 14px 14px; border-radius:12px; background:#fff; }
+    .nummer { min-width:25px; padding-top:5px; color:var(--blau); font-size:18px; font-weight:bold; }
+    .aufgabe-loeschen { position:absolute; top:8px; right:8px; width:26px; height:26px; padding:0; border:1px solid #cbd5e1; border-radius:50%; background:#f8fafc; color:#64748b; font-size:15px; line-height:1; cursor:pointer; z-index:1; }
+    .aufgabe-loeschen:hover { border-color:#dc2626; color:#dc2626; background:#fee2e2; }
+    .rechnung { min-width:0; flex:1; }
+    .rechenblatt { width:100%; max-width:min(650px, calc(var(--spalten,10) * 46px)); margin:0 auto 12px; padding:0; border:1px solid #aab4c2; border-radius:0; background:#fff; overflow-x:auto; overflow-y:hidden; }
+    .rechenblatt.mit-punkten { padding-top:38px; }
+    .gitterzeile { display:grid; grid-template-columns:repeat(var(--spalten,10), minmax(28px, 1fr)); min-height:38px; }
+    .gitterzelle { position:relative; display:flex; align-items:center; justify-content:center; min-width:0; border:1px solid #aab4c2; color:#0000c8; background:#fff; font: bold 22px "Courier New",monospace; }
+    .gitterzelle.operator { color:#0000c8; background:#fff; }.gitterzelle.leer { color:transparent; }
+    .malpunkt { display:inline-block; width:6px; height:6px; border-radius:50%; background:currentColor; }
+    .punkt-stapel { position:absolute; left:50%; bottom:100%; transform:translateX(-50%); margin-bottom:3px; display:flex; flex-direction:column-reverse; align-items:center; gap:2px; pointer-events:none; }
+    .punkt { width:6px; height:6px; border-radius:50%; background:#2563eb; flex:none; }
+    .gitterzelle.gesperrt { color:transparent; background:#e5e9f0; border-color:#cbd5e1; }
+    .loesungsweg .gitterzelle.gesperrt { color:transparent; background:#e5e9f0; border-color:#cbd5e1; }
+    .merk-anzeige { position:absolute; right:2px; bottom:1px; min-width:13px; padding:0 1px; border:1px solid #94a3b8; border-radius:3px; background:#fff; color:#475569; font:bold 11px "Courier New",monospace; line-height:12px; }
+    .loesungsweg .merk-anzeige { border-color:#86efac; color:#166534; background:#f0fdf4; }
+    .strich { height:5px; margin:2px 0; border:0; background:#0000c8; }
+    .arbeitszeilen { display:grid; gap:2px; margin:2px 0; }
+    .rechnung.loesung-an .rechenblatt > :not(.loesungsweg) { display:none; }
+    .rechnung.loesung-an .rechenblatt { border:0; background:transparent; }
+    .teilstrich { min-height:6px; }
+    .strich-zelle { height:3px; }
+    .strich-zelle.aktiv { background:#16a34a; }
+    .arbeits-gitter .gitterzelle { position:relative; min-height:40px; border-style:dashed; padding:0; }
+    .gitterzelle.ergebnis-feld { padding:0; }
+    .arbeits-gitter .haupt, .ergebnis-feld .haupt { width:100%; height:100%; border:0; outline:0; color:#0000c8; background:transparent; text-align:center; font:bold 20px "Courier New",monospace; }
+    .merk-mini { position:absolute; right:2px; bottom:2px; width:15px; height:15px; padding:0; border:1px dotted #94a3b8; border-radius:3px; outline:0; color:#475569; background:#fff; text-align:center; font:bold 11px "Courier New",monospace; }
+    .merk-mini:focus { border-style:solid; background:#e2e8f0; }
+    .arbeits-gitter .gitterzelle.gesperrt { background:#e5e9f0; border-color:#cbd5e1; }
+    .arbeits-gitter .gitterzelle.gesperrt input { display:none; }
+    .merk-mini::placeholder { color:transparent; }
+    .doppelstrich { height:8px; margin:2px 0; background:linear-gradient(#0000c8 0 2px, transparent 2px 6px, #0000c8 6px 8px); }
+    .loesungsweg .doppelstrich { background:linear-gradient(#16a34a 0 2px, transparent 2px 6px, #16a34a 6px 8px); }
+    .loesungsweg { display:none; margin-top:7px; padding:7px; border-radius:7px; background:#ecfdf5; }.loesungsweg.sichtbar { display:block; }.loesungsweg .gitterzelle { color:#166534; border-color:#86efac; background:#f0fdf4; }.loesungsweg .strich { background:#16a34a; }
+    .haupt.richtig { background:#dcfce7; } .haupt.falsch { background:#fee2e2; }
+    .merk-mini.richtig { border-color:#16a34a; border-style:solid; background:#dcfce7; } .merk-mini.falsch { border-color:#dc2626; border-style:solid; background:#fee2e2; }
+    [data-pinyin] { position:relative; }
+    [data-pinyin]::after { content:attr(data-pinyin); position:absolute; left:50%; bottom:100%; transform:translateX(-50%); margin-bottom:8px; padding:5px 9px; border-radius:6px; background:#1f2937; color:#fff; font-size:12px; font-weight:normal; line-height:1.3; white-space:normal; width:max-content; max-width:240px; text-align:center; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .15s; z-index:50; }
+    [data-pinyin]:hover::after, [data-pinyin].zeige-pinyin::after { opacity:1; visibility:visible; }
+    .eigen-box { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:10px; margin:-8px 0 22px; }
+    .eigen-box[hidden] { display:none; }
+    .eigen-box input { width:110px; padding:10px; border:2px solid #cbd5e1; border-radius:9px; font:bold 22px "Courier New",monospace; text-align:center; color:#0000c8; }
+    .eigen-box input:focus { outline:0; border-color:var(--blau); }
+    .eigen-op { font:bold 26px "Courier New",monospace; color:#475569; }
+    .eigen-ok { padding:11px 18px; border:0; border-radius:9px; background:var(--blau); color:#fff; font-size:16px; font-weight:bold; cursor:pointer; }
+    .buttons { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; margin-top:22px; } .buttons button { padding:12px 20px; border:0; border-radius:9px; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; }
+    .buttons-haupt { grid-column:2; display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+    @media (max-width:650px) { .buttons { grid-template-columns:1fr; justify-items:center; } .buttons-haupt { grid-column:1; } button.loesung { grid-column:1; justify-self:center; } }
+    .pruefen { background:var(--blau); } .neu { background:#f59e0b; }
+    button.loesung { grid-column:3; justify-self:end; background:transparent; color:#16a34a; border:2px solid #16a34a; padding:10px 18px; }
+    button.loesung:hover { background:#f0fdf4; }
+    #ergebnis { min-height:25px; margin-top:17px; color:#1d4ed8; text-align:center; font-size:18px; font-weight:bold; }
+    .merkhilfe { display:flex; align-items:center; gap:18px; margin-top:25px; padding:15px 20px; border-radius:12px; background:#fffbeb; color:#78350f; line-height:1.5; } .merkhilfe img { width:75px; height:75px; object-fit:contain; transform:scaleX(-1); }
+    .footer { margin-top:35px; padding-top:20px; border-top:1px solid #e2e8f0; color:var(--grau); text-align:center; font-size:14px; line-height:1.8; } .footer-logo { display:block; width:170px; max-width:70%; margin:0 auto 12px; } a { color:var(--blau); font-weight:bold; text-decoration:none; } a:hover { text-decoration:underline; }
+    @media (max-width:650px) { .app { padding:18px 9px; } .aufgaben-box { padding:13px 8px; } .aufgaben { grid-template-columns:1fr; gap:9px; } .aufgabe { padding:10px 4px; } .gitterzeile { grid-template-columns:repeat(var(--spalten,10), minmax(22px, 1fr)); }.gitterzelle { font-size:17px; } .merkhilfe { align-items:flex-start; gap:10px; padding:13px; } .merkhilfe img { width:55px; height:55px; } }
+    .jubel-elefant { display:none; position:fixed; right:25px; bottom:25px; width:150px; z-index:10000; pointer-events:none; animation:winken .8s infinite alternate; }
+    @keyframes winken { from{transform:rotate(-6deg);} to{transform:rotate(6deg);} }
+  </style>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+</head>
+<body>
+  <main class="app">
+    <a class="logo-link" href="https://mistudia.com" target="_blank" rel="noopener noreferrer"><img class="logo" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Lernen mit Spaß!"></a>
+    <h1 id="titel">miStudia – Schriftlich rechnen</h1>
+    <p class="info" id="info">Rechne die Aufgaben <b>schriftlich</b> in dein Heft. Trage das Ergebnis und deine gemerkten Zahlen ein &ndash; die kleinen K&auml;stchen sind f&uuml;r den &Uuml;bertrag (&bdquo;1 gemerkt&ldquo;).</p>
+    <nav class="lang-box" aria-label="Sprache auswählen">
+      <button class="lang aktiv" data-lang="de">🇩🇪</button><button class="lang" data-lang="en">🇺🇸</button><button class="lang" data-lang="es">🇪🇸</button><button class="lang" data-lang="zh">🇨🇳</button><button class="lang" data-lang="fr">🇫🇷</button><button class="lang" data-lang="ru">🇷🇺</button><button class="lang" data-lang="ar">🇸🇦</button>
+    </nav>
+    <nav class="stufe-box" aria-label="Schwierigkeitsstufe auswählen">
+      <button class="stufe aktiv" data-stufe="leicht" data-key="leicht">😊 Leicht</button><button class="stufe" data-stufe="mittel" data-key="mittel">🧠 Mittel</button><button class="stufe" data-stufe="schwer" data-key="schwer">🔥 Schwer</button><button class="stufe" data-stufe="dezimal" data-key="dezimal">🔢 Dezimal</button><button class="stufe" data-stufe="eigene" data-key="eigen">✏️ Eigene Aufgabe</button>
+    </nav>
+    <nav class="art-box" aria-label="Rechenart auswählen">
+      <button class="art aktiv" data-art="plus" data-key="addition">➕ Addition</button><button class="art" data-art="minus" data-key="subtraktion">➖ Subtraktion</button><button class="art" data-art="mal" data-key="multiplikation">✖️ Multiplikation</button><button class="art" data-art="geteilt" data-key="division">➗ Division</button>
+    </nav>
+    <div class="eigen-box" id="eigenBox" hidden><input id="eigenA" inputmode="numeric" maxlength="6" aria-label="1. Zahl" placeholder="15"><span id="eigenOp" class="eigen-op">·</span><input id="eigenB" inputmode="numeric" maxlength="6" aria-label="2. Zahl" placeholder="238"><button type="button" id="eigenOk" class="eigen-ok">Aufgabe übernehmen</button></div>
+    <section class="aufgaben-box" aria-label="Rechenaufgaben"><div class="aufgaben" id="aufgaben"></div><div class="buttons"><div class="buttons-haupt"><button class="neu" id="neu">🔄 Neue Aufgaben</button><button class="pruefen" id="pruefen">✓ Prüfen</button></div><button class="loesung" id="loesung">💡 Lösungen</button></div><div id="ergebnis" aria-live="polite"></div></section>
+    <aside class="merkhilfe"><img src="/img/elefant.png" alt="miStudia Elefant"><div><strong id="merktippLabel">Merktipp:</strong> <span id="merktippText">Schreibe die Zahlen ordentlich untereinander. Bei Addition und Subtraktion stehen Einer unter Einern, Zehner unter Zehnern und Hunderter unter Hundertern.</span></div></aside>
+    <footer class="footer"><a href="https://mistudia.com" target="_blank" rel="noopener noreferrer"><img class="footer-logo" src="/img/mistudia-logo-learnbygame.png" alt="miStudia"></a><div>© <span id="jahr"></span> miStudia · <a href="https://mistudia.com" target="_blank" rel="noopener noreferrer">mistudia.com</a></div></footer>
+  </main>
+  <img id="jubelElefant" class="jubel-elefant" src="/img/elefant.png" alt="Jubel-Elefant">
+  <script>
+    let art = 'plus', stufe = 'leicht', aktivSprache = 'de', aufgaben = [];
+    let pruefenAktiv = false, loesungAktiv = false;
+    const aufgabenElement = document.getElementById('aufgaben'), ergebnis = document.getElementById('ergebnis');
+    function zufall(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function ziffer(n, stelle) { return Math.floor(n / stelle) % 10; }
+    const STUFEN = {
+      leicht: { plus: { min: 10, max: 99 }, minus: { aMin: 30, aMax: 99, bMin: 10 }, mal: { aMin: 12, aMax: 99, bMin: 2, bMax: 9 }, geteilt: { bMin: 2, bMax: 5, lMin: 2, lMax: 9 } },
+      mittel: { plus: { min: 100, max: 899 }, minus: { aMin: 300, aMax: 999, bMin: 100 }, mal: { aMin: 120, aMax: 899, bMin: 12, bMax: 49 }, geteilt: { bMin: 2, bMax: 9, lMin: 12, lMax: 99 } },
+      schwer: { plus: { min: 1000, max: 8999 }, minus: { aMin: 3000, aMax: 9999, bMin: 1000 }, mal: { aMin: 120, aMax: 899, bMin: 112, bMax: 489 }, geteilt: { bMin: 11, bMax: 89, lMin: 100, lMax: 999 } }
+    };
+    const DEZIMALSTELLEN = 2;
+    function dezStellenFuer(feld) {
+      if (stufe !== 'dezimal') return 0;
+      if (feld === 'b' && (art === 'mal' || art === 'geteilt')) return 0;
+      return DEZIMALSTELLEN;
+    }
+    function formatZahl(wert, dez) {
+      const vz = wert < 0 ? '−' : '';
+      const abs = Math.abs(wert);
+      if (!dez) return vz + String(abs);
+      const s = String(abs).padStart(dez + 1, '0');
+      return vz + s.slice(0, -dez) + ',' + s.slice(-dez);
+    }
+    function verschiebeMerk(merk, dez) {
+      if (!dez) return merk;
+      const neu = {};
+      Object.keys(merk).forEach(k => { const kk = Number(k); neu[kk < dez ? kk : kk + 1] = merk[k]; });
+      return neu;
+    }
+    function erstelleAufgabe(erzwingeNegativ = false) {
+      let a, b, c, loesung, zeichen;
+      if (stufe === 'dezimal') {
+        if (art === 'plus') { a = zufall(5, 999); b = zufall(5, 999); loesung = a + b; zeichen = '+'; }
+        if (art === 'minus') { a = zufall(50, 999); b = zufall(5, a); loesung = a - b; zeichen = '−'; }
+        if (art === 'mal') { a = zufall(5, 899); b = zufall(2, 9); loesung = a * b; zeichen = '·'; }
+        if (art === 'geteilt') { loesung = zufall(5, 899); b = zufall(2, 9); a = loesung * b; zeichen = ':'; }
+        return { a, b, loesung, zeichen };
+      }
+      const s = STUFEN[stufe];
+      if (art === 'plus') {
+        a = zufall(s.plus.min, s.plus.max); b = zufall(s.plus.min, s.plus.max);
+        if (stufe === 'schwer') { c = zufall(s.plus.min, s.plus.max); loesung = a + b + c; }
+        else loesung = a + b;
+        zeichen = '+';
+      }
+      if (art === 'minus') {
+        if (stufe === 'schwer') {
+          a = zufall(s.minus.aMin, s.minus.aMax);
+          b = zufall(s.minus.bMin, a);
+          const d = a - b;
+          const cMin = Math.min(s.minus.bMin, d);
+          c = zufall(cMin, d);
+          loesung = d - c;
+        } else if (stufe === 'mittel' && erzwingeNegativ) {
+          a = zufall(s.minus.aMin, s.minus.aMax - 1); b = zufall(a + 1, s.minus.aMax);
+          loesung = a - b;
+        } else {
+          a = zufall(s.minus.aMin, s.minus.aMax); b = zufall(s.minus.bMin, a);
+          loesung = a - b;
+        }
+        zeichen = '−';
+      }
+      if (art === 'mal') { a = zufall(s.mal.aMin, s.mal.aMax); b = zufall(s.mal.bMin, s.mal.bMax); loesung = a * b; zeichen = '·'; }
+      if (art === 'geteilt') { b = zufall(s.geteilt.bMin, s.geteilt.bMax); loesung = zufall(s.geteilt.lMin, s.geteilt.lMax); a = b * loesung; zeichen = ':'; }
+      return { a, b, c, loesung, zeichen };
+    }
+    let SP = 10;
+    function spaltenFuer(a) {
+      const la = formatZahl(a.a, dezStellenFuer('a')).length, lb = formatZahl(a.b, dezStellenFuer('b')).length, ll = formatZahl(a.loesung, dezStellenFuer('loesung')).length;
+      const lc = a.c !== undefined ? formatZahl(a.c, dezStellenFuer('c')).length : 0;
+      if (art === 'mal') return Math.max(la + 1 + lb, ll + 1);
+      if (art === 'geteilt') return 1 + la + 1 + lb + 1 + ll;
+      return Math.max(la, lb, lc, ll) + 1;
+    }
+    function ziffernHtml(z) { return z === '·' ? '<span class="malpunkt"></span>' : z; }
+    const MAL_FARBEN = ['#ec4899', '#06b6d4', '#f97316', '#7c3aed', '#65a30d'];
+    function multiplikationsKopf(a) {
+      const da = dezStellenFuer('a'), db = dezStellenFuer('b');
+      const aText = formatZahl(a.a, da), bText = formatZahl(a.b, db);
+      const text = `${aText}${a.zeichen}${bText}`;
+      const zeichen = text.split(''); const start = SP - zeichen.length;
+      const bStartIdx = aText.length + 1;
+      const mehrzeilig = bText.length >= 2;
+      return `<div class="gitterzeile">${Array.from({length:SP}, (_,i) => {
+        const charIdx = i - start;
+        const istZiffer = i >= start && charIdx !== aText.length;
+        let farbe = '';
+        if (mehrzeilig && charIdx >= bStartIdx) farbe = MAL_FARBEN[(charIdx - bStartIdx) % MAL_FARBEN.length];
+        const inhalt = i >= start ? ziffernHtml(zeichen[charIdx]) : '';
+        const style = farbe ? ` style="color:${farbe}"` : '';
+        const punktStapel = istZiffer ? `<div class="punkt-stapel" data-punkt-key="${charIdx}"></div>` : '';
+        return `<div class="gitterzelle"${style}>${inhalt}${punktStapel}</div>`;
+      }).join('')}</div>`;
+    }
+    function gitterZeile(text = '', op = '', merk = {}, gesperrt = 0, farbe = '') {
+      const zeichen = String(text).split(''); const start = SP - zeichen.length;
+      const zifferStil = farbe ? ` style="color:${farbe}"` : '';
+      const merkStil = farbe ? ` style="color:${farbe};border-color:${farbe}"` : '';
+      return `<div class="gitterzeile">${Array.from({length:SP}, (_,i) => {
+        const r = SP - 1 - i; const mk = merk[r] ? `<span class="merk-anzeige"${merkStil}>${merk[r]}</span>` : '';
+        const istOp = i === start - 1 && op; const leer = i < start && !istOp && !mk; const istGesperrt = r < gesperrt;
+        const zellStil = (!istOp && i >= start && farbe) ? zifferStil : '';
+        return `<div class="gitterzelle ${istOp ? 'operator' : ''} ${leer ? 'leer' : ''} ${istGesperrt ? 'gesperrt' : ''}"${zellStil}>${istOp ? op : (i >= start ? ziffernHtml(zeichen[i - start]) : '')}${mk}</div>`;
+      }).join('')}</div>`;
+    }
+    function zweiteZeileEingabe(i, text, op, merkErwartet = {}) {
+      const zeichen = String(text).split(''); const start = SP - zeichen.length;
+      return `<div class="gitterzeile">${Array.from({length:SP}, (_,j) => {
+        const r = SP - 1 - j;
+        const istOp = j === start - 1 && op;
+        const zeichenIndex = j - start;
+        const istKomma = j >= start && zeichen[zeichenIndex] === ',';
+        const inhalt = istOp ? op : (j >= start ? zeichen[zeichenIndex] : '');
+        const brauchtBox = !istKomma && r > 0 && (istOp || j >= start);
+        const erwartet = merkErwartet[r] !== undefined ? String(merkErwartet[r]) : '';
+        const box = brauchtBox ? `<input class="merk-mini" data-role="merk-mini" data-col="${j}" data-erwartet="${erwartet}" inputmode="numeric" maxlength="1" aria-label="Gemerkte Zahl an Stelle ${r + 1} zu Aufgabe ${i + 1}">` : '';
+        const leer = !istOp && !inhalt && !brauchtBox;
+        return `<div class="gitterzelle ${istOp ? 'operator' : ''} ${leer ? 'leer' : ''}">${inhalt}${box}</div>`;
+      }).join('')}</div>`;
+    }
+    function uebertragAdd(zahlen) { const m = {}; let c = 0; const max = Math.max(...zahlen.map(n => String(n).length)); for (let k = 0; k < max + 1; k++) { let s = c; zahlen.forEach(n => s += ziffer(n, Math.pow(10, k))); c = Math.floor(s / 10); if (c > 0) m[k + 1] = c; } return m; }
+    function uebertragSub(a, b) { const m = {}; let bor = 0; const max = String(a).length; for (let k = 0; k < max; k++) { const d = ziffer(a, Math.pow(10, k)) - ziffer(b, Math.pow(10, k)) - bor; if (d < 0) { bor = 1; m[k + 1] = 1; } else bor = 0; } return m; }
+    function uebertragMulZeile(a, z, shift) { const m = {}; if (!z) return m; let c = 0; const len = String(a).length; for (let k = 0; k < len; k++) { const p = ziffer(a, Math.pow(10, k)) * z + c; c = Math.floor(p / 10); if (c > 0) m[k + 1 + shift] = c; } return m; }
+    function gitterZeileEnde(text, endSpalte, op = '', merk = {}) {
+      const zeichen = String(text).split(''); const start = endSpalte + 1 - zeichen.length;
+      return `<div class="gitterzeile">${Array.from({length:SP}, (_,i) => {
+        const r = endSpalte - i; const mk = merk[r] ? `<span class="merk-anzeige">${merk[r]}</span>` : '';
+        const istOp = i === start - 1 && op; const inhalt = istOp ? op : (i >= start && i <= endSpalte ? zeichen[i - start] : '');
+        return `<div class="gitterzelle ${istOp ? 'operator' : ''} ${inhalt ? '' : 'leer'}">${inhalt}${mk}</div>`;
+      }).join('')}</div>`;
+    }
+    function teilstrich(vonSpalte, bisSpalte) {
+      return `<div class="gitterzeile teilstrich">${Array.from({length:SP}, (_,i) => `<div class="strich-zelle ${i >= vonSpalte && i <= bisSpalte ? 'aktiv' : ''}"></div>`).join('')}</div>`;
+    }
+    function divisionsSchritte(a, offset = 1) {
+      const dezA = dezStellenFuer('a');
+      const zi = String(a.a).split('').map(Number); const ganzstellen = zi.length - dezA; const zeilen = [];
+      let rest = 0, erste = true, letzteEnde = offset - 1;
+      for (let i = 0; i < zi.length; i++) {
+        const cur = rest * 10 + zi[i];
+        const kommaShift = dezA && i >= ganzstellen ? 1 : 0;
+        const ende = offset + i + kommaShift;
+        letzteEnde = ende;
+        const q = Math.floor(cur / a.b);
+        if (q === 0) { rest = cur; continue; }
+        const prod = q * a.b; const neuRest = cur - prod;
+        const start = ende + 1 - String(cur).length;
+        if (!erste) zeilen.push(gitterZeileEnde(String(cur), ende));
+        zeilen.push(gitterZeileEnde(String(prod), ende, '−', uebertragSub(cur, prod)));
+        zeilen.push(teilstrich(start - 1, ende));
+        rest = neuRest;
+        erste = false;
+      }
+      zeilen.push(gitterZeileEnde(String(rest), letzteEnde));
+      return zeilen.join('');
+    }
+    function gitterZeileLinks(text, offset = 0) { const zeichen = String(text).split(''); return `<div class="gitterzeile">${Array.from({length:SP}, (_,i) => `<div class="gitterzelle ${(i < offset || i >= zeichen.length + offset) ? 'leer' : ''}">${zeichen[i - offset] || ''}</div>`).join('')}</div>`; }
+    function divisionsAufgabeEingabe(i, a) {
+      const da = dezStellenFuer('a'), db = dezStellenFuer('b'), dl = dezStellenFuer('loesung');
+      const text = `${formatZahl(a.a, da)}${a.zeichen}${formatZahl(a.b, db)}=`;
+      const zeichen = text.split(''); const offset = 1;
+      const loesungStr = formatZahl(a.loesung, dl).split('');
+      return `<div class="gitterzeile">${Array.from({length:SP}, (_,j) => {
+        if (j < offset || j < zeichen.length + offset) return `<div class="gitterzelle ${j < offset ? 'leer' : ''}">${zeichen[j - offset] || ''}</div>`;
+        const idx = j - (zeichen.length + offset);
+        const ziffer = loesungStr[idx];
+        if (ziffer === ',') return `<div class="gitterzelle">,</div>`;
+        const box = `<input class="haupt" data-role="haupt" data-col="${j}" data-erwartet="${ziffer}" data-ergebnis="1" inputmode="numeric" maxlength="1" aria-label="Ziffer ${idx + 1} im Ergebnis zu Aufgabe ${i + 1}">`;
+        return `<div class="gitterzelle ergebnis-feld">${box}</div>`;
+      }).join('')}</div>`;
+    }
+    function aufgabenZeilen(a, i = 0) {
+      const da = dezStellenFuer('a'), db = dezStellenFuer('b');
+      if (art === 'mal') return multiplikationsKopf(a);
+      if (art === 'geteilt') return divisionsAufgabeEingabe(i, a);
+      if (art === 'plus' && a.c !== undefined) {
+        const dc = dezStellenFuer('c');
+        const merk = uebertragAdd([a.a, a.b, a.c]);
+        return gitterZeile(formatZahl(a.a, da))
+          + zweiteZeileEingabe(i, formatZahl(a.b, db), a.zeichen, {})
+          + zweiteZeileEingabe(i, formatZahl(a.c, dc), a.zeichen, verschiebeMerk(merk, da));
+      }
+      const merk = art === 'plus' ? uebertragAdd([a.a, a.b]) : uebertragSub(a.a, a.b);
+      return gitterZeile(formatZahl(a.a, da)) + zweiteZeileEingabe(i, formatZahl(a.b, db), a.zeichen, verschiebeMerk(merk, da));
+    }
+    function arbeitsGitter(i, zeile, gesperrtRechts = 0, zeigeMerk = true, erwartetText, erwartetMerk, istErgebnis = false, farbe = '', punktInfo = null) {
+      const negativ = erwartetText !== undefined && String(erwartetText).startsWith('−');
+      const ziffernText = negativ ? String(erwartetText).slice(1) : erwartetText;
+      const zeichen = String(ziffernText || '').split(''); const start = SP - zeichen.length;
+      const farbStil = farbe ? ` style="color:${farbe}"` : '';
+      return `<div class="gitterzeile arbeits-gitter">${Array.from({length:SP}, (_,j) => {
+        const gesperrt = j >= SP - gesperrtRechts;
+        const r = SP - 1 - j;
+        const istVorzeichen = art === 'minus' && erwartetText !== undefined && j === start - 1;
+        let merkInput = '';
+        if (zeigeMerk && !gesperrt && !istVorzeichen) {
+          const erwartetMk = erwartetMerk && erwartetMerk[r] !== undefined ? String(erwartetMerk[r]) : '';
+          merkInput = `<input class="merk-mini" data-role="merk-mini" data-col="${j}" data-erwartet="${erwartetMk}"${farbStil} inputmode="numeric" maxlength="1" aria-label="Gemerkte Zahl an Stelle ${j+1} in Zeile ${zeile} zu Aufgabe ${i+1}">`;
+        }
+        if (istVorzeichen) {
+          const ergebnisAttr = istErgebnis ? ' data-ergebnis="1"' : '';
+          return `<div class="gitterzelle"><input class="haupt" data-role="haupt" data-col="${j}" data-erwartet="${negativ ? '−' : ''}"${ergebnisAttr} inputmode="text" maxlength="1" aria-label="Vorzeichen in Zwischenschritt ${zeile} zu Aufgabe ${i+1}"></div>`;
+        }
+        let hauptAttr = '';
+        if (!gesperrt && erwartetText !== undefined) {
+          const erwartetZiffer = j >= start ? (zeichen[j - start] || '') : '';
+          hauptAttr = ` data-erwartet="${erwartetZiffer}"`;
+          if (istErgebnis) hauptAttr += ' data-ergebnis="1"';
+          if (punktInfo && j >= start && erwartetZiffer !== '') {
+            const m = r - gesperrtRechts;
+            if (m < punktInfo.lenA) {
+              const aCharIdx = punktInfo.lenA - 1 - m;
+              hauptAttr += ` data-a-key="${aCharIdx}" data-b-key="${punktInfo.bCharIdx}"`;
+            }
+          }
+        }
+        return `<div class="gitterzelle ${gesperrt ? 'gesperrt' : ''}">${merkInput}<input class="haupt" data-role="haupt" data-col="${j}"${hauptAttr}${farbStil} inputmode="numeric" maxlength="1" aria-label="Ziffer ${j+1} in Zwischenschritt ${zeile} zu Aufgabe ${i+1}"></div>`;
+      }).join('')}</div>`;
+    }
+    function gesperrtFuerZeile(a, z) { if (art !== 'mal') return 0; const stellen = String(a.b).length; return z < stellen ? stellen - 1 - z : 0; }
+    function gitterZeileEndeEingabe(text, endSpalte, op, merk, i) {
+      const zeichen = String(text).split(''); const start = endSpalte + 1 - zeichen.length;
+      return `<div class="gitterzeile">${Array.from({length:SP}, (_,j) => {
+        const r = endSpalte - j;
+        const istOp = j === start - 1 && op;
+        const inBereich = j >= start && j <= endSpalte;
+        const erwartetMk = merk[r] !== undefined ? String(merk[r]) : '';
+        const box = erwartetMk ? `<input class="merk-mini" data-role="merk-mini" data-col="${j}" data-erwartet="${erwartetMk}" inputmode="numeric" maxlength="1" aria-label="Geliehene Zahl an Stelle ${r + 1} zu Aufgabe ${i + 1}">` : '';
+        if (istOp) {
+          return `<div class="gitterzelle operator">${op}${box}</div>`;
+        }
+        if (!inBereich) return `<div class="gitterzelle ${box ? '' : 'leer'}">${box}</div>`;
+        const erwartet = zeichen[j - start];
+        return `<div class="gitterzelle ergebnis-feld"><input class="haupt" data-role="haupt" data-col="${j}" data-erwartet="${erwartet}" inputmode="numeric" maxlength="1" aria-label="Ziffer im Rechenweg zu Aufgabe ${i + 1}">${box}</div>`;
+      }).join('')}</div>`;
+    }
+    function divisionsSchritteEingabe(a, offset, i) {
+      const dezA = dezStellenFuer('a');
+      const zi = String(a.a).split('').map(Number); const ganzstellen = zi.length - dezA; const zeilen = [];
+      let rest = 0, erste = true, letzteEnde = offset - 1;
+      for (let k = 0; k < zi.length; k++) {
+        const cur = rest * 10 + zi[k];
+        const kommaShift = dezA && k >= ganzstellen ? 1 : 0;
+        const ende = offset + k + kommaShift;
+        letzteEnde = ende;
+        const q = Math.floor(cur / a.b);
+        if (q === 0) { rest = cur; continue; }
+        const prod = q * a.b; const neuRest = cur - prod;
+        const start = ende + 1 - String(cur).length;
+        if (!erste) zeilen.push(gitterZeileEndeEingabe(String(cur), ende, '', {}, i));
+        zeilen.push(gitterZeileEndeEingabe(String(prod), ende, '−', uebertragSub(cur, prod), i));
+        zeilen.push(teilstrich(start - 1, ende));
+        rest = neuRest;
+        erste = false;
+      }
+      zeilen.push(gitterZeileEndeEingabe(String(rest), letzteEnde, '', {}, i));
+      return zeilen.join('');
+    }
+    function loesungsZeilen(a) {
+      const da = dezStellenFuer('a'), db = dezStellenFuer('b'), dl = dezStellenFuer('loesung');
+      if (art === 'plus') {
+        if (a.c !== undefined) {
+          const dc = dezStellenFuer('c');
+          const m = uebertragAdd([a.a, a.b, a.c]);
+          return gitterZeile(formatZahl(a.a, da)) + gitterZeile(formatZahl(a.b, db), a.zeichen, {}) + gitterZeile(formatZahl(a.c, dc), a.zeichen, verschiebeMerk(m, da)) + '<div class="strich"></div>' + gitterZeile(formatZahl(a.loesung, dl));
+        }
+        const m = uebertragAdd([a.a, a.b]);
+        return gitterZeile(formatZahl(a.a, da)) + gitterZeile(formatZahl(a.b, db), a.zeichen, verschiebeMerk(m, da)) + '<div class="strich"></div>' + gitterZeile(formatZahl(a.loesung, dl));
+      }
+      if (art === 'minus') {
+        if (a.c !== undefined) {
+          const d = a.a - a.b;
+          const m1 = uebertragSub(a.a, a.b);
+          const m2 = uebertragSub(d, a.c);
+          return gitterZeile(formatZahl(a.a, da)) + gitterZeile(formatZahl(a.b, db), a.zeichen, m1) + '<div class="strich"></div>' + gitterZeile(String(d)) + gitterZeile(formatZahl(a.c, dezStellenFuer('c')), a.zeichen, m2) + '<div class="strich"></div>' + gitterZeile(formatZahl(a.loesung, dl));
+        }
+        const negativ = a.loesung < 0; const oben = negativ ? a.b : a.a; const unten = negativ ? a.a : a.b;
+        const m = uebertragSub(oben, unten);
+        return gitterZeile(formatZahl(oben, da)) + gitterZeile(formatZahl(unten, db), a.zeichen, verschiebeMerk(m, da)) + '<div class="strich"></div>' + gitterZeile(formatZahl(a.loesung, dl));
+      }
+      if (art === 'geteilt') { return gitterZeileLinks(`${formatZahl(a.a, da)}${a.zeichen}${formatZahl(a.b, db)}=${formatZahl(a.loesung, dl)}`, 1) + divisionsSchritte(a, 1); }
+      const zeilen = [aufgabenZeilen(a), '<div class="strich"></div>'];
+      const ziffern = String(a.b).split(''); const stellen = ziffern.length;
+      const mehrzeilig = stellen >= 2;
+      const merkEnde = uebertragAdd(ziffern.map((z, i) => a.a * Number(z) * Math.pow(10, stellen - 1 - i)));
+      ziffern.forEach((z, i) => {
+        const shift = stellen - 1 - i;
+        const farbe = mehrzeilig ? MAL_FARBEN[i % MAL_FARBEN.length] : '';
+        zeilen.push(gitterZeile(Number(z) ? String(a.a * Number(z)) + '0'.repeat(shift) : '0', '', uebertragMulZeile(a.a, Number(z), shift), shift, farbe));
+      });
+      zeilen.push('<div class="doppelstrich"></div>');
+      zeilen.push(gitterZeile(formatZahl(a.loesung, dl), '', verschiebeMerk(merkEnde, dl)));
+      return zeilen.join('');
+    }
+    function arbeitsZeilenHtml(a, i) {
+      if (art === 'geteilt') return divisionsSchritteEingabe(a, 1, i);
+      const dl = dezStellenFuer('loesung');
+      if (art === 'mal') {
+        const ziffern = String(a.b).split(''); const stellen = ziffern.length;
+        const mehrzeilig = stellen >= 2;
+        const aText = formatZahl(a.a, dezStellenFuer('a'));
+        const bStartIdx = aText.length + 1;
+        const merkEnde = uebertragAdd(ziffern.map((z, k) => a.a * Number(z) * Math.pow(10, stellen - 1 - k)));
+        const teile = ziffern.map((z, k) => {
+          const shift = stellen - 1 - k;
+          const text = Number(z) ? String(a.a * Number(z)) + '0'.repeat(shift) : '0';
+          const farbe = mehrzeilig ? MAL_FARBEN[k % MAL_FARBEN.length] : '';
+          const punktInfo = Number(z) ? { lenA: aText.length, bCharIdx: bStartIdx + k } : null;
+          return arbeitsGitter(i, k + 1, gesperrtFuerZeile(a, k), true, text, uebertragMulZeile(a.a, Number(z), shift), false, farbe, punktInfo);
+        });
+        const summeRow = arbeitsGitter(i, stellen + 1, 0, true, formatZahl(a.loesung, dl), verschiebeMerk(merkEnde, dl), true);
+        return [...teile, '<div class="doppelstrich"></div>', summeRow].join('');
+      }
+      if (art === 'minus' && a.c !== undefined) {
+        const d = a.a - a.b;
+        const row1 = arbeitsGitter(i, 1, 0, false, String(d), undefined, false);
+        const merk2 = uebertragSub(d, a.c);
+        const row2 = zweiteZeileEingabe(i, String(a.c), a.zeichen, merk2);
+        const row3 = arbeitsGitter(i, 2, 0, false, formatZahl(a.loesung, dl), undefined, true);
+        return row1 + row2 + '<div class="strich"></div>' + row3;
+      }
+      return arbeitsGitter(i, 1, 0, false, formatZahl(a.loesung, dl), undefined, true);
+    }
+    function aufgabeHtml(a, i) {
+      SP = spaltenFuer(a);
+      const t = texte[aktivSprache];
+      const mitPunkten = art === 'mal' && String(a.b).length >= 2;
+      return `<article class="aufgabe"><button type="button" class="aufgabe-loeschen" aria-label="${t.loeschenLabel} ${i + 1}" title="${t.loeschenLabel}">✕</button><div class="nummer">${i + 1}.</div><div class="rechnung"><div class="rechenblatt${mitPunkten ? ' mit-punkten' : ''}" style="--spalten:${SP}">${aufgabenZeilen(a, i)}<div class="strich"></div><div class="arbeitszeilen">${arbeitsZeilenHtml(a, i)}</div><div class="loesungsweg" id="schritt-${i}" style="--spalten:${SP}">${loesungsZeilen(a)}</div></div></div></article>`;
+    }
+    let eigeneZahlen = { a: '', b: '' };
+    function eigeneAufgabe() {
+      const t = texte[aktivSprache];
+      const sa = eigeneZahlen.a.trim(), sb = eigeneZahlen.b.trim();
+      if (!sa && !sb) return { leer: true };
+      const maxB = art === 'mal' ? 4 : 6;
+      if (!/^\d{1,6}$/.test(sa) || !new RegExp('^\\d{1,' + maxB + '}$').test(sb)) return { fehler: t.eigenFehler };
+      const a = Number(sa), b = Number(sb);
+      if (art === 'geteilt' && (b === 0 || a === 0 || a % b !== 0)) return { fehler: t.eigenDivision };
+      if (art === 'plus') return { aufgabe: { a, b, loesung: a + b, zeichen: '+' } };
+      if (art === 'minus') return { aufgabe: { a, b, loesung: a - b, zeichen: '−' } };
+      if (art === 'mal') return { aufgabe: { a, b, loesung: a * b, zeichen: '·' } };
+      return { aufgabe: { a, b, loesung: a / b, zeichen: ':' } };
+    }
+    function neueAufgaben() {
+      const eigen = stufe === 'eigene';
+      document.getElementById('eigenBox').hidden = !eigen;
+      if (eigen) {
+        document.getElementById('eigenOp').textContent = { plus: '+', minus: '−', mal: '·', geteilt: ':' }[art];
+        const r = eigeneAufgabe();
+        aufgaben = r.aufgabe ? [r.aufgabe] : [];
+        aufgabenElement.classList.add('einspaltig');
+        aufgabenElement.innerHTML = aufgaben.map(aufgabeHtml).join('');
+        ergebnis.textContent = r.fehler || '';
+        pruefenAktiv = false; loesungAktiv = false;
+        return;
+      }
+      const erzwingeIndex = (stufe === 'mittel' && art === 'minus') ? zufall(0, 3) : -1;
+      aufgaben = Array.from({length:4}, (_, i) => erstelleAufgabe(i === erzwingeIndex));
+      aufgabenElement.classList.toggle('einspaltig', art === 'geteilt');
+      aufgabenElement.innerHTML = aufgaben.map(aufgabeHtml).join('');
+      ergebnis.textContent = '';
+      pruefenAktiv = false; loesungAktiv = false;
+    }
+    function normalisiere(s) { return s.replace(/-/g, '−'); }
+    function konfettiAusRuessel() {
+      const elefant = document.getElementById('jubelElefant');
+      const rect = elefant.getBoundingClientRect();
+      const startX = rect.left + 20, startY = rect.top + 40;
+      for (let i = 0; i < 30; i++) {
+        const k = document.createElement('div');
+        k.style.position = 'fixed'; k.style.left = startX + 'px'; k.style.top = startY + 'px';
+        k.style.width = '8px'; k.style.height = '8px'; k.style.borderRadius = '50%';
+        k.style.background = `hsl(${Math.random() * 360},100%,50%)`; k.style.zIndex = '10001';
+        document.body.appendChild(k);
+        const x = -(120 + Math.random() * 260), y = Math.random() * 180 - 90;
+        k.animate([{ transform: 'translate(0,0)', opacity: 1 }, { transform: `translate(${x}px,${y}px)`, opacity: 0 }], { duration: 1200 + Math.random() * 500, easing: 'ease-out' });
+        setTimeout(() => k.remove(), 1700);
+      }
+    }
+    function jubel() {
+      const elefant = document.getElementById('jubelElefant');
+      elefant.style.display = 'block';
+      const interval = setInterval(konfettiAusRuessel, 300);
+      setTimeout(() => { clearInterval(interval); elefant.style.display = 'none'; }, 4000);
+    }
+    function pruefen() {
+      if (!aufgaben.length) return;
+      if (pruefenAktiv) {
+        document.querySelectorAll('.aufgabe input.richtig, .aufgabe input.falsch').forEach(inp => inp.classList.remove('richtig', 'falsch'));
+        ergebnis.textContent = '';
+        pruefenAktiv = false;
+        return;
+      }
+      let richtig = 0;
+      document.querySelectorAll('.aufgabe').forEach((aufgabeEl, i) => {
+        let aufgabeOk = true;
+        aufgabeEl.querySelectorAll('input[data-erwartet]').forEach(inp => {
+          if (!sichtbar(inp)) return;
+          const erwartet = inp.dataset.erwartet;
+          const wert = normalisiere(inp.value.trim());
+          inp.classList.remove('richtig', 'falsch');
+          if (!erwartet && !wert) return;
+          const ok = wert === erwartet;
+          inp.classList.add(ok ? 'richtig' : 'falsch');
+          if (inp.dataset.ergebnis && !ok) aufgabeOk = false;
+        });
+        if (aufgabeOk) richtig++;
+      });
+      ergebnis.textContent = texte[aktivSprache].richtig(richtig, aufgaben.length);
+      if (richtig === aufgaben.length) jubel();
+      pruefenAktiv = true;
+    }
+    function loesungen() {
+      if (!aufgaben.length) return;
+      if (loesungAktiv) {
+        document.querySelectorAll('.loesungsweg.sichtbar').forEach(el => el.classList.remove('sichtbar'));
+        document.querySelectorAll('.rechnung.loesung-an').forEach(el => el.classList.remove('loesung-an'));
+        ergebnis.textContent = '';
+        loesungAktiv = false;
+        return;
+      }
+      document.querySelectorAll('.aufgabe').forEach((aufgabeEl, i) => {
+        aufgabeEl.querySelectorAll('input[data-erwartet]').forEach(inp => {
+          inp.value = inp.dataset.erwartet;
+          inp.classList.remove('falsch');
+          inp.classList.add('richtig');
+        });
+        document.getElementById(`schritt-${i}`).classList.add('sichtbar');
+        document.getElementById(`schritt-${i}`).closest('.rechnung').classList.add('loesung-an');
+        punkteAktualisieren(aufgabeEl);
+      });
+      ergebnis.textContent = texte[aktivSprache].loesungenText;
+      loesungAktiv = true;
+    }
+    function punkteAktualisieren(aufgabeEl) {
+      aufgabeEl.querySelectorAll('.punkt-stapel').forEach(ps => { ps.innerHTML = ''; });
+      const stapel = {};
+      aufgabeEl.querySelectorAll('.arbeits-gitter .haupt[data-a-key]').forEach(inp => {
+        if (!inp.value.trim()) return;
+        const farbe = inp.style.color || '';
+        [inp.dataset.aKey, inp.dataset.bKey].forEach(key => {
+          (stapel[key] = stapel[key] || []).push(farbe);
+        });
+      });
+      Object.keys(stapel).forEach(key => {
+        const ziel = aufgabeEl.querySelector(`.punkt-stapel[data-punkt-key="${key}"]`);
+        if (!ziel) return;
+        stapel[key].forEach(farbe => {
+          const punkt = document.createElement('span');
+          punkt.className = 'punkt';
+          if (farbe) punkt.style.background = farbe;
+          ziel.appendChild(punkt);
+        });
+      });
+    }
+    function punkteVerhalten() {
+      aufgabenElement.addEventListener('input', (e) => {
+        const inp = e.target;
+        if (!(inp instanceof HTMLInputElement) || !inp.dataset.aKey) return;
+        punkteAktualisieren(inp.closest('.aufgabe'));
+      });
+    }
+    const texte = {
+      de: { titel: 'miStudia – Schriftlich rechnen', info: 'Rechne die Aufgaben <b>schriftlich</b> in dein Heft. Trage das Ergebnis und deine gemerkten Zahlen ein &ndash; die kleinen K&auml;stchen sind f&uuml;r den &Uuml;bertrag (&bdquo;1 gemerkt&ldquo;).', addition: '➕ Addition', subtraktion: '➖ Subtraktion', multiplikation: '✖️ Multiplikation', division: '➗ Division', leicht: '😊 Leicht', mittel: '🧠 Mittel', schwer: '🔥 Schwer', dezimal: '🔢 Dezimal', pruefen: '✓ Prüfen', loesung: '💡 Lösungen', neu: '🔄 Neue Aufgaben', ergebnisLabel: 'Ergebnis', ergebnisPlaceholder: 'Ergebnis', merktippLabel: 'Merktipp:', merktippText: 'Schreibe die Zahlen ordentlich untereinander. Bei Addition und Subtraktion stehen Einer unter Einern, Zehner unter Zehnern und Hunderter unter Hundertern.', richtig: (n, gesamt) => `Du hast ${n} von ${gesamt} Aufgaben richtig gelöst.`, loesungenText: '💡 Die Lösungen mit den Rechenzeilen werden angezeigt.', loeschenLabel: 'Eingaben löschen', eigen: '✏️ Eigene Aufgabe', eigenOk: 'Aufgabe übernehmen', eigenFehler: 'Bitte zwei ganze Zahlen eingeben (bis 6 Stellen, bei Multiplikation die 2. Zahl bis 4 Stellen).', eigenDivision: 'Die Division muss ohne Rest aufgehen, z. B. 306 : 6.' },
+      en: { titel: 'miStudia – Written Calculation', info: 'Solve the problems <b>on paper</b> in your notebook. Enter the result and any carried numbers &ndash; the small boxes are for the carry ("1 carried").', addition: '➕ Addition', subtraktion: '➖ Subtraction', multiplikation: '✖️ Multiplication', division: '➗ Division', leicht: '😊 Easy', mittel: '🧠 Medium', schwer: '🔥 Hard', dezimal: '🔢 Decimals', pruefen: '✓ Check', loesung: '💡 Solutions', neu: '🔄 New problems', ergebnisLabel: 'Result', ergebnisPlaceholder: 'Result', merktippLabel: 'Tip:', merktippText: 'Write the numbers neatly underneath each other. For addition and subtraction, ones go under ones, tens under tens, and hundreds under hundreds.', richtig: (n, gesamt) => `You solved ${n} out of ${gesamt} problems correctly.`, loesungenText: '💡 The solutions with the working steps are now shown.', loeschenLabel: 'Clear inputs', eigen: '✏️ My own problem', eigenOk: 'Use problem', eigenFehler: 'Please enter two whole numbers (up to 6 digits; for multiplication the 2nd number up to 4 digits).', eigenDivision: 'The division must come out evenly, e.g. 306 : 6.' },
+      es: { titel: 'miStudia – Cálculo escrito', info: 'Resuelve los ejercicios <b>por escrito</b> en tu cuaderno. Anota el resultado y los números que llevas &ndash; las casillas pequeñas son para la reserva («llevo 1»).', addition: '➕ Suma', subtraktion: '➖ Resta', multiplikation: '✖️ Multiplicación', division: '➗ División', leicht: '😊 Fácil', mittel: '🧠 Medio', schwer: '🔥 Difícil', dezimal: '🔢 Decimales', pruefen: '✓ Comprobar', loesung: '💡 Soluciones', neu: '🔄 Nuevos ejercicios', ergebnisLabel: 'Resultado', ergebnisPlaceholder: 'Resultado', merktippLabel: 'Consejo:', merktippText: 'Escribe los números ordenados unos debajo de otros. En la suma y la resta, las unidades van bajo las unidades, las decenas bajo las decenas y las centenas bajo las centenas.', richtig: (n, gesamt) => `Has resuelto ${n} de ${gesamt} ejercicios correctamente.`, loesungenText: '💡 Se muestran las soluciones con los pasos del cálculo.', loeschenLabel: 'Borrar entradas', eigen: '✏️ Mi propio ejercicio', eigenOk: 'Usar ejercicio', eigenFehler: 'Introduce dos números enteros (hasta 6 cifras; en la multiplicación el 2.º número hasta 4 cifras).', eigenDivision: 'La división debe ser exacta, p. ej. 306 : 6.' },
+      zh: { titel: 'miStudia – 竖式计算', info: '请在练习本上<b>用竖式</b>计算这些题目。填写结果和你进位的数字 &ndash; 每个小方框用来写进位（"进1"）。', addition: '➕ 加法', subtraktion: '➖ 减法', multiplikation: '✖️ 乘法', division: '➗ 除法', leicht: '😊 简单', mittel: '🧠 中等', schwer: '🔥 困难', dezimal: '🔢 小数', pruefen: '✓ 检查', loesung: '💡 显示答案', neu: '🔄 新题目', ergebnisLabel: '结果', ergebnisPlaceholder: '结果', merktippLabel: '小提示：', merktippText: '把数字整齐地写在下面对齐的位置。做加法和减法时，个位对个位，十位对十位，百位对百位。', richtig: (n, gesamt) => `你答对了 ${gesamt} 题中的 ${n} 题。`, loesungenText: '💡 现在显示带计算步骤的答案。', loeschenLabel: '清空输入', eigen: '✏️ 自己出题', eigenOk: '确定题目', eigenFehler: '请输入两个整数（最多6位；乘法的第二个数最多4位）。', eigenDivision: '除法必须整除，例如 306 : 6。' },
+      fr: { titel: 'miStudia – Calcul posé', info: 'Résous les exercices <b>par écrit</b> dans ton cahier. Inscris le résultat et les chiffres retenus &ndash; les petites cases servent à la retenue (« 1 retenu »).', addition: '➕ Addition', subtraktion: '➖ Soustraction', multiplikation: '✖️ Multiplication', division: '➗ Division', leicht: '😊 Facile', mittel: '🧠 Moyen', schwer: '🔥 Difficile', dezimal: '🔢 Décimaux', pruefen: '✓ Vérifier', loesung: '💡 Solutions', neu: '🔄 Nouveaux exercices', ergebnisLabel: 'Résultat', ergebnisPlaceholder: 'Résultat', merktippLabel: 'Astuce :', merktippText: 'Écris les nombres bien alignés les uns sous les autres. Pour l’addition et la soustraction, les unités sont sous les unités, les dizaines sous les dizaines et les centaines sous les centaines.', richtig: (n, gesamt) => `Tu as résolu ${n} exercice${n === 1 ? '' : 's'} correctement sur ${gesamt}.`, loesungenText: '💡 Les solutions avec les étapes de calcul sont affichées.', loeschenLabel: 'Effacer les saisies', eigen: '✏️ Mon propre exercice', eigenOk: 'Valider', eigenFehler: 'Saisis deux nombres entiers (jusqu\'à 6 chiffres ; pour la multiplication, le 2e nombre jusqu\'à 4 chiffres).', eigenDivision: 'La division doit tomber juste, p. ex. 306 : 6.' },
+      ru: { titel: 'miStudia – Письменные вычисления', info: 'Реши задания <b>письменно</b> в тетради. Запиши результат и числа, которые ты запомнил &ndash; маленькие клетки нужны для переноса («1 в уме»).', addition: '➕ Сложение', subtraktion: '➖ Вычитание', multiplikation: '✖️ Умножение', division: '➗ Деление', leicht: '😊 Легко', mittel: '🧠 Средне', schwer: '🔥 Сложно', dezimal: '🔢 Десятичные', pruefen: '✓ Проверить', loesung: '💡 Решения', neu: '🔄 Новые задания', ergebnisLabel: 'Результат', ergebnisPlaceholder: 'Результат', merktippLabel: 'Совет:', merktippText: 'Пиши числа аккуратно друг под другом. При сложении и вычитании единицы под единицами, десятки под десятками, сотни под сотнями.', richtig: (n, gesamt) => `Правильно решено ${n} из ${gesamt} заданий.`, loesungenText: '💡 Показаны решения с шагами вычисления.', loeschenLabel: 'Очистить поля', eigen: '✏️ Своё задание', eigenOk: 'Принять задание', eigenFehler: 'Введи два целых числа (до 6 цифр; при умножении второе число до 4 цифр).', eigenDivision: 'Деление должно выполняться без остатка, например 306 : 6.' },
+      ar: { titel: 'miStudia – الحساب الكتابي', info: 'حل التمارين <b>كتابيًا</b> في دفترك. اكتب النتيجة والأرقام التي حفظتها &ndash; المربعات الصغيرة مخصصة لرقم الحمل ("حمل 1").', addition: '➕ الجمع', subtraktion: '➖ الطرح', multiplikation: '✖️ الضرب', division: '➗ القسمة', leicht: '😊 سهل', mittel: '🧠 متوسط', schwer: '🔥 صعب', dezimal: '🔢 كسور عشرية', pruefen: '✓ تحقق', loesung: '💡 الحلول', neu: '🔄 تمارين جديدة', ergebnisLabel: 'النتيجة', ergebnisPlaceholder: 'النتيجة', merktippLabel: 'نصيحة:', merktippText: 'اكتب الأرقام بدقة فوق بعضها البعض. في الجمع والطرح، توضع الآحاد تحت الآحاد، والعشرات تحت العشرات، والمئات تحت المئات.', richtig: (n, gesamt) => `لقد حللت ${n} من ${gesamt} تمارين بشكل صحيح.`, loesungenText: '💡 يتم الآن عرض الحلول مع خطوات الحساب.', loeschenLabel: 'مسح المدخلات', eigen: '✏️ تمرين خاص بي', eigenOk: 'اعتماد التمرين', eigenFehler: 'أدخل عددين صحيحين (حتى 6 خانات؛ في الضرب العدد الثاني حتى 4 خانات).', eigenDivision: 'يجب أن تكون القسمة بلا باقٍ، مثل 306 : 6.' }
+    };
+    const UMSCHRIFT = {
+      zh: {
+        titel: 'miStudia – Shùshì Jìsuàn',
+        info: 'Qǐng zài liànxí běn shàng yòng shùshì jìsuàn zhèxiē tímù. Tiánxiě jiéguǒ hé nǐ jìnwèi de shùzì – měi gè xiǎo fāngkuàng yònglái xiě jìnwèi ("jìn yī").',
+        addition: 'jiāfǎ', subtraktion: 'jiǎnfǎ', multiplikation: 'chéngfǎ', division: 'chúfǎ',
+        leicht: 'jiǎndān', mittel: 'zhōngděng', schwer: 'kùnnán', dezimal: 'xiǎoshù',
+        pruefen: 'jiǎnchá', loesung: 'xiǎnshì dá’àn', neu: 'xīn tímù',
+        merktippLabel: 'xiǎo tíshì', merktippText: 'Bǎ shùzì zhěngqí de xiě zài xiàmiàn duìqí de wèizhi. Zuò jiāfǎ hé jiǎnfǎ shí, gèwèi duì gèwèi, shíwèi duì shíwèi, bǎiwèi duì bǎiwèi.',
+        loeschenLabel: 'qīngkōng shūrù', eigen: 'zìjǐ chūtí', eigenOk: 'quèdìng tímù', eigenFehler: 'Qǐng shūrù liǎng gè zhěngshù.', eigenDivision: 'Chúfǎ bìxū zhěngchú.', loesungenText: 'Xiànzài xiǎnshì dài jìsuàn bùzhòu de dá’àn.'
+      },
+      ru: {
+        titel: 'miStudia – Pis’mennye vychisleniya',
+        info: 'Reshi zadaniya pis’menno v tetradi. Zapishi rezul’tat i chisla, kotorye ty zapomnil — malen’kie kletki nuzhny dlya perenosa ("1 v ume").',
+        addition: 'slozheniye', subtraktion: 'vychitaniye', multiplikation: 'umnozheniye', division: 'deleniye',
+        leicht: 'legko', mittel: 'sredne', schwer: 'slozhno', dezimal: 'desyatichnye',
+        pruefen: 'proverit’', loesung: 'resheniya', neu: 'novye zadaniya',
+        merktippLabel: 'sovet', merktippText: 'Pishi chisla akkuratno drug pod drugom. Pri slozhenii i vychitanii yedinitsy pod yedinitsami, desyatki pod desyatkami, sotni pod sotnyami.',
+        loeschenLabel: 'ochistit’ polya', eigen: 'svoyo zadaniye', eigenOk: 'prinyat’ zadaniye', eigenFehler: 'Vvedi dva tselykh chisla.', eigenDivision: 'Deleniye dolzhno vypolnyat’sya bez ostatka.', loesungenText: 'Pokazany resheniya s shagami vychisleniya.'
+      },
+      ar: {
+        titel: 'al-ḥisāb al-kitābī',
+        info: 'ḥill at-tamārīn kitābiyyan fī daftarik. uktub an-natīja wal-arqām allatī ḥafiẓtahā – al-murabba‘āt aṣ-ṣaghīra mukhaṣṣaṣa li-raqam al-ḥaml ("ḥaml 1").',
+        addition: 'al-jamʿ', subtraktion: 'aṭ-ṭarḥ', multiplikation: 'aḍ-ḍarb', division: 'al-qisma',
+        leicht: 'sahl', mittel: 'mutawassiṭ', schwer: 'ṣaʿb', dezimal: 'kusūr ʿushriyya',
+        pruefen: 'taḥaqqaq', loesung: 'al-ḥulūl', neu: 'tamārīn jadīda',
+        merktippLabel: 'naṣīḥa', merktippText: 'uktub al-arqām bi-diqqa fawqa baʿḍihā al-baʿḍ. fī al-jamʿ waṭ-ṭarḥ, tūḍaʿ al-āḥād taḥt al-āḥād, wal-ʿasharāt taḥt al-ʿasharāt, wal-mi’āt taḥt al-mi’āt.',
+        loeschenLabel: 'masḥ al-mudkhalāt', eigen: 'tamrīn khāṣ bī', eigenOk: 'iʿtimād at-tamrīn', eigenFehler: 'adkhil ʿadadayn ṣaḥīḥayn.', eigenDivision: 'yajib an takūn al-qisma bilā bāqin.', loesungenText: 'yatimmu al-ān ʿarḍ al-ḥulūl maʿa khaṭawāt al-ḥisāb.'
+      }
+    };
+    function pinyinSetzen(el, key) {
+      if (!el) return;
+      const tabelle = UMSCHRIFT[aktivSprache];
+      const py = tabelle ? tabelle[key] : undefined;
+      if (py) { el.dataset.pinyin = py; }
+      else { delete el.dataset.pinyin; el.classList.remove('zeige-pinyin'); }
+    }
+    function pinyinVerhalten() {
+      document.addEventListener('click', (e) => {
+        if (!UMSCHRIFT[aktivSprache]) return;
+        const el = e.target.closest('[data-pinyin]');
+        if (!el) return;
+        el.classList.add('zeige-pinyin');
+        clearTimeout(el._pinyinTimer);
+        el._pinyinTimer = setTimeout(() => el.classList.remove('zeige-pinyin'), 2500);
+      });
+    }
+    function sprache(s) {
+      aktivSprache = s;
+      const rtl = s === 'ar' ? 'rtl' : 'ltr';
+      document.querySelectorAll('.lang').forEach(b => b.classList.toggle('aktiv', b.dataset.lang === s));
+      const t = texte[s];
+      document.getElementById('titel').textContent = t.titel;
+      document.getElementById('titel').dir = rtl;
+      pinyinSetzen(document.getElementById('titel'), 'titel');
+      document.getElementById('info').innerHTML = t.info;
+      document.getElementById('info').dir = rtl;
+      pinyinSetzen(document.getElementById('info'), 'info');
+      document.querySelectorAll('.art[data-key]').forEach(b => { b.textContent = t[b.dataset.key]; b.dir = rtl; pinyinSetzen(b, b.dataset.key); });
+      document.querySelectorAll('.stufe[data-key]').forEach(b => { b.textContent = t[b.dataset.key]; b.dir = rtl; pinyinSetzen(b, b.dataset.key); });
+      document.getElementById('pruefen').textContent = t.pruefen;
+      document.getElementById('pruefen').dir = rtl;
+      pinyinSetzen(document.getElementById('pruefen'), 'pruefen');
+      document.getElementById('loesung').textContent = t.loesung;
+      document.getElementById('loesung').dir = rtl;
+      pinyinSetzen(document.getElementById('loesung'), 'loesung');
+      document.getElementById('neu').textContent = t.neu;
+      document.getElementById('eigenOk').textContent = t.eigenOk;
+      document.getElementById('neu').dir = rtl;
+      pinyinSetzen(document.getElementById('neu'), 'neu');
+      document.getElementById('merktippLabel').textContent = t.merktippLabel;
+      document.getElementById('merktippLabel').dir = rtl;
+      pinyinSetzen(document.getElementById('merktippLabel'), 'merktippLabel');
+      document.getElementById('merktippText').textContent = t.merktippText;
+      document.getElementById('merktippText').dir = rtl;
+      pinyinSetzen(document.getElementById('merktippText'), 'merktippText');
+      document.querySelectorAll('.aufgabe-loeschen').forEach(b => { b.title = t.loeschenLabel; b.setAttribute('aria-label', `${t.loeschenLabel} ${b.closest('.aufgabe').querySelector('.nummer').textContent}`); });
+      ergebnis.textContent = '';
+    }
+    function sichtbar(el) { return !!el && !el.closest('.gesperrt'); }
+    function aufgabeLoeschen() {
+      aufgabenElement.addEventListener('click', (e) => {
+        const button = e.target.closest('.aufgabe-loeschen');
+        if (!button) return;
+        const aufgabeEl = button.closest('.aufgabe');
+        aufgabeEl.querySelectorAll('input').forEach(inp => { inp.value = ''; inp.classList.remove('richtig', 'falsch'); });
+        const rechnung = aufgabeEl.querySelector('.rechnung');
+        if (rechnung) rechnung.classList.remove('loesung-an');
+        const loesungsweg = aufgabeEl.querySelector('.loesungsweg');
+        if (loesungsweg) loesungsweg.classList.remove('sichtbar');
+        aufgabeEl.querySelectorAll('.punkt-stapel').forEach(ps => { ps.innerHTML = ''; });
+        ergebnis.textContent = '';
+      });
+    }
+    function naviListeZeile(rowEl) {
+      const inputs = Array.from(rowEl.querySelectorAll('input')).filter(sichtbar);
+      const spalten = []; const nachSpalte = {};
+      inputs.forEach(inp => {
+        const col = inp.dataset.col;
+        if (!nachSpalte[col]) { nachSpalte[col] = {}; spalten.push(col); }
+        nachSpalte[col][inp.dataset.role] = inp;
+      });
+      const liste = [];
+      spalten.forEach((col, idx) => {
+        const eintrag = nachSpalte[col];
+        if (eintrag.haupt) liste.push(eintrag.haupt);
+        const istLetzte = idx === spalten.length - 1;
+        if (eintrag['merk-mini'] && !istLetzte) liste.push(eintrag['merk-mini']);
+      });
+      return liste;
+    }
+    function pfeiltastenNavigation() {
+      aufgabenElement.addEventListener('keydown', (e) => {
+        if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+        const t = e.target;
+        if (!(t instanceof HTMLInputElement)) return;
+        const rechenblatt = t.closest('.rechenblatt');
+        const rowEl = t.closest('.gitterzeile');
+        if (!rechenblatt || !rowEl) return;
+        const col = Number(t.dataset.col);
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          const liste = naviListeZeile(rowEl);
+          const idx = liste.indexOf(t);
+          const ziel = liste[e.key === 'ArrowRight' ? idx + 1 : idx - 1];
+          if (ziel) { e.preventDefault(); ziel.focus(); }
+          return;
+        }
+        const zeilen = Array.from(rechenblatt.querySelectorAll('.gitterzeile')).filter(z => z.querySelector('input'));
+        const zIdx = zeilen.indexOf(rowEl);
+        if (zIdx === -1) return;
+        const zielZeile = zeilen[e.key === 'ArrowDown' ? zIdx + 1 : zIdx - 1];
+        if (!zielZeile) return;
+        const kandidaten = Array.from(zielZeile.querySelectorAll('input')).filter(sichtbar);
+        if (!kandidaten.length) return;
+        let ziel = kandidaten.find(k => Number(k.dataset.col) === col);
+        if (!ziel) ziel = kandidaten.reduce((beste, k) => Math.abs(Number(k.dataset.col) - col) < Math.abs(Number(beste.dataset.col) - col) ? k : beste);
+        if (ziel) { e.preventDefault(); ziel.focus(); }
+      });
+    }
+    document.querySelectorAll('.art').forEach(button => button.addEventListener('click', () => { art = button.dataset.art; document.querySelectorAll('.art').forEach(b => b.classList.toggle('aktiv', b === button)); neueAufgaben(); }));
+    document.querySelectorAll('.stufe').forEach(button => button.addEventListener('click', () => { stufe = button.dataset.stufe; document.querySelectorAll('.stufe').forEach(b => b.classList.toggle('aktiv', b === button)); neueAufgaben(); }));
+    document.querySelectorAll('.lang').forEach(button => button.addEventListener('click', () => sprache(button.dataset.lang)));
+    document.getElementById('pruefen').addEventListener('click', pruefen); document.getElementById('loesung').addEventListener('click', loesungen); document.getElementById('neu').addEventListener('click', neueAufgaben); document.getElementById('jahr').textContent = new Date().getFullYear();
+    pfeiltastenNavigation();
+    document.getElementById('eigenOk').addEventListener('click', () => {
+      eigeneZahlen = { a: document.getElementById('eigenA').value, b: document.getElementById('eigenB').value };
+      neueAufgaben();
+      const erste = aufgabenElement.querySelector('.arbeits-gitter input, .ergebnis-feld input');
+      if (erste) erste.focus();
+    });
+    ['eigenA', 'eigenB'].forEach(id => document.getElementById(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('eigenOk').click(); }));
+    aufgabeLoeschen();
+    pinyinVerhalten();
+    punkteVerhalten();
+    neueAufgaben();
+  </script>
+<script src="/home-button.js"></script>
+</body>
+</html>

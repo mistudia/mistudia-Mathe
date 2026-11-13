@@ -1,0 +1,2583 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>miStudia - Mathewaage</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:
+        linear-gradient(
+            #eef5ff,
+            #dfefff
+        );
+
+    min-height:100vh;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+color:#1e293b;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:30px;
+}
+
+
+.app{
+
+    width:100%;
+    max-width:1200px;
+
+background: white;
+
+    border-radius:18px;
+
+    padding:30px;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.12);
+}
+
+.top{
+
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:nowrap;
+
+    margin-bottom:25px;
+}
+
+input{
+
+    width:500px;
+
+    background:white;
+
+    border:2px solid #90caf9;
+
+    border-radius:8px;
+
+    padding:16px;
+
+    color:#1e293b;
+
+    font-size:22px;
+
+    outline:none;
+
+    text-align:center;
+
+    transition:.2s;
+}
+
+input:focus{
+    border-color:#1976d2;
+    box-shadow:0 0 8px rgba(25,118,210,.3);
+}
+
+button{
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px 22px;
+
+    font-size:18px;
+
+    font-family:Arial, sans-serif;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    background:#1976d2;
+    color:white;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.18);
+
+    transition:.25s;
+}
+
+button:hover{
+    background:#1565c0;
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+.primary{
+    background:#38bdf8;
+    color:black;
+}
+
+.controls{
+
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:22px;
+    flex-wrap:wrap;
+
+    margin-top:15px;
+    margin-bottom:25px;
+}
+
+.controlGroup{
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+}
+
+.groupButtons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.controlGroup button{
+    min-width:64px;
+}
+
+.btn-pruefen{ background:#3367d6; }
+.btn-pruefen:hover{ background:#2b57b5; }
+
+.btn-loesung{ background:#1ea64b; }
+.btn-loesung:hover{ background:#198c3f; }
+
+.btn-vereinfachen{ background:#0891b2; }
+.btn-vereinfachen:hover{ background:#0e7490; }
+
+.btn-reset{ background:#64748b; }
+.btn-reset:hover{ background:#475569; }
+
+.btn-undo{ background:#ec4899; }
+.btn-undo:hover{ background:#db2777; }
+
+/* Buttonfarben passend zu den Elementen auf der Waage */
+/* Kugeln (Zahlen): positiv = blau, negativ = orange */
+.group-number button.btn-num-pos{ background:#0ea5e9; border:3px solid #075985; }
+.group-number button.btn-num-pos:hover{ background:#0284c7; }
+.group-number button.btn-num-neg{ background:#f97316; border:3px solid #9a3412; }
+.group-number button.btn-num-neg:hover{ background:#ea580c; }
+
+.group-multdiv button.btn-negate{ background:#ef4444; }
+.group-multdiv button.btn-negate:hover{ background:#dc2626; }
+.group-multdiv button.btn-negate{ margin-left:26px; }
+.group-multdiv button.btn-swap{ background:#0284c7; margin-left:26px; }
+.group-multdiv button.btn-swap:hover{ background:#0369a1; }
+
+/* Boxen (x): positiv = grün, negativ = violett */
+.group-x button.btn-x-pos{ background:#84cc16; color:#1a2e05; border:3px solid #3f6212; }
+.group-x button.btn-x-pos:hover{ background:#65a30d; }
+.group-x button.btn-x-neg{ background:#7c3aed; border:3px solid #4c1d95; }
+.group-x button.btn-x-neg:hover{ background:#6d28d9; }
+
+.group-multdiv button{ background:#0d9488; }
+.group-multdiv button:hover{ background:#0f766e; }
+
+#equationView{
+
+    text-align:center;
+
+    font-size:34px;
+
+    font-weight:700;
+
+    margin-bottom:20px;
+
+    color:#1e293b;
+}
+
+canvas{
+
+    width:100%;
+    height:auto;
+    aspect-ratio:1200/560;
+    display:block;
+
+background:
+    linear-gradient(
+        to bottom,
+        #f5f9ff,
+        #e3f0ff
+    );
+
+    border-radius:24px;
+
+    border:
+        2px solid #90caf9;
+}
+
+.info{
+
+    text-align:center;
+
+    margin-top:20px;
+
+    color:#94a3b8;
+
+    font-size:18px;
+}
+
+select{
+
+    border:none;
+
+    border-radius:16px;
+
+    padding:14px 20px;
+
+    font-size:18px;
+
+    background:#1e293b;
+
+    color:white;
+
+    cursor:pointer;
+
+    min-width:120px;
+}
+
+.header{
+
+    display:grid;
+
+    grid-template-columns:
+        180px
+        1fr
+        180px;
+
+    align-items:center;
+
+    margin-bottom:25px;
+}
+
+.leftHeader{
+
+    display:flex;
+
+    justify-content:flex-start;
+}
+
+.centerHeader{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+.rightHeader{
+
+}
+
+.logo{
+
+    width:240px;
+
+    height:auto;
+
+    object-fit:contain;
+}
+
+h1{
+
+    margin:0;
+    padding-top:8px;
+
+    font-size:52px;
+
+    color:#1565c0;
+
+    text-align:center;
+}
+
+.subtitle{
+
+    font-size:20px;
+
+    color:#475569;
+
+    margin-top:5px;
+
+    text-align:center;
+}
+
+.equationContainer{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#eef5ff;
+
+    border:2px solid #90caf9;
+
+    border-radius:22px;
+
+    padding:12px 24px;
+
+    flex: 1 1 auto;
+    width:100%;
+    max-width:none;
+}
+
+.leftEquationInput,
+.rightEquationInput{
+
+    background:transparent;
+
+    border:none;
+
+    outline:none;
+
+    color:#1565c0;
+
+    font-size:28px;
+
+    width:320px;
+}
+
+.leftEquationInput{
+
+    text-align:right;
+}
+
+.rightEquationInput{
+
+    text-align:left;
+}
+
+.equalsSign{
+
+    font-size:36px;
+
+    font-weight:bold;
+
+    color:#fde047;
+
+    margin:0 24px;
+}
+
+.equationRow{
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:flex-end;
+
+    margin-bottom:20px;
+
+    min-height:90px;
+}
+
+.equationCenter{
+
+    position:absolute;
+
+    left:50%;
+
+    transform:translateX(-50%);
+}
+
+.commandBarWrap{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    flex-shrink:0;
+    max-width: 340px;
+    margin-left:auto;
+}
+
+.commandBar{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    background:#eef5ff;
+    border:2px solid #90caf9;
+
+    padding:12px 18px;
+
+    border-radius:14px;
+
+    flex-wrap:wrap;
+}
+
+
+.commandBarInput{
+
+    width:180px;
+
+    background:white;
+
+    border:2px solid #90caf9;
+
+    border-radius:8px;
+
+    outline:none;
+
+    color:#1565c0;
+
+    font-size:20px;
+    font-weight:700;
+
+    padding:10px 12px;
+
+    text-align:center;
+}
+
+.commandBarInput:focus{
+    border-color:#1976d2;
+    box-shadow:0 0 8px rgba(25,118,210,.3);
+}
+
+.commandBarInput::placeholder{
+    color:#3b82f6;
+    opacity:0.55;
+    font-style:italic;
+    font-weight:normal;
+    font-size:15px;
+}
+
+.commandBarBtn{
+    padding:10px 20px;
+    font-size:16px;
+}
+
+.commandBarHint{
+    font-size:14px;
+    color:#64748b;
+    margin-top:6px;
+    text-align:right;
+}
+.equationLine{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:28px;
+
+    width:100%;
+
+    margin:auto;
+
+    white-space:nowrap;
+    word-spacing:0.02em;
+    letter-spacing:0.01em;
+}
+
+.eqLeft,
+.eqEqual,
+.eqRight{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    white-space:nowrap;
+}
+
+.eqEqual{
+
+    text-align:center;
+
+    font-size:34px;
+
+    font-weight:700;
+    color:#2563eb;
+
+
+}
+
+.eqLeft,
+.eqRight{
+
+    width:320px;
+
+    font-size:34px;
+
+    font-weight:700;
+
+    color:#2563eb;
+}
+
+.eqLeft{
+    justify-content:flex-end;
+}
+
+.eqRight{
+    justify-content:flex-start;
+}
+
+.bottomArea{
+
+    display:flex;
+    gap:30px;
+    align-items:flex-start;
+}
+
+.waageWrap{
+    flex:1 1 600px;
+    min-width:0;
+}
+
+.historyPanel{
+
+    flex:0 0 320px;
+    width:320px;
+    max-height:600px;
+
+    background:#eef5ff;
+    border:2px solid #90caf9;
+    border-radius:16px;
+
+    padding:16px;
+
+    display:flex;
+    flex-direction:column;
+}
+
+.historyTitle{
+    font-weight:bold;
+    color:#1565c0;
+    font-size:22px;
+    margin-bottom:10px;
+    flex-shrink:0;
+    text-align:center;
+}
+
+#historyList{
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.historyStep{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    background:white;
+    border-radius:10px;
+    padding:8px 12px;
+    border-left:4px solid #1976d2;
+    overflow-x:auto;
+}
+
+.historyIndex{
+    font-size:15px;
+    font-weight:bold;
+    color:#1976d2;
+    text-transform:uppercase;
+}
+
+.historyEq{
+    font-size:18px;
+    color:#1e293b;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+#probeModal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:20000;
+    align-items:center;
+    justify-content:center;
+}
+
+#probeCard{
+    background:white;
+    width:min(700px,92%);
+    max-height:90vh;
+    overflow:auto;
+    border-radius:16px;
+    padding:30px;
+    position:relative;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+
+#probeClose{
+    position:absolute;
+    right:15px;
+    top:15px;
+    width:40px;
+    height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    font-size:20px;
+    line-height:1;
+    border-radius:50%;
+}
+
+#probeContent{
+    font-size:24px;
+    color:#0f172a;
+    text-align:center;
+    line-height:1.6;
+}
+
+/* Echte Bruchdarstellung (Bruchstrich statt Schrägstrich) */
+.frac{
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    vertical-align:middle;
+    margin:0 4px;
+    line-height:1.05;
+    font-size:0.78em;
+}
+.frac .num{ padding:0 4px; }
+.frac .den{ padding:0 4px; border-top:2px solid currentColor; }
+
+/* Modal-Optik */
+.probeTitle{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:18px;
+    padding-bottom:12px;
+    border-bottom:2px solid #e2e8f0;
+    color:#1565c0;
+}
+.probeRow{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-left:5px solid #94a3b8;
+    border-radius:12px;
+    padding:14px 16px;
+    margin:12px 0;
+    overflow-x:auto;
+    white-space:nowrap;
+    word-spacing:0.08em;
+    letter-spacing:0.01em;
+}
+.probeRow.step1{ border-left-color:#0ea5e9; }
+.probeRow.step2{ border-left-color:#7c3aed; }
+.probeRow.ok{ border-left-color:#16a34a; background:#f0fdf4; }
+.probeRow.bad{ border-left-color:#dc2626; background:#fef2f2; }
+.probeLabel{
+    display:block;
+    font-size:14px;
+    font-weight:bold;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#64748b;
+    margin-bottom:6px;
+    text-align:left;
+}
+.xVal{
+    /* Lösung deutlich lesbar: Dunkelblau auf hellem Blau statt Rot/Braun auf Gelb */
+    background:#dbeafe;
+    color:#1d4ed8;
+    border:1px solid #93c5fd;
+    font-weight:bold;
+    padding:2px 12px;
+    border-radius:8px;
+    display:inline-block;
+}
+.resultBig{
+    font-size:34px;
+    font-weight:bold;
+    color:#0f172a;
+}
+.verdict{
+    margin-top:10px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+
+
+
+
+
+/* Handy (ans Ende verschoben, damit es greift) */
+@media (max-width: 640px){
+    body{ padding:10px; }
+    .app{ padding:14px; border-radius:18px; }
+    .header{ grid-template-columns:1fr; row-gap:10px; }
+    .logo{ width:120px; margin:0 auto; }
+    h1{ font-size:32px; }
+    .top{ flex-direction:column; }
+    .equationContainer{ flex: 1 1 auto; width:100%; flex-wrap:wrap; }
+    .commandBarWrap{ width:100%; }
+    .leftEquationInput, .rightEquationInput{ width:120px; font-size:20px; }
+    .bottomArea{ flex-direction:column; }
+    .historyPanel{ width:100%; flex-basis:auto; max-height:260px; }
+    #probeCard{ padding:18px; }
+    #probeContent{ font-size:18px; }
+    canvas{ height:auto; }
+    .equationRow{ flex-direction:column; align-items:center; }
+    .commandBar{ padding:10px 12px; gap:8px; }
+    .commandBarInput{ width:110px; font-size:16px; padding:8px; }
+    .commandBarBtn{ font-size:14px; padding:8px 14px; }
+    .controls{ gap:12px; }
+    .controlGroup{ padding:10px 12px; }
+    .controlGroup button{ font-size:18px; padding:10px 16px; min-width:52px; }
+}
+@media (max-width: 640px){
+    /* große Gleichung nicht mehr über das Eingabefeld legen */
+    .equationCenter{ position:static; left:auto; transform:none; width:100%; }
+    #equationView{ font-size:28px; margin-bottom:12px; overflow-wrap:anywhere; }
+    .commandBarWrap{ margin-left:0; max-width:100%; align-items:center; }
+    h1{ font-size:28px; }
+}
+</style>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="header">
+
+    <div class="leftHeader">
+
+        <img
+            src="/img/mistudia-logo.png"
+            class="logo"
+        >
+
+    </div>
+
+    <div class="centerHeader">
+
+        <h1>miStudia - Mathewaage</h1>
+
+        <div class="subtitle">
+            Gleichungen veranschaulichen
+        </div>
+
+    </div>
+
+    <div class="rightHeader"></div>
+
+</div>
+
+<div class="top">
+
+    <div class="equationContainer">
+
+        <input
+            id="leftEquationInput"
+            class="leftEquationInput"
+            value="2x-4x+7"
+            aria-label="Linke Seite der Gleichung"
+            onkeydown="handleEquationEnter(event)"
+        >
+
+        <div class="equalsSign">
+            =
+        </div>
+
+        <input
+            id="rightEquationInput"
+            class="rightEquationInput"
+            value="x+5"
+            aria-label="Rechte Seite der Gleichung"
+            onkeydown="handleEquationEnter(event)"
+        >
+
+    </div>
+
+</div>
+
+<div class="equationRow">
+
+    <div class="equationCenter">
+
+        <div id="equationView"></div>
+
+    </div>
+
+    <div class="commandBarWrap">
+
+        <div class="commandBar">
+
+            <input
+                id="commandInput"
+                class="commandBarInput"
+                placeholder="z.B. +3x, -2"
+                onkeydown="handleCommandEnter(event)"
+            >
+
+            <button class="commandBarBtn" onclick="executeCommand()">OK</button>
+
+        </div>
+
+        <div class="commandBarHint">
+            Tipp: z.B. <b>+3</b>, <b>-2x</b>, <b>·4</b> oder <b>÷2</b> eingeben und Enter drücken. Brüche gehen auch: <b>1/2x + 3/4</b>.
+        </div>
+
+    </div>
+
+</div>
+
+<div class="controls">
+
+<div class="controlGroup group-number">
+    <div class="groupButtons">
+        <button class="btn-num-pos" onclick="applyOperation('+',1)">+1</button>
+        <button class="btn-num-neg" onclick="applyOperation('-',1)">-1</button>
+    </div>
+</div>
+
+<div class="controlGroup group-x">
+    <div class="groupButtons">
+        <button class="btn-x-pos" onclick="applySingleX('+')">+x</button>
+        <button class="btn-x-neg" onclick="applySingleX('-')">-x</button>
+    </div>
+</div>
+
+<div class="controlGroup group-multdiv">
+    <div class="groupButtons">
+        <button onclick="applyMultiply(2)">·2</button>
+        <button onclick="applyDivide(2)">÷2</button>
+        <button class="btn-negate" onclick="multiplyByNegativeOne()">·(-1)</button>
+        <button class="btn-swap" onclick="swapSides()">⇄ Seiten tauschen</button>
+    </div>
+</div>
+
+<div class="controlGroup group-special">
+    <div class="groupButtons">
+        <button class="btn-pruefen" onclick="showProbe()">🔍 Probe</button>
+        <button class="btn-loesung" onclick="showSolution()">💡 Lösung</button>
+        <button class="btn-vereinfachen" onclick="simplifyEquation()">🧹 Vereinfachen</button>
+        <button class="btn-undo" onclick="undoLastStep()">↩️ Schritt zurück</button>
+        <button class="btn-reset" onclick="resetToOriginal()">🔄 Ursprungsgleichung</button>
+    </div>
+</div>
+
+</div>
+
+<div class="bottomArea">
+
+    <div class="waageWrap">
+        <canvas
+            id="canvas"
+            width="1200"
+            height="560"
+        ></canvas>
+    </div>
+
+    <div class="historyPanel">
+        <div class="historyTitle">📜 Zwischenschritte</div>
+        <div id="historyList"></div>
+    </div>
+
+</div>
+
+<div class="info">
+    Gib eine Gleichung ein und forme sie interaktiv um.
+</div>
+
+</div>
+
+<div id="probeModal" onclick="if(event.target===this) closeProbe();">
+    <div id="probeCard">
+        <button id="probeClose" onclick="closeProbe()">✖</button>
+        <div id="probeContent"></div>
+    </div>
+</div>
+
+<script>
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+let equation = {
+    left:{x:0,c:0},
+    right:{x:0,c:0}
+};
+
+// Verlauf der Zwischenschritte (Anzeige unter der Waage)
+let history = [];
+
+// Zustände vor jeder Umformung – für „Schritt zurück“.
+let undoStack = [];
+
+// Die zuletzt geladene (ursprüngliche) Aufgabe, für den "Ursprungsgleichung"-Button
+let originalEquation = null;
+let originalInputs = null;
+
+
+// ===================================
+// PARSEN
+// ===================================
+
+// Wandelt eine Zahl ODER einen Bruch ("3/4", "-1/2", "0.5") in eine Zahl um
+function parseNumber(str){
+
+    str = String(str).trim().replace(/,/g, ".");
+
+    if(str === "" || str === "+") return 1;
+    if(str === "-") return -1;
+
+    if(str.includes("/")){
+
+        let parts = str.split("/");
+
+        if(parts.length !== 2) return NaN;
+
+        let num = parts[0].trim();
+        let den = parts[1].trim();
+
+        if(num === "" || num === "+") num = "1";
+        if(num === "-") num = "-1";
+
+        let n = Number(num);
+        let d = Number(den);
+
+        if(!Number.isFinite(n) || !Number.isFinite(d) || d === 0) return NaN;
+
+        return n / d;
+    }
+
+    return Number(str);
+}
+
+// Parst einen linearen Ausdruck OHNE Klammern (z.B. "2x+5-3x", "1/2x+3/4")
+function parseLinearTerms(side){
+
+    let xCoeff = 0;
+    let constant = 0;
+
+    side = side.replace(/-/g,"+-");
+
+    let terms = side.split("+");
+
+    terms.forEach(term=>{
+
+        term = term.trim();
+
+        if(term==="") return;
+
+        if(term.includes("x")){
+
+            // "3/4x", "x/2", "2x" -> Koeffizient bestimmen
+            let coeffStr = term.replace("x","");
+
+            // Form "x/2" bzw. "-x/2" -> "1/2" bzw. "-1/2"
+            coeffStr = coeffStr.replace(/^(-?)\//, "$11/");
+
+            if(coeffStr === "" || coeffStr === "-")
+                coeffStr = coeffStr + "1";
+
+            xCoeff += parseNumber(coeffStr);
+
+        }else{
+
+            constant += parseNumber(term);
+        }
+    });
+
+    return {
+        x:xCoeff,
+        c:constant
+    };
+}
+
+// Baut aus Koeffizienten wieder einen Ausdrucks-String (für die Klammer-Auflösung)
+function formatSignedLinear(xCoeff, cConst){
+
+    let xPart = "";
+
+    if(xCoeff === 1) xPart = "x";
+    else if(xCoeff === -1) xPart = "-x";
+    else if(xCoeff !== 0) xPart = xCoeff + "x";
+
+    let cPart = "";
+
+    if(cConst !== 0){
+        cPart = (cConst > 0 && xPart !== "") ? ("+" + cConst) : String(cConst);
+    }
+
+    let result = xPart + cPart;
+
+    return result === "" ? "0" : result;
+}
+
+// Löst Klammern wie "2(x+3)" oder "-(x-5)" auf (auch verschachtelt)
+function expandParens(str){
+
+    let guard = 0;
+
+    while(str.includes("(") && guard < 30){
+
+        guard++;
+
+        let before = str;
+
+        str = str.replace(/(-?\d*\.?\d*(?:\/\d+(?:\.\d+)?)?)\(([^()]+)\)/, (match, coeffStr, inner)=>{
+
+            let coeff = parseNumber(coeffStr);
+
+            let parsed = parseLinearTerms(inner);
+
+            return formatSignedLinear(
+                parsed.x * coeff,
+                parsed.c * coeff
+            );
+        });
+
+        if(str === before) break; // keine gültige Klammer mehr gefunden -> Abbruch
+    }
+
+    return str;
+}
+
+function parseSide(side){
+
+    // Reine Zahlenprodukte zuerst ausrechnen: "3*4" wird zu "12".
+    // Ein Stern vor x bleibt erhalten, damit "2*x" weiterhin als "2x" gilt.
+    let numberFactor = "-?(?:\\d*\\.?\\d+(?:\\/\\d+(?:\\.\\d+)?)?)";
+    let productPattern = new RegExp("(" + numberFactor + ")\\*(" + numberFactor + ")");
+
+    while(productPattern.test(side)){
+        side = side.replace(productPattern, (match, left, right)=>{
+            return parseNumber(left) * parseNumber(right);
+        });
+    }
+
+    side = side.replace(/\*/g, ""); // "2*x" -> "2x", "2*(x+3)" -> "2(x+3)"
+
+    side = expandParens(side);
+
+    return parseLinearTerms(side);
+}
+
+
+// ===================================
+// LADEN
+// ===================================
+
+function loadEquation(){
+
+    let leftSide =
+        document.getElementById(
+            "leftEquationInput"
+        ).value;
+
+    let rightSide =
+        document.getElementById(
+            "rightEquationInput"
+        ).value;
+
+    let parsedLeft = parseSide(leftSide);
+    let parsedRight = parseSide(rightSide);
+
+    if(
+        Number.isNaN(parsedLeft.x) ||
+        Number.isNaN(parsedLeft.c) ||
+        Number.isNaN(parsedRight.x) ||
+        Number.isNaN(parsedRight.c)
+    ){
+        alert("Bitte eine gültige Gleichung eingeben, z.B. 2x-4x+7");
+        return;
+    }
+
+    equation.left = parsedLeft;
+    equation.right = parsedRight;
+
+    // Ursprungsgleichung merken (für den "Ursprungsgleichung"-Button)
+    originalEquation = {
+        left: { x:parsedLeft.x, c:parsedLeft.c },
+        right: { x:parsedRight.x, c:parsedRight.c }
+    };
+
+    originalInputs = { left: leftSide, right: rightSide };
+
+    history = []; // neue Aufgabe -> Verlauf zurücksetzen
+    undoStack = [];
+
+    // Nicht automatisch vereinfacht anzeigen: Eingabe so lassen wie getippt
+    rawDisplay = {
+        left: formatRawInput(leftSide),
+        right: formatRawInput(rightSide)
+    };
+
+    resetCleared = false;
+
+    redraw();
+}
+
+// Rohanzeige der eingegebenen Gleichung (vor dem Zusammenfassen)
+var rawDisplay = null;
+var resetCleared = false;
+
+function clearRawDisplay(){
+    rawDisplay = null;
+}
+
+function saveUndoState(){
+    undoStack.push({
+        left: { ...equation.left },
+        right: { ...equation.right },
+        rawDisplay: rawDisplay ? { ...rawDisplay } : null,
+        history: history.slice(),
+        resetCleared: resetCleared
+    });
+}
+
+function undoLastStep(){
+    let previous = undoStack.pop();
+
+    if(!previous) return;
+
+    equation.left = previous.left;
+    equation.right = previous.right;
+    rawDisplay = previous.rawDisplay;
+    history = previous.history;
+    resetCleared = previous.resetCleared;
+
+    renderHistory();
+    redraw();
+}
+
+// Eingabetext hübsch machen, ohne zu vereinfachen
+function formatRawInput(txt){
+
+    let t = String(txt||"").replace(/\s+/g,"");
+
+    if(t === "") return "";
+
+    // Bei Variablen die übliche Kurzschreibweise verwenden: "3*x" -> "3x".
+    // Reine Zahlenprodukte bleiben als Multiplikation sichtbar: "3*4" -> "3·4".
+    t = t.replace(/\*x/g, "x");
+    t = t.replace(/\*/g, "·");
+    t = t.replace(/(?!^)([+\-])/g, "\u2009$1\u2009");
+    t = t.replace(/-/g, "−");
+
+    return t;
+}
+
+// Setzt die Gleichung auf den Ausgangszustand zurück (vor allen Operationen)
+// Zweiter Klick = alles leeren (nichts links, nichts rechts, keine Zwischenschritte)
+function resetToOriginal(){
+
+    if(!originalEquation) return;
+
+    if(!resetCleared){
+        resetCleared = true;
+    }else{
+        resetCleared = false;
+        equation.left = { x:0, c:0 };
+        equation.right = { x:0, c:0 };
+        history = [];
+        rawDisplay = { left:"", right:"" };
+        document.getElementById("leftEquationInput").value = "";
+        document.getElementById("rightEquationInput").value = "";
+        renderHistory();
+        redraw();
+        return;
+    }
+
+    if(originalInputs){
+        document.getElementById("leftEquationInput").value = originalInputs.left;
+        document.getElementById("rightEquationInput").value = originalInputs.right;
+    }
+
+    rawDisplay = {
+        left: formatRawInput(document.getElementById("leftEquationInput").value),
+        right: formatRawInput(document.getElementById("rightEquationInput").value)
+    };
+
+    equation.left = {
+        x:originalEquation.left.x,
+        c:originalEquation.left.c
+    };
+
+    equation.right = {
+        x:originalEquation.right.x,
+        c:originalEquation.right.c
+    };
+
+    redraw();
+}
+
+
+// ===================================
+// TEXT
+// ===================================
+
+function sideToString(side){
+
+    let parts = [];
+
+    if(side.x !== 0){
+
+        if(side.x === 1)
+            parts.push("x");
+
+        else if(side.x === -1)
+            parts.push("−x");
+
+        else{
+            let coeffStr = toFraction(side.x);
+            if(coeffStr.startsWith("-"))
+                parts.push("−" + coeffStr.substring(1) + "x");
+            else
+                parts.push(coeffStr + "x");
+        }
+    }
+
+    if(side.c > 0){
+        parts.push(toFraction(side.c));
+    }
+
+    if(side.c < 0){
+        parts.push("−" + toFraction(Math.abs(side.c)));
+    }
+
+    if(parts.length === 0)
+        return "0";
+
+    let result = parts[0];
+    for(let i = 1; i < parts.length; i++){
+        if(parts[i].startsWith("−"))
+            result += "\u2009−\u2009" + parts[i].substring(1);
+        else
+            result += "\u2009+\u2009" + parts[i];
+    }
+
+    return result;
+}
+
+
+// ===================================
+// ZEICHNEN
+// ===================================
+
+function redraw(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    let tiltAngle = computeTiltAngle();
+
+    drawBalance(tiltAngle);
+
+    drawSide(
+        equation.left,
+        300,
+        tiltAngle
+    );
+
+    drawSide(
+        equation.right,
+        900,
+        tiltAngle
+    );
+
+document.getElementById("equationView").innerHTML = `
+    <div class="equationLine">
+        <div class="eqLeft">
+            ${rawDisplay ? rawDisplay.left : sideToString(equation.left)}
+        </div>
+
+        <div class="eqEqual">
+            =
+        </div>
+
+        <div class="eqRight">
+            ${rawDisplay ? rawDisplay.right : sideToString(equation.right)}
+        </div>
+    </div>
+`;
+
+    recordHistoryStep();
+}
+
+// Merkt sich den aktuellen Stand im Verlauf, falls er sich
+// gegenüber dem letzten Schritt verändert hat
+function recordHistoryStep(){
+
+    let currentStep =
+        rawDisplay
+            ? (rawDisplay.left + " = " + rawDisplay.right)
+            : (sideToString(equation.left) + " = " + sideToString(equation.right));
+
+    // Geleerter Zustand -> keine Zwischenschritte
+    if(rawDisplay && rawDisplay.left === "" && rawDisplay.right === ""){
+        return;
+    }
+
+    if(
+        history.length === 0 ||
+        history[history.length - 1] !== currentStep
+    ){
+        history.push(currentStep);
+        renderHistory();
+    }
+}
+
+function renderHistory(){
+
+    let list = document.getElementById("historyList");
+
+    if(!list) return;
+
+    list.innerHTML = history.map((step)=>{
+
+        return `
+            <div class="historyStep">
+                <span class="historyEq">${step}</span>
+            </div>
+        `;
+    }).join("");
+
+    list.scrollTop = list.scrollHeight;
+}
+
+
+// ===================================
+// WAAGE
+// ===================================
+
+function computeTiltAngle(){
+
+    let leftWeight =
+        Math.abs(equation.left.x)
+        + Math.abs(equation.left.c);
+
+    let rightWeight =
+        Math.abs(equation.right.x)
+        + Math.abs(equation.right.c);
+
+    let angle = 0;
+
+    // Nur kippen wenn KEIN x mehr vorhanden
+    // (mit x ist die tatsächliche Gewichtung unbekannt)
+    if(
+        equation.left.x === 0
+        &&
+        equation.right.x === 0
+    ){
+
+        if(leftWeight > rightWeight){
+            angle = -0.14;
+        }
+
+        if(rightWeight > leftWeight){
+            angle = 0.14;
+        }
+    }
+
+    return angle;
+}
+
+function drawBalance(angle){
+
+    ctx.save();
+
+    // Sockel-Schatten (Bodenkontakt, für mehr Tiefe) – bleibt stehen
+    ctx.beginPath();
+    ctx.ellipse(600, 518, 100, 12, 0, 0, Math.PI*2);
+    ctx.fillStyle = "rgba(15,23,42,0.15)";
+    ctx.fill();
+
+    // Ständer (schlanke Säule mit Metallic-Verlauf statt breitem Dreieck) – bleibt stehen
+    let columnGradient =
+        ctx.createLinearGradient(585,0,615,0);
+    columnGradient.addColorStop(0, "#cbd5e1");
+    columnGradient.addColorStop(0.5, "#f1f5f9");
+    columnGradient.addColorStop(1, "#64748b");
+
+    ctx.fillStyle = columnGradient;
+
+    roundRect(585, 416, 30, 90, 10);
+    ctx.fill();
+
+    // Standfuß – bleibt stehen
+    ctx.beginPath();
+    ctx.ellipse(600, 512, 95, 14, 0, 0, Math.PI*2);
+
+    let baseGradient =
+        ctx.createLinearGradient(505,0,695,0);
+    baseGradient.addColorStop(0, "#94a3b8");
+    baseGradient.addColorStop(0.5, "#e2e8f0");
+    baseGradient.addColorStop(1, "#64748b");
+
+    ctx.fillStyle = baseGradient;
+    ctx.fill();
+
+    // Ab hier kippt nur der Balken mit Tellern und Nabe
+    ctx.translate(600,380);
+
+    ctx.rotate(angle);
+
+    ctx.translate(-600,-380);
+
+    // Balken
+    let beamGradient =
+        ctx.createLinearGradient(0,372,0,388);
+    beamGradient.addColorStop(0, "#cbd5e1");
+    beamGradient.addColorStop(1, "#64748b");
+
+    ctx.fillStyle = beamGradient;
+
+    roundRect(
+        230,
+        372,
+        740,
+        16,
+        8
+    );
+
+    ctx.fill();
+
+    drawPlate(300);
+
+    drawPlate(900);
+
+    // Drehpunkt (Nabe) obenauf, mit Glanzlicht
+    ctx.beginPath();
+
+    ctx.arc(
+        600,
+        380,
+        34,
+        0,
+        Math.PI*2
+    );
+
+    let hubGradient =
+        ctx.createRadialGradient(590,370,4,600,380,34);
+    hubGradient.addColorStop(0, "#ffffff");
+    hubGradient.addColorStop(0.5, "#cbd5e1");
+    hubGradient.addColorStop(1, "#64748b");
+
+    ctx.fillStyle = hubGradient;
+
+    ctx.fill();
+
+    ctx.restore();
+
+    // Vergleichszeichen auf der Nabe (bleibt immer waagrecht)
+    let symbol = "=";
+    if(angle < -0.001) symbol = ">";   // links schwerer
+    else if(angle > 0.001) symbol = "<";
+
+    ctx.save();
+    ctx.font = "bold 38px 'Segoe UI', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#0f172a";
+    ctx.fillText(symbol, 600, 381);
+    ctx.restore();
+}
+
+
+// ===================================
+// TELLER
+// ===================================
+
+function drawPlate(x){
+
+    // Halteschnur
+    ctx.beginPath();
+
+    ctx.moveTo(x,325);
+
+    ctx.lineTo(x,372);
+
+    ctx.lineWidth=5;
+    ctx.strokeStyle="#90caf9";
+
+    ctx.stroke();
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x,
+        325,
+        165,
+        62,
+        0,
+        0,
+        Math.PI
+    );
+
+    ctx.fillStyle="#dbeafe";
+
+    ctx.fill();
+
+    ctx.lineWidth=5;
+
+    ctx.strokeStyle="#90caf9";
+
+    ctx.stroke();
+}
+
+
+// ===================================
+// OBJEKTE
+// ===================================
+
+// ===================================
+// BRUCHDARSTELLUNG
+// ===================================
+
+function toFraction(value){
+
+    // Ganze Zahl
+    if(Number.isInteger(value))
+        return value.toString();
+
+    const tolerance = 0.0001;
+
+    // mögliche Nenner
+    let denominators =
+        [2,3,4,5,6,8,10,12];
+
+    for(let d of denominators){
+
+        let n = Math.round(value * d);
+
+        if(Math.abs(value - n/d) < tolerance){
+
+            // z.B. 4/2 -> 2
+            if(n % d === 0){
+
+                return (n/d).toString();
+            }
+
+            return n + "/" + d;
+        }
+    }
+
+    // FALLBACK:
+    // Nachkommastellen entfernen wenn .00
+    let rounded =
+        Number(value.toFixed(2));
+
+    if(Number.isInteger(rounded)){
+
+        return rounded.toString();
+    }
+
+    return rounded.toString();
+}
+
+
+
+function drawSide(side,centerX,angle){
+
+    angle = angle || 0;
+
+    let items = [];
+
+    // =========================
+    // X BOXEN
+    // =========================
+
+    let xAbs = Math.abs(side.x);
+
+    let xWhole = Math.floor(xAbs);
+
+    let xFraction = xAbs - xWhole;
+
+    // Ganze x
+    for(let i=0;i<xWhole;i++){
+
+        items.push({
+            type:"x",
+            label: side.x<0 ? "-x" : "x",
+            negative:side.x<0
+        });
+    }
+
+    // Bruch-x
+    if(xFraction > 0.001){
+
+        items.push({
+            type:"x",
+            label:(side.x<0 ? "-" : "") + toFraction(xFraction) + "x",
+            negative:side.x<0
+        });
+    }
+
+
+    // =========================
+    // ZAHLEN
+    // =========================
+
+    let cAbs = Math.abs(side.c);
+
+    let cWhole = Math.floor(cAbs);
+
+    let cFraction = cAbs - cWhole;
+
+    // Ganze Kugeln
+    for(let i=0;i<cWhole;i++){
+
+        items.push({
+            type:"1",
+            label: side.c<0 ? "-1" : "1",
+            negative:side.c<0
+        });
+    }
+
+    // Bruchkugel
+    if(cFraction > 0.001){
+
+        items.push({
+            type:"1",
+            label:(side.c<0 ? "-" : "") + toFraction(cFraction),
+            negative:side.c<0
+        });
+    }
+
+
+    // Schutz: mehr als 100 Elemente pro Seite würden das
+    // Zeichnen unbrauchbar/langsam machen -> begrenzen
+    const MAX_SCALE_ITEMS = 100;
+    let overflow = 0;
+
+    if(items.length > MAX_SCALE_ITEMS){
+        overflow = items.length - MAX_SCALE_ITEMS;
+        items = items.slice(0, MAX_SCALE_ITEMS);
+    }
+
+    // =========================
+    // ZEICHNEN (dynamisches Raster,
+    // damit auch viele Elemente ~100
+    // noch auf die Waage passen)
+    // =========================
+
+    const widthBudget = 520;   // verfügbare Breite um centerX herum
+    const heightBudget = 260;  // verfügbare Höhe über dem Waagebalken
+    const baseRowY = 285;      // unterste Reihe, dicht über dem Teller
+
+    if(items.length > 0){
+
+        ctx.save();
+        ctx.translate(600,380);
+        ctx.rotate(angle);
+        ctx.translate(-600,-380);
+
+        let cols =
+            Math.max(
+                1,
+                Math.min(
+                    items.length,
+                    Math.round(
+                        Math.sqrt(items.length * widthBudget / heightBudget)
+                    )
+                )
+            );
+
+        let rows = Math.ceil(items.length / cols);
+
+        let spacingX = Math.min(70, widthBudget / cols);
+        let spacingY = Math.min(74, heightBudget / rows);
+
+        let itemSize =
+            Math.max(
+                16,
+                Math.min(spacingX, spacingY) * 0.74
+            );
+
+        items.forEach((item,index)=>{
+
+            let col = index % cols;
+            let row = Math.floor(index/cols);
+
+            let currentRowCount =
+                Math.min(
+                    cols,
+                    items.length - row * cols
+                );
+
+            let rowWidth =
+                (currentRowCount - 1) * spacingX;
+
+            let startX =
+                centerX - rowWidth / 2;
+
+            let x =
+                startX + col * spacingX;
+
+            let y =
+                baseRowY - row * spacingY;
+
+            if(item.type==="x"){
+
+                drawBox(
+                    x,
+                    y,
+                    item.label,
+                    item.negative,
+                    itemSize
+                );
+
+            }else{
+
+                drawBall(
+                    x,
+                    y,
+                    item.label,
+                    item.negative,
+                    itemSize*0.46
+                );
+            }
+        });
+
+        ctx.restore();
+    }
+
+    if(overflow > 0){
+
+        ctx.save();
+        ctx.fillStyle = "#1e293b";
+        ctx.font = "bold 14px Arial";
+        ctx.textAlign = "center";
+        ctx.translate(600,380);
+        ctx.rotate(angle);
+        ctx.translate(-600,-380);
+        ctx.fillText(
+            "(+" + overflow + " weitere)",
+            centerX,
+            305
+        );
+        ctx.restore();
+    }
+}
+
+// ===================================
+// BOX
+// ===================================
+
+function drawBox(x,y,label,negative,size){
+
+    size = size || 42;
+
+    ctx.save();
+
+   ctx.fillStyle =
+    negative
+    ? "#7c3aed"
+    : "#84cc16";
+
+roundRect(
+    x - size/2,
+    y - size/2,
+    size,
+    size,
+    size*0.24
+);
+
+    ctx.fill();
+
+    ctx.lineWidth = Math.max(2, size*0.09);
+    ctx.strokeStyle = negative ? "#4c1d95" : "#3f6212";
+    ctx.stroke();
+
+ctx.fillStyle =
+    negative
+    ? "#ffffff"
+    : "white";
+
+if(size >= 15){
+
+    ctx.font="bold " + Math.max(11, Math.round(size*0.46)) + "px Arial";
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(
+        label,
+        x,
+        y+1
+    );
+}
+
+    ctx.restore();
+}
+
+
+// ===================================
+// KUGEL
+// ===================================
+
+function drawBall(x,y,label,negative,size){
+
+    size = size || 18;
+
+    ctx.save();
+
+   ctx.beginPath();
+
+ctx.arc(
+    x,
+    y,
+    size,
+    0,
+    Math.PI*2
+);
+
+ctx.fillStyle =
+    negative
+    ? "#f97316"
+    : "#0ea5e9";
+    ctx.fill();
+
+    ctx.lineWidth = Math.max(2, size*0.16);
+    ctx.strokeStyle = negative ? "#9a3412" : "#075985";
+    ctx.stroke();
+
+    ctx.fillStyle="white";
+
+if(size >= 13){
+
+    ctx.font="bold " + Math.max(11, Math.round(size*0.82)) + "px Arial";
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(
+        label,
+        x,
+        y+1
+    );
+}
+
+    ctx.restore();
+}
+
+
+// ===================================
+// OPERATIONEN
+// ===================================
+
+function applyOperation(op,val){
+
+    saveUndoState();
+    clearRawDisplay();
+    resetCleared = false;
+
+
+    if(op==="+"){
+
+        equation.left.c += val;
+        equation.right.c += val;
+    }
+
+    if(op==="-"){
+
+        equation.left.c -= val;
+        equation.right.c -= val;
+    }
+
+    redraw();
+}
+
+function applyMultiply(val){
+
+    saveUndoState();
+    clearRawDisplay();
+    resetCleared = false;
+
+
+    equation.left.x *= val;
+    equation.left.c *= val;
+
+    equation.right.x *= val;
+    equation.right.c *= val;
+
+    redraw();
+}
+
+// ===================================
+// ×(-1)
+// ===================================
+
+function multiplyByNegativeOne(){
+
+    saveUndoState();
+    clearRawDisplay();
+    resetCleared = false;
+
+
+    equation.left.x *= -1;
+    equation.left.c *= -1;
+
+    equation.right.x *= -1;
+    equation.right.c *= -1;
+
+    redraw();
+}
+
+// ===================================
+// SEITEN TAUSCHEN
+// ===================================
+
+function swapSides(){
+
+    saveUndoState();
+    clearRawDisplay();
+    resetCleared = false;
+
+
+    let tmp = equation.left;
+    equation.left = equation.right;
+    equation.right = tmp;
+
+    redraw();
+}
+
+function applyDivide(val){
+
+    if(!val || Number.isNaN(val)){
+        alert("Division durch 0 ist nicht erlaubt.");
+        return;
+    }
+
+    saveUndoState();
+    clearRawDisplay();
+    resetCleared = false;
+
+    equation.left.x /= val;
+    equation.left.c /= val;
+
+    equation.right.x /= val;
+    equation.right.c /= val;
+
+    redraw();
+}
+
+// ===================================
+// X ADDITION / SUBTRAKTION
+// ===================================
+
+function applyXOperation(op,val){
+
+    saveUndoState();
+    if(op === "+"){
+
+        equation.left.x += val;
+        equation.right.x += val;
+    }
+
+    if(op === "-"){
+
+        equation.left.x -= val;
+        equation.right.x -= val;
+    }
+
+    redraw();
+}
+
+
+// ===================================
+// X MULTIPLIKATION
+// ===================================
+
+function applyXMultiply(val){
+
+    saveUndoState();
+    equation.left.x *= val;
+    equation.right.x *= val;
+
+    redraw();
+}
+
+
+// ===================================
+// X DIVISION
+// ===================================
+
+function applyXDivide(val){
+
+    if(!val || Number.isNaN(val)){
+        alert("Division durch 0 ist nicht erlaubt.");
+        return;
+    }
+
+    saveUndoState();
+
+    equation.left.x /= val;
+    equation.right.x /= val;
+
+    redraw();
+}
+// ===================================
+// +x / -x
+// ===================================
+
+function applySingleX(op){
+
+    saveUndoState();
+    clearRawDisplay();
+    resetCleared = false;
+
+
+    if(op === "+"){
+
+        equation.left.x += 1;
+        equation.right.x += 1;
+    }
+
+    if(op === "-"){
+
+        equation.left.x -= 1;
+        equation.right.x -= 1;
+    }
+
+    redraw();
+}
+
+
+// ===================================
+// ·x
+// ===================================
+
+function multiplyByX(){
+
+    saveUndoState();
+    clearRawDisplay();
+    resetCleared = false;
+
+
+    // Zahlen werden zu x
+    equation.left.x += equation.left.c;
+    equation.right.x += equation.right.c;
+
+    equation.left.c = 0;
+    equation.right.c = 0;
+
+    redraw();
+}
+
+
+// ===================================
+// ÷x
+// ===================================
+
+function divideByX(){
+
+    saveUndoState();
+    clearRawDisplay();
+    resetCleared = false;
+
+
+    // einfache symbolische Division
+
+    if(equation.left.x !== 0){
+
+        equation.left.c =
+            equation.left.c / equation.left.x;
+
+        equation.left.x = 1;
+    }
+
+    if(equation.right.x !== 0){
+
+        equation.right.c =
+            equation.right.c / equation.right.x;
+
+        equation.right.x = 1;
+    }
+
+    redraw();
+}
+
+// ===================================
+// VEREINFACHEN
+// ===================================
+
+function simplifyEquation(){
+
+    saveUndoState();
+    clearRawDisplay();
+    resetCleared = false;
+
+
+    // Alle x-Terme auf die linke Seite sammeln,
+    // alle Zahlen auf die rechte Seite sammeln.
+    // (Die alte Version kürzte nur bei GLEICHEM Vorzeichen auf
+    // beiden Seiten und tat bei unterschiedlichem Vorzeichen
+    // gar nichts - dadurch wirkte "Vereinfachen" oft, als würde
+    // es nicht komplett vereinfachen.)
+
+    let newLeftX = equation.left.x - equation.right.x;
+    let newRightC = equation.right.c - equation.left.c;
+
+    equation.left = { x:newLeftX, c:0 };
+    equation.right = { x:0, c:newRightC };
+
+    redraw();
+}
+
+
+// ===================================
+// ROUNDED RECT
+// ===================================
+
+function roundRect(x,y,w,h,r){
+
+    ctx.beginPath();
+
+    ctx.moveTo(x+r,y);
+
+    ctx.lineTo(x+w-r,y);
+
+    ctx.quadraticCurveTo(
+        x+w,
+        y,
+        x+w,
+        y+r
+    );
+
+    ctx.lineTo(x+w,y+h-r);
+
+    ctx.quadraticCurveTo(
+        x+w,
+        y+h,
+        x+w-r,
+        y+h
+    );
+
+    ctx.lineTo(x+r,y+h);
+
+    ctx.quadraticCurveTo(
+        x,
+        y+h,
+        x,
+        y+h-r
+    );
+
+    ctx.lineTo(x,y+r);
+
+    ctx.quadraticCurveTo(
+        x,
+        y,
+        x+r,
+        y
+    );
+
+    ctx.closePath();
+}
+
+
+// ===================================
+// KOMMANDO AUSFÜHREN
+// ===================================
+
+function executeCommand(){
+
+    let cmd =
+        document.getElementById(
+            "commandInput"
+        ).value.trim();
+
+    if(cmd === "")
+        return;
+
+
+    // =========================
+    // + ZAHL
+    // =========================
+
+    if(cmd.startsWith("+")){
+
+        let value =
+            cmd.substring(1);
+
+        if(value === "x"){
+
+            applySingleX("+");
+
+            return;
+        }
+
+        if(value.includes("x")){
+
+            value =
+                Number(
+                    value.replace("x","")
+                );
+
+            applyXOperation(
+                "+",
+                value
+            );
+
+            return;
+        }
+
+        applyOperation(
+            "+",
+            Number(value)
+        );
+
+        return;
+
+    }
+
+
+    // =========================
+    // - ZAHL
+    // =========================
+
+    if(cmd.startsWith("-")){
+
+        let value =
+            cmd.substring(1);
+
+        if(value === "x"){
+
+            applySingleX("-");
+
+            return;
+        }
+
+        if(value.includes("x")){
+
+            value =
+                Number(
+                    value.replace("x","")
+                );
+
+            applyXOperation(
+                "-",
+                value
+            );
+
+            return;
+        }
+
+        applyOperation(
+            "-",
+            Number(value)
+        );
+
+        return;
+    }
+
+
+    // =========================
+    // MULTIPLIKATION
+    // =========================
+
+if(
+    cmd.startsWith("·")
+    ||
+    cmd.startsWith("*")
+){
+
+        let value =
+            cmd.substring(1);
+
+        if(value === "x"){
+
+            multiplyByX();
+
+            return;
+        }
+
+        applyMultiply(
+            Number(value)
+        );
+
+        return;
+    }
+
+
+    // =========================
+    // DIVISION
+    // =========================
+
+if(
+    cmd.startsWith("÷")
+    ||
+    cmd.startsWith("/")
+){
+
+        let value =
+            cmd.substring(1);
+
+        if(value === "x"){
+
+            divideByX();
+
+            return;
+        }
+
+        applyDivide(
+            Number(value)
+        );
+
+        return;
+    }
+}
+
+// ===================================
+// ENTER IM KOMMANDOFELD
+// ===================================
+
+function handleCommandEnter(event){
+
+    if(event.key === "Enter"){
+
+        executeCommand();
+    }
+}
+
+// Start
+loadEquation();
+
+// ===================================
+// ENTER IM GLEICHUNGSFELD
+// ===================================
+
+function handleEquationEnter(event){
+
+    if(event.key === "Enter"){
+
+        loadEquation();
+    }
+}
+
+// ===================================
+// PROBE
+// ===================================
+
+// Zahl als HTML mit echtem Bruchstrich (statt "3/4")
+function fracHtml(value){
+
+    let txt = toFraction(value);
+
+    let m = txt.match(/^(-?)(\d+)\/(\d+)$/);
+
+    if(!m) return txt;
+
+    return (m[1] === "-" ? "−" : "")
+        + '<span class="frac"><span class="num">'
+        + m[2]
+        + '</span><span class="den">'
+        + m[3]
+        + '</span></span>';
+}
+
+function showProbe(){
+
+    // x berechnen
+    let a =
+        equation.left.x - equation.right.x;
+
+    let b =
+        equation.right.c - equation.left.c;
+
+    if(a === 0){
+        alert("x lässt sich hier nicht eindeutig bestimmen (x fällt auf beiden Seiten weg).");
+        return;
+    }
+
+    let x = b / a;
+
+    let baseEq = originalEquation
+        ? { left:{x:originalEquation.left.x, c:originalEquation.left.c},
+            right:{x:originalEquation.right.x, c:originalEquation.right.c} }
+        : { left:{x:equation.left.x, c:equation.left.c},
+            right:{x:equation.right.x, c:equation.right.c} };
+
+    let leftOriginal =
+        document.getElementById(
+            "leftEquationInput"
+        ).value;
+
+    let rightOriginal =
+        document.getElementById(
+            "rightEquationInput"
+        ).value;
+
+    // x einsetzen (nur zur Anzeige, HTML-sicher escaped)
+    function escapeHtml(str){
+        return str
+            .replace(/&/g,"&amp;")
+            .replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;");
+    }
+
+// ======================
+// ANZEIGE-VERSION
+// ======================
+
+// Brüche in der Eingabe schön mit Bruchstrich darstellen
+    function prettyFractions(str){
+        return str.replace(/(\d+)\s*\/\s*(\d+)/g,
+            '<span class="frac"><span class="num">$1</span><span class="den">$2</span></span>');
+    }
+
+    function prettyEquation(str, xValueHtml){
+        str = escapeHtml(str)
+            .replace(/\*/g, "·")
+            .replace(/(\d)x/g, "$1·x")
+            .replace(/(\d)\(/g, "$1·(")
+            .replace(/(\))\(/g, "$1·(");
+
+        str = str
+            .replace(/\+/g, " + ")
+            .replace(/-/g, " − ")
+            .replace(/·/g, " · ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+        str = prettyFractions(str);
+
+        if(xValueHtml !== undefined){
+            str = str.replace(
+                /x/g,
+                '(<span class="xVal">' + xValueHtml + '</span>)'
+            );
+        }
+
+        return str;
+    }
+
+let leftInserted = prettyEquation(leftOriginal, fracHtml(x));
+
+let rightInserted = prettyEquation(rightOriginal, fracHtml(x));
+
+// Hier bewusst die Eingabe zeigen, nicht die bereits zusammengefasste Form.
+let leftPlain = prettyEquation(leftOriginal);
+let rightPlain = prettyEquation(rightOriginal);
+
+
+    // ausrechnen (direkt aus den geparsten Koeffizienten,
+    // kein eval() auf Nutzereingaben nötig)
+    let leftValue = baseEq.left.x * x + baseEq.left.c;
+    let rightValue = baseEq.right.x * x + baseEq.right.c;
+
+    let ok = Math.abs(leftValue-rightValue) < 0.0001;
+
+    document.getElementById("probeContent").innerHTML = `
+        <div class="probeTitle">🔍 Probe</div>
+
+        <div class="probeRow step1">
+            <span class="probeLabel">Lösung einsetzen</span>
+            x = <span class="xVal">${fracHtml(x)}</span>
+        </div>
+
+        <div class="probeRow step1">
+            <span class="probeLabel">Ursprungsgleichung</span>
+            ${leftPlain} &thinsp;=&thinsp; ${rightPlain}
+        </div>
+
+        <div class="probeRow step2">
+            <span class="probeLabel">Einsetzen</span>
+            ${leftInserted} &thinsp;=&thinsp; ${rightInserted}
+        </div>
+
+        <div class="probeRow ${ok ? "ok" : "bad"}">
+            <span class="probeLabel">Ergebnis</span>
+            <span class="resultBig">
+                ${fracHtml(leftValue)} &thinsp;=&thinsp; ${fracHtml(rightValue)}
+            </span>
+            <div class="verdict" style="color:${ok ? "#16a34a" : "#dc2626"};">
+                ${ok ? "✅ Die Probe stimmt" : "❌ Die Probe stimmt nicht"}
+            </div>
+        </div>
+    `;
+
+    document.getElementById("probeModal").style.display = "flex";
+}
+
+function closeProbe(){
+    document.getElementById("probeModal").style.display = "none";
+}
+
+// Zeigt die Lösung (x = ...) direkt, ohne die Einsetzung/Probe-Rechnung
+function showSolution(){
+
+    let a = equation.left.x - equation.right.x;
+    let b = equation.right.c - equation.left.c;
+
+    let resultHtml;
+
+    if(a === 0){
+
+        resultHtml =
+            b === 0
+            ? "Jede Zahl ist eine Lösung (0 = 0)."
+            : "Keine Lösung möglich (Widerspruch).";
+
+    }else{
+
+        let x = b / a;
+
+        resultHtml = `x&nbsp;&nbsp;=&nbsp;&nbsp;<span class="xVal">${fracHtml(x)}</span>`;
+    }
+
+    document.getElementById("probeContent").innerHTML = `
+        <div class="probeTitle" style="color:#15803d;">💡 Lösung</div>
+
+        <div class="probeRow ok">
+            <span class="probeLabel">Ergebnis</span>
+            <span class="resultBig">${resultHtml}</span>
+        </div>
+    `;
+
+    document.getElementById("probeModal").style.display = "flex";
+}
+
+
+</script>
+
+<script src="/home-button.js"></script>
+</body>
+</html>

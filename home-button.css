@@ -1,0 +1,11 @@
+/* Zurück-zum-Startmenü-Knopf in jeder Unter-App der Mathe-App */
+.ms-home-btn {
+  position: fixed; top: 10px; top: max(10px, env(safe-area-inset-top)); left: 10px; z-index: 2147483000;
+  width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: #ffffff; color: #1565c0; border: 2px solid #1565c0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22); text-decoration: none; -webkit-tap-highlight-color: transparent;
+}
+.ms-home-btn:hover { background: #e8f1ff; }
+.ms-home-btn:focus-visible { outline: 3px solid #ffb300; outline-offset: 2px; }
+.ms-home-btn svg { width: 24px; height: 24px; display: block; }
+@media print { .ms-home-btn { display: none !important; } }

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>miStudia – Größen umwandeln</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root { --blau: #2563eb; --dunkelblau: #1e40af; --hellblau: #dbeafe; --grau: #64748b; }
+    body { margin: 0; min-height: 100vh; padding: 25px 15px; font-family: Arial, sans-serif; color: #1f2937; background: #f2f6ff; }
+    .app { width: 100%; max-width: 950px; margin: 0 auto; padding: 30px; background: #fff; border-radius: 20px; box-shadow: 0 10px 35px rgba(0,0,0,.10); }
+    .logo-link { display: block; max-width: 500px; margin: 0 auto 15px; text-align: center; }
+    .logo { width: 100%; height: auto; display: block; }
+    h1 { margin: 12px 0 8px; text-align: center; color: var(--blau); font-size: clamp(25px, 4vw, 34px); }
+    .info { margin: 0 auto 20px; max-width: 680px; text-align: center; line-height: 1.6; color: var(--grau); }
+    .info b { color: var(--blau); }
+    .sprachleiste { display: flex; justify-content: center; gap: 10px; margin: 14px 0 4px; }
+    .sprache-btn { background: #fff; border: 3px solid transparent; border-radius: 10px; padding: 6px 14px; font-size: 22px; line-height: 1; cursor: pointer; transition: .2s; box-shadow: 0 3px 8px rgba(0,0,0,.12); }
+    .sprache-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,.18); }
+    .sprache-btn.aktiv { border-color: var(--blau); background: var(--hellblau); }
+    .kategorie-box { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 20px 0 25px; }
+    .kategorie { padding: 10px 17px; border: 2px solid #cbd5e1; border-radius: 30px; background: #fff; color: #475569; font-size: 16px; font-weight: bold; cursor: pointer; transition: .15s; }
+    .kategorie:hover { border-color: #93c5fd; }
+    .kategorie.aktiv { color: #fff; border-color: var(--blau); background: var(--blau); }
+    .rechner { padding: 23px; border-radius: 15px; background: #f8fafc; }
+    .kopf, .aufgabe { display: grid; grid-template-columns: 48px minmax(0, 1fr) 30px minmax(0, 1fr); align-items: center; gap: 10px; }
+    .kopf { padding: 0 12px 9px; color: #475569; text-align: center; font-weight: bold; }
+    .aufgabe { margin-bottom: 9px; padding: 12px; border-radius: 12px; background: #fff; }
+    .nummer { color: var(--blau); font-size: 18px; font-weight: bold; text-align: center; }
+    .vorgegeben { min-height: 48px; padding: 11px; border: 2px solid var(--blau); border-radius: 8px; background: var(--hellblau); color: #1d4ed8; text-align: center; font-size: 18px; font-weight: bold; }
+    .gleich { color: #64748b; text-align: center; font-size: 21px; font-weight: bold; }
+    input { width: 100%; min-height: 48px; padding: 10px 12px; border: 2px solid #cbd5e1; border-radius: 8px; outline: none; background: #fff; font-size: 18px; color: #1f2937; text-align: center; }
+    input:focus, select:focus { border-color: var(--blau); }
+    input.richtig { border-color: #16a34a; background: #dcfce7; }
+    input.falsch { border-color: #dc2626; background: #fee2e2; }
+    .eingabe-gruppe { display: flex; gap: 6px; align-items: center; min-width: 0; }
+    .eingabe-gruppe input { flex: 1 1 0; min-width: 0; }
+    .buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .buttons button { border: none; padding: 12px 20px; border-radius: 9px; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .pruefen { background: var(--blau); } .loesung { background: #16a34a; } .neu { background: #f59e0b; }
+    #ergebnis { min-height: 25px; margin: 17px 0 0; text-align: center; color: #1d4ed8; font-size: 18px; font-weight: bold; }
+    .merkhilfe { display: flex; align-items: center; gap: 18px; margin-top: 25px; padding: 15px 20px; border-radius: 12px; background: #fffbeb; color: #78350f; line-height: 1.5; }
+    .merkhilfe img { width: 75px; height: 75px; object-fit: contain; }
+    .footer { margin-top: 35px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; color: var(--grau); font-size: 14px; line-height: 1.8; }
+    .footer-logo { display: block; width: 170px; max-width: 70%; margin: 0 auto 12px; }
+    a { color: var(--blau); font-weight: bold; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    @media (max-width: 620px) { .app { padding: 18px 8px; } .rechner { padding: 17px 8px; } .kopf, .aufgabe { grid-template-columns: 29px minmax(0, 1fr) 18px minmax(0, 1fr); gap: 4px; } .kopf { padding: 0 4px 7px; font-size: 12px; } .aufgabe { padding: 8px 4px; } .nummer, .vorgegeben, input { font-size: 14px; } .merkhilfe { align-items: flex-start; gap: 10px; padding: 13px; } .merkhilfe img { width: 55px; height: 55px; } }
+  </style>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+</head>
+<body>
+  <main class="app">
+    <a class="logo-link" href="https://mistudia.com" target="_blank" rel="noopener noreferrer"><img class="logo" src="/img/mistudia-logo.png" alt="miStudia – Lernen mit Spaß!"></a>
+    <h1 id="titel">miStudia – Größen umwandeln</h1>
+    <div class="sprachleiste">
+      <button class="sprache-btn" id="langDe" onclick="setLang('de')">🇩🇪</button>
+      <button class="sprache-btn" id="langEn" onclick="setLang('en')">🇺🇸</button>
+      <button class="sprache-btn" id="langEs" onclick="setLang('es')">🇪🇸</button>
+      <button class="sprache-btn" id="langZh" onclick="setLang('zh')">🇨🇳</button>
+    </div>
+    <p class="info" id="infoText">Rechne die sieben Aufgaben um und vergleiche anschließend deine Ergebnisse.<br><b>Blau = vorgegeben</b></p>
+    <nav class="kategorie-box" id="kategorieBox" aria-label="Größenart auswählen">
+      <button class="kategorie aktiv" data-kategorie="laenge">📏 Länge</button>
+      <button class="kategorie" data-kategorie="flaeche">⬜ Fläche</button>
+      <button class="kategorie" data-kategorie="volumen">💧 Volumen</button>
+      <button class="kategorie" data-kategorie="masse">⚖️ Gewichte</button>
+      <button class="kategorie" data-kategorie="zeit">⏱️ Zeit</button>
+      <button class="kategorie" data-kategorie="gemischt">🔀 Gemischt</button>
+      <button class="kategorie" data-kategorie="mehrfach">🧩 Mehrere Einheiten</button>
+    </nav>
+    <section class="rechner" id="rechnerBox" aria-label="Sieben Umrechnungsaufgaben">
+      <div class="kopf"><div id="kopfNr">Nr.</div><div id="kopfGegeben">Gegeben</div><div></div><div id="kopfErgebnis">Dein Ergebnis</div></div>
+      <div id="aufgaben"></div>
+      <div class="buttons"><button class="pruefen" id="pruefen">✓ Prüfen</button><button class="loesung" id="loesung">💡 Lösungen</button><button class="neu" id="neu">🔄 Neue Aufgaben</button></div>
+      <div id="ergebnis" aria-live="polite"></div>
+    </section>
+    <aside class="merkhilfe"><img src="/img/elefant.png" alt="miStudia Elefant"><div><strong id="merktippLabel">Merktipp:</strong> <span id="merktippText">Bei Länge, Fläche, Volumen und Masse gibt es verschiedene Umrechnungsschritte. Wähle einfach die Einheiten aus – miStudia rechnet für dich!</span></div></aside>
+    <footer class="footer"><a href="https://mistudia.com" target="_blank" rel="noopener noreferrer"><img src="/img/mistudia-logo.png" alt="miStudia" class="footer-logo"></a><div>© <span id="jahr"></span> miStudia · <a href="https://mistudia.com" target="_blank" rel="noopener noreferrer">mistudia.com</a></div></footer>
+  </main>
+  <script>
+    /* ---------- Hilfsfunktionen ---------- */
+    function rnd(n) { return Math.floor(Math.random() * n); }
+    function rund(zahl, stellen = 4) { const f = Math.pow(10, stellen); return Math.round(zahl * f) / f; }
+    function randStep(min, max, step) { const n = Math.round((min + Math.random() * (max - min)) / step); return rund(n * step); }
+
+    /* ---------- Umrechnungsfaktoren (Basis = jeweils die "1"-Einheit) ---------- */
+    const FACTORS = {
+      laenge: { 'km': 1000, 'm': 1, 'dm': .1, 'cm': .01, 'mm': .001 },
+      flaeche: { 'km²': 1000000, 'ha': 10000, 'm²': 1, 'dm²': .01, 'cm²': .0001, 'mm²': .000001 },
+      volumen: { 'l': 1, 'ml': .001 },
+      masse: { 't': 1000000, 'kg': 1000, 'g': 1, 'mg': .001 },
+      zeit: { 'h': 3600, 'min': 60, 's': 1 }
+    };
+
+    /* ---------- Kuratierte, realistische Umrechnungspaare ---------- */
+    const LAENGE_PAARE = [
+      { von: 'm', nach: 'cm', wert: () => randStep(0.5, 12, 0.5) },
+      { von: 'cm', nach: 'm', wert: () => randStep(50, 950, 10) },
+      { von: 'km', nach: 'm', wert: () => randStep(0.1, 9.9, 0.1) },
+      { von: 'km', nach: 'm', wert: () => randStep(0.01, 0.99, 0.01) },
+      { von: 'm', nach: 'km', wert: () => randStep(500, 9500, 100) },
+      { von: 'mm', nach: 'cm', wert: () => randStep(10, 99, 1) },
+      { von: 'cm', nach: 'mm', wert: () => randStep(1, 9.99, 0.01) },
+      { von: 'm', nach: 'mm', wert: () => randStep(0.1, 0.9, 0.1) }
+    ];
+    const FLAECHE_PAARE = [
+      { von: 'm²', nach: 'cm²', wert: () => randStep(0.5, 9.5, 0.5) },
+      { von: 'cm²', nach: 'm²', wert: () => randStep(10000, 95000, 5000) },
+      { von: 'dm²', nach: 'cm²', wert: () => randStep(1, 9, 1) },
+      { von: 'cm²', nach: 'dm²', wert: () => randStep(100, 900, 100) },
+      { von: 'km²', nach: 'ha', wert: () => randStep(1, 9, 1) },
+      { von: 'ha', nach: 'km²', wert: () => randStep(100, 900, 100) },
+      { von: 'ha', nach: 'm²', wert: () => randStep(1, 9, 1) },
+      { von: 'm²', nach: 'ha', wert: () => randStep(10000, 90000, 10000) },
+      { von: 'mm²', nach: 'cm²', wert: () => randStep(50, 950, 50) }
+    ];
+    const VOLUMEN_PAARE = [
+      { von: 'l', nach: 'ml', wert: () => randStep(0.5, 9.5, 0.5) },
+      { von: 'ml', nach: 'l', wert: () => randStep(100, 4900, 50) },
+      { von: 'l', nach: 'ml', wert: () => randStep(0.1, 9.9, 0.1) },
+      { von: 'ml', nach: 'l', wert: () => randStep(50, 950, 25) },
+      { von: 'l', nach: 'ml', wert: () => randStep(1, 9.99, 0.01) }
+    ];
+    const GEWICHT_PAARE = [
+      { von: 'kg', nach: 'g', wert: () => randStep(0.1, 9.9, 0.1) },
+      { von: 'g', nach: 'kg', wert: () => randStep(500, 9500, 100) },
+      { von: 't', nach: 'kg', wert: () => randStep(0.1, 9.9, 0.1) },
+      { von: 'kg', nach: 't', wert: () => randStep(500, 9500, 100) },
+      { von: 'g', nach: 'mg', wert: () => randStep(5, 95, 5) },
+      { von: 'g', nach: 'kg', wert: () => randStep(10500, 19500, 500) }
+    ];
+    const ZEIT_PAARE = [
+      { von: 'h', nach: 'min', wert: () => randStep(0.5, 9.5, 0.5) },
+      { von: 'min', nach: 's', wert: () => randStep(1, 9, 1) },
+      { von: 'min', nach: 'h', wert: () => randStep(30, 300, 30) },
+      { von: 's', nach: 'min', wert: () => randStep(60, 5940, 60) }
+    ];
+
+    /* ---------- Vorlagen für Verbund-Einheiten (z. B. "3 m 25 cm") ---------- */
+    const MEHRFACH_VORLAGEN = [
+      { kategorie: 'laenge', teile: [['m', [1, 9, 1]], ['cm', [1, 99, 1]]] },
+      { kategorie: 'laenge', teile: [['km', [1, 9, 1]], ['m', [50, 950, 50]]] },
+      { kategorie: 'laenge', teile: [['m', [1, 9, 1]], ['cm', [1, 9, 1]], ['mm', [1, 9, 1]]] },
+      { kategorie: 'masse', teile: [['kg', [1, 9, 1]], ['g', [50, 950, 50]]] },
+      { kategorie: 'volumen', teile: [['l', [1, 9, 1]], ['ml', [50, 950, 50]]] },
+      { kategorie: 'zeit', teile: [['h', [1, 6, 1]], ['min', [1, 59, 1]]] },
+      { kategorie: 'zeit', teile: [['min', [1, 9, 1]], ['s', [5, 55, 5]]] }
+    ];
+
+    /* Baut aus einer Vorlage entweder eine "kompakt"- (Verbund → 1 Ergebnis)
+       oder eine "split"-Aufgabe (1 Wert → mehrere Ergebnisfelder) */
+    function baueVorlagenAufgabe(vorlage, richtung) {
+      const factors = FACTORS[vorlage.kategorie];
+      const teileWerte = vorlage.teile.map(([einheit, [min, max, step]]) => [randStep(min, max, step), einheit]);
+      const zielEinheit = teileWerte[teileWerte.length - 1][1];
+      let basisWert = 0;
+      teileWerte.forEach(([wert, einheit]) => { basisWert += wert * factors[einheit]; });
+      if (richtung === 'kompakt') {
+        const loesung = rund(basisWert / factors[zielEinheit]);
+        const given = teileWerte.map(([wert, einheit]) => `${formatZahl(wert)} ${einheit}`).join(' ');
+        return { given, teile: [{ ziel: zielEinheit, loesung }] };
+      }
+      const gesamt = rund(basisWert / factors[zielEinheit]);
+      const given = `${formatZahl(gesamt)} ${zielEinheit}`;
+      const teile = teileWerte.map(([wert, einheit]) => ({ ziel: einheit, loesung: wert }));
+      return { given, teile };
+    }
+
+    function einfacheAufgabe(paare, factors) {
+      const p = paare[rnd(paare.length)];
+      const wert = p.wert();
+      const loesung = rund(wert * factors[p.von] / factors[p.nach]);
+      return { given: `${formatZahl(wert)} ${p.von}`, teile: [{ ziel: p.nach, loesung }] };
+    }
+
+    /* ---------- Generatoren je Kategorie (7 Aufgaben) ---------- */
+    function genEinfach(paare, factors) { return Array.from({ length: 7 }, () => einfacheAufgabe(paare, factors)); }
+    function genZeit() {
+      const zeitVorlagen = MEHRFACH_VORLAGEN.filter(v => v.kategorie === 'zeit');
+      return Array.from({ length: 7 }, () => {
+        const r = Math.random();
+        if (r < 0.25) return baueVorlagenAufgabe(zeitVorlagen[rnd(zeitVorlagen.length)], 'kompakt');
+        if (r < 0.5) return baueVorlagenAufgabe(zeitVorlagen[rnd(zeitVorlagen.length)], 'split');
+        return einfacheAufgabe(ZEIT_PAARE, FACTORS.zeit);
+      });
+    }
+    // Nur 2-teilige Vorlagen dürfen "umgedreht" werden (Verbund-Ergebnis = 2 Eingabefelder).
+    // Die 3-teilige Länge-Vorlage (m+cm+mm) bekäme sonst 3 Eingabefelder, das wäre unübersichtlich.
+    const MEHRFACH_VORLAGEN_SPLITFAEHIG = MEHRFACH_VORLAGEN.filter(v => v.teile.length === 2);
+    function genMehrfach() {
+      return Array.from({ length: 7 }, () => {
+        const richtung = Math.random() < 0.55 ? 'kompakt' : 'split';
+        const pool = richtung === 'split' ? MEHRFACH_VORLAGEN_SPLITFAEHIG : MEHRFACH_VORLAGEN;
+        return baueVorlagenAufgabe(pool[rnd(pool.length)], richtung);
+      });
+    }
+    function genGemischt() {
+      const quellen = [
+        { paare: LAENGE_PAARE, factors: FACTORS.laenge },
+        { paare: FLAECHE_PAARE, factors: FACTORS.flaeche },
+        { paare: VOLUMEN_PAARE, factors: FACTORS.volumen },
+        { paare: GEWICHT_PAARE, factors: FACTORS.masse },
+        { paare: ZEIT_PAARE, factors: FACTORS.zeit }
+      ];
+      return Array.from({ length: 7 }, () => {
+        const r = Math.random();
+        if (r < 0.15) return baueVorlagenAufgabe(MEHRFACH_VORLAGEN[rnd(MEHRFACH_VORLAGEN.length)], 'kompakt');
+        if (r < 0.25) return baueVorlagenAufgabe(MEHRFACH_VORLAGEN_SPLITFAEHIG[rnd(MEHRFACH_VORLAGEN_SPLITFAEHIG.length)], 'split');
+        const q = quellen[rnd(quellen.length)];
+        return einfacheAufgabe(q.paare, q.factors);
+      });
+    }
+
+    let aktuell = 'laenge', aufgaben = [];
+    const aufgabenElement = document.getElementById('aufgaben'), ergebnis = document.getElementById('ergebnis');
+
+    /* ---------- Übersetzungen ---------- */
+    let lang = 'de';
+    const TR = {
+      de: {
+        pageTitle: 'Größen umwandeln',
+        heading: 'miStudia – Größen umwandeln',
+        infoHtml: 'Rechne die sieben Aufgaben um und vergleiche anschließend deine Ergebnisse.<br><b>Blau = vorgegeben</b>',
+        kategorieAriaLabel: 'Größenart auswählen',
+        kategorien: { laenge: '📏 Länge', flaeche: '⬜ Fläche', volumen: '💧 Volumen', masse: '⚖️ Gewichte', zeit: '⏱️ Zeit', gemischt: '🔀 Gemischt', mehrfach: '🧩 Mehrere Einheiten' },
+        rechnerAriaLabel: 'Sieben Umrechnungsaufgaben',
+        kopfNr: 'Nr.', kopfGegeben: 'Gegeben', kopfErgebnis: 'Dein Ergebnis',
+        antwortAriaLabel: i => `Antwort zu Aufgabe ${i}`,
+        antwortAriaLabelTeil: (i, einheit) => `Antwort zu Aufgabe ${i}, Anteil in ${einheit}`,
+        pruefenBtn: '✓ Prüfen', loesungBtn: '💡 Lösungen', neuBtn: '🔄 Neue Aufgaben',
+        ergebnisText: n => `Du hast ${n} von 7 Aufgaben richtig gelöst.`,
+        loesungenText: '💡 Die Lösungen werden angezeigt.',
+        merktippLabel: 'Merktipp:',
+        merktippText: 'Bei jeder Kategorie gibt es andere Umrechnungsschritte – bei „Gemischt“ und „Mehrere Einheiten“ wird es richtig kniffelig. Wähle einfach eine Kategorie – miStudia erstellt automatisch neue Aufgaben!',
+        locale: 'de-DE'
+      },
+      en: {
+        pageTitle: 'Convert Units',
+        heading: 'miStudia – Convert Units',
+        infoHtml: 'Convert all seven tasks, then compare your results.<br><b>Blue = given</b>',
+        kategorieAriaLabel: 'Choose a category',
+        kategorien: { laenge: '📏 Length', flaeche: '⬜ Area', volumen: '💧 Volume', masse: '⚖️ Weight', zeit: '⏱️ Time', gemischt: '🔀 Mixed', mehrfach: '🧩 Combined Units' },
+        rechnerAriaLabel: 'Seven conversion tasks',
+        kopfNr: 'No.', kopfGegeben: 'Given', kopfErgebnis: 'Your result',
+        antwortAriaLabel: i => `Answer to task ${i}`,
+        antwortAriaLabelTeil: (i, einheit) => `Answer to task ${i}, part in ${einheit}`,
+        pruefenBtn: '✓ Check', loesungBtn: '💡 Solutions', neuBtn: '🔄 New tasks',
+        ergebnisText: n => `You got ${n} out of 7 tasks correct.`,
+        loesungenText: '💡 The solutions are shown.',
+        merktippLabel: 'Tip:',
+        merktippText: 'Every category has different conversion steps – "Mixed" and "Combined Units" get really tricky. Just pick a category – miStudia creates new tasks automatically!',
+        locale: 'en-US'
+      },
+      es: {
+        pageTitle: 'Convertir unidades',
+        heading: 'miStudia – Convertir unidades',
+        infoHtml: 'Resuelve las siete tareas y compara después tus resultados.<br><b>Azul = dado</b>',
+        kategorieAriaLabel: 'Elegir una categoría',
+        kategorien: { laenge: '📏 Longitud', flaeche: '⬜ Superficie', volumen: '💧 Volumen', masse: '⚖️ Peso', zeit: '⏱️ Tiempo', gemischt: '🔀 Mixto', mehrfach: '🧩 Unidades combinadas' },
+        rechnerAriaLabel: 'Siete tareas de conversión',
+        kopfNr: 'N.º', kopfGegeben: 'Dado', kopfErgebnis: 'Tu resultado',
+        antwortAriaLabel: i => `Respuesta a la tarea ${i}`,
+        antwortAriaLabelTeil: (i, einheit) => `Respuesta a la tarea ${i}, parte en ${einheit}`,
+        pruefenBtn: '✓ Comprobar', loesungBtn: '💡 Soluciones', neuBtn: '🔄 Nuevas tareas',
+        ergebnisText: n => `Has resuelto correctamente ${n} de 7 tareas.`,
+        loesungenText: '💡 Se muestran las soluciones.',
+        merktippLabel: 'Consejo:',
+        merktippText: 'Cada categoría tiene pasos de conversión distintos – con "Mixto" y "Unidades combinadas" se pone realmente difícil. Elige una categoría – ¡miStudia crea nuevas tareas automáticamente!',
+        locale: 'es-ES'
+      },
+      zh: {
+        pageTitle: '单位换算',
+        heading: 'miStudia – 单位换算',
+        infoHtml: '完成这七道题，然后比较你的结果。<br><b>蓝色 = 已知</b>',
+        kategorieAriaLabel: '选择类别',
+        kategorien: { laenge: '📏 长度', flaeche: '⬜ 面积', volumen: '💧 体积', masse: '⚖️ 重量', zeit: '⏱️ 时间', gemischt: '🔀 混合', mehrfach: '🧩 组合单位' },
+        rechnerAriaLabel: '七道换算题',
+        kopfNr: '编号', kopfGegeben: '已知', kopfErgebnis: '你的结果',
+        antwortAriaLabel: i => `第${i}题的答案`,
+        antwortAriaLabelTeil: (i, einheit) => `第${i}题的答案（单位：${einheit}）`,
+        pruefenBtn: '✓ 检查', loesungBtn: '💡 答案', neuBtn: '🔄 新题目',
+        ergebnisText: n => `你答对了 7 题中的 ${n} 题。`,
+        loesungenText: '💡 已显示答案。',
+        merktippLabel: '小贴士：',
+        merktippText: '每个类别的换算步骤都不同——"混合"和"组合单位"会更有挑战性。只需选择一个类别，miStudia 会自动生成新题目！',
+        locale: 'zh-CN'
+      }
+    };
+    function T() { return TR[lang]; }
+    function wendeSpracheAn() {
+      const t = T();
+      document.title = 'miStudia – ' + t.pageTitle;
+      document.documentElement.lang = lang;
+      document.getElementById('titel').textContent = t.heading;
+      document.getElementById('infoText').innerHTML = t.infoHtml;
+      document.getElementById('kategorieBox').setAttribute('aria-label', t.kategorieAriaLabel);
+      document.getElementById('rechnerBox').setAttribute('aria-label', t.rechnerAriaLabel);
+      document.querySelectorAll('.kategorie').forEach(b => { b.textContent = t.kategorien[b.dataset.kategorie]; });
+      document.getElementById('kopfNr').textContent = t.kopfNr;
+      document.getElementById('kopfGegeben').textContent = t.kopfGegeben;
+      document.getElementById('kopfErgebnis').textContent = t.kopfErgebnis;
+      document.getElementById('pruefen').textContent = t.pruefenBtn;
+      document.getElementById('loesung').textContent = t.loesungBtn;
+      document.getElementById('neu').textContent = t.neuBtn;
+      document.getElementById('merktippLabel').textContent = t.merktippLabel;
+      document.getElementById('merktippText').textContent = t.merktippText;
+      document.querySelectorAll('.sprache-btn').forEach(b => b.classList.remove('aktiv'));
+      document.getElementById('lang' + lang.charAt(0).toUpperCase() + lang.slice(1)).classList.add('aktiv');
+    }
+    function setLang(l) {
+      lang = l;
+      wendeSpracheAn();
+      neueAufgaben();
+    }
+
+    function formatZahl(zahl) { return new Intl.NumberFormat(T().locale, { maximumFractionDigits: 10 }).format(zahl); }
+    function neueAufgaben() {
+      const t = T();
+      switch (aktuell) {
+        case 'laenge': aufgaben = genEinfach(LAENGE_PAARE, FACTORS.laenge); break;
+        case 'flaeche': aufgaben = genEinfach(FLAECHE_PAARE, FACTORS.flaeche); break;
+        case 'volumen': aufgaben = genEinfach(VOLUMEN_PAARE, FACTORS.volumen); break;
+        case 'masse': aufgaben = genEinfach(GEWICHT_PAARE, FACTORS.masse); break;
+        case 'zeit': aufgaben = genZeit(); break;
+        case 'gemischt': aufgaben = genGemischt(); break;
+        case 'mehrfach': aufgaben = genMehrfach(); break;
+      }
+      aufgabenElement.innerHTML = aufgaben.map((a, i) => {
+        const eingaben = a.teile.map((teil, j) => {
+          const label = a.teile.length > 1 ? t.antwortAriaLabelTeil(i + 1, teil.ziel) : t.antwortAriaLabel(i + 1);
+          return `<input class="antwort" type="text" inputmode="decimal" aria-label="${label}" placeholder="? ${teil.ziel}">`;
+        }).join('');
+        return `<div class="aufgabe"><div class="nummer">${i + 1}.</div><div class="vorgegeben">${a.given}</div><div class="gleich">=</div><div class="eingabe-gruppe">${eingaben}</div></div>`;
+      }).join('');
+      ergebnis.textContent = '';
+    }
+    function pruefen() {
+      let richtig = 0;
+      document.querySelectorAll('.aufgabe').forEach((el, index) => {
+        const aufgabe = aufgaben[index];
+        let alleRichtig = true;
+        el.querySelectorAll('.antwort').forEach((input, j) => {
+          const eingabe = Number(input.value.trim().replace(',', '.'));
+          const korrekt = Math.abs(eingabe - aufgabe.teile[j].loesung) < 1e-8;
+          input.classList.remove('richtig', 'falsch');
+          input.classList.add(korrekt ? 'richtig' : 'falsch');
+          if (!korrekt) alleRichtig = false;
+        });
+        if (alleRichtig) richtig++;
+      });
+      ergebnis.textContent = T().ergebnisText(richtig);
+    }
+    function loesungen() {
+      document.querySelectorAll('.aufgabe').forEach((el, index) => {
+        const aufgabe = aufgaben[index];
+        el.querySelectorAll('.antwort').forEach((input, j) => {
+          input.value = formatZahl(aufgabe.teile[j].loesung) + ' ' + aufgabe.teile[j].ziel;
+          input.classList.remove('falsch');
+          input.classList.add('richtig');
+        });
+      });
+      ergebnis.textContent = T().loesungenText;
+    }
+    document.querySelectorAll('.kategorie').forEach(button => button.addEventListener('click', () => { aktuell = button.dataset.kategorie; document.querySelectorAll('.kategorie').forEach(b => b.classList.toggle('aktiv', b === button)); neueAufgaben(); }));
+    document.getElementById('pruefen').addEventListener('click', pruefen); document.getElementById('loesung').addEventListener('click', loesungen); document.getElementById('neu').addEventListener('click', neueAufgaben);
+    document.getElementById('jahr').textContent = new Date().getFullYear();
+    wendeSpracheAn(); neueAufgaben();
+  </script>
+<script src="/home-button.js"></script>
+</body>
+</html>
