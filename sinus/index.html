@@ -43,7 +43,13 @@
   .haupt { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
   .graph-wrap { border: 2px solid #c9d6ea; border-radius: 14px; padding: 6px; background: #ffffff; }
   svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+  .titel-info { text-align: center; margin: -6px 0 8px; font-size: 14px; color: #4f5b6e; }
+  .titel-info .b-wort { margin: 0 8px; }
   .live { text-align: center; font-size: 22px; margin: 6px 0 2px; }
+  .skala { display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; margin: 6px 0 2px; font-size: 14px; color: #4f5b6e; }
+  .skala button { font: 700 15px system-ui, sans-serif; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--blue); background: #ffffff; color: var(--blue); cursor: pointer; }
+  .skala button[aria-pressed="true"] { background: var(--blue); color: #ffffff; }
+  .lex-knopf { display: block; margin: 14px auto 0; font-size: 15px; padding: 8px 16px; }
   .regler { display: grid; gap: 10px; }
   .regel { border: 2px solid; border-radius: 12px; padding: 8px 10px; background: #ffffff; }
   .regel.a { border-color: var(--ca); } .regel.b { border-color: var(--cb); } .regel.c { border-color: var(--cc); } .regel.d { border-color: var(--cd); }
@@ -79,7 +85,7 @@
 <body>
 <div class="app">
   <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
-  <h1 id="titel">Parameter bei Sinusfunktionen</h1>
+  <h1 id="titel">Parameter bei Sinusfunktionen</h1><div class="titel-info"><span class="ik" data-k="sinus"></span><span class="ik" data-k="pi"></span></div>
 
   <div class="formel-box">
     <div class="formel m">f(x) = <span class="ka">a</span> · sin(<span class="kb">b</span> · x + <span class="kc">c</span>) + <span class="kd">d</span></div>
@@ -101,6 +107,7 @@
     <div>
       <div class="graph-wrap"><svg id="graph" viewBox="0 0 800 460" role="img"></svg></div>
       <div class="live m" id="live"></div>
+      <div class="skala"><span id="tSkala"></span><button type="button" id="skPi" aria-pressed="true">π</button><button type="button" id="skDez" aria-pressed="false">1, 2, 3</button></div>
     </div>
 
     <div>
@@ -128,8 +135,8 @@
   </div>
 
   <div class="infos">
-    <div class="info"><span class="m"><span class="ka">a</span> = </span><span id="tAmp"></span><br><span id="tAmpTxt"></span></div>
-    <div class="info"><span class="m" style="color:var(--cp)">p</span> = <span id="tPer"></span><br><span id="tPerTxt"></span> <span class="m">p = 2π / <span class="kb">b</span></span></div>
+    <div class="info"><span class="m"><span class="ka">a</span> = </span><span id="tAmp"></span><span class="ik" data-k="amplitude"></span><br><span id="tAmpTxt"></span></div>
+    <div class="info"><span class="m" style="color:var(--cp)">p</span> = <span id="tPer"></span><span class="ik" data-k="periode"></span><br><span id="tPerTxt"></span> <span class="m">p = 2π / <span class="kb">b</span></span></div>
     <div class="info"><span id="tRest"></span><br><span id="tRestTxt"></span> <span class="m">y = <span class="kd">d</span></span></div>
     <div class="info"><span id="tShift"></span><br><span class="m">x = −<span class="kc">c</span> / <span class="kb">b</span></span></div>
   </div>
@@ -137,6 +144,7 @@
   <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
 </div>
 
+<script src="/funktionen/lexikon.js"></script>
 <script>
 var L = {
   de: { title:"Parameter bei Sinusfunktionen", vergleich:"im Vergleich zu", effA:"streckt/staucht entlang y-Achse", effB:"streckt/staucht entlang x-Achse", effC:"verschiebt entlang x-Achse", effD:"verschiebt entlang y-Achse",
@@ -176,12 +184,40 @@ var L = {
         amp:"Amplitude", ampTxt:"Distância da linha de equilíbrio até o máximo.", per:"Período", perTxt:"Comprimento de uma oscilação completa. Vale:", rest:"Linha de equilíbrio", restTxt:"A linha média da oscilação fica em", shift:"Deslocamento no eixo x: a oscilação começa em",
         here:"aqui", yours:"sua função", aria:"Gráfico da função seno comparada com sin(x)" }
 };
+var L2 = {
+  de: { skala:"x-Achse in:", piSkala:"Vielfachen von π", dezSkala:"Dezimalzahlen" },
+  en: { skala:"x-axis in:", piSkala:"multiples of π", dezSkala:"decimals" },
+  es: { skala:"Eje x en:", piSkala:"múltiplos de π", dezSkala:"decimales" },
+  zh: { skala:"x 轴单位：", piSkala:"π 的倍数", dezSkala:"小数" },
+  fr: { skala:"Axe des x en :", piSkala:"multiples de π", dezSkala:"nombres décimaux" },
+  ru: { skala:"Ось x в:", piSkala:"долях π", dezSkala:"десятичных числах" },
+  ar: { skala:"محور x بـ:", piSkala:"مضاعفات π", dezSkala:"أعداد عشرية" },
+  ja: { skala:"x 軸の目盛り：", piSkala:"π の倍数", dezSkala:"小数" },
+  pt: { skala:"Eixo x em:", piSkala:"múltiplos de π", dezSkala:"decimais" }
+};
+for(var l2 in L2) for(var k2 in L2[l2]) L[l2][k2] = L2[l2][k2];
 var lang = "de";
 var LOC = { de:"de-DE", en:"en-US", es:"es-ES", zh:"zh-CN", fr:"fr-FR", ru:"ru-RU", ar:"ar-u-nu-latn", ja:"ja-JP", pt:"pt-BR" };
 function t(k){ return (L[lang] && L[lang][k]) || L.de[k]; }
 function zahl(v, max){ return new Intl.NumberFormat(LOC[lang] || "de-DE", { maximumFractionDigits: max == null ? 2 : max }).format(Math.abs(v) < 1e-9 ? 0 : v); }
 
 var P = { a:1, b:1, c:0, d:0 };
+var piModus = true;
+// Wert als Vielfaches von π (z. B. "3π/4"), falls er glatt ist; sonst null
+function piBruch(v){
+  var q = v / Math.PI;
+  for(var d = 1; d <= 12; d++){
+    var n = Math.round(q * d);
+    if(Math.abs(n / d - q) < 1e-6){
+      if(n === 0) return "0";
+      var g = (function ggt(a, b){ return b ? ggt(b, a % b) : a; })(Math.abs(n), d); n /= g; var dd = d / g;
+      var z = (Math.abs(n) === 1 ? "" : Math.abs(n)) + "π";
+      return (n < 0 ? "−" : "") + z + (dd > 1 ? "/" + dd : "");
+    }
+  }
+  return null;
+}
+function xTxt(v){ var pb = piModus ? piBruch(v) : null; return pb != null ? pb : zahl(v); }
 var BSP = { f:{a:1,b:1,c:0,d:0,col:"#e06666"}, g:{a:0.5,b:1,c:0,d:0,col:"#f2c94c"}, h:{a:1,b:2,c:0,d:0,col:"#3f9a8c"}, i:{a:1,b:1,c:1,d:0,col:"#00a3e0"}, j:{a:1,b:1,c:0,d:0.5,col:"#e91ee0"} };
 var modus = "regler", alleZeigen = false, aktivBsp = null;
 
@@ -244,10 +280,18 @@ function zeichne(){
   svg.innerHTML = "";
   svg.setAttribute("aria-label", t("aria"));
   // Gitter + Achsen
-  for(var k = -2; k <= 4; k++){
-    var gx = sx(k * Math.PI / 2);
-    svg.appendChild(el("line", { x1: gx, y1: MT, x2: gx, y2: H - MB, stroke: "#dde3ec", "stroke-width": 1 }));
-    if(k) svg.appendChild(el("text", { x: gx, y: H - MB + 20, "font-size": 14, fill: "#333", "text-anchor": "middle" }, piLabel(k)));
+  if(piModus){
+    for(var k = -2; k <= 4; k++){
+      var gx = sx(k * Math.PI / 2);
+      svg.appendChild(el("line", { x1: gx, y1: MT, x2: gx, y2: H - MB, stroke: "#dde3ec", "stroke-width": 1 }));
+      if(k) svg.appendChild(el("text", { x: gx, y: H - MB + 20, "font-size": 14, fill: "#333", "text-anchor": "middle" }, piLabel(k)));
+    }
+  } else {
+    for(var k2 = Math.ceil(X0); k2 <= Math.floor(X1); k2++){
+      var gx2 = sx(k2);
+      svg.appendChild(el("line", { x1: gx2, y1: MT, x2: gx2, y2: H - MB, stroke: "#dde3ec", "stroke-width": 1 }));
+      if(k2) svg.appendChild(el("text", { x: gx2, y: H - MB + 20, "font-size": 14, fill: "#333", "text-anchor": "middle" }, zahl(k2)));
+    }
   }
   var schritt = YM > 3 ? 1 : 0.5;
   for(var y = -Math.floor(YM / schritt) * schritt; y <= YM + 1e-9; y += schritt){
@@ -287,12 +331,12 @@ function zeichne(){
     while(x0 > X0 + p) x0 -= p;
     if(Math.abs(q.c) > 1e-9){
       svg.appendChild(el("line", { x1: sx(-q.c / q.b), y1: MT, x2: sx(-q.c / q.b), y2: H - MB, stroke: "#00a3e0", "stroke-width": 2.5, "stroke-dasharray": "3 4" }));
-      schild(svg, sx(-q.c / q.b), H - MB - 12, "x = " + zahl(-q.c / q.b), "#0083b8");
+      schild(svg, sx(-q.c / q.b), H - MB - 12, "x = " + xTxt(-q.c / q.b), "#0083b8");
     }
     var py = sy(q.d - Math.abs(q.a) - 0.25 * (YM > 2 ? 1 : 0.6));
     if(x0 + p <= X1){
       pfeil(svg, sx(x0) + 2, py, sx(x0 + p) - 2, py, "#6f2da8", true);
-      schild(svg, (sx(x0) + sx(x0 + p)) / 2, py + 16, "p = 2π / " + zahl(q.b) + " ≈ " + zahl(p), "#6f2da8");
+      schild(svg, (sx(x0) + sx(x0 + p)) / 2, py + 16, "p = 2π / " + zahl(q.b) + (piModus && piBruch(p) ? " = " + piBruch(p) : "") + " ≈ " + zahl(p), "#6f2da8");
     }
     // Amplitude am ersten sichtbaren Hochpunkt (bzw. Tiefpunkt bei a < 0)
     if(Math.abs(q.a) > 1e-9){
@@ -312,13 +356,13 @@ function zeichne(){
 function live(){
   var q = P;
   var s = 'f(x) = <span class="ka">' + zahl(q.a) + '</span> · sin(<span class="kb">' + zahl(q.b) + '</span> · x ' +
-          (q.c < 0 ? '− ' : '+ ') + '<span class="kc">' + zahl(Math.abs(q.c)) + '</span>) ' +
+          (q.c < 0 ? '− ' : '+ ') + '<span class="kc">' + xTxt(Math.abs(q.c)) + '</span>) ' +
           (q.d < 0 ? '− ' : '+ ') + '<span class="kd">' + zahl(Math.abs(q.d)) + '</span>';
   var box = document.getElementById("live");
   box.innerHTML = (modus === "bsp" && alleZeigen) ? "" : s;
-  ["a", "b", "c", "d"].forEach(function(k){ document.getElementById("o" + k).textContent = zahl(q[k]); document.getElementById("r" + k).value = q[k]; });
+  ["a", "b", "c", "d"].forEach(function(k){ document.getElementById("o" + k).textContent = k === "c" ? xTxt(q[k]) : zahl(q[k]); document.getElementById("r" + k).value = q[k]; });
   document.getElementById("tAmp").innerHTML = t("amp") + " – " + t("here") + ': <b class="ka">a = ' + zahl(Math.abs(q.a)) + '</b>';
-  document.getElementById("tPer").innerHTML = t("per") + " – " + t("here") + ': <b style="color:var(--cp)">p ≈ ' + zahl(2 * Math.PI / q.b) + '</b>';
+  document.getElementById("tPer").innerHTML = t("per") + " – " + t("here") + ': <b style="color:var(--cp)">p ' + (piModus && piBruch(2 * Math.PI / q.b) ? "= " + piBruch(2 * Math.PI / q.b) + " " : "") + '≈ ' + zahl(2 * Math.PI / q.b) + '</b>';
   document.getElementById("tRest").innerHTML = t("rest") + " – " + t("here") + ': <b class="kd">y = ' + zahl(q.d) + '</b>';
 }
 function setze(neu){ for(var k in neu) if(k in P) P[k] = neu[k]; zeichne(); }
@@ -336,6 +380,15 @@ function texte(){
   document.getElementById("tPerTxt").textContent = t("perTxt");
   document.getElementById("tRestTxt").textContent = t("restTxt");
   document.getElementById("tShift").textContent = t("shift");
+  document.getElementById("tSkala").textContent = t("skala");
+  document.getElementById("skPi").title = t("piSkala"); document.getElementById("skDez").title = t("dezSkala");
+  document.querySelectorAll(".ik").forEach(function(e){
+    var k = e.dataset.k, ein = FB.T[FB.lang()][k] || FB.T.de[k];
+    e.innerHTML = e.parentNode.classList.contains("titel-info") ? FB.wort(k, ein[0]) : FB.knopf(k);
+  });
+  var lk = document.getElementById("lexKnopf");
+  if(!lk){ lk = document.createElement("button"); lk.type = "button"; lk.id = "lexKnopf"; lk.className = "b-alle lex-knopf"; lk.setAttribute("data-lex", "1"); var fu = document.querySelector(".footer"); fu.parentNode.insertBefore(lk, fu); }
+  lk.textContent = FB.ui("lex");
   var dez = zahl(0.5).indexOf(",") >= 0 ? "0,5" : "0.5";
   document.querySelectorAll(".bsp .kasten").forEach(function(k){ if(/0[.,]5/.test(k.textContent)) k.textContent = dez; });
   document.querySelectorAll(".bsp .m").forEach(function(m){ if(m.textContent.indexOf("f(x)") === 0) m.textContent = "f(x) = sin(x) = 1 · sin(1 · x + 0) + 0"; });
@@ -358,7 +411,7 @@ document.querySelectorAll(".klein").forEach(function(b){
     var r = document.getElementById("r" + b.dataset.r), st = parseFloat(r.step);
     var v = Math.round((parseFloat(r.value) + st * parseFloat(b.dataset.s)) / st) * st;
     v = Math.min(parseFloat(r.max), Math.max(parseFloat(r.min), v));
-    P[b.dataset.r] = Math.round(v * 100) / 100; zeichne();
+    P[b.dataset.r] = (b.dataset.r === "c" && piModus) ? v : Math.round(v * 100) / 100; zeichne();
   });
 });
 document.getElementById("reset").addEventListener("click", function(){ setze({ a:1, b:1, c:0, d:0 }); });
@@ -382,8 +435,22 @@ document.getElementById("alle").addEventListener("click", function(){
   this.setAttribute("aria-pressed", alleZeigen); this.textContent = alleZeigen ? t("eins") : t("alle");
   markiereBsp(); zeichne();
 });
+// π-Skala: x-Achse und Regler c in Vielfachen von π (c in Schritten von π/12)
+function setzeSkala(pi){
+  piModus = pi;
+  document.getElementById("skPi").setAttribute("aria-pressed", pi); document.getElementById("skDez").setAttribute("aria-pressed", !pi);
+  var rc = document.getElementById("rc");
+  if(pi){ rc.min = -Math.PI; rc.max = Math.PI; rc.step = Math.PI / 12; P.c = Math.round(P.c / (Math.PI / 12)) * Math.PI / 12; }
+  else { rc.min = -3; rc.max = 3; rc.step = 0.1; }
+  try { localStorage.setItem("msSinusPi", pi ? "1" : "0"); } catch(e){}
+  zeichne();
+}
+document.getElementById("skPi").addEventListener("click", function(){ setzeSkala(true); });
+document.getElementById("skDez").addEventListener("click", function(){ setzeSkala(false); });
+FB.liste(["sinus", "pi", "amplitude", "periode", "fx", "zahlen", "defb", "wertb", "nst", "extrem", "sym", "abl", "wende", "beruehren", "exponent", "wurzel"]);
 var rzT; window.addEventListener("resize", function(){ clearTimeout(rzT); rzT = setTimeout(zeichne, 150); });
 window.MS_LANG = { apply: function(l){ if(L[l]){ lang = l; texte(); } } };
+(function(){ var v = null; try { v = localStorage.getItem("msSinusPi"); } catch(e){} if(v === "0") setzeSkala(false); else setzeSkala(true); })();
 texte();
 </script>
 <script src="/home-button.js"></script>

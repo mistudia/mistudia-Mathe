@@ -60,6 +60,7 @@
 
 <script src="/funktionen/texte.js"></script>
 <script src="/funktionen/kern.js"></script>
+<script src="/funktionen/lexikon.js"></script>
 <script src="/funktionen/seite.js"></script>
 <script>
 (function(){
@@ -147,7 +148,10 @@
     if(P){ g.punkt(Bz.num(P.x1), Bz.num(P.y1), C.P, "P₁"); g.punkt(Bz.num(P.x2), Bz.num(P.y2), C.P, "P₂"); }
   }
   function kl(a){ return a.n < 0 ? "(" + FK.btxt(a) + ")" : FK.btxt(a); }
+  var C1 = "#e11d48", C2 = "#0891b2"; // P₁ und P₂ beim Einsetzen
+  function k1(v){ return FS.ein(kl(v), C1); } function k2(v){ return FS.ein(kl(v), C2); }
   function texte(){
+    FS.vorschau();
     document.title = "miStudia – " + t("linTitle");
     document.getElementById("titel").textContent = t("linTitle");
     document.getElementById("tabMB").textContent = t("modeMB");
@@ -166,8 +170,10 @@
     var p = poly(), mv = Bz.num(M), h = "";
     if(P){
       h += FS.karte(t("rechnung"),
-        f("m = (y₂ " + FK.MINUS + " y₁) / (x₂ " + FK.MINUS + " x₁) = (" + FK.btxt(P.y2) + " " + FK.MINUS + " " + kl(P.y1) + ") / (" + FK.btxt(P.x2) + " " + FK.MINUS + " " + kl(P.x1) + ") = " + FK.btxt(M)) + "<br>" +
-        f("b = y₁ " + FK.MINUS + " m · x₁ = " + FK.btxt(P.y1) + " " + FK.MINUS + " " + kl(M) + " · " + kl(P.x1) + " = " + FK.btxt(Bb)));
+        '<div class="klein-text">' + t("rwM") + "</div>" +
+        f("m = (" + FS.ein("y₂", C2) + " " + FK.MINUS + " " + FS.ein("y₁", C1) + ") / (" + FS.ein("x₂", C2) + " " + FK.MINUS + " " + FS.ein("x₁", C1) + ") = (" + k2(P.y2) + " " + FK.MINUS + " " + k1(P.y1) + ") / (" + k2(P.x2) + " " + FK.MINUS + " " + k1(P.x1) + ") = " + FK.btxt(M)) +
+        '<div class="klein-text" style="margin-top:6px">' + t("rwB") + "</div>" +
+        f("b = " + FS.ein("y₁", C1) + " " + FK.MINUS + " m · " + FS.ein("x₁", C1) + " = " + k1(P.y1) + " " + FK.MINUS + " " + kl(M) + " · " + k1(P.x1) + " = " + FK.btxt(Bb)));
     }
     h += FS.karte("f(x)", f("f(x) = " + FK.ptxt(p)));
     var sh = f("m = " + FK.btxt(M));
@@ -189,6 +195,8 @@
     box.innerHTML = h;
   }
   FS.sprache(function(){ texte(); graph.zeichne(); });
+  FS.eingabeHilfe({ text: function(s){ return "f(x) = " + FK.ptxt(FK.parse(s)); },
+    zeilen: [["2x + 1", "hMal"], ["1/2 x - 3", "hBruch"], ["-0,5x + 1.5", "hDez"], ["3(x - 2)", "hKlammer"]] });
   eingabeAusWerten();
   rechne(true);
 })();

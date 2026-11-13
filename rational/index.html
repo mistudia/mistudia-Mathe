@@ -44,6 +44,7 @@
 
 <script src="/funktionen/texte.js"></script>
 <script src="/funktionen/kern.js"></script>
+<script src="/funktionen/lexikon.js"></script>
 <script src="/funktionen/seite.js"></script>
 <script src="/funktionen/rational.js"></script>
 <script>
@@ -112,6 +113,7 @@
   }
   function unendl(v){ return v > 0 ? "+" + FK.INF : M + FK.INF; }
   function texte(){
+    FS.vorschau();
     document.title = "miStudia – " + t("ratTitle");
     document.getElementById("titel").textContent = t("ratTitle");
     document.getElementById("zeichnen").textContent = t("draw");
@@ -135,9 +137,9 @@
     var lh = '<div class="klein-text">' + t("nennerNull") + ": " + f(FK.ptxt(A.n) + " = 0") + "</div>";
     if(!A.luecken.length) lh += t("noLuecke");
     else lh += "<ul>" + A.pole.map(function(p){
-      return "<li>" + FS.fleck(POL) + f("x = " + FK.xtxt(p.z)) + ": <b>" + t("polst") + "</b> " + t(p.vzw ? "mitVzw" : "ohneVzw") + (p.z.m > 1 ? ' <span class="klein-text">(' + t("vielf", { n: p.z.m }) + ")</span>" : "") + "</li>";
+      return "<li>" + FS.fleck(POL) + f("x = " + FK.xtxt(p.z)) + ": <b>" + FB.wort("pol", t("polst")) + "</b> " + t(p.vzw ? "mitVzw" : "ohneVzw") + (p.z.m > 1 ? ' <span class="klein-text">(' + t("vielf", { n: p.z.m }) + ")</span>" : "") + "</li>";
     }).join("") + A.hebbar.map(function(l){
-      return "<li>" + FS.fleck(POL) + f("x = " + FK.xtxt(l.z)) + ": <b>" + t("hebbar") + "</b> " + f(FS.vollPunkt(t("lblL"), l.z, l.y)) + "</li>";
+      return "<li>" + FS.fleck(POL) + f("x = " + FK.xtxt(l.z)) + ": <b>" + FB.wort("hebbar", t("hebbar")) + "</b> " + f(FS.vollPunkt(t("lblL"), l.z, l.y)) + "</li>";
     }).join("") + "</ul>";
     h += FS.karte(t("luecken"), lh);
     h += FS.karte(t("sym"), t(A.sym === "Y" ? "symY" : A.sym === "O" ? "symO" : "symN").replace(/ \(.*\)$/, ""));
@@ -172,8 +174,14 @@
     if(A.ext.length || A.sattel.length){
       eh += "<ul>" + A.ext.map(function(e){
         var vz = Math.abs(e.f2) < 1e-9 ? "= 0" : e.f2 < 0 ? "< 0" : "> 0";
-        return "<li>" + FS.fleck(e.art === "H" ? C.H : C.T) + f("x = " + FK.xtxt(e.z) + ": f″(x) " + (e.f2ex ? "= " + e.f2ex + " " : "") + vz) + " → <b>" + t(e.art === "H" ? "hp" : "tp") + "</b> " + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + "</li>";
-      }).join("") + A.sattel.map(function(s){ return "<li>" + FS.fleck(C.S) + t("sp") + " " + f(FS.vollPunkt(t("lblS"), s.z, s.y)) + "</li>"; }).join("") + "</ul>";
+        var farbe = e.art === "H" ? C.H : C.T;
+        var rw = FS.rechenweg([
+          ["rwExt1", f("f′(x) = 0 ⇔ " + FK.ptxt(A.P) + " = 0") + " ⇒ " + f(FS.xListe(FK.nullstellen(A.P).filter(function(z){ return A.inD(z.x); })))],
+          ["rwExt2", f("f″(" + FK.xtxt(e.z) + ") " + (e.f2ex ? "= " + e.f2ex + " " : "") + vz) + " ⇒ <b>" + t(e.art === "H" ? "hp" : "tp") + "</b>"],
+          ["rwY", FS.einsetzenBruch(A.Zr, A.Nr, e.z, farbe) + "<br>⇒ <b>" + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + "</b>"]
+        ]);
+        return "<li>" + FS.fleck(farbe) + f("x = " + FK.xtxt(e.z) + ": f″(x) " + (e.f2ex ? "= " + e.f2ex + " " : "") + vz) + " → <b>" + FB.wort("extrem", t(e.art === "H" ? "hp" : "tp")) + "</b> " + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + rw + "</li>";
+      }).join("") + A.sattel.map(function(s){ return "<li>" + FS.fleck(C.S) + FB.wort("sattel", t("sp")) + " " + f(FS.vollPunkt(t("lblS"), s.z, s.y)) + "</li>"; }).join("") + "</ul>";
     } else eh += t("noExt");
     h += FS.karte(t("ext"), eh);
     var wh = '<div class="klein-text">' + t("notw2") + "</div>";
@@ -185,6 +193,8 @@
     box.innerHTML = h;
   }
   FS.sprache(function(){ texte(); graph.zeichne(); });
+  FS.eingabeHilfe({ text: function(s){ var r = FR.parse(s); return "f(x) = " + bruch(r.z, r.n); },
+    zeilen: [["(x^2 - 1)/(x - 2)", "hBruchF"], ["1/(x^2 - 4)", "hHoch"], ["3x/(x^2 + 1)", "hMal"], ["(0,5x + 1)/(x - 1)", "hDez"], ["(x - 1)(x + 2)/(x + 3)", "hKlammer"]] });
   rechne();
 })();
 </script>

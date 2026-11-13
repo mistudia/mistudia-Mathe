@@ -44,6 +44,7 @@
 
 <script src="/funktionen/texte.js"></script>
 <script src="/funktionen/kern.js"></script>
+<script src="/funktionen/lexikon.js"></script>
 <script src="/funktionen/seite.js"></script>
 <script>
 (function(){
@@ -94,6 +95,7 @@
     A.wp.forEach(function(w){ g.punkt(w.z.x, w.y.v, C.W, FS.label(t(w.sattel ? "lblS" : "lblW"), w.z, w.y), "oben"); });
   }
   function texte(){
+    FS.vorschau();
     document.title = "miStudia – " + t("polTitle");
     document.getElementById("titel").textContent = t("polTitle");
     document.getElementById("zeichnen").textContent = t("draw");
@@ -116,20 +118,26 @@
     }
     h += FS.karte(t("ySchn"), FS.fleck(C.Y) + f(FK.punkt(t("lblY"), "0", FK.btxt(A.yAchse))));
     var nh = A.nst.length ? "<ul>" + A.nst.map(function(z, i){
-      var zus = z.m > 1 ? ' <span class="klein-text">(' + t("fachN", { n: z.m }) + (z.m % 2 === 0 ? ", " + t("beruehrt") : "") + ")</span>" : "";
+      var zus = z.m > 1 ? ' <span class="klein-text">(' + t("fachN", { n: z.m }) + (z.m % 2 === 0 ? ", " + FB.wort("beruehren", t("beruehrt")) : "") + ")</span>" : "";
       return "<li>" + FS.fleck(C.N) + f(FK.punkt(t("lblN") + (A.nst.length > 1 ? "₁₂₃₄₅₆"[i] : ""), FK.xtxt(z), "0")) + zus + "</li>";
     }).join("") + "</ul>" : t("noNst");
     h += FS.karte(t("nst"), nh);
-    if(n >= 1) h += FS.karte(t("abl"), f("f′(x) = " + FK.ptxt(A.a1)) + "<br>" + f("f″(x) = " + FK.ptxt(A.a2)) + (n >= 3 ? "<br>" + f("f‴(x) = " + FK.ptxt(FK.ableitung(A.a2))) : ""));
+    if(n >= 1) h += FS.karte(t("abl"), f("f′(x) = " + FK.ptxt(A.a1)) + "<br>" + f("f″(x) = " + FK.ptxt(A.a2)) + (n >= 3 ? "<br>" + f("f‴(x) = " + FK.ptxt(FK.ableitung(A.a2))) : "") + '<div class="klein-text">' + t("ablHinweis") + "</div>");
     if(n >= 2){
       var eh = '<div class="klein-text">' + t("notw1") + "</div>";
       if(A.ext.length || A.sattel.length){
         eh += "<ul>" + A.ext.map(function(e){
           var a2 = e.z.b ? FK.btxt(FK.wertB(A.a2, e.z.b)) : FK.zahl(FK.wertN(A.a2, e.z.x));
           var a2v = FK.wertN(A.a2, e.z.x), vz = Math.abs(a2v) < 1e-9 ? "= 0" : a2v < 0 ? "< 0" : "> 0";
-          return "<li>" + FS.fleck(e.art === "H" ? C.H : C.T) + f("x = " + FK.xtxt(e.z) + ": f″(x) = " + a2 + " " + vz) + " → <b>" + t(e.art === "H" ? "hp" : "tp") + "</b> " + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + "</li>";
+          var farbe = e.art === "H" ? C.H : C.T;
+          var rw = FS.rechenweg([
+            ["rwExt1", f("f′(x) = " + FK.ptxt(A.a1) + " = 0") + " ⇒ " + f(FS.xListe(FK.nullstellen(A.a1)))],
+            ["rwExt2", FS.einsetzen(A.a2, e.z, farbe, "f″") + " " + f(vz) + " ⇒ <b>" + t(e.art === "H" ? "hp" : "tp") + "</b>"],
+            ["rwY", FS.einsetzen(p, e.z, farbe, "f") + "<br>⇒ <b>" + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + "</b>"]
+          ]);
+          return "<li>" + FS.fleck(farbe) + f("x = " + FK.xtxt(e.z) + ": f″(x) = " + a2 + " " + vz) + " → <b>" + FB.wort("extrem", t(e.art === "H" ? "hp" : "tp")) + "</b> " + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + rw + "</li>";
         }).join("") + A.sattel.map(function(s){
-          return "<li>" + FS.fleck(C.S) + f("x = " + FK.xtxt(s.z)) + ": " + t("sp") + " " + f(FS.vollPunkt(t("lblS"), s.z, s.y)) + "</li>";
+          return "<li>" + FS.fleck(C.S) + f("x = " + FK.xtxt(s.z)) + ": " + FB.wort("sattel", t("sp")) + " " + f(FS.vollPunkt(t("lblS"), s.z, s.y)) + "</li>";
         }).join("") + "</ul>";
       } else eh += t("noExt");
       eh += '<div class="klein-text">' + t("hinr1") + "</div>";
@@ -137,8 +145,15 @@
     }
     if(n >= 3){
       var wh = '<div class="klein-text">' + t("notw2") + "</div>";
+      var a3 = FK.ableitung(A.a2);
       wh += A.wp.length ? "<ul>" + A.wp.map(function(w){
-        return "<li>" + FS.fleck(C.W) + f(FS.vollPunkt(t(w.sattel ? "lblS" : "lblW"), w.z, w.y)) + (w.sattel ? ' <span class="klein-text">– ' + t("sp") + "</span>" : "") + "</li>";
+        var a3v = FK.wertN(a3, w.z.x), farbe = w.sattel ? C.S : C.W;
+        var rw = FS.rechenweg([
+          ["rwWp1", f("f″(x) = " + FK.ptxt(A.a2) + " = 0") + " ⇒ " + f(FS.xListe(FK.nullstellen(A.a2)))],
+          ["rwWp2", FS.einsetzen(a3, w.z, farbe, "f‴") + " " + f(Math.abs(a3v) < 1e-9 ? "= 0" : "≠ 0") + (Math.abs(a3v) < 1e-9 ? '<div class="klein-text">' + t("rwSp") + "</div>" : "")],
+          ["rwY", FS.einsetzen(p, w.z, farbe, "f") + "<br>⇒ <b>" + f(FS.vollPunkt(t(w.sattel ? "lblS" : "lblW"), w.z, w.y)) + "</b>"]
+        ]);
+        return "<li>" + FS.fleck(farbe) + f(FS.vollPunkt(t(w.sattel ? "lblS" : "lblW"), w.z, w.y)) + (w.sattel ? ' <span class="klein-text">– ' + FB.wort("sattel", t("sp")) + "</span>" : "") + rw + "</li>";
       }).join("") + "</ul>" : t("noWp");
       wh += '<div class="klein-text">' + t("hinr2") + "</div>";
       h += FS.karte(t("wp"), wh);
@@ -155,6 +170,8 @@
     box.innerHTML = h;
   }
   FS.sprache(function(){ texte(); graph.zeichne(); });
+  FS.eingabeHilfe({ text: function(s){ return "f(x) = " + FK.ptxt(FK.parse(s)); },
+    zeilen: [["x^3 - 2x", "hHoch"], ["3x^2 + 2*x", "hMal"], ["1/3 x^3 - x", "hBruch"], ["0,25x^4 - 1.5x^2", "hDez"], ["(x - 1)(x + 2)^2", "hKlammer"], ["-x^3 + 4x", "hMinus"]] });
   rechne(true);
 })();
 </script>

@@ -13,7 +13,8 @@ var FU = (function(){
   function mischen(a){ a = a.slice(); for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
   function poly(koeff){ return FK.trim(koeff.map(function(c){ return typeof c === "number" ? B(c) : c; })); } // aufsteigend
   function lin(a, b){ return poly([B(-b), B(a)]); } // a·x − b  → (x − b) bei a = 1
-  function f(s){ return '<span class="f" dir="ltr">' + s + '</span>'; }
+  function f(s){ return window.FS ? FS.f(s) : '<span class="f" dir="ltr">' + s + '</span>'; }
+  function mt(s){ return window.FB ? FB.mathe(s) : s; }
   function eingabeTxt(p){ return FK.ptxt(p).replace(/−/g, "-"); }
   function klammerP(p){ var s = FK.ptxt(p); return FK.grad(p) >= 1 && / [+−] /.test(s) ? "(" + s + ")" : s; }
   // (x − 1)(x + 2)·x  – Linearfaktoren als Text, Faktor x zuerst
@@ -177,7 +178,7 @@ var FU = (function(){
       }
       if(!z.fertig) h += '<div class="u-knoepfe"><button type="button" class="knopf" data-u="pruefen">' + t("uPruefen") + '</button><button type="button" class="knopf hell" data-u="tipp">' + t("uTipp") + '</button><button type="button" class="knopf hell" data-u="zeigen">' + t("uZeigen") + "</button></div>";
       if(z.meldung) h += '<div class="u-meldung ' + (z.ok ? "gut" : "schlecht") + '">' + t(z.meldung) + "</div>";
-      if(z.tipp && !z.fertig) h += '<div class="u-tipp">💡 ' + t(st.h) + "</div>";
+      if(z.tipp && !z.fertig) h += '<div class="u-tipp">💡 ' + mt(t(st.h)) + "</div>";
       if(z.gezeigt) h += '<div class="u-loesung">' + t("uLoesung") + " " + f(loesungTxt(st)) + "</div>";
       h += "</section>";
     });
