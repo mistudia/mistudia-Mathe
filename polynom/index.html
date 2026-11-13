@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!-- polynom/index.html – Polynomfunktionen: Kurvendiskussion (miStudia Mathe)
+     Rechnen und Zeichnen: /funktionen/kern.js, Texte: /funktionen/texte.js -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Polynomfunktionen</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<link rel="stylesheet" href="/funktionen/kern.css">
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel"></h1>
+  <form class="eingabe-zeile" id="form" dir="ltr">
+    <label for="eingabe">f(x) =</label>
+    <input type="text" id="eingabe" value="x^3 - 6x^2 + 9x" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text">
+    <button type="submit" class="knopf" id="zeichnen"></button>
+  </form>
+  <div class="fehler" id="fehler" role="alert"></div>
+  <div class="beispiele" id="beispiele" dir="ltr"><span id="tBsp"></span></div>
+
+  <div class="haupt">
+    <div class="graph-box">
+      <div class="graph-wrap"><svg id="graph" role="img"></svg><div class="zoom" id="zoom"></div></div>
+      <div class="legende"><label><input type="checkbox" id="zeigeAbl"> <span id="tAbl"></span></label></div>
+      <p class="tipp" id="tipp"></p>
+    </div>
+    <div class="analyse" id="analyse"></div>
+  </div>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+
+<script src="/funktionen/texte.js"></script>
+<script src="/funktionen/kern.js"></script>
+<script src="/funktionen/seite.js"></script>
+<script>
+(function(){
+  var t = FK.t, C = FS.FARBE, f = FS.f;
+  var BSP = ["x^3 - 6x^2 + 9x", "x^3 - 3x + 1", "x^4 - 4x^2", "0,25x^4 - 2x^2", "x^5 - 5x^3 + 4x", "(x - 1)(x + 2)^2", "-x^3 + 3x^2 - 4", "x^4 + x^3"];
+  var A = null, fehlerCode = null;
+  var graph = new FK.Graph(document.getElementById("graph"), { zeichnen: zeichneInhalt });
+  var titelZoom = FK.knoepfe(document.getElementById("zoom"), graph, passend);
+
+  BSP.forEach(function(s){
+    var b = document.createElement("button"); b.type = "button"; b.textContent = s.replace(/\^2/g, "²").replace(/\^3/g, "³").replace(/\^4/g, "⁴").replace(/\^5/g, "⁵").replace(/-/g, "−");
+    b.addEventListener("click", function(){ document.getElementById("eingabe").value = s; rechne(true); });
+    document.getElementById("beispiele").appendChild(b);
+  });
+  document.getElementById("form").addEventListener("submit", function(e){ e.preventDefault(); rechne(true); });
+  document.getElementById("zeigeAbl").addEventListener("change", function(){ graph.zeichne(); });
+  window.addEventListener("resize", function(){ graph.zeichne(); });
+
+  function rechne(neuEinpassen){
+    fehlerCode = null;
+    try {
+      var p = FK.parse(document.getElementById("eingabe").value);
+      if(FK.grad(p) > 6) throw { code: "errDeg6" };
+      A = FK.analyse(p);
+    } catch(e){ fehlerCode = e.code || "errParse"; }
+    texte();
+    if(!fehlerCode && neuEinpassen){ passend(); }
+    graph.zeichne();
+  }
+  function passend(){
+    if(!A) return;
+    var xs = [];
+    A.nst.forEach(function(z){ xs.push(z.x); });
+    A.ext.forEach(function(e){ xs.push(e.z.x); }); A.wp.forEach(function(w){ xs.push(w.z.x); });
+    var p = A.p; graph.passend(xs, [function(x){ return FK.wertN(p, x); }]);
+  }
+  function zeichneInhalt(g){
+    if(!A) return;
+    var p = A.p;
+    if(document.getElementById("zeigeAbl").checked){
+      g.kurve(function(x){ return FK.wertN(A.a1, x); }, C.a1, 2.5, "8 6");
+      g.kurve(function(x){ return FK.wertN(A.a2, x); }, C.a2, 2.5, "3 5");
+    }
+    g.kurve(function(x){ return FK.wertN(p, x); }, C.f, 3.5);
+    g.punkt(0, FK.Bz.num(A.yAchse), C.Y, null);
+    A.nst.forEach(function(z, i){ g.punkt(z.x, 0, C.N, t("lblN") + (A.nst.length > 1 ? "₁₂₃₄₅₆"[i] : ""), "unten"); });
+    A.ext.forEach(function(e){ g.punkt(e.z.x, e.y.v, e.art === "H" ? C.H : C.T, FS.label(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y), e.art === "H" ? "oben" : "unten"); });
+    A.wp.forEach(function(w){ g.punkt(w.z.x, w.y.v, C.W, FS.label(t(w.sattel ? "lblS" : "lblW"), w.z, w.y), "oben"); });
+  }
+  function texte(){
+    document.title = "miStudia – " + t("polTitle");
+    document.getElementById("titel").textContent = t("polTitle");
+    document.getElementById("zeichnen").textContent = t("draw");
+    document.getElementById("eingabe").setAttribute("aria-label", t("eingabe"));
+    document.getElementById("tBsp").textContent = t("bsp");
+    document.getElementById("tAbl").innerHTML = t("showAbl").replace("f′", '<b style="color:' + C.a1 + '">f′</b>').replace("f″", '<b style="color:' + C.a2 + '">f″</b>');
+    document.getElementById("tipp").textContent = t("tipp");
+    document.getElementById("graph").setAttribute("aria-label", t("polTitle"));
+    titelZoom();
+    document.getElementById("fehler").textContent = fehlerCode ? t(fehlerCode) : "";
+    var box = document.getElementById("analyse");
+    if(fehlerCode || !A){ box.innerHTML = ""; return; }
+    var h = "", p = A.p, n = A.n;
+    h += FS.karte("f(x)", f("f(x) = " + FK.ptxt(p)) + '<div class="klein-text">' + t("grad") + ": " + Math.max(n, 0) + "</div>");
+    h += FS.karte(t("dom"), f("D = " + FK.R));
+    h += FS.karte(t("sym"), t(A.sym === "Y" ? "symY" : A.sym === "O" ? "symO" : "symN"));
+    if(n >= 1){
+      var plus = A.anVz > 0 ? "+" + FK.INF : FK.MINUS + FK.INF, minus = (n % 2 === 0 ? A.anVz : -A.anVz) > 0 ? "+" + FK.INF : FK.MINUS + FK.INF;
+      h += FS.karte(t("inf"), "<ul><li>" + f(t("unendl", { r: "+" + FK.INF, g: plus })) + "</li><li>" + f(t("unendl", { r: FK.MINUS + FK.INF, g: minus })) + "</li></ul>");
+    }
+    h += FS.karte(t("ySchn"), FS.fleck(C.Y) + f(FK.punkt(t("lblY"), "0", FK.btxt(A.yAchse))));
+    var nh = A.nst.length ? "<ul>" + A.nst.map(function(z, i){
+      var zus = z.m > 1 ? ' <span class="klein-text">(' + t("fachN", { n: z.m }) + (z.m % 2 === 0 ? ", " + t("beruehrt") : "") + ")</span>" : "";
+      return "<li>" + FS.fleck(C.N) + f(FK.punkt(t("lblN") + (A.nst.length > 1 ? "₁₂₃₄₅₆"[i] : ""), FK.xtxt(z), "0")) + zus + "</li>";
+    }).join("") + "</ul>" : t("noNst");
+    h += FS.karte(t("nst"), nh);
+    if(n >= 1) h += FS.karte(t("abl"), f("f′(x) = " + FK.ptxt(A.a1)) + "<br>" + f("f″(x) = " + FK.ptxt(A.a2)) + (n >= 3 ? "<br>" + f("f‴(x) = " + FK.ptxt(FK.ableitung(A.a2))) : ""));
+    if(n >= 2){
+      var eh = '<div class="klein-text">' + t("notw1") + "</div>";
+      if(A.ext.length || A.sattel.length){
+        eh += "<ul>" + A.ext.map(function(e){
+          var a2 = e.z.b ? FK.btxt(FK.wertB(A.a2, e.z.b)) : FK.zahl(FK.wertN(A.a2, e.z.x));
+          var a2v = FK.wertN(A.a2, e.z.x), vz = Math.abs(a2v) < 1e-9 ? "= 0" : a2v < 0 ? "< 0" : "> 0";
+          return "<li>" + FS.fleck(e.art === "H" ? C.H : C.T) + f("x = " + FK.xtxt(e.z) + ": f″(x) = " + a2 + " " + vz) + " → <b>" + t(e.art === "H" ? "hp" : "tp") + "</b> " + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + "</li>";
+        }).join("") + A.sattel.map(function(s){
+          return "<li>" + FS.fleck(C.S) + f("x = " + FK.xtxt(s.z)) + ": " + t("sp") + " " + f(FS.vollPunkt(t("lblS"), s.z, s.y)) + "</li>";
+        }).join("") + "</ul>";
+      } else eh += t("noExt");
+      eh += '<div class="klein-text">' + t("hinr1") + "</div>";
+      h += FS.karte(t("ext"), eh);
+    }
+    if(n >= 3){
+      var wh = '<div class="klein-text">' + t("notw2") + "</div>";
+      wh += A.wp.length ? "<ul>" + A.wp.map(function(w){
+        return "<li>" + FS.fleck(C.W) + f(FS.vollPunkt(t(w.sattel ? "lblS" : "lblW"), w.z, w.y)) + (w.sattel ? ' <span class="klein-text">– ' + t("sp") + "</span>" : "") + "</li>";
+      }).join("") + "</ul>" : t("noWp");
+      wh += '<div class="klein-text">' + t("hinr2") + "</div>";
+      h += FS.karte(t("wp"), wh);
+    }
+    h += FS.karte(t("mon"), FS.abschnitte(A.mon, t("steigt"), t("faellt"), t("konst")));
+    if(n >= 2) h += FS.karte(t("kr"), FS.abschnitte(A.kr, t("links"), t("rechts"), ""));
+    var wb = A.wb, wt;
+    if(wb.art === "const") wt = "W = {" + wb.y.ex + "}";
+    else if(wb.art === "R") wt = "W = " + FK.R;
+    else if(wb.art === "ab") wt = "W = " + FK.intervall(FK.ytxt(wb.y), FK.INF, true, false);
+    else wt = "W = " + FK.intervall(FK.MINUS + FK.INF, FK.ytxt(wb.y), false, true);
+    h += FS.karte(t("rng"), f(wt));
+    h += '<div class="klein-text" style="text-align:center">' + t("note") + "</div>";
+    box.innerHTML = h;
+  }
+  FS.sprache(function(){ texte(); graph.zeichne(); });
+  rechne(true);
+})();
+</script>
+<script src="/home-button.js"></script>
+</body>
+</html>

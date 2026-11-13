@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<!-- linear/index.html – Lineare Funktionen (miStudia Mathe)
+     Steigung & y-Achsenabschnitt (Regler oder Eingabe) oder Gerade durch 2 Punkte.
+     Rechnen und Zeichnen: /funktionen/kern.js, Texte: /funktionen/texte.js -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Lineare Funktionen</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<link rel="stylesheet" href="/funktionen/kern.css">
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel"></h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tabMB" aria-selected="true"></button>
+    <button type="button" role="tab" id="tab2P" aria-selected="false"></button>
+  </div>
+  <form class="eingabe-zeile" id="form" dir="ltr">
+    <label for="eingabe">f(x) =</label>
+    <input type="text" id="eingabe" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button type="submit" class="knopf" id="zeichnen"></button>
+  </form>
+  <div class="fehler" id="fehler" role="alert"></div>
+
+  <div class="haupt">
+    <div class="graph-box">
+      <div class="graph-wrap"><svg id="graph" role="img"></svg><div class="zoom" id="zoom"></div></div>
+      <p class="tipp" id="tipp"></p>
+    </div>
+    <div>
+      <div class="regler" id="regler">
+        <div class="regel"><label for="rm"><span><span class="m">m</span> <span id="tm"></span></span><output id="om"></output></label>
+          <div class="zeile"><button class="klein" type="button" data-k="m" data-s="-1" aria-label="−">−</button><input type="range" id="rm" min="-5" max="5" step="0.25"><button class="klein" type="button" data-k="m" data-s="1" aria-label="+">+</button></div></div>
+        <div class="regel"><label for="rb"><span><span class="m">b</span> <span id="tb"></span></span><output id="ob"></output></label>
+          <div class="zeile"><button class="klein" type="button" data-k="b" data-s="-1" aria-label="−">−</button><input type="range" id="rb" min="-10" max="10" step="0.5"><button class="klein" type="button" data-k="b" data-s="1" aria-label="+">+</button></div></div>
+      </div>
+      <form class="punkte" id="punkte" hidden dir="ltr">
+        <fieldset><legend id="tp1"></legend><label>x₁ <input id="x1" value="-1" inputmode="text"></label><label>y₁ <input id="y1" value="1" inputmode="text"></label></fieldset>
+        <fieldset><legend id="tp2"></legend><label>x₂ <input id="x2" value="3" inputmode="text"></label><label>y₂ <input id="y2" value="4" inputmode="text"></label></fieldset>
+        <button type="submit" class="knopf" id="zeichnen2" style="grid-column: 1 / -1"></button>
+      </form>
+      <div class="analyse" id="analyse"></div>
+    </div>
+  </div>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+
+<script src="/funktionen/texte.js"></script>
+<script src="/funktionen/kern.js"></script>
+<script src="/funktionen/seite.js"></script>
+<script>
+(function(){
+  var t = FK.t, C = FS.FARBE, f = FS.f, B = FK.B, Bz = FK.Bz;
+  var modus = "MB", M = B(1, 2), Bb = B(1), P = null, fehlerCode = null;
+  var graph = new FK.Graph(document.getElementById("graph"), { zeichnen: zeichneInhalt });
+  var titelZoom = FK.knoepfe(document.getElementById("zoom"), graph, passend);
+  var R = { m: [-5, 5, 0.25], b: [-10, 10, 0.5] };
+
+  function poly(){ return FK.trim([Bb, M]); }
+  function bz(v){ return FK.parse(String(Math.round(v * 1000) / 1000))[0]; }
+  function setze(k, v){
+    v = Math.round(v * 100) / 100;
+    if(k === "m") M = bz(v); else Bb = bz(v);
+    P = null; fehlerCode = null; eingabeAusWerten(); rechne(false);
+  }
+  function eingabeAusWerten(){ document.getElementById("eingabe").value = FK.ptxt(poly()).replace(/−/g, "-"); }
+  ["m", "b"].forEach(function(k){ document.getElementById("r" + k).addEventListener("input", function(){ setze(k, parseFloat(this.value)); }); });
+  document.querySelectorAll("#regler .klein").forEach(function(btn){
+    btn.addEventListener("click", function(){ var k = btn.dataset.k, r = R[k], cur = Bz.num(k === "m" ? M : Bb);
+      setze(k, Math.min(r[1], Math.max(r[0], Math.round((cur + r[2] * btn.dataset.s) / r[2]) * r[2]))); });
+  });
+  document.getElementById("form").addEventListener("submit", function(e){
+    e.preventDefault(); fehlerCode = null; P = null;
+    try { var q = FK.parse(document.getElementById("eingabe").value); if(FK.grad(q) > 1) throw { code: "errLin" }; Bb = q[0]; M = q[1] || B(0); }
+    catch(er){ fehlerCode = er.code || "errParse"; }
+    rechne(true);
+  });
+  document.getElementById("punkte").addEventListener("submit", function(e){ e.preventDefault(); ausPunkten(); rechne(true); });
+  function ausPunkten(){
+    fehlerCode = null;
+    try {
+      var x1 = FS.zahlEingabe(document.getElementById("x1").value), y1 = FS.zahlEingabe(document.getElementById("y1").value);
+      var x2 = FS.zahlEingabe(document.getElementById("x2").value), y2 = FS.zahlEingabe(document.getElementById("y2").value);
+      if(Bz.num(Bz.sub(x2, x1)) === 0){ P = { x1: x1, y1: y1, x2: x2, y2: y2, senkrecht: true }; fehlerCode = "gleichX"; return; }
+      M = Bz.div(Bz.sub(y2, y1), Bz.sub(x2, x1)); Bb = Bz.sub(y1, Bz.mul(M, x1));
+      P = { x1: x1, y1: y1, x2: x2, y2: y2 };
+      eingabeAusWerten();
+    } catch(er){ fehlerCode = er.code || "errParse"; P = null; }
+  }
+  ["MB", "2P"].forEach(function(m){
+    document.getElementById("tab" + m).addEventListener("click", function(){
+      modus = m;
+      document.getElementById("tabMB").setAttribute("aria-selected", m === "MB"); document.getElementById("tab2P").setAttribute("aria-selected", m === "2P");
+      document.getElementById("regler").hidden = m !== "MB"; document.getElementById("punkte").hidden = m !== "2P";
+      document.getElementById("form").hidden = m !== "MB";
+      if(m === "2P") ausPunkten(); else { P = null; fehlerCode = null; eingabeAusWerten(); }
+      rechne(true);
+    });
+  });
+  window.addEventListener("resize", function(){ graph.zeichne(); });
+
+  function rechne(einpassen){
+    var mv = Bz.num(M), bv = Bz.num(Bb);
+    document.getElementById("rm").value = mv; document.getElementById("om").textContent = FK.btxt(M);
+    document.getElementById("rb").value = bv; document.getElementById("ob").textContent = FK.btxt(Bb);
+    texte();
+    if(einpassen) passend();
+    graph.zeichne();
+  }
+  function passend(){
+    var xs = [0, 1], p = poly();
+    if(!Bz.null(M)) xs.push(-Bz.num(Bb) / Bz.num(M));
+    if(P){ xs.push(Bz.num(P.x1), Bz.num(P.x2)); }
+    var fns = [function(x){ return FK.wertN(p, x); }];
+    if(P && P.senkrecht) fns = [function(){ return Bz.num(P.y1); }, function(){ return Bz.num(P.y2); }];
+    graph.passend(xs, fns);
+  }
+  function zeichneInhalt(g){
+    if(P && P.senkrecht){
+      var xv = Bz.num(P.x1); g.linie(xv, g.v.y0, xv, g.v.y1, "#b91c1c", 3, "8 6");
+      g.punkt(xv, Bz.num(P.y1), C.P, "P₁"); g.punkt(xv, Bz.num(P.y2), C.P, "P₂"); return;
+    }
+    if(fehlerCode) return;
+    var p = poly(), mv = Bz.num(M), bv = Bz.num(Bb);
+    // Steigungsdreieck ab dem y-Achsenabschnitt
+    if(mv !== 0){
+      g.polygon([[0, bv], [1, bv], [1, bv + mv]], "rgba(234,88,12,0.15)", "#ea580c");
+      g.text(0.5, bv, "1", "#ea580c", { anker: "middle", dy: mv > 0 ? 13 : -13 });
+      g.text(1, bv + mv / 2, FK.btxt(M), "#ea580c", { dx: 8 });
+    }
+    g.kurve(function(x){ return FK.wertN(p, x); }, C.f, 3.5);
+    g.punkt(0, bv, C.Y, t("lblY"), mv >= 0 ? "oben" : "unten");
+    if(mv !== 0) g.punkt(-bv / mv, 0, C.N, t("lblN"), mv > 0 ? "unten" : "oben");
+    if(P){ g.punkt(Bz.num(P.x1), Bz.num(P.y1), C.P, "P₁"); g.punkt(Bz.num(P.x2), Bz.num(P.y2), C.P, "P₂"); }
+  }
+  function kl(a){ return a.n < 0 ? "(" + FK.btxt(a) + ")" : FK.btxt(a); }
+  function texte(){
+    document.title = "miStudia – " + t("linTitle");
+    document.getElementById("titel").textContent = t("linTitle");
+    document.getElementById("tabMB").textContent = t("modeMB");
+    document.getElementById("tab2P").textContent = t("mode2P");
+    document.getElementById("zeichnen").textContent = t("draw");
+    document.getElementById("zeichnen2").textContent = t("draw");
+    document.getElementById("eingabe").setAttribute("aria-label", t("eingabe"));
+    document.getElementById("tm").textContent = t("m"); document.getElementById("tb").textContent = t("b");
+    document.getElementById("tp1").textContent = t("p1"); document.getElementById("tp2").textContent = t("p2");
+    document.getElementById("tipp").textContent = t("tipp");
+    document.getElementById("graph").setAttribute("aria-label", t("linTitle"));
+    titelZoom();
+    document.getElementById("fehler").textContent = fehlerCode ? t(fehlerCode) : "";
+    var box = document.getElementById("analyse");
+    if(fehlerCode){ box.innerHTML = ""; return; }
+    var p = poly(), mv = Bz.num(M), h = "";
+    if(P){
+      h += FS.karte(t("rechnung"),
+        f("m = (y₂ " + FK.MINUS + " y₁) / (x₂ " + FK.MINUS + " x₁) = (" + FK.btxt(P.y2) + " " + FK.MINUS + " " + kl(P.y1) + ") / (" + FK.btxt(P.x2) + " " + FK.MINUS + " " + kl(P.x1) + ") = " + FK.btxt(M)) + "<br>" +
+        f("b = y₁ " + FK.MINUS + " m · x₁ = " + FK.btxt(P.y1) + " " + FK.MINUS + " " + kl(M) + " · " + kl(P.x1) + " = " + FK.btxt(Bb)));
+    }
+    h += FS.karte("f(x)", f("f(x) = " + FK.ptxt(p)));
+    var sh = f("m = " + FK.btxt(M));
+    if(mv !== 0){
+      var absM = FK.btxt(B(Math.abs(M.n), M.d));
+      sh += "<br>" + t(mv > 0 ? "dreieckO" : "dreieckU", { m: absM });
+      sh += "<br>" + t("winkel") + ": " + f("α = arctan(" + FK.btxt(M) + ") ≈ " + FK.zahl(Math.atan(mv) * 180 / Math.PI, 1) + "°");
+    } else sh += "<br>" + t("waag");
+    h += FS.karte(t("m"), sh);
+    h += FS.karte(t("b"), FS.fleck(C.Y) + f(FK.punkt(t("lblY"), "0", FK.btxt(Bb))));
+    var nh;
+    if(mv !== 0){
+      var x0 = Bz.div(Bz.neg(Bb), M);
+      nh = '<span class="klein-text">' + t("nstRech") + "</span><br>" + f("0 = " + FK.ptxt(p)) + "<br>" + f("x = " + FK.MINUS + "b / m = " + FK.MINUS + kl(Bb) + " / " + kl(M) + " = " + FK.btxt(x0)) + "<br>" + FS.fleck(C.N) + f(FK.punkt(t("lblN"), FK.btxt(x0), "0"));
+    } else nh = Bz.null(Bb) ? t("alleNst") : t("keineNstW");
+    h += FS.karte(t("nst"), nh);
+    h += FS.karte(t("mon"), mv > 0 ? t("steigt") : mv < 0 ? t("faellt") : t("konst"));
+    h += FS.karte(t("dom") + " / " + t("rng"), f("D = " + FK.R) + "<br>" + f("W = " + (mv !== 0 ? FK.R : "{" + FK.btxt(Bb) + "}")));
+    box.innerHTML = h;
+  }
+  FS.sprache(function(){ texte(); graph.zeichne(); });
+  eingabeAusWerten();
+  rechne(true);
+})();
+</script>
+<script src="/home-button.js"></script>
+</body>
+</html>

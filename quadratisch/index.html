@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<!-- quadratisch/index.html – Quadratische Funktionen (miStudia Mathe)
+     Regler für Normalform (a, b, c) oder Scheitelpunktform (a, d, e) oder freie Eingabe.
+     Rechnen und Zeichnen: /funktionen/kern.js, Texte: /funktionen/texte.js -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Quadratische Funktionen</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<link rel="stylesheet" href="/funktionen/kern.css">
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel"></h1>
+  <form class="eingabe-zeile" id="form" dir="ltr">
+    <label for="eingabe">f(x) =</label>
+    <input type="text" id="eingabe" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button type="submit" class="knopf" id="zeichnen"></button>
+  </form>
+  <div class="fehler" id="fehler" role="alert"></div>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tabABC" aria-selected="true"></button>
+    <button type="button" role="tab" id="tabSF" aria-selected="false"></button>
+  </div>
+
+  <div class="haupt">
+    <div class="graph-box">
+      <div class="graph-wrap"><svg id="graph" role="img"></svg><div class="zoom" id="zoom"></div></div>
+      <p class="tipp" id="tipp"></p>
+    </div>
+    <div>
+      <div class="regler" id="regler"></div>
+      <div class="analyse" id="analyse"></div>
+    </div>
+  </div>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+
+<script src="/funktionen/texte.js"></script>
+<script src="/funktionen/kern.js"></script>
+<script src="/funktionen/seite.js"></script>
+<script>
+(function(){
+  var t = FK.t, C = FS.FARBE, f = FS.f, B = FK.B, Bz = FK.Bz;
+  var modus = "ABC";
+  var R = { // Regler: [min, max, Schritt]
+    ABC: { a: [-3, 3, 0.1], b: [-10, 10, 0.5], c: [-10, 10, 0.5] },
+    SF:  { a: [-3, 3, 0.1], d: [-8, 8, 0.5], e: [-10, 10, 0.5] }
+  };
+  var W = { a: 1, b: -2, c: -3, d: 1, e: -4 };
+  var p = null, A = null, fehlerCode = null, eingegeben = false;
+  var graph = new FK.Graph(document.getElementById("graph"), { zeichnen: zeichneInhalt });
+  var titelZoom = FK.knoepfe(document.getElementById("zoom"), graph, passend);
+
+  function bz(v){ return FK.parse(String(Math.round(v * 1000) / 1000)); }
+  function ausReglern(){
+    var a = bz(W.a)[0];
+    if(modus === "ABC") return FK.trim([bz(W.c)[0], bz(W.b)[0], a]);
+    var d = bz(W.d)[0], e = bz(W.e)[0]; // a(x − d)² + e
+    return FK.trim([Bz.add(Bz.mul(a, Bz.mul(d, d)), e), Bz.mul(Bz.neg(a), Bz.mul(B(2), d)), a]);
+  }
+  function baueRegler(){
+    var box = document.getElementById("regler"), keys = Object.keys(R[modus]);
+    box.innerHTML = keys.map(function(k){
+      var r = R[modus][k];
+      return '<div class="regel"><label for="r' + k + '"><span><span class="m">' + k + '</span></span><output id="o' + k + '"></output></label>' +
+        '<div class="zeile"><button class="klein" type="button" data-k="' + k + '" data-s="-1" aria-label="' + FK.MINUS + '">' + FK.MINUS + '</button>' +
+        '<input type="range" id="r' + k + '" min="' + r[0] + '" max="' + r[1] + '" step="' + r[2] + '" value="' + W[k] + '">' +
+        '<button class="klein" type="button" data-k="' + k + '" data-s="1" aria-label="+">+</button></div></div>';
+    }).join("");
+    keys.forEach(function(k){
+      document.getElementById("r" + k).addEventListener("input", function(){ setze(k, parseFloat(this.value)); });
+    });
+    box.querySelectorAll(".klein").forEach(function(b){
+      b.addEventListener("click", function(){ var k = b.dataset.k, r = R[modus][k]; setze(k, Math.min(r[1], Math.max(r[0], Math.round((W[k] + r[2] * b.dataset.s) / r[2]) * r[2]))); });
+    });
+  }
+  function setze(k, v){
+    v = Math.round(v * 100) / 100;
+    if(k === "a" && v === 0) v = W.a > 0 ? -0.1 : 0.1;
+    W[k] = v; eingegeben = false;
+    p = ausReglern(); document.getElementById("eingabe").value = FK.ptxt(p).replace(/−/g, "-");
+    rechne(false);
+  }
+  function reglerAusP(){ // Regler an eingetippte Funktion anpassen (soweit im Bereich)
+    var a = Bz.num(p[2]), b = Bz.num(p[1]), c = Bz.num(p[0]);
+    W.a = a; W.b = b; W.c = c; W.d = -b / (2 * a); W.e = c - b * b / (4 * a);
+  }
+  function zeigeRegler(){
+    Object.keys(R[modus]).forEach(function(k){
+      var el = document.getElementById("r" + k); if(!el) return;
+      el.value = W[k]; document.getElementById("o" + k).textContent = FK.zahl(W[k]);
+    });
+  }
+  document.getElementById("form").addEventListener("submit", function(e){
+    e.preventDefault(); fehlerCode = null;
+    try {
+      var q = FK.parse(document.getElementById("eingabe").value);
+      if(FK.grad(q) !== 2) throw { code: "errQuad" };
+      p = q; eingegeben = true; reglerAusP();
+    } catch(er){ fehlerCode = er.code || "errParse"; }
+    rechne(true);
+  });
+  ["ABC", "SF"].forEach(function(m){
+    document.getElementById("tab" + m).addEventListener("click", function(){
+      modus = m; document.getElementById("tabABC").setAttribute("aria-selected", m === "ABC"); document.getElementById("tabSF").setAttribute("aria-selected", m === "SF");
+      baueRegler(); zeigeRegler();
+    });
+  });
+  window.addEventListener("resize", function(){ graph.zeichne(); });
+
+  function rechne(einpassen){
+    if(!fehlerCode && p) A = FK.analyse(p);
+    zeigeRegler(); texte();
+    if(einpassen) passend();
+    graph.zeichne();
+  }
+  function scheitel(){ var xs = Bz.div(Bz.neg(p[1]), Bz.mul(B(2), p[2])); return { x: xs, y: FK.wertB(p, xs) }; }
+  function passend(){
+    if(!A) return;
+    var s = scheitel(), xs = [Bz.num(s.x)];
+    A.nst.forEach(function(z){ xs.push(z.x); });
+    graph.passend(xs, [function(x){ return FK.wertN(p, x); }]);
+  }
+  function zeichneInhalt(g){
+    if(!A || fehlerCode) return;
+    var s = scheitel(), sx = Bz.num(s.x), sy = Bz.num(s.y);
+    g.linie(sx, g.v.y0, sx, g.v.y1, C.ach, 2.5, "10 7");
+    g.kurve(function(x){ return FK.wertN(p, x); }, C.f, 3.5);
+    g.punkt(0, Bz.num(p[0]), C.Y, null);
+    A.nst.forEach(function(z, i){ g.punkt(z.x, 0, C.N, t("lblN") + (A.nst.length > 1 ? "₁₂"[i] : ""), Bz.num(p[2]) > 0 ? "oben" : "unten"); });
+    g.punkt(sx, sy, C.V, FK.punkt(t("lblV"), FK.btxt(s.x), FK.btxt(s.y)).length <= 14 ? FK.punkt(t("lblV"), FK.btxt(s.x), FK.btxt(s.y)) : t("lblV"), Bz.num(p[2]) > 0 ? "unten" : "oben");
+  }
+  function klammer(a){ return a.n < 0 ? "(" + FK.btxt(a) + ")" : FK.btxt(a); }
+  function xMinus(z){ // (x − z) bzw. (x + |z|)
+    if(z.b){ if(Bz.null(z.b)) return "x"; return z.b.n > 0 ? "(x " + FK.MINUS + " " + FK.btxt(z.b) + ")" : "(x + " + FK.btxt(Bz.neg(z.b)) + ")"; }
+    if(/^[^ ()+]+$/.test(z.ex)) return z.ex.charAt(0) === FK.MINUS ? "(x + " + z.ex.slice(1) + ")" : "(x " + FK.MINUS + " " + z.ex + ")";
+    return "(x " + FK.MINUS + " (" + z.ex + "))";
+  }
+  function texte(){
+    document.title = "miStudia – " + t("quadTitle");
+    document.getElementById("titel").textContent = t("quadTitle");
+    document.getElementById("zeichnen").textContent = t("draw");
+    document.getElementById("eingabe").setAttribute("aria-label", t("eingabe"));
+    document.getElementById("tabABC").textContent = t("modeABC");
+    document.getElementById("tabSF").textContent = t("modeSF");
+    document.getElementById("tipp").textContent = t("tipp");
+    document.getElementById("graph").setAttribute("aria-label", t("quadTitle"));
+    titelZoom();
+    document.getElementById("fehler").textContent = fehlerCode ? t(fehlerCode) : "";
+    var box = document.getElementById("analyse");
+    if(fehlerCode || !A){ box.innerHTML = ""; return; }
+    var a = p[2], b = p[1], c = p[0], s = scheitel(), h = "";
+    // Darstellungen
+    var sfT = FK.btxt(a).replace(/^1$/, "").replace(/^−1$/, FK.MINUS);
+    var dTeil = Bz.null(s.x) ? "x²" : (s.x.n > 0 ? "(x " + FK.MINUS + " " + FK.btxt(s.x) + ")²" : "(x + " + FK.btxt(Bz.neg(s.x)) + ")²");
+    var eTeil = Bz.null(s.y) ? "" : (s.y.n > 0 ? " + " + FK.btxt(s.y) : " " + FK.MINUS + " " + FK.btxt(Bz.neg(s.y)));
+    var dar = f(t("nf") + ": f(x) = " + FK.ptxt(p)) + "<br>" + f(t("sf") + ": f(x) = " + (sfT.indexOf("/") >= 0 ? sfT + "·" : sfT) + dTeil + eTeil);
+    if(A.nst.length){
+      var lf = A.nst.length === 1 && A.nst[0].m === 2 ? xMinus(A.nst[0]) + "²" : A.nst.map(xMinus).join("");
+      dar += "<br>" + f(t("lf") + ": f(x) = " + (sfT.indexOf("/") >= 0 ? sfT + "·" : sfT) + lf);
+    }
+    h += FS.karte(t("formen"), dar);
+    // Öffnung
+    var an = Math.abs(Bz.num(a));
+    h += FS.karte(t("form"), "<ul><li>" + t(Bz.num(a) > 0 ? "oeffO" : "oeffU") + "</li><li>" + t(an > 1 ? "gestreckt" : an < 1 ? "gestaucht" : "normalpar") + "</li></ul>");
+    // Scheitelpunkt
+    h += FS.karte(t("scheitel"), f("x<sub>S</sub> = " + FK.MINUS + "b / (2a) = " + (Bz.null(b) ? "0" : FK.MINUS + klammer(b)) + " / (2 · " + klammer(a) + ") = " + FK.btxt(s.x)) + "<br>" +
+      f("y<sub>S</sub> = f(" + FK.btxt(s.x) + ") = " + FK.btxt(s.y)) + "<br>" + FS.fleck(C.V) + "<b>" + f(FK.punkt(t("lblV"), FK.btxt(s.x), FK.btxt(s.y))) + "</b><br>" +
+      t("achse") + ": " + f("x = " + FK.btxt(s.x)));
+    h += FS.karte(t("ySchn"), FS.fleck(C.Y) + f(FK.punkt(t("lblY"), "0", FK.btxt(c))));
+    // Diskriminante & abc-Formel
+    var D = Bz.sub(Bz.mul(b, b), Bz.mul(B(4), Bz.mul(a, c))), Dv = Bz.num(D);
+    var dh = f("D = b² " + FK.MINUS + " 4ac = " + klammer(b) + "² " + FK.MINUS + " 4 · " + klammer(a) + " · " + klammer(c) + " = " + FK.btxt(D)) + "<br><b>" + t(Dv > 0 ? "d2" : Dv === 0 ? "d1" : "d0") + "</b>";
+    if(Dv >= 0){
+      dh += "<br>" + t("abc") + ": " + f("x<sub>1,2</sub> = (" + FK.MINUS + "b ± √D) / (2a) = (" + FK.btxt(Bz.neg(b)) + " ± √" + klammer(D) + ") / " + klammer(Bz.mul(B(2), a)));
+    }
+    h += FS.karte(t("diskr"), dh);
+    h += FS.karte(t("nst"), A.nst.length ? "<ul>" + A.nst.map(function(z, i){
+      return "<li>" + FS.fleck(C.N) + f(FK.punkt(t("lblN") + (A.nst.length > 1 ? "₁₂"[i] : ""), FK.xtxt(z), "0")) + (z.m === 2 ? ' <span class="klein-text">(' + t("fachN", { n: 2 }) + ", " + t("beruehrt") + ")</span>" : "") + (z.ex != null && z.ex.indexOf("√") >= 0 ? ' <span class="klein-text">' + f("≈ " + FK.zahl(z.x)) + "</span>" : "") + "</li>";
+    }).join("") + "</ul>" : t("noNst"));
+    h += FS.karte(t("mon"), FS.abschnitte(A.mon, t("steigt"), t("faellt"), t("konst")));
+    h += FS.karte(t("dom") + " / " + t("rng"), f("D = " + FK.R) + "<br>" + f("W = " + (Bz.num(a) > 0 ? FK.intervall(FK.btxt(s.y), FK.INF, true, false) : FK.intervall(FK.MINUS + FK.INF, FK.btxt(s.y), false, true))));
+    box.innerHTML = h;
+  }
+  FS.sprache(function(){ texte(); graph.zeichne(); });
+  baueRegler();
+  p = ausReglern(); document.getElementById("eingabe").value = FK.ptxt(p).replace(/−/g, "-");
+  rechne(true);
+})();
+</script>
+<script src="/home-button.js"></script>
+</body>
+</html>

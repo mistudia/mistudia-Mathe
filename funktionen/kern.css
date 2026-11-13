@@ -1,0 +1,61 @@
+/* Gemeinsames Aussehen für /linear/, /quadratisch/, /polynom/ */
+:root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --karte: #f4f8ff; --kartenrand: #c9d6ea; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+.app { max-width: 1200px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+#logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+h1 { text-align: center; color: var(--blue); margin: 0 0 14px; font-size: 28px; }
+.m { font-family: "Cambria Math", Cambria, "Times New Roman", serif; }
+.eingabe-zeile { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center; margin-bottom: 8px; }
+.eingabe-zeile label { font: italic 22px "Cambria Math", Cambria, "Times New Roman", serif; }
+.eingabe-zeile input[type=text] { font: 20px "Cambria Math", Cambria, "Times New Roman", serif; padding: 9px 12px; border: 2px solid var(--line); border-radius: 12px; min-width: 0; width: min(420px, 100%); color: var(--text); background: #ffffff; }
+.eingabe-zeile input[type=text]:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(21,101,192,0.18); }
+.knopf { font: 700 16px system-ui, sans-serif; padding: 10px 16px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+.knopf.hell { background: #e3eefc; color: var(--blue); }
+.fehler { color: #b91c1c; text-align: center; font-weight: 700; min-height: 1.2em; margin: 2px 0 6px; }
+.beispiele { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; margin-bottom: 12px; font-size: 14px; color: var(--muted); }
+.beispiele button { font: 16px "Cambria Math", Cambria, "Times New Roman", serif; padding: 5px 10px; border-radius: 999px; border: 2px solid var(--kartenrand); background: #ffffff; color: var(--text); cursor: pointer; }
+.beispiele button:hover { border-color: var(--blue); }
+.tabs { display: flex; gap: 8px; justify-content: center; margin: 0 0 12px; flex-wrap: wrap; }
+.tabs button { font: 700 15px system-ui, sans-serif; padding: 9px 16px; border-radius: 999px; border: 2px solid var(--blue); background: #ffffff; color: var(--blue); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+.haupt { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.graph-box { position: sticky; top: 8px; }
+.graph-wrap { position: relative; border: 2px solid var(--kartenrand); border-radius: 14px; overflow: hidden; background: #ffffff; }
+.graph-wrap svg { direction: ltr; display: block; width: 100%; height: min(62vh, 560px); height: min(62dvh, 560px); touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.zoom { position: absolute; top: 8px; right: 8px; display: flex; flex-direction: column; gap: 6px; }
+.zoom button { width: 38px; height: 38px; border-radius: 10px; border: 2px solid var(--line); background: rgba(255,255,255,0.92); color: var(--text); font: 700 20px system-ui; cursor: pointer; padding: 0; }
+.tipp { font-size: 13px; color: var(--muted); text-align: center; margin: 6px 0 0; }
+.legende { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; font-size: 14px; margin-top: 6px; }
+.legende label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.regler { display: grid; gap: 10px; margin-bottom: 12px; }
+.regel { border: 2px solid var(--kartenrand); border-radius: 12px; padding: 8px 10px; background: #ffffff; }
+.regel label { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; font-size: 14px; color: var(--muted); }
+.regel label .m { font-size: 20px; font-style: italic; color: var(--text); font-weight: 700; }
+.regel output { font: 700 18px system-ui, sans-serif; color: var(--text); }
+.regel .zeile { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.regel input[type=range] { flex: 1; min-width: 0; height: 30px; accent-color: var(--blue); }
+.klein { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line); background: #ffffff; color: var(--text); font: 700 18px system-ui; cursor: pointer; padding: 0; flex: 0 0 34px; }
+.punkte { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+.punkte fieldset { border: 2px solid var(--kartenrand); border-radius: 12px; padding: 8px 10px; margin: 0; }
+.punkte legend { font-weight: 700; padding: 0 4px; }
+.punkte label { display: flex; align-items: center; gap: 6px; margin: 4px 0; font: italic 18px "Cambria Math", Cambria, serif; }
+.punkte input { width: 100%; min-width: 0; font: 18px system-ui; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; }
+.analyse { display: grid; gap: 10px; }
+.karte { background: var(--karte); border: 1px solid var(--kartenrand); border-radius: 12px; padding: 10px 12px; font-size: 16px; line-height: 1.5; }
+.karte h2 { margin: 0 0 4px; font-size: 16px; color: var(--blue); }
+.karte .f { font: 19px "Cambria Math", Cambria, "Times New Roman", serif; }
+.karte .klein-text { font-size: 14px; color: var(--muted); }
+.karte ul { margin: 2px 0 0; padding-inline-start: 18px; }
+.karte li { margin: 2px 0; }
+.punkt-fleck { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-inline-end: 6px; vertical-align: baseline; }
+.footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; }
+.footer a { color: var(--blue); }
+@media (max-width: 860px) {
+  body { padding: 8px; } .app { padding: 12px; border-radius: 16px; }
+  h1 { font-size: 23px; }
+  .haupt { grid-template-columns: 1fr; }
+  .graph-box { position: static; }
+  .graph-wrap svg { height: min(56vh, 420px); height: min(56dvh, 420px); }
+}
