@@ -1,0 +1,294 @@
+// ============================================================
+// negativ/app.js – Negative Zahlen
+// Entdecken: Thermometer (−30 … 40 °C) und Zahlenstrahl, beide ziehbar,
+// Betrag, Gegenzahl, Vergleichen, Alltagsbeispiele.
+// Rechnen: a + b, a − b als Pfeile am Zahlenstrahl, a · b und a : b mit
+// Vorzeichenregel. Üben: gemischte Aufgaben mit Lösungsweg.
+// Texte: negativ/texte.js (NT), Sprache aus dem Startmenü (MS_LANG).
+// ============================================================
+(function(){
+  "use strict";
+  var NS = "http://www.w3.org/2000/svg";
+  var lang = "de";
+  function $(id){ return document.getElementById(id); }
+  function t(k, v){ var s = (NT[lang] && NT[lang][k]) || NT.de[k] || k; if(v) for(var x in v) s = s.split("{" + x + "}").join(v[x]); return s; }
+  function el(n, a, txt){ var e = document.createElementNS(NS, n); for(var k in a) e.setAttribute(k, a[k]); if(txt != null) e.textContent = txt; return e; }
+  function punktKomma(){ return !(lang === "en" || lang === "zh" || lang === "ja" || lang === "ar"); }
+  // Zahl mit echtem Minuszeichen (−) und landesüblichem Dezimalzeichen
+  function z(v){
+    var r = Math.round(v * 100) / 100, s = String(Math.abs(r));
+    if(punktKomma()) s = s.replace(".", ",");
+    return (r < 0 ? "−" : "") + s;
+  }
+  function zk(v){ return v < 0 ? "(" + z(v) + ")" : z(v); } // in Klammern, wenn negativ
+  function lies(s){ s = String(s).trim().replace(/[−–]/g, "-").replace(",", ".").replace(/\s/g, ""); if(s === "" || s === "-") return NaN; return Number(s); }
+  function zuf(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+  function bdi(s){ return '<bdi dir="ltr">' + s + "</bdi>"; }
+
+  // ---------- Zahlenstrahl ----------
+  // o: { min, max, marken: [{ v, cls, text }], pfeile: [{ von, bis, cls, text, ebene }], zieh }
+  function zahlenstrahl(svg, o){
+    while(svg.lastChild) svg.removeChild(svg.lastChild);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height, rand = 24, y0 = H - 40;
+    var span = o.max - o.min, sx = (W - 2 * rand) / span;
+    var X = function(v){ return rand + (v - o.min) * sx; };
+    svg._X = X; svg._inv = function(px){ return o.min + (px - rand) / sx; };
+    svg.appendChild(el("line", { x1: rand - 12, y1: y0, x2: W - rand + 14, y2: y0, "class": "achse" }));
+    svg.appendChild(el("path", { d: "M" + (W - rand + 16) + " " + y0 + "l-12 -6v12z", fill: "#1a2233" }));
+    var schritt = span <= 16 ? 1 : span <= 50 ? 5 : 10;
+    for(var v = Math.ceil(o.min); v <= o.max; v++){
+      var gross = v % schritt === 0;
+      if(!gross && span > 50 && v % 5 !== 0) continue;
+      if(!gross && v === 0) gross = true;
+      svg.appendChild(el("line", { x1: X(v), y1: y0 - (gross ? 9 : 5), x2: X(v), y2: y0 + (gross ? 9 : 5), "class": gross ? "tick" : "tick klein" }));
+      if(gross) svg.appendChild(el("text", { x: X(v), y: y0 + 28, "class": "tzahl" + (v < 0 ? " neg" : v > 0 ? " pos" : " null") }, z(v)));
+    }
+    (o.pfeile || []).forEach(function(p){
+      var x1 = X(p.von), x2 = X(p.bis), yy = y0 - 22 - (p.ebene || 0) * 26, h = Math.min(26, Math.abs(x2 - x1) / 2 + 6);
+      if(Math.abs(x2 - x1) < 2) return;
+      var dir = x2 > x1 ? 1 : -1;
+      svg.appendChild(el("path", { d: "M" + x1 + " " + yy + "Q" + ((x1 + x2) / 2) + " " + (yy - h) + " " + (x2 - dir * 2) + " " + yy, "class": "pfeil " + p.cls + (p.gestr ? " gestr" : "") }));
+      svg.appendChild(el("path", { d: "M" + x2 + " " + yy + "l" + (-dir * 11) + " -7M" + x2 + " " + yy + "l" + (-dir * 11) + " 3", "class": "pfeil " + p.cls }));
+      if(p.text) svg.appendChild(el("text", { x: (x1 + x2) / 2, y: yy - h / 2 - 8, "class": "ptext " + p.cls }, p.text));
+    });
+    (o.marken || []).forEach(function(m){
+      svg.appendChild(el("circle", { cx: X(m.v), cy: y0, r: 9, "class": "marke" + (m.cls ? " " + m.cls : "") }));
+      if(m.text != null) svg.appendChild(el("text", { x: X(m.v), y: y0 - 16, "class": "mtext" + (m.cls ? " " + m.cls : "") }, m.text));
+    });
+  }
+  function bereich(werte, minSpan){
+    var lo = Math.min.apply(null, werte.concat([0])), hi = Math.max.apply(null, werte.concat([0]));
+    lo = Math.floor((lo - 2) / 5) * 5; hi = Math.ceil((hi + 2) / 5) * 5;
+    while(hi - lo < (minSpan || 20)){ lo -= 5; if(hi - lo < (minSpan || 20)) hi += 5; }
+    return { min: lo, max: hi };
+  }
+
+  // ---------- Entdecken: Thermometer + Zahlenstrahl ----------
+  var temp = -7, TMIN = -30, TMAX = 40;
+  var TY0 = 40, TY1 = 440; // y für 40 °C bzw. −30 °C
+  function ty(v){ return TY1 - (v - TMIN) / (TMAX - TMIN) * (TY1 - TY0); }
+  function thermo(){
+    var s = $("thermo"); while(s.lastChild) s.removeChild(s.lastChild);
+    var farbe = temp < 0 ? "#2563eb" : temp > 0 ? "#dc2626" : "#7c3aed";
+    s.appendChild(el("rect", { x: 70, y: 18, width: 34, height: 450, rx: 17, fill: "#f8fafc", stroke: "#6b7280", "stroke-width": 2.5 }));
+    s.appendChild(el("circle", { cx: 87, cy: 490, r: 34, fill: farbe, stroke: "#6b7280", "stroke-width": 2.5 }));
+    s.appendChild(el("rect", { x: 79, y: ty(temp), width: 16, height: 490 - ty(temp), fill: farbe }));
+    s.appendChild(el("rect", { x: 79, y: 466, width: 16, height: 10, fill: farbe }));
+    for(var v = TMIN; v <= TMAX; v += 2){
+      var g = v % 10 === 0;
+      s.appendChild(el("line", { x1: 104, y1: ty(v), x2: 104 + (g ? 18 : 9), y2: ty(v), stroke: v === 0 ? "#7c3aed" : "#1a2233", "stroke-width": g ? 2 : 1 }));
+      if(g) s.appendChild(el("text", { x: 158, y: ty(v) + 5, "text-anchor": "end", "font-size": 16, "font-weight": v === 0 ? 800 : 600, fill: v < 0 ? "#2563eb" : v > 0 ? "#dc2626" : "#7c3aed", "font-family": "system-ui, sans-serif" }, z(v)));
+    }
+    s.appendChild(el("line", { x1: 60, y1: ty(0), x2: 104, y2: ty(0), stroke: "#7c3aed", "stroke-width": 2, "stroke-dasharray": "4 3" }));
+    s.appendChild(el("text", { x: 34, y: 30, "text-anchor": "middle", "font-size": 18, "font-weight": 700, fill: "#1a2233", "font-family": "system-ui, sans-serif" }, "°C"));
+    s.appendChild(el("rect", { x: 40, y: ty(temp) - 15, width: 30, height: 30, rx: 8, fill: "#ffffff", stroke: farbe, "stroke-width": 2 }));
+    s.appendChild(el("path", { d: "M70 " + ty(temp) + "l-8 -6v12z", fill: farbe }));
+  }
+  function entdecken(){
+    thermo();
+    var w = $("tempWert"); w.textContent = z(temp) + " °C"; w.className = "gross " + (temp < 0 ? "kalt" : "warm");
+    $("tempText").textContent = temp < 0 ? t("unterNull", { n: Math.abs(temp) }) : temp > 0 ? t("ueberNull", { n: temp }) : t("nullGrad");
+    zahlenstrahl($("zsEntd"), { min: TMIN, max: TMAX, marken: [{ v: temp, text: z(temp) }],
+      pfeile: temp ? [{ von: 0, bis: temp, cls: temp < 0 ? "minus" : "plus", text: String(Math.abs(temp)), gestr: true }] : [] });
+    $("betrag").innerHTML = bdi("|" + z(temp) + "| = " + z(Math.abs(temp))) + " – " + t("betrag");
+    $("gegen").innerHTML = t("gegenL", { z: bdi(z(temp)), g: bdi(z(-temp)) });
+  }
+  function ziehbar(svg, setze){
+    var aktiv = false;
+    function wert(ev){ var r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal; return svg._inv((ev.clientX - r.left) / r.width * vb.width); }
+    svg.addEventListener("pointerdown", function(ev){ aktiv = true; svg.setPointerCapture(ev.pointerId); setze(wert(ev)); });
+    svg.addEventListener("pointermove", function(ev){ if(aktiv) setze(wert(ev)); });
+    svg.addEventListener("pointerup", function(){ aktiv = false; });
+    svg.addEventListener("pointercancel", function(){ aktiv = false; });
+  }
+  function setzeTemp(v){ v = Math.max(TMIN, Math.min(TMAX, Math.round(v))); if(v !== temp){ temp = v; entdecken(); } }
+  ziehbar($("zsEntd"), setzeTemp);
+  (function(){
+    var s = $("thermo"), aktiv = false;
+    function wert(ev){ var r = s.getBoundingClientRect(), y = (ev.clientY - r.top) / r.height * 540; return TMIN + (TY1 - y) / (TY1 - TY0) * (TMAX - TMIN); }
+    s.addEventListener("pointerdown", function(ev){ aktiv = true; s.setPointerCapture(ev.pointerId); setzeTemp(wert(ev)); });
+    s.addEventListener("pointermove", function(ev){ if(aktiv) setzeTemp(wert(ev)); });
+    s.addEventListener("pointerup", function(){ aktiv = false; });
+    s.addEventListener("pointercancel", function(){ aktiv = false; });
+    s.addEventListener("keydown", function(ev){ if(ev.key === "ArrowUp"){ setzeTemp(temp + 1); ev.preventDefault(); } if(ev.key === "ArrowDown"){ setzeTemp(temp - 1); ev.preventDefault(); } });
+    s.setAttribute("tabindex", "0");
+  })();
+
+  function vergleich(){
+    var a = lies($("va").value), b = lies($("vb").value);
+    if(!isFinite(a) || !isFinite(b)){ $("vrel").textContent = "?"; $("vText").textContent = ""; return; }
+    var r = a < b ? "<" : a > b ? ">" : "=";
+    $("vrel").textContent = r;
+    var B = bereich([a, b], 20);
+    zahlenstrahl($("zsVgl"), { min: B.min, max: B.max, marken: [{ v: a, text: z(a) }, { v: b, cls: "b", text: z(b) }] });
+    $("vText").innerHTML = r === "=" ? t("vGleich") : t("vErkl", { k: bdi(z(Math.min(a, b))), g: bdi(z(Math.max(a, b))) }) + " " + bdi(z(a) + " " + r + " " + z(b));
+  }
+  ["va", "vb"].forEach(function(id){ $(id).addEventListener("input", vergleich); });
+
+  function alltag(){
+    var h = "";
+    ["a1", "a2", "a3", "a4", "a5"].forEach(function(k){ var p = t(k).split("|"); h += "<div><b>" + bdi(p[0]) + "</b>" + p[1] + "</div>"; });
+    $("alltag").innerHTML = h;
+  }
+
+  // ---------- Rechnen ----------
+  function rechne(a, op, b){ return op === "+" ? a + b : op === "-" ? a - b : op === "*" ? a * b : (b === 0 ? NaN : a / b); }
+  function opZ(op){ return op === "+" ? "+" : op === "-" ? "−" : op === "*" ? "·" : ":"; }
+  // Pfeile und Schritte für a op b
+  function loesung(a, op, b){
+    var r = rechne(a, op, b), pf = [], sch = [], ges = "";
+    if(op === "+" || op === "-"){
+      var weg = op === "+" ? b : -b; // tatsächliche Bewegung
+      pf.push({ von: 0, bis: a, cls: "start", text: z(a), gestr: true });
+      pf.push({ von: a, bis: r, cls: weg >= 0 ? "plus" : "minus", text: (weg >= 0 ? "+" : "−") + z(Math.abs(weg)), ebene: 1 });
+      sch.push(t("start", { a: '<span class="start">' + bdi(z(a)) + "</span>" }));
+      var k = op === "+" ? (b >= 0 ? "plusPos" : "plusNeg") : (b >= 0 ? "minusPos" : "minusNeg");
+      var cls = weg >= 0 ? "plus" : "minus";
+      sch.push('<span class="' + cls + '">' + t(k, { b: bdi(z(b)), n: Math.abs(b) }) + "</span>");
+      sch.push(t("ergebnis", { r: "<b>" + bdi(z(r)) + "</b>" }));
+      if(op === "+" && b < 0 || op === "-" && b < 0) sch.push(t("umform", { u: bdi(z(a) + " " + opZ(op) + " " + zk(b) + " = " + z(a) + " " + (weg >= 0 ? "+" : "−") + " " + z(Math.abs(b))) }));
+      ges = t(weg >= 0 ? "geschW" : "geschK", { a: bdi(z(a)), n: Math.abs(weg), r: bdi(z(r)) });
+    } else {
+      var sa = a < 0 ? "−" : "+", sb = b < 0 ? "−" : "+", sr = (a < 0) !== (b < 0) ? "−" : "+";
+      if(op === "*" && Number.isInteger(a) && Math.abs(a) >= 1 && Math.abs(a) <= 10 && Number.isInteger(b)){
+        for(var i = 0; i < Math.abs(a); i++) pf.push({ von: i * b, bis: (i + 1) * b, cls: b >= 0 ? "plus" : "minus", text: i === 0 ? z(b) : "", ebene: 0 });
+        if(a < 0) pf.push({ von: 0, bis: r, cls: "start", text: z(r), ebene: 2, gestr: true });
+        sch.push(t("malSpr", { a: Math.abs(a), b: bdi(zk(b)), p: bdi(z(Math.abs(a) * b)) }) + (a < 0 ? " " + t("malUm", { r: bdi(z(r)) }) : ""));
+      }
+      sch.push(t("vorz", { v: bdi("(" + sa + ") " + opZ(op) + " (" + sb + ") = (" + sr + ")") }));
+      sch.push(t("betr", { v: bdi(z(Math.abs(a)) + " " + opZ(op) + " " + z(Math.abs(b)) + " = " + (isFinite(r) ? z(Math.abs(r)) : "?")) }));
+      sch.push(t("ergebnis", { r: "<b>" + bdi(isFinite(r) ? z(r) : "–") + "</b>" }));
+      if(op === ":" && b === 0) sch = [t("durchNull")];
+    }
+    var werte = [a, isFinite(r) ? r : 0]; pf.forEach(function(p){ werte.push(p.von, p.bis); });
+    return { r: r, pfeile: pf, schritte: sch, gesch: ges, werte: werte };
+  }
+  function rechnen(){
+    var a = lies($("ra").value), b = lies($("rb").value), op = $("rop").value;
+    if(!isFinite(a) || !isFinite(b)){ $("rerg").textContent = "?"; return; }
+    var L = loesung(a, op, b), B = bereich(L.werte, 20);
+    $("rerg").textContent = isFinite(L.r) ? z(L.r) : "–";
+    zahlenstrahl($("zsRech"), { min: B.min, max: B.max, pfeile: L.pfeile, marken: isFinite(L.r) ? [{ v: L.r, text: z(L.r) }] : [] });
+    $("rSchritte").innerHTML = L.schritte.map(function(s){ return "<li>" + s + "</li>"; }).join("");
+    $("rGeschichte").innerHTML = L.gesch;
+    // Vorzeichenregel hervorheben
+    var an = (op === "*" || op === ":") ? (a < 0 ? "-" : "+") + (b < 0 ? "-" : "+") : "";
+    var h = "";
+    [["+", "+"], ["-", "-"], ["+", "-"], ["-", "+"]].forEach(function(p){
+      var rr = p[0] === p[1] ? "+" : "−", o = (op === ":" ? ":" : "·");
+      h += '<tr class="' + (an === p[0] + p[1] ? "an" : "") + '"><td>(' + (p[0] === "-" ? "−" : "+") + ") " + o + " (" + (p[1] === "-" ? "−" : "+") + ")</td><td>=</td><td>(" + rr + ")</td></tr>";
+    });
+    $("regeln").innerHTML = h;
+  }
+  ["ra", "rb"].forEach(function(id){ $(id).addEventListener("input", rechnen); });
+  $("rop").addEventListener("change", rechnen);
+
+  // ---------- Üben ----------
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false;
+  var TYPEN = ["ablesen", "vergleich", "temp", "plusminus", "plusminus", "maldurch", "betrag"];
+  function neueAufgabe(){
+    var typ = TYPEN[zuf(0, TYPEN.length - 1)], a, b, op;
+    beantwortet = false;
+    if(typ === "ablesen"){ a = zuf(-15, 15) || -6; auf = { typ: typ, a: a, l: a }; }
+    else if(typ === "vergleich"){ a = zuf(-20, 20); b = Math.random() < 0.1 ? a : zuf(-20, 20); auf = { typ: typ, a: a, b: b, l: a < b ? "<" : a > b ? ">" : "=" }; }
+    else if(typ === "temp"){ a = zuf(-12, 8); var n = zuf(2, 15), w = Math.random() < 0.5 ? 1 : -1; auf = { typ: typ, a: a, n: n, w: w, l: a + w * n, op: w > 0 ? "+" : "-", b: n }; }
+    else if(typ === "plusminus"){ a = zuf(-20, 20); b = zuf(-15, 15) || 4; op = Math.random() < 0.5 ? "+" : "-"; auf = { typ: typ, a: a, b: b, op: op, l: rechne(a, op, b) }; }
+    else if(typ === "maldurch"){
+      a = zuf(-10, 10) || -3; b = zuf(-10, 10) || 5; op = Math.random() < 0.5 ? "*" : ":";
+      if(op === ":"){ var q = a; a = q * b; auf = { typ: typ, a: a, b: b, op: op, l: q }; } else auf = { typ: typ, a: a, b: b, op: op, l: a * b };
+    }
+    else { a = zuf(-25, 25) || -9; var g = Math.random() < 0.5; auf = { typ: g ? "gegen" : "betrag", a: a, l: g ? -a : Math.abs(a) }; }
+    zeigeAufgabe();
+  }
+  function aufgabeText(){
+    var A = auf;
+    if(A.typ === "ablesen") return t("aufAblesen");
+    if(A.typ === "vergleich") return t("aufVergleich") + " " + bdi(z(A.a) + " ☐ " + z(A.b));
+    if(A.typ === "temp") return t("aufTemp", { a: bdi(z(A.a)), n: A.n, w: t(A.w > 0 ? "waermer" : "kaelter") });
+    if(A.typ === "plusminus" || A.typ === "maldurch") return t("aufRechnen") + " " + bdi(z(A.a) + " " + opZ(A.op) + " " + zk(A.b) + " = ?");
+    if(A.typ === "betrag") return t("aufBetrag", { z: bdi("|" + z(A.a) + "|") });
+    return t("aufGegen", { z: bdi(z(A.a)) });
+  }
+  function zeigeAufgabe(){
+    $("auftrag").innerHTML = aufgabeText();
+    $("meldung").textContent = ""; $("meldung").className = "meldung";
+    $("zsLoes").hidden = true;
+    var zs = $("zsUeb");
+    zs.hidden = auf.typ !== "ablesen";
+    if(auf.typ === "ablesen") zahlenstrahl(zs, { min: -20, max: 20, marken: [{ v: auf.a, text: "?" }] });
+    var z2 = $("antwortzeile"); z2.innerHTML = "";
+    if(auf.typ === "vergleich"){
+      ["<", "=", ">"].forEach(function(c){ var b = document.createElement("button"); b.type = "button"; b.className = "knopf hell zeichen"; b.textContent = c; b.addEventListener("click", function(){ pruefe(c); }); z2.appendChild(b); });
+    } else {
+      var inp = document.createElement("input"); inp.className = "zahl"; inp.id = "antwort"; inp.setAttribute("inputmode", "text"); inp.setAttribute("autocomplete", "off"); inp.placeholder = t("eingabe");
+      inp.addEventListener("keydown", function(e){ if(e.key === "Enter") pruefe(inp.value); });
+      var mb = document.createElement("button"); mb.type = "button"; mb.className = "knopf hell zeichen"; mb.textContent = "±"; mb.title = t("vorzeichenKnopf");
+      mb.addEventListener("click", function(){ var v = inp.value.trim(); inp.value = /^[−-]/.test(v) ? v.replace(/^[−-]/, "") : "−" + v; inp.focus(); });
+      var pb = document.createElement("button"); pb.type = "button"; pb.className = "knopf"; pb.id = "pruefen"; pb.textContent = t("pruefen");
+      pb.addEventListener("click", function(){ pruefe(inp.value); });
+      z2.appendChild(mb); z2.appendChild(inp); z2.appendChild(pb);
+    }
+    $("weiter").textContent = t("weiter");
+    $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });
+  }
+  function pruefe(eingabe){
+    if(beantwortet) return;
+    var ok;
+    if(auf.typ === "vergleich") ok = eingabe === auf.l;
+    else { var v = lies(eingabe); if(!isFinite(v)) return; ok = Math.abs(v - auf.l) < 1e-9; }
+    beantwortet = true; anzahl++; if(ok) punkte++;
+    var m = $("meldung");
+    var loesText = auf.typ === "vergleich" ? z(auf.a) + " " + auf.l + " " + z(auf.b) : z(auf.l);
+    m.className = "meldung " + (ok ? "gut" : "schlecht");
+    m.innerHTML = ok ? t("richtig") + " " + bdi(loesText) : t("falsch", { l: bdi(loesText) });
+    // Lösungsweg am Zahlenstrahl
+    var s = $("zsLoes"), B;
+    if(auf.typ === "temp" || auf.typ === "plusminus" || (auf.typ === "maldurch" && auf.op === "*")){
+      var L = loesung(auf.a, auf.op, auf.b); B = bereich(L.werte, 20);
+      zahlenstrahl(s, { min: B.min, max: B.max, pfeile: L.pfeile, marken: [{ v: L.r, text: z(L.r) }] }); s.hidden = false;
+      if(!ok) m.innerHTML += '<br><span class="muted" style="font-weight:400">' + L.schritte.join(" · ") + "</span>";
+    } else if(auf.typ === "maldurch" && !ok){
+      m.innerHTML += '<br><span class="muted" style="font-weight:400">' + loesung(auf.a, auf.op, auf.b).schritte.join(" · ") + "</span>";
+    } else if(auf.typ === "vergleich" || auf.typ === "betrag" || auf.typ === "gegen" || auf.typ === "ablesen"){
+      var mk = auf.typ === "vergleich" ? [{ v: auf.a, text: z(auf.a) }, { v: auf.b, cls: "b", text: z(auf.b) }] : auf.typ === "ablesen" ? [{ v: auf.a, text: z(auf.a) }] : [{ v: auf.a, text: z(auf.a) }, { v: -auf.a, cls: "b", text: z(-auf.a) }];
+      var pf = auf.typ === "betrag" ? [{ von: 0, bis: auf.a, cls: auf.a < 0 ? "minus" : "plus", text: String(Math.abs(auf.a)) }] : [];
+      B = bereich(mk.map(function(q){ return q.v; }), 20);
+      zahlenstrahl(s, { min: B.min, max: B.max, marken: auf.typ === "betrag" ? [mk[0]] : mk, pfeile: pf }); s.hidden = false;
+      if(auf.typ === "vergleich" && !ok) m.innerHTML += '<br><span class="muted" style="font-weight:400">' + t("vErkl", { k: bdi(z(Math.min(auf.a, auf.b))), g: bdi(z(Math.max(auf.a, auf.b))) }) + "</span>";
+    }
+    $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });
+    $("weiter").focus();
+  }
+  $("weiter").addEventListener("click", neueAufgabe);
+
+  // ---------- Reiter ----------
+  var tab = "entd";
+  function zeigeTab(k){
+    tab = k;
+    document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
+    ["entd", "rech", "ueben"].forEach(function(x){ $("s_" + x).hidden = x !== k; });
+    if(k === "ueben" && !auf) neueAufgabe();
+    alles();
+  }
+  document.querySelectorAll(".tabs button").forEach(function(b){ b.addEventListener("click", function(){ zeigeTab(b.dataset.tab); }); });
+
+  // ---------- Texte (bei jedem Sprachwechsel alles neu beschriften) ----------
+  function alles(){
+    document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    document.title = "miStudia – " + t("titel");
+    $("titel").textContent = t("titel");
+    document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
+    $("tZieh").textContent = t("zieh");
+    $("tVergleich").textContent = t("tVergleich"); $("tAlltag").textContent = t("tAlltag");
+    $("tRechnen").textContent = t("tRechnen"); $("tRegeln").textContent = t("tRegeln"); $("regelHinweis").textContent = t("regelHinweis");
+    entdecken(); vergleich(); alltag(); rechnen();
+    if(auf){
+      var alt = $("meldung").innerHTML, war = beantwortet, eing = $("antwort") ? $("antwort").value : "";
+      $("auftrag").innerHTML = aufgabeText(); $("weiter").textContent = t("weiter"); $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });
+      if($("antwort")){ $("antwort").placeholder = t("eingabe"); $("pruefen").textContent = t("pruefen"); }
+      if(war && alt){ beantwortet = false; anzahl--; var richtigVorher = $("meldung").classList.contains("gut"); if(richtigVorher) punkte--; pruefe(auf.typ === "vergleich" ? (richtigVorher ? auf.l : "x") : (richtigVorher ? String(auf.l) : (eing || "999999"))); }
+    }
+  }
+  window.MS_LANG = { apply: function(l){ if(NT[l]){ lang = l; alles(); } } };
+  alles();
+})();
