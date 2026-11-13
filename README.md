@@ -11,6 +11,7 @@ Startmenü (`index.html`) + 7 Mathe-Apps als Unterordner, eine Domain → eine A
 | `prozent/` | Prozentumwandler |
 | `waage/` | Mathe-Waage |
 | `binome/` | BINOME |
+| `sinus/` | neu, nur hier (aus der Folie „Parameter bei Sinusfunktionen“) |
 
 Die Unterordner sind **Kopien**. Änderungen an einer App bitte hier übernehmen
 (oder die App hier weiterentwickeln). Unterschiede zu den Einzel-Repos:

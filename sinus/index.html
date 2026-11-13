@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     sinus/index.html – Parameter bei Sinusfunktionen (miStudia Mathe)
+     Interaktive Fassung der Folien „Parameter bei Sinusfunktionen“:
+     f(x) = a·sin(b·x + c) + d im Vergleich zu sin(x), Regler für a–d,
+     Amplitude, Periode, Ruhelage, Verschiebung; Beispiele f, g, h, i, j.
+     Sprache kommt aus dem Startmenü (home-button.js → MS_LANG.apply).
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Sinusfunktionen</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root {
+    --ca: #f0a500; --cb: #00a651; --cc: #00a3e0; --cd: #e91ee0; --cf: #e06666; --cp: #6f2da8; --rest: #8aa6e6;
+    --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1100px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 12px; font-size: 30px; }
+  .m { font-family: "Cambria Math", Cambria, "Times New Roman", serif; font-style: italic; }
+  .ka { color: var(--ca); font-weight: 700; } .kb { color: var(--cb); font-weight: 700; } .kc { color: var(--cc); font-weight: 700; } .kd { color: var(--cd); font-weight: 700; }
+  .formel-box { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 16px; margin-bottom: 12px; }
+  .formel { font-size: 30px; border: 3px solid var(--blue); border-radius: 10px; padding: 6px 16px; background: #ffffff; white-space: nowrap; }
+  .wolke { background: #fff6a8; border: 2px solid #e6c800; border-radius: 22px; padding: 6px 14px; font-size: 14px; text-align: center; color: #3a3200; }
+  .wolke .m { color: #d4001a; font-size: 17px; }
+  .effekte { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .eff { border-radius: 12px; padding: 8px 10px; font-size: 14px; text-align: center; background: #ffffff; border: 2px solid; }
+  .eff b.m { font-size: 20px; display: block; }
+  .eff.a { border-color: var(--ca); color: #8a5d00; } .eff.b { border-color: var(--cb); color: #006b34; }
+  .eff.c { border-color: var(--cc); color: #00648a; } .eff.d { border-color: var(--cd); color: #8f0f89; }
+  .tabs { display: flex; gap: 8px; justify-content: center; margin: 4px 0 12px; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 9px 16px; border-radius: 999px; border: 2px solid var(--blue); background: #ffffff; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .haupt { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+  .graph-wrap { border: 2px solid #c9d6ea; border-radius: 14px; padding: 6px; background: #ffffff; }
+  svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+  .live { text-align: center; font-size: 22px; margin: 6px 0 2px; }
+  .regler { display: grid; gap: 10px; }
+  .regel { border: 2px solid; border-radius: 12px; padding: 8px 10px; background: #ffffff; }
+  .regel.a { border-color: var(--ca); } .regel.b { border-color: var(--cb); } .regel.c { border-color: var(--cc); } .regel.d { border-color: var(--cd); }
+  .regel label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14px; color: var(--muted); }
+  .regel label .m { font-size: 20px; }
+  .regel output { font: 700 18px system-ui, sans-serif; color: var(--text); min-width: 52px; text-align: end; }
+  .regel .zeile { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .regel input[type=range] { flex: 1; min-width: 0; height: 30px; }
+  .regel.a input { accent-color: var(--ca); } .regel.b input { accent-color: var(--cb); } .regel.c input { accent-color: var(--cc); } .regel.d input { accent-color: var(--cd); }
+  .klein { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line); background: #ffffff; color: var(--text); font: 700 18px system-ui; cursor: pointer; padding: 0; }
+  .knopf { font: 700 15px system-ui, sans-serif; padding: 10px 14px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .infos { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+  .info { background: #f4f8ff; border: 1px solid #c9d6ea; border-radius: 12px; padding: 10px 12px; font-size: 15px; line-height: 1.45; }
+  .info .m { font-size: 18px; }
+  .beispiele { display: grid; gap: 8px; }
+  .bsp { display: flex; align-items: center; gap: 10px; text-align: start; width: 100%; padding: 8px 10px; border-radius: 12px; border: 2px solid var(--line); background: #ffffff; cursor: pointer; font-size: 17px; color: var(--text); }
+  .bsp[aria-pressed="true"] { border-color: var(--blue); background: #eaf2ff; }
+  .bsp .farbe { width: 16px; height: 16px; border-radius: 50%; flex: 0 0 16px; }
+  .bsp .m { font-size: 18px; }
+  .kasten { border: 2px solid; border-radius: 4px; padding: 0 3px; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; }
+  .footer a { color: var(--blue); }
+  @media (max-width: 760px) {
+    body { padding: 8px; } .app { padding: 12px; border-radius: 16px; }
+    h1 { font-size: 24px; } .formel { font-size: 22px; padding: 4px 10px; }
+    .effekte { grid-template-columns: repeat(2, 1fr); }
+    .haupt { grid-template-columns: 1fr; }
+    .live { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Parameter bei Sinusfunktionen</h1>
+
+  <div class="formel-box">
+    <div class="formel m">f(x) = <span class="ka">a</span> · sin(<span class="kb">b</span> · x + <span class="kc">c</span>) + <span class="kd">d</span></div>
+    <div class="wolke"><span id="tVergleich">im Vergleich zu</span><br><span class="m">f(x) = sin(x)</span></div>
+  </div>
+  <div class="effekte">
+    <div class="eff a"><b class="m">a</b><span id="tEffA"></span></div>
+    <div class="eff b"><b class="m">b</b><span id="tEffB"></span></div>
+    <div class="eff c"><b class="m">c</b><span id="tEffC"></span></div>
+    <div class="eff d"><b class="m">d</b><span id="tEffD"></span></div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tabRegler" aria-selected="true"></button>
+    <button type="button" role="tab" id="tabBsp" aria-selected="false"></button>
+  </div>
+
+  <div class="haupt">
+    <div>
+      <div class="graph-wrap"><svg id="graph" viewBox="0 0 800 460" role="img"></svg></div>
+      <div class="live m" id="live"></div>
+    </div>
+
+    <div>
+      <div class="regler" id="reglerBox">
+        <div class="regel a"><label for="ra"><span><span class="m ka">a</span> <span id="tLabA"></span></span><output id="oa"></output></label>
+          <div class="zeile"><button class="klein" data-r="a" data-s="-1" aria-label="−">−</button><input type="range" id="ra" min="-3" max="3" step="0.1" value="1"><button class="klein" data-r="a" data-s="1" aria-label="+">+</button></div></div>
+        <div class="regel b"><label for="rb"><span><span class="m kb">b</span> <span id="tLabB"></span></span><output id="ob"></output></label>
+          <div class="zeile"><button class="klein" data-r="b" data-s="-1" aria-label="−">−</button><input type="range" id="rb" min="0.25" max="4" step="0.25" value="1"><button class="klein" data-r="b" data-s="1" aria-label="+">+</button></div></div>
+        <div class="regel c"><label for="rc"><span><span class="m kc">c</span> <span id="tLabC"></span></span><output id="oc"></output></label>
+          <div class="zeile"><button class="klein" data-r="c" data-s="-1" aria-label="−">−</button><input type="range" id="rc" min="-3" max="3" step="0.1" value="0"><button class="klein" data-r="c" data-s="1" aria-label="+">+</button></div></div>
+        <div class="regel d"><label for="rd"><span><span class="m kd">d</span> <span id="tLabD"></span></span><output id="od"></output></label>
+          <div class="zeile"><button class="klein" data-r="d" data-s="-1" aria-label="−">−</button><input type="range" id="rd" min="-2" max="2" step="0.1" value="0"><button class="klein" data-r="d" data-s="1" aria-label="+">+</button></div></div>
+        <button type="button" class="knopf hell" id="reset"></button>
+      </div>
+
+      <div class="beispiele" id="bspBox" hidden>
+        <button type="button" class="bsp" data-bsp="f"><span class="farbe" style="background:var(--cf)"></span><span class="m">f(x) = sin(x) = 1 · sin(1 · x + 0) + 0</span></button>
+        <button type="button" class="bsp" data-bsp="g"><span class="farbe" style="background:#f2c94c"></span><span class="m">g(x) = <span class="kasten" style="border-color:var(--ca)">0,5</span> · sin(x)</span></button>
+        <button type="button" class="bsp" data-bsp="h"><span class="farbe" style="background:#3f9a8c"></span><span class="m">h(x) = sin(<span class="kasten" style="border-color:var(--cb)">2</span>x)</span></button>
+        <button type="button" class="bsp" data-bsp="i"><span class="farbe" style="background:var(--cc)"></span><span class="m">i(x) = sin(x + <span class="kasten" style="border-color:var(--cc)">1</span>)</span></button>
+        <button type="button" class="bsp" data-bsp="j"><span class="farbe" style="background:var(--cd)"></span><span class="m">j(x) = sin(x) + <span class="kasten" style="border-color:var(--cd)">0,5</span></span></button>
+        <button type="button" class="knopf" id="alle" aria-pressed="false"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="infos">
+    <div class="info"><span class="m"><span class="ka">a</span> = </span><span id="tAmp"></span><br><span id="tAmpTxt"></span></div>
+    <div class="info"><span class="m" style="color:var(--cp)">p</span> = <span id="tPer"></span><br><span id="tPerTxt"></span> <span class="m">p = 2π / <span class="kb">b</span></span></div>
+    <div class="info"><span id="tRest"></span><br><span id="tRestTxt"></span> <span class="m">y = <span class="kd">d</span></span></div>
+    <div class="info"><span id="tShift"></span><br><span class="m">x = −<span class="kc">c</span> / <span class="kb">b</span></span></div>
+  </div>
+
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+
+<script>
+var L = {
+  de: { title:"Parameter bei Sinusfunktionen", vergleich:"im Vergleich zu", effA:"streckt/staucht entlang y-Achse", effB:"streckt/staucht entlang x-Achse", effC:"verschiebt entlang x-Achse", effD:"verschiebt entlang y-Achse",
+        tabR:"🎚️ Ausprobieren", tabB:"📋 Beispiele", labA:"Amplitude", labB:"Streckfaktor x", labC:"Verschiebung x", labD:"Verschiebung y", reset:"↺ Zurück zu sin(x)", alle:"Alle Beispiele zeigen", eins:"Nur ein Beispiel zeigen",
+        amp:"Amplitude", ampTxt:"Abstand von der Ruhelage bis zum Hochpunkt.", per:"Periode", perTxt:"Länge einer ganzen Schwingung. Es gilt:", rest:"Ruhelage", restTxt:"Die Mittellinie der Schwingung liegt bei", shift:"Verschiebung entlang der x-Achse: Die Schwingung beginnt bei",
+        here:"hier", yours:"deine Funktion", aria:"Graph der Sinusfunktion im Vergleich zu sin(x)" },
+  en: { title:"Parameters of Sine Functions", vergleich:"compared with", effA:"stretches/compresses along the y-axis", effB:"stretches/compresses along the x-axis", effC:"shifts along the x-axis", effD:"shifts along the y-axis",
+        tabR:"🎚️ Try it out", tabB:"📋 Examples", labA:"Amplitude", labB:"x-stretch factor", labC:"x-shift", labD:"y-shift", reset:"↺ Back to sin(x)", alle:"Show all examples", eins:"Show one example",
+        amp:"Amplitude", ampTxt:"Distance from the rest line to the maximum.", per:"Period", perTxt:"Length of one full oscillation. It holds:", rest:"Rest line (midline)", restTxt:"The midline of the oscillation is at", shift:"Shift along the x-axis: the oscillation starts at",
+        here:"here", yours:"your function", aria:"Graph of the sine function compared with sin(x)" },
+  es: { title:"Parámetros de las funciones seno", vergleich:"en comparación con", effA:"estira/comprime a lo largo del eje y", effB:"estira/comprime a lo largo del eje x", effC:"desplaza a lo largo del eje x", effD:"desplaza a lo largo del eje y",
+        tabR:"🎚️ Probar", tabB:"📋 Ejemplos", labA:"Amplitud", labB:"factor en x", labC:"desplazamiento x", labD:"desplazamiento y", reset:"↺ Volver a sin(x)", alle:"Mostrar todos los ejemplos", eins:"Mostrar un ejemplo",
+        amp:"Amplitud", ampTxt:"Distancia de la línea de equilibrio al máximo.", per:"Periodo", perTxt:"Longitud de una oscilación completa. Se cumple:", rest:"Línea de equilibrio", restTxt:"La línea media de la oscilación está en", shift:"Desplazamiento en el eje x: la oscilación empieza en",
+        here:"aquí", yours:"tu función", aria:"Gráfica de la función seno comparada con sin(x)" },
+  zh: { title:"正弦函数的参数", vergleich:"与之比较", effA:"沿 y 轴拉伸/压缩", effB:"沿 x 轴拉伸/压缩", effC:"沿 x 轴平移", effD:"沿 y 轴平移",
+        tabR:"🎚️ 动手试试", tabB:"📋 例子", labA:"振幅", labB:"x 方向伸缩", labC:"x 方向平移", labD:"y 方向平移", reset:"↺ 回到 sin(x)", alle:"显示所有例子", eins:"只显示一个例子",
+        amp:"振幅", ampTxt:"从平衡位置到最高点的距离。", per:"周期", perTxt:"一次完整振动的长度。有：", rest:"平衡位置", restTxt:"振动的中线位于", shift:"沿 x 轴平移：振动从这里开始",
+        here:"这里", yours:"你的函数", aria:"正弦函数与 sin(x) 比较的图像" },
+  fr: { title:"Paramètres des fonctions sinus", vergleich:"par rapport à", effA:"étire/comprime selon l’axe des y", effB:"étire/comprime selon l’axe des x", effC:"décale selon l’axe des x", effD:"décale selon l’axe des y",
+        tabR:"🎚️ Essayer", tabB:"📋 Exemples", labA:"Amplitude", labB:"facteur en x", labC:"décalage x", labD:"décalage y", reset:"↺ Revenir à sin(x)", alle:"Afficher tous les exemples", eins:"Afficher un seul exemple",
+        amp:"Amplitude", ampTxt:"Distance entre la position d’équilibre et le maximum.", per:"Période", perTxt:"Longueur d’une oscillation complète. On a :", rest:"Position d’équilibre", restTxt:"La ligne médiane de l’oscillation est en", shift:"Décalage selon l’axe des x : l’oscillation commence en",
+        here:"ici", yours:"ta fonction", aria:"Courbe de la fonction sinus comparée à sin(x)" },
+  ru: { title:"Параметры синусоиды", vergleich:"по сравнению с", effA:"растягивает/сжимает вдоль оси y", effB:"растягивает/сжимает вдоль оси x", effC:"сдвигает вдоль оси x", effD:"сдвигает вдоль оси y",
+        tabR:"🎚️ Попробовать", tabB:"📋 Примеры", labA:"Амплитуда", labB:"сжатие по x", labC:"сдвиг по x", labD:"сдвиг по y", reset:"↺ Назад к sin(x)", alle:"Показать все примеры", eins:"Показать один пример",
+        amp:"Амплитуда", ampTxt:"Расстояние от положения равновесия до максимума.", per:"Период", perTxt:"Длина одного полного колебания. Верно:", rest:"Положение равновесия", restTxt:"Средняя линия колебания находится при", shift:"Сдвиг вдоль оси x: колебание начинается при",
+        here:"здесь", yours:"твоя функция", aria:"График синусоиды по сравнению с sin(x)" },
+  ar: { title:"معاملات دوال الجيب", vergleich:"مقارنةً بـ", effA:"تمدّد/تضغط على امتداد محور y", effB:"تمدّد/تضغط على امتداد محور x", effC:"تزيح على امتداد محور x", effD:"تزيح على امتداد محور y",
+        tabR:"🎚️ جرّب بنفسك", tabB:"📋 أمثلة", labA:"السعة", labB:"معامل التمدد في x", labC:"الإزاحة في x", labD:"الإزاحة في y", reset:"↺ العودة إلى sin(x)", alle:"اعرض كل الأمثلة", eins:"اعرض مثالًا واحدًا",
+        amp:"السعة", ampTxt:"المسافة من خط الاتزان إلى القمة.", per:"الدورة", perTxt:"طول اهتزازة كاملة. ويكون:", rest:"خط الاتزان", restTxt:"يقع الخط الأوسط للاهتزاز عند", shift:"الإزاحة على محور x: يبدأ الاهتزاز عند",
+        here:"هنا", yours:"دالتك", aria:"منحنى دالة الجيب مقارنةً بـ sin(x)" },
+  ja: { title:"正弦関数のパラメーター", vergleich:"くらべるのは", effA:"y軸方向にのばす/ちぢめる", effB:"x軸方向にのばす/ちぢめる", effC:"x軸方向に平行移動", effD:"y軸方向に平行移動",
+        tabR:"🎚️ 動かしてみよう", tabB:"📋 例", labA:"振幅", labB:"x方向の倍率", labC:"x方向の移動", labD:"y方向の移動", reset:"↺ sin(x) にもどす", alle:"すべての例を表示", eins:"1つの例だけ表示",
+        amp:"振幅", ampTxt:"中心線から山の頂点までの距離。", per:"周期", perTxt:"1回の振動の長さ。次が成り立つ：", rest:"中心線（つり合いの位置）", restTxt:"振動の中心線の位置は", shift:"x軸方向の移動：振動はここから始まる",
+        here:"ここでは", yours:"きみの関数", aria:"sin(x) とくらべた正弦関数のグラフ" },
+  pt: { title:"Parâmetros das funções seno", vergleich:"em comparação com", effA:"estica/comprime ao longo do eixo y", effB:"estica/comprime ao longo do eixo x", effC:"desloca ao longo do eixo x", effD:"desloca ao longo do eixo y",
+        tabR:"🎚️ Experimentar", tabB:"📋 Exemplos", labA:"Amplitude", labB:"fator em x", labC:"deslocamento x", labD:"deslocamento y", reset:"↺ Voltar a sin(x)", alle:"Mostrar todos os exemplos", eins:"Mostrar um exemplo",
+        amp:"Amplitude", ampTxt:"Distância da linha de equilíbrio até o máximo.", per:"Período", perTxt:"Comprimento de uma oscilação completa. Vale:", rest:"Linha de equilíbrio", restTxt:"A linha média da oscilação fica em", shift:"Deslocamento no eixo x: a oscilação começa em",
+        here:"aqui", yours:"sua função", aria:"Gráfico da função seno comparada com sin(x)" }
+};
+var lang = "de";
+var LOC = { de:"de-DE", en:"en-US", es:"es-ES", zh:"zh-CN", fr:"fr-FR", ru:"ru-RU", ar:"ar-u-nu-latn", ja:"ja-JP", pt:"pt-BR" };
+function t(k){ return (L[lang] && L[lang][k]) || L.de[k]; }
+function zahl(v, max){ return new Intl.NumberFormat(LOC[lang] || "de-DE", { maximumFractionDigits: max == null ? 2 : max }).format(Math.abs(v) < 1e-9 ? 0 : v); }
+
+var P = { a:1, b:1, c:0, d:0 };
+var BSP = { f:{a:1,b:1,c:0,d:0,col:"#e06666"}, g:{a:0.5,b:1,c:0,d:0,col:"#f2c94c"}, h:{a:1,b:2,c:0,d:0,col:"#3f9a8c"}, i:{a:1,b:1,c:1,d:0,col:"#00a3e0"}, j:{a:1,b:1,c:0,d:0.5,col:"#e91ee0"} };
+var modus = "regler", alleZeigen = false, aktivBsp = null;
+
+// Koordinaten
+var W = 800, H = 460, ML = 44, MR = 14, MT = 14, MB = 34;
+var X0 = -Math.PI, X1 = 2.25 * Math.PI;
+function yBereich(){
+  var m = 1.6;
+  var liste = (modus === "bsp" && alleZeigen) ? Object.keys(BSP).map(function(k){ return BSP[k]; }) : [P];
+  liste.forEach(function(q){ m = Math.max(m, Math.abs(q.a) + Math.abs(q.d) + 0.4); });
+  return Math.ceil(m * 2) / 2;
+}
+var YM = 1.6;
+function sx(x){ return ML + (x - X0) / (X1 - X0) * (W - ML - MR); }
+function sy(y){ return MT + (YM - y) / (2 * YM) * (H - MT - MB); }
+function el(name, attrs, text){
+  var e = document.createElementNS("http://www.w3.org/2000/svg", name);
+  for(var k in attrs) e.setAttribute(k, attrs[k]);
+  if(text != null) e.textContent = text;
+  return e;
+}
+function kurve(q, farbe, breite, strich){
+  var d = "", n = 500;
+  for(var i = 0; i <= n; i++){
+    var x = X0 + (X1 - X0) * i / n, y = q.a * Math.sin(q.b * x + q.c) + q.d;
+    d += (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(y).toFixed(1);
+  }
+  var a = { d: d, fill: "none", stroke: farbe, "stroke-width": breite, "stroke-linejoin": "round" };
+  if(strich) a["stroke-dasharray"] = strich;
+  return el("path", a);
+}
+function pfeil(svg, x1, y1, x2, y2, farbe, beide){
+  var id = "pf" + farbe.replace(/[^a-z0-9]/gi, "");
+  if(!svg.querySelector("#" + id)){
+    var defs = svg.querySelector("defs") || svg.insertBefore(el("defs", {}), svg.firstChild);
+    var m = el("marker", { id: id, viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse" });
+    m.appendChild(el("path", { d: "M0 0 L10 5 L0 10 z", fill: farbe }));
+    defs.appendChild(m);
+  }
+  var a = { x1: x1, y1: y1, x2: x2, y2: y2, stroke: farbe, "stroke-width": 3, "marker-end": "url(#" + id + ")" };
+  if(beide) a["marker-start"] = "url(#" + id + ")";
+  svg.appendChild(el("line", a));
+}
+function schild(svg, x, y, text, farbe, anker){
+  var g = el("g", {});
+  var tx = el("text", { x: x, y: y, "font-size": 17, "font-style": "italic", "font-family": "Cambria Math, Cambria, Times New Roman, serif", "font-weight": 700, fill: farbe, "text-anchor": anker || "middle", "dominant-baseline": "middle", "paint-order": "stroke", stroke: "#ffffff", "stroke-width": 5 }, text);
+  g.appendChild(tx); svg.appendChild(g);
+}
+function piLabel(k){ // k Vielfache von π/2
+  var s = { "-2":"−π", "-1":"−π/2", "1":"π/2", "2":"π", "3":"3π/2", "4":"2π" }[String(k)];
+  return s || "";
+}
+function zeichne(){
+  YM = yBereich();
+  var svg = document.getElementById("graph");
+  // Auf schmalen Bildschirmen kleinere Zeichenfläche → Beschriftungen bleiben lesbar
+  var schmal = (svg.parentNode.clientWidth || 800) < 600;
+  W = schmal ? 460 : 800; H = schmal ? 400 : 460;
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.innerHTML = "";
+  svg.setAttribute("aria-label", t("aria"));
+  // Gitter + Achsen
+  for(var k = -2; k <= 4; k++){
+    var gx = sx(k * Math.PI / 2);
+    svg.appendChild(el("line", { x1: gx, y1: MT, x2: gx, y2: H - MB, stroke: "#dde3ec", "stroke-width": 1 }));
+    if(k) svg.appendChild(el("text", { x: gx, y: H - MB + 20, "font-size": 14, fill: "#333", "text-anchor": "middle" }, piLabel(k)));
+  }
+  var schritt = YM > 3 ? 1 : 0.5;
+  for(var y = -Math.floor(YM / schritt) * schritt; y <= YM + 1e-9; y += schritt){
+    var gy = sy(y);
+    svg.appendChild(el("line", { x1: ML, y1: gy, x2: W - MR, y2: gy, stroke: "#dde3ec", "stroke-width": 1 }));
+    if(Math.abs(y) > 1e-9) svg.appendChild(el("text", { x: ML - 6, y: gy + 5, "font-size": 13, fill: "#333", "text-anchor": "end" }, zahl(y, 1)));
+  }
+  svg.appendChild(el("line", { x1: ML, y1: sy(0), x2: W - MR, y2: sy(0), stroke: "#555", "stroke-width": 1.5 }));
+  svg.appendChild(el("line", { x1: sx(0), y1: MT, x2: sx(0), y2: H - MB, stroke: "#555", "stroke-width": 1.5 }));
+  svg.appendChild(el("text", { x: sx(0) - 6, y: sy(0) + 16, "font-size": 13, fill: "#333", "text-anchor": "end" }, "0"));
+
+  if(modus === "bsp" && alleZeigen){
+    ["f", "g", "h", "i", "j"].forEach(function(k){ svg.appendChild(kurve(BSP[k], BSP[k].col, k === "f" ? 3 : 2.5)); });
+    var lx = sx(-Math.PI) + 14;
+    ["f", "g", "h", "i", "j"].forEach(function(k){
+      var q = BSP[k]; schild(svg, lx, sy(q.a * Math.sin(q.b * (-Math.PI + 0.15) + q.c) + q.d), k, q.col, "start");
+    });
+    schild(svg, sx(0.75), sy(1.05 + 0.5), "a = 0,5".replace(",", zahl(0.5).indexOf(",") >= 0 ? "," : "."), "#c48a00");
+    schild(svg, sx(Math.PI / 2), sy(-0.15), "b = 2", "#00a651");
+    pfeil(svg, sx(0) + 4, sy(-0.05), sx(Math.PI) - 4, sy(-0.05), "#00a651", true);
+    svg.appendChild(el("line", { x1: sx(-1), y1: sy(0), x2: sx(-1), y2: H - MB, stroke: "#00a3e0", "stroke-width": 2.5, "stroke-dasharray": "3 4" }));
+    schild(svg, sx(-1), sy(-YM + 0.35), "x = −1", "#00a3e0");
+    schild(svg, sx(-1.05), sy(0.55), "c = 1", "#00a3e0", "end");
+    schild(svg, sx(0.2), sy(0.95), "d = " + zahl(0.5), "#e91ee0", "start");
+  } else {
+    var q = P;
+    // Grundfunktion
+    svg.appendChild(kurve({ a:1, b:1, c:0, d:0 }, "#e06666", 2.5, "7 6"));
+    // Ruhelage
+    svg.appendChild(el("line", { x1: ML, y1: sy(q.d), x2: W - MR, y2: sy(q.d), stroke: "#8aa6e6", "stroke-width": 3, "stroke-dasharray": "12 8" }));
+    schild(svg, sx(2.1 * Math.PI), sy(q.d) - 14, t("rest") + " y = " + zahl(q.d), "#5d7fd0", "end");
+    // eigene Kurve
+    svg.appendChild(kurve(q, "#1a2b6b", 4));
+    // Startpunkt der Schwingung (x = −c/b) und Periode
+    var x0 = -q.c / q.b, p = 2 * Math.PI / q.b;
+    while(x0 < X0 + 0.05) x0 += p;
+    while(x0 > X0 + p) x0 -= p;
+    if(Math.abs(q.c) > 1e-9){
+      svg.appendChild(el("line", { x1: sx(-q.c / q.b), y1: MT, x2: sx(-q.c / q.b), y2: H - MB, stroke: "#00a3e0", "stroke-width": 2.5, "stroke-dasharray": "3 4" }));
+      schild(svg, sx(-q.c / q.b), H - MB - 12, "x = " + zahl(-q.c / q.b), "#0083b8");
+    }
+    var py = sy(q.d - Math.abs(q.a) - 0.25 * (YM > 2 ? 1 : 0.6));
+    if(x0 + p <= X1){
+      pfeil(svg, sx(x0) + 2, py, sx(x0 + p) - 2, py, "#6f2da8", true);
+      schild(svg, (sx(x0) + sx(x0 + p)) / 2, py + 16, "p = 2π / " + zahl(q.b) + " ≈ " + zahl(p), "#6f2da8");
+    }
+    // Amplitude am ersten sichtbaren Hochpunkt (bzw. Tiefpunkt bei a < 0)
+    if(Math.abs(q.a) > 1e-9){
+      var xm = (Math.PI / 2 - q.c) / q.b;
+      while(xm < X0 + 0.3) xm += p;
+      while(xm - p > X0 + 0.3) xm -= p;
+      if(xm < X1 - 0.3){
+        pfeil(svg, sx(xm), sy(q.d), sx(xm), sy(q.d + q.a) + (q.a > 0 ? 3 : -3), "#f0a500");
+        schild(svg, sx(xm) + 10, sy(q.d + q.a / 2), "a = " + zahl(q.a), "#c48a00", "start");
+      }
+    }
+    // Legende
+    schild(svg, W - MR - 6, MT + 14, "f(x) = sin(x)", "#d04848", "end");
+  }
+  live();
+}
+function live(){
+  var q = P;
+  var s = 'f(x) = <span class="ka">' + zahl(q.a) + '</span> · sin(<span class="kb">' + zahl(q.b) + '</span> · x ' +
+          (q.c < 0 ? '− ' : '+ ') + '<span class="kc">' + zahl(Math.abs(q.c)) + '</span>) ' +
+          (q.d < 0 ? '− ' : '+ ') + '<span class="kd">' + zahl(Math.abs(q.d)) + '</span>';
+  var box = document.getElementById("live");
+  box.innerHTML = (modus === "bsp" && alleZeigen) ? "" : s;
+  ["a", "b", "c", "d"].forEach(function(k){ document.getElementById("o" + k).textContent = zahl(q[k]); document.getElementById("r" + k).value = q[k]; });
+  document.getElementById("tAmp").innerHTML = t("amp") + " – " + t("here") + ': <b class="ka">a = ' + zahl(Math.abs(q.a)) + '</b>';
+  document.getElementById("tPer").innerHTML = t("per") + " – " + t("here") + ': <b style="color:var(--cp)">p ≈ ' + zahl(2 * Math.PI / q.b) + '</b>';
+  document.getElementById("tRest").innerHTML = t("rest") + " – " + t("here") + ': <b class="kd">y = ' + zahl(q.d) + '</b>';
+}
+function setze(neu){ for(var k in neu) if(k in P) P[k] = neu[k]; zeichne(); }
+function texte(){
+  document.documentElement.lang = lang;
+  document.title = "miStudia – " + t("title");
+  document.getElementById("titel").textContent = t("title");
+  document.getElementById("tVergleich").textContent = t("vergleich");
+  ["A", "B", "C", "D"].forEach(function(K){ document.getElementById("tEff" + K).textContent = t("eff" + K); document.getElementById("tLab" + K).textContent = t("lab" + K); });
+  document.getElementById("tabRegler").textContent = t("tabR");
+  document.getElementById("tabBsp").textContent = t("tabB");
+  document.getElementById("reset").textContent = t("reset");
+  document.getElementById("alle").textContent = alleZeigen ? t("eins") : t("alle");
+  document.getElementById("tAmpTxt").textContent = t("ampTxt");
+  document.getElementById("tPerTxt").textContent = t("perTxt");
+  document.getElementById("tRestTxt").textContent = t("restTxt");
+  document.getElementById("tShift").textContent = t("shift");
+  var dez = zahl(0.5).indexOf(",") >= 0 ? "0,5" : "0.5";
+  document.querySelectorAll(".bsp .kasten").forEach(function(k){ if(/0[.,]5/.test(k.textContent)) k.textContent = dez; });
+  document.querySelectorAll(".bsp .m").forEach(function(m){ if(m.textContent.indexOf("f(x)") === 0) m.textContent = "f(x) = sin(x) = 1 · sin(1 · x + 0) + 0"; });
+  [".info", ".eff", "#titel"].forEach(function(s){ document.querySelectorAll(s).forEach(function(e){ e.dir = lang === "ar" ? "rtl" : "ltr"; }); });
+  zeichne();
+}
+function zeigeModus(m){
+  modus = m;
+  document.getElementById("tabRegler").setAttribute("aria-selected", m === "regler");
+  document.getElementById("tabBsp").setAttribute("aria-selected", m === "bsp");
+  document.getElementById("reglerBox").hidden = m !== "regler";
+  document.getElementById("bspBox").hidden = m !== "bsp";
+  zeichne();
+}
+["a", "b", "c", "d"].forEach(function(k){
+  document.getElementById("r" + k).addEventListener("input", function(){ aktivBsp = null; markiereBsp(); P[k] = parseFloat(this.value); zeichne(); });
+});
+document.querySelectorAll(".klein").forEach(function(b){
+  b.addEventListener("click", function(){
+    var r = document.getElementById("r" + b.dataset.r), st = parseFloat(r.step);
+    var v = Math.round((parseFloat(r.value) + st * parseFloat(b.dataset.s)) / st) * st;
+    v = Math.min(parseFloat(r.max), Math.max(parseFloat(r.min), v));
+    P[b.dataset.r] = Math.round(v * 100) / 100; zeichne();
+  });
+});
+document.getElementById("reset").addEventListener("click", function(){ setze({ a:1, b:1, c:0, d:0 }); });
+document.getElementById("tabRegler").addEventListener("click", function(){ zeigeModus("regler"); });
+var bspGeoeffnet = false;
+document.getElementById("tabBsp").addEventListener("click", function(){
+  if(!bspGeoeffnet){ bspGeoeffnet = true; alleZeigen = true; var al = document.getElementById("alle"); al.setAttribute("aria-pressed", "true"); al.textContent = t("eins"); markiereBsp(); }
+  zeigeModus("bsp");
+});
+function markiereBsp(){ document.querySelectorAll(".bsp").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.bsp === aktivBsp && !alleZeigen); }); }
+document.querySelectorAll(".bsp").forEach(function(b){
+  b.addEventListener("click", function(){
+    alleZeigen = false; aktivBsp = b.dataset.bsp;
+    document.getElementById("alle").setAttribute("aria-pressed", "false");
+    document.getElementById("alle").textContent = t("alle");
+    markiereBsp(); setze(BSP[aktivBsp]);
+  });
+});
+document.getElementById("alle").addEventListener("click", function(){
+  alleZeigen = !alleZeigen;
+  this.setAttribute("aria-pressed", alleZeigen); this.textContent = alleZeigen ? t("eins") : t("alle");
+  markiereBsp(); zeichne();
+});
+var rzT; window.addEventListener("resize", function(){ clearTimeout(rzT); rzT = setTimeout(zeichne, 150); });
+window.MS_LANG = { apply: function(l){ if(L[l]){ lang = l; texte(); } } };
+texte();
+</script>
+<script src="/home-button.js"></script>
+</body>
+</html>
