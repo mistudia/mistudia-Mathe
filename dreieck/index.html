@@ -34,9 +34,10 @@
   .knopf { font: 700 15px system-ui, sans-serif; padding: 9px 16px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
   .knopf.hell { background: #e3eefc; color: var(--blue); }
   .meldung { margin: 8px 0 0; font-weight: 700; } .meldung.gut { color: #1d7a3f; } .meldung.schlecht { color: #b91c1c; }
-  .werkzeuge { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 8px; }
+  .werkzeuge { display: grid; grid-template-columns: repeat(13, 1fr); gap: 6px; margin-bottom: 8px; }
   .wz { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border-radius: 12px; border: 2px solid var(--line); background: #ffffff; color: var(--text); cursor: pointer; font: 600 12px system-ui, sans-serif; min-width: 0; }
   .wz svg { width: 26px; height: 26px; }
+  @media (max-width: 1000px) { .werkzeuge { grid-template-columns: repeat(7, 1fr); } }
   .wz span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .wz[aria-pressed="true"] { border-color: var(--blue); background: #e3eefc; color: var(--blue); }
   .zeile2 { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 6px; min-height: 40px; }
@@ -51,7 +52,15 @@
   .zoomknoepfe button, .aktionen button { width: 42px; height: 42px; border-radius: 10px; border: 2px solid var(--line); background: rgba(255,255,255,0.92); color: var(--text); font: 700 20px system-ui; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
   .aktionen { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
   .aktionen button { width: auto; padding: 0 12px; gap: 6px; font-size: 15px; }
-  .aktionen label { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; margin-inline-start: auto; }
+  .aktionen label { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; }
+  .aktionen label.links { margin-inline-start: auto; cursor: help; }
+  .optionen { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+  .optionen .knopf { padding: 7px 12px; font-size: 14px; }
+  .optionen .knopf[aria-pressed="true"] { background: var(--blue); color: #ffffff; }
+  .feldbox.breit input { width: 170px; }
+  .gdknopf { color: var(--geo) !important; }
+  .gdknopf[aria-pressed="true"] { background: var(--geo) !important; color: #ffffff !important; border-color: var(--geo) !important; }
+  .info { font: 700 16px system-ui; color: #7c3aed; min-height: 0; margin: 4px 0 0; }
   .messung { font: 700 17px system-ui; color: var(--geo); min-height: 1.3em; margin: 6px 0 0; }
   /* SVG-Inhalt */
   .strecke { stroke: #1a2233; stroke-width: 2.2; stroke-linecap: round; }
@@ -71,10 +80,25 @@
   .basis { stroke: var(--geo); stroke-width: 3; }
   .winkelbogen { fill: none; stroke: var(--geo); stroke-width: 2.5; }
   .geo { fill: rgba(13, 148, 136, 0.06); stroke: rgba(13, 148, 136, 0.5); stroke-width: 1.2; }
+  .ref { stroke: #16a34a; stroke-width: 4; fill: none; opacity: 0.55; stroke-linecap: round; }
+  .sym { fill: #15803d; font-weight: 800; paint-order: stroke; stroke: #ffffff; stroke-linejoin: round; font-family: system-ui, sans-serif; }
+  .bem { fill: none; stroke: #7c3aed; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .bemtext { fill: #7c3aed; font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-linejoin: round; font-family: system-ui, sans-serif; }
+  .notiz { fill: #1a2233; paint-order: stroke; stroke: #ffffff; stroke-linejoin: round; font-family: system-ui, sans-serif; font-weight: 600; }
+  .rw { fill: none; stroke: var(--geo); stroke-width: 2; } .rwpunkt { fill: var(--geo); }
+  .strecke.vor.flaeche { fill: rgba(21, 101, 192, 0.06); }
+  .kopie { fill: rgba(124, 58, 237, 0.12); stroke: #7c3aed; stroke-width: 2; stroke-dasharray: 6 4; }
+  .gdkoerper { fill: rgba(13, 148, 136, 0.10); stroke: #0f766e; stroke-width: 1.6; }
+  .gdpar { stroke: rgba(15, 118, 110, 0.35); stroke-width: 0.8; fill: none; }
+  .gdskala { stroke: #0f766e; stroke-width: 0.9; fill: none; }
+  .gdzahl { fill: #0f766e; text-anchor: middle; font-family: system-ui, sans-serif; font-weight: 600; } .gdzahl.klein { fill: rgba(15, 118, 110, 0.75); }
+  .gdgriff circle { fill: rgba(255, 255, 255, 0.92); stroke: #0f766e; stroke-width: 2; }
+  .gdgriff path { fill: none; stroke: #0f766e; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
   @media (max-width: 600px) {
     body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
-    .werkzeuge { grid-template-columns: repeat(4, 1fr); }
+    .werkzeuge { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .wz { padding: 4px 1px; font-size: 11px; border-radius: 10px; } .wz span { white-space: normal; text-overflow: clip; text-align: center; line-height: 1.1; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; } .wz svg { width: 22px; height: 22px; }
     #blatt { height: 56vh; height: 56dvh; }
   }
 </style>
@@ -92,14 +116,20 @@
     <button type="button" class="wz" data-t="punkt"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg><span></span></button>
     <button type="button" class="wz" data-t="lineal"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4" stroke="currentColor" stroke-width="1.6"/></svg><span></span></button>
     <button type="button" class="wz" data-t="zirkel"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 6L6 20M12 6l6 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/><circle cx="12" cy="6" r="2" fill="currentColor"/></svg><span></span></button>
-    <button type="button" class="wz" data-t="geo"><svg viewBox="0 0 24 24"><path d="M2 19h20L12 7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 19a4 4 0 0 1 8 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="kreis"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="geo"><svg viewBox="0 0 24 24"><path d="M4 19h16M4 19L16 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 19a6 6 0 0 0-1.8-4.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="rechteck"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" fill="none" stroke="currentColor" stroke-width="2"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="vieleck"><svg viewBox="0 0 24 24"><path d="M12 3l8.5 6.2-3.2 10H6.7L3.5 9.2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span></span></button>
     <button type="button" class="wz" data-t="messen"><svg viewBox="0 0 24 24"><path d="M4 18L20 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M3 14l3 5M17 3l4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="bemassung"><svg viewBox="0 0 24 24"><path d="M4 6v12M20 6v12M4 12h16M4 12l3-2.5M4 12l3 2.5M20 12l-3-2.5M20 12l-3 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="text"><svg viewBox="0 0 24 24"><path d="M5 6V4h14v2M12 4v16M9 20h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span></span></button>
+    <button type="button" class="wz" data-t="kopieren"><svg viewBox="0 0 24 24"><path d="M3 17L9 6l5 11z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20l6-11 5 11z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-dasharray="2.5 2"/></svg><span></span></button>
     <button type="button" class="wz" data-t="radieren"><svg viewBox="0 0 24 24"><path d="M4 15l8-8 7 7-6 6H8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 20h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span></span></button>
     <button type="button" class="wz" data-t="hand"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg><span></span></button>
   </div>
   <div class="zeile2">
     <label class="feldbox" id="feldbox"><span id="feldlabel"></span><input id="feld" type="text" inputmode="decimal" autocomplete="off"><span id="einheit">cm</span></label>
-    <button type="button" class="knopf hell" id="neuEinstich" hidden></button>
+    <span class="optionen" id="optionen"></span>
   </div>
   <p class="hinweis" id="hinweis"></p>
   <div class="blattbox">
@@ -108,12 +138,15 @@
       <button type="button" id="zplus">+</button>
       <button type="button" id="zminus">−</button>
       <button type="button" id="fit">⤢</button>
+      <button type="button" id="gdBtn" class="gdknopf" aria-pressed="false"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M2 18h20L12 8z" fill="rgba(13,148,136,0.18)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 18v-1.5M8 18v-2.5M11 18v-1.5M14 18v-2.5M17 18v-1.5" stroke="currentColor" stroke-width="1.2"/><path d="M8.5 18a3.5 3.5 0 0 1 7 0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
     </div>
   </div>
   <p class="messung" id="messung" aria-live="polite"></p>
+  <p class="info" id="info" aria-live="polite"></p>
   <div class="aktionen">
     <button type="button" id="rueck">↶ <span></span></button>
     <button type="button" id="leer"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg> <span></span></button>
+    <label id="hilfenBox" class="links"><input type="checkbox" id="hilfen" checked> <span id="tHilfen"></span></label>
     <label><input type="checkbox" id="masse" checked> <span id="tMasse"></span></label>
   </div>
   <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>

@@ -19,16 +19,20 @@
   function el(n, a, txt){ var e = document.createElementNS(NS, n); for(var k in a) e.setAttribute(k, a[k]); if(txt != null) e.textContent = txt; return e; }
 
   // ---------- Zustand (Welt in mm, y nach unten) ----------
-  var S = { pts: [], lines: [], arcs: [], nr: 0 };
+  function leeresBlatt(){ return { pts: [], lines: [], arcs: [], texte: [], dims: [], nr: 0 }; }
+  var S = leeresBlatt();
   var hist = [];
   var tool = "lineal", step = 0, tmp = {};
   var view = { x: -15, y: -15, w: 180, h: 120 };
   var zeigeMasse = true;
   var modus = "frei", aufg = null, meldung = null;
   var schnitte = [], schnitteAlt = true;
+  var hilfen = true, bemArt = "l", letzteKopie = null;
+  // Geodreieck (Overlay): Nullpunkt x/y in mm, Drehung w; lokale Hypotenuse von −80 bis 80 mm, Spitze bei (0, −80)
+  var GD = { on: false, x: 60, y: 60, w: 0 };
 
   function merke(){ hist.push(JSON.stringify(S)); if(hist.length > 100) hist.shift(); schnitteAlt = true; }
-  function rueck(){ if(!hist.length) return; S = JSON.parse(hist.pop()); schnitteAlt = true; reset(); zeichne(); }
+  function rueck(){ if(!hist.length) return; S = JSON.parse(hist.pop()); S.texte = S.texte || []; S.dims = S.dims || []; letzteKopie = null; schnitteAlt = true; reset(); zeichne(); hinweis(); }
   function name(i){ var b = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; return i < 26 ? b[i] : b[i % 26] + "′".repeat(Math.floor(i / 26)); }
   function neuerPunkt(x, y){ var p = { id: ++S.nr, x: x, y: y, n: name(S.pts.length) }; S.pts.push(p); return p; }
   function punkt(id){ for(var i = 0; i < S.pts.length; i++) if(S.pts[i].id === id) return S.pts[i]; return null; }
@@ -99,6 +103,128 @@
     if(f && f.pid) return punkt(f.pid);
     return neuerPunkt(f ? f.x : x, f ? f.y : y);
   }
+
+  // ---------- Fanghilfen (waagrecht, senkrecht, parallel, rechtwinklig, gleich lang, tangential) ----------
+  function modPi(d){ d %= Math.PI; if(d < 0) d += Math.PI; return Math.min(d, Math.PI - d); }
+  function richtungen(){
+    var r = [[0, "—", null], [Math.PI / 2, "|", null]];
+    S.lines.forEach(function(l){ var w = Math.atan2(l.y2 - l.y1, l.x2 - l.x1); r.push([w, "∥", l]); r.push([w + Math.PI / 2, "⊥", l]); });
+    return r;
+  }
+  function richtungsFang(a, b, festL){
+    var L = festL || dist(a, b), w = Math.atan2(b.y - a.y, b.x - a.x), info = null;
+    if(L < 0.5 || !hilfen) return { p: festL ? { x: a.x + L * Math.cos(w), y: a.y + L * Math.sin(w) } : b, info: null };
+    var best = null, bd = 3 * Math.PI / 180;
+    richtungen().forEach(function(c){ var d = modPi(w - c[0]); if(d < bd - 1e-9){ bd = d; best = c; } });
+    if(best){ w = best[0] + Math.round((w - best[0]) / Math.PI) * Math.PI; info = { sym: best[1], ref: best[2] }; }
+    if(!festL){
+      var L0 = L, tol = 8 / ppm(), gl = null;
+      S.lines.forEach(function(l){ var len = Math.hypot(l.x2 - l.x1, l.y2 - l.y1); if(Math.abs(len - L0) < tol){ tol = Math.abs(len - L0); gl = l; L = len; } });
+      if(gl){ info = info || { sym: "", ref: null }; info.gleich = gl; info.sym = (info.sym ? info.sym + " " : "") + "="; }
+    }
+    return { p: { x: a.x + L * Math.cos(w), y: a.y + L * Math.sin(w) }, info: info };
+  }
+  function abstandGerade(p, l){ // Abstand zur Strecke, nur wenn der Lotfußpunkt auf ihr liegt
+    var dx = l.x2 - l.x1, dy = l.y2 - l.y1, A = dx * dx + dy * dy; if(A < 1e-9) return Infinity;
+    var u = ((p.x - l.x1) * dx + (p.y - l.y1) * dy) / A; if(u < 0 || u > 1) return Infinity;
+    return Math.abs((p.x - l.x1) * dy - (p.y - l.y1) * dx) / Math.sqrt(A);
+  }
+  function radFang(c, r){ // Radius so, dass der Kreis eine Linie/einen Kreis berührt
+    if(!hilfen) return null;
+    var tol = 10 / ppm(), best = null;
+    S.lines.forEach(function(l){ var d = abstandGerade(c, l); if(d > 0.5 && Math.abs(d - r) < tol){ tol = Math.abs(d - r); best = { r: d, ref: l }; } });
+    S.arcs.forEach(function(a){ var d = Math.hypot(a.cx - c.x, a.cy - c.y); if(d < 0.01) return;
+      [d - a.r, d + a.r, a.r - d].forEach(function(rr){ if(rr > 0.5 && Math.abs(rr - r) < tol){ tol = Math.abs(rr - r); best = { r: rr, refA: a }; } }); });
+    return best;
+  }
+  // ---------- Geodreieck ----------
+  function gdWelt(lx, ly){ var c = Math.cos(GD.w), s = Math.sin(GD.w); return { x: GD.x + lx * c - ly * s, y: GD.y + lx * s + ly * c }; }
+  function gdLokal(p){ var c = Math.cos(GD.w), s = Math.sin(GD.w), dx = p.x - GD.x, dy = p.y - GD.y; return { x: dx * c + dy * s, y: -dx * s + dy * c }; }
+  function kanteProj(p){ var l = gdLokal(p); return gdWelt(Math.max(-80, Math.min(80, l.x)), 0); }
+  function kanteAbstand(p){ var l = gdLokal(p); return Math.abs(l.x) <= 80 ? Math.abs(l.y) : Infinity; }
+  function kantePunkt(p){ var f = fang(p); if(f && kanteAbstand(f) < 1.2) return { p: { x: f.x, y: f.y }, f: f }; return { p: kanteProj(p), f: null }; }
+  var GRIFF = { zieh: [0, -27], dreh: [0, -68] };
+  function gdGriff(p){
+    if(!GD.on) return null;
+    var tol = 22 / ppm();
+    for(var k in GRIFF){ var q = gdWelt(GRIFF[k][0], GRIFF[k][1]); if(dist(p, q) < tol) return k; }
+    return null;
+  }
+  function gdZiehen(p){
+    tmp.info = null;
+    if(tmp.gd.art === "zieh"){
+      var nx = p.x + tmp.gd.ox, ny = p.y + tmp.gd.oy, f = fang({ x: nx, y: ny });
+      GD.x = f ? f.x : nx; GD.y = f ? f.y : ny;
+    } else {
+      var w = Math.atan2(p.y - GD.y, p.x - GD.x) + Math.PI / 2;
+      w = Math.round(w * 180 / Math.PI) * Math.PI / 180;
+      if(hilfen){
+        var bd = 2 * Math.PI / 180, best = null;
+        richtungen().forEach(function(c){ var d = modPi(w - c[0]); if(d < bd - 1e-9){ bd = d; best = c; } });
+        if(best){ w = best[0] + Math.round((w - best[0]) / Math.PI) * Math.PI; tmp.info = { sym: best[1], ref: best[2] }; }
+      }
+      GD.w = w;
+      var g = Math.round(normWinkel(-w) * 180 / Math.PI) % 180;
+      tmp.info = tmp.info || { sym: "" }; tmp.info.sym = (tmp.info.sym ? tmp.info.sym + "  " : "") + g + "°";
+      tmp.infoPos = gdWelt(0, -68);
+    }
+    zeichne();
+  }
+  function zeichneGeo(){
+    if(!GD.on) return;
+    var k = 1 / ppm(), g = el("g", { "class": "gd", transform: "translate(" + GD.x + " " + GD.y + ") rotate(" + (GD.w * 180 / Math.PI) + ")" });
+    g.appendChild(el("polygon", { points: "-80,0 80,0 0,-80", "class": "gdkoerper", "vector-effect": "non-scaling-stroke" }));
+    var d = "";
+    for(var j = 5; j < 80; j += 5) d += "M" + (-(80 - j) + 1.5) + " " + (-j) + "H" + (80 - j - 1.5);
+    d += "M0 -6V-78";
+    g.appendChild(el("path", { d: d, "class": "gdpar", "vector-effect": "non-scaling-stroke" }));
+    var tk = "";
+    for(var m = -79; m <= 79; m++){ var len = m % 10 === 0 ? 4 : m % 5 === 0 ? 2.6 : 1.5; tk += "M" + m + " 0V" + (-len); }
+    for(var a = 0; a <= 180; a++){
+      var rad = a * Math.PI / 180, r1 = a % 10 === 0 ? 48 : a % 5 === 0 ? 49.6 : 50.6;
+      tk += "M" + (52 * Math.cos(rad)) + " " + (-52 * Math.sin(rad)) + "L" + (r1 * Math.cos(rad)) + " " + (-r1 * Math.sin(rad));
+    }
+    g.appendChild(el("path", { d: tk, "class": "gdskala", "vector-effect": "non-scaling-stroke" }));
+    for(var c = -7; c <= 7; c++) g.appendChild(el("text", { x: c * 10, y: -6, "class": "gdzahl", "font-size": 3 }, String(Math.abs(c))));
+    for(a = 0; a <= 180; a += 10){
+      if(a === 90) continue;
+      rad = a * Math.PI / 180;
+      g.appendChild(el("text", { x: 45 * Math.cos(rad), y: -45 * Math.sin(rad) + 1, "class": "gdzahl", "font-size": 2.6 }, String(a)));
+      g.appendChild(el("text", { x: 40.5 * Math.cos(rad), y: -40.5 * Math.sin(rad) + 1, "class": "gdzahl klein", "font-size": 2 }, String(180 - a)));
+    }
+    // Griffe (Bildschirmgröße)
+    [["zieh", "M0 -8V8M-8 0H8M0 -8l-3 3M0 -8l3 3M0 8l-3 -3M0 8l3 -3M-8 0l3 -3M-8 0l3 3M8 0l-3 -3M8 0l-3 3"],
+     ["dreh", "M5.5 -4A7 7 0 1 0 7 2M5.5 -4l0.5 -4.5M5.5 -4l-4.3 -1"]].forEach(function(h){
+      var q = el("g", { transform: "translate(" + GRIFF[h[0]][0] + " " + GRIFF[h[0]][1] + ") scale(" + k + ")", "class": "gdgriff" });
+      q.appendChild(el("circle", { r: 14 })); q.appendChild(el("path", { d: h[1] })); g.appendChild(q);
+    });
+    svg.appendChild(g);
+  }
+
+  // ---------- Kopieren (kongruente Figuren) ----------
+  function inDreieck(p, P){
+    function s(a, b, c){ return (a.x - c.x) * (b.y - c.y) - (b.x - c.x) * (a.y - c.y); }
+    var d1 = s(p, P[0], P[1]), d2 = s(p, P[1], P[2]), d3 = s(p, P[2], P[0]);
+    return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
+  }
+  function kopieTrafo(f){
+    if(!letzteKopie) return;
+    var lk = letzteKopie; merke(); letzteKopie = lk;
+    lk.pids.forEach(function(id){ var q = punkt(id); if(q){ var r = f(q.x, q.y); q.x = r.x; q.y = r.y; } });
+    lk.lis.forEach(function(i){ var l = S.lines[i]; if(!l) return; var a = f(l.x1, l.y1), b = f(l.x2, l.y2); l.x1 = a.x; l.y1 = a.y; l.x2 = b.x; l.y2 = b.y; });
+    schnitteAlt = true; zeichne(); hinweis();
+  }
+  function kopieMitte(){
+    var x = 0, y = 0, n = 0;
+    letzteKopie.lis.forEach(function(i){ var l = S.lines[i]; if(l){ x += l.x1 + l.x2; y += l.y1 + l.y2; n += 2; } });
+    return n ? { x: x / n, y: y / n } : { x: 0, y: 0 };
+  }
+  function kopieDrehen(g){
+    if(!letzteKopie) return;
+    var c = kopieMitte(), w = g * Math.PI / 180, co = Math.cos(w), si = Math.sin(w);
+    kopieTrafo(function(x, y){ return { x: c.x + (x - c.x) * co - (y - c.y) * si, y: c.y + (x - c.x) * si + (y - c.y) * co }; });
+  }
+  function kopieSpiegeln(){ if(!letzteKopie) return; var c = kopieMitte(); kopieTrafo(function(x, y){ return { x: 2 * c.x - x, y: y }; }); }
 
   // ---------- Dreiecke finden ----------
   function verbunden(p, q){
@@ -175,11 +301,21 @@
     svg.appendChild(el("rect", { x: view.x, y: view.y, width: view.w, height: view.h, fill: "url(#karo)" }));
     S.arcs.forEach(function(a){ svg.appendChild(bogenEl(a, "bogen")); });
     S.lines.forEach(function(l){ svg.appendChild(el("line", { x1: l.x1, y1: l.y1, x2: l.x2, y2: l.y2, "class": "strecke", "vector-effect": "non-scaling-stroke" })); });
+    S.dims.forEach(zeichneBem);
+    S.texte.forEach(function(n){ svg.appendChild(el("text", { x: n.x, y: n.y, "class": "notiz", "font-size": 5, "stroke-width": 1 }, n.s)); });
     // Dreiecke + Maße
     var D = dreiecke();
     if(D.length && (zeigeMasse || modus === "aufg")){
       var d0 = D[D.length - 1];
       svg.appendChild(el("polygon", { points: d0.P.map(function(p){ return p.x + "," + p.y; }).join(" "), "class": "dreieck" }));
+      // rechter Winkel: Quadrat mit Punkt
+      [0, 1, 2].forEach(function(i){
+        var p = d0.P[i], q1 = d0.P[(i + 1) % 3], q2 = d0.P[(i + 2) % 3];
+        if(Math.abs(winkelBei(q1, p, q2) - Math.PI / 2) > 0.004) return;
+        var s = 11 * k, u1 = { x: (q1.x - p.x) / dist(p, q1), y: (q1.y - p.y) / dist(p, q1) }, u2 = { x: (q2.x - p.x) / dist(p, q2), y: (q2.y - p.y) / dist(p, q2) };
+        svg.appendChild(el("path", { d: "M" + (p.x + u1.x * s) + " " + (p.y + u1.y * s) + "L" + (p.x + (u1.x + u2.x) * s) + " " + (p.y + (u1.y + u2.y) * s) + "L" + (p.x + u2.x * s) + " " + (p.y + u2.y * s), "class": "rw", "vector-effect": "non-scaling-stroke" }));
+        svg.appendChild(el("circle", { cx: p.x + (u1.x + u2.x) * s / 2, cy: p.y + (u1.y + u2.y) * s / 2, r: 1.6 * k, "class": "rwpunkt" }));
+      });
       if(zeigeMasse){
         var mx = (d0.P[0].x + d0.P[1].x + d0.P[2].x) / 3, my = (d0.P[0].y + d0.P[1].y + d0.P[2].y) / 3;
         [[1, 2, "a"], [0, 2, "b"], [0, 1, "c"]].forEach(function(s){
@@ -192,6 +328,14 @@
         });
       }
     }
+    // Kongruenz zweier Dreiecke
+    var kon = "";
+    for(var i = 0; i < D.length && !kon; i++) for(var j = i + 1; j < D.length && !kon; j++){
+      var s1 = [D[i].a, D[i].b, D[i].c].sort(function(x, y){ return x - y; }), s2 = [D[j].a, D[j].b, D[j].c].sort(function(x, y){ return x - y; });
+      if(Math.abs(s1[0] - s2[0]) < 0.6 && Math.abs(s1[1] - s2[1]) < 0.6 && Math.abs(s1[2] - s2[2]) < 0.6)
+        kon = t("kongruent", { a: D[i].P.map(function(q){ return q.n; }).join(""), b: D[j].P.map(function(q){ return q.n; }).join("") });
+    }
+    document.getElementById("info").textContent = kon;
     // Punkte
     var dz = D.length ? D[D.length - 1] : null;
     S.pts.forEach(function(p){
@@ -205,18 +349,77 @@
       g.appendChild(text(nx, ny, p.n, "pname", 17));
       svg.appendChild(g);
     });
+    zeichneGeo();
     vorschau();
   }
-  // Werkzeug-Vorschau (Zirkel, Lineal-Linie, Geodreieck)
+  function zeichneBem(d){
+    var k = 1 / ppm(), p, pf = 7 * k;
+    if(d.t === "l"){
+      var dx = d.x2 - d.x1, dy = d.y2 - d.y1, L = Math.hypot(dx, dy) || 1, nx = dy / L, ny = -dx / L, ux = dx / L, uy = dy / L, o = 18 * k;
+      if(ny > 1e-9 || (Math.abs(ny) <= 1e-9 && nx > 0)){ nx = -nx; ny = -ny; }
+      var ax = d.x1 + nx * o, ay = d.y1 + ny * o, bx = d.x2 + nx * o, by = d.y2 + ny * o;
+      p = "M" + (d.x1 + nx * 3 * k) + " " + (d.y1 + ny * 3 * k) + "L" + (ax + nx * 5 * k) + " " + (ay + ny * 5 * k) + "M" + (d.x2 + nx * 3 * k) + " " + (d.y2 + ny * 3 * k) + "L" + (bx + nx * 5 * k) + " " + (by + ny * 5 * k) + "M" + ax + " " + ay + "L" + bx + " " + by;
+      p += "M" + (ax + ux * pf + nx * pf * 0.4) + " " + (ay + uy * pf + ny * pf * 0.4) + "L" + ax + " " + ay + "L" + (ax + ux * pf - nx * pf * 0.4) + " " + (ay + uy * pf - ny * pf * 0.4);
+      p += "M" + (bx - ux * pf + nx * pf * 0.4) + " " + (by - uy * pf + ny * pf * 0.4) + "L" + bx + " " + by + "L" + (bx - ux * pf - nx * pf * 0.4) + " " + (by - uy * pf - ny * pf * 0.4);
+      svg.appendChild(el("path", { d: p, "class": "bem", "vector-effect": "non-scaling-stroke" }));
+      svg.appendChild(text((ax + bx) / 2 + nx * 9 * k, (ay + by) / 2 + ny * 9 * k + 5 * k, cm(L) + " cm", "bemtext", 13));
+    } else {
+      var a1 = Math.atan2(d.y1 - d.sy, d.x1 - d.sx), a2 = Math.atan2(d.y2 - d.sy, d.x2 - d.sx), w = a2 - a1, R = 26 * k;
+      while(w > Math.PI) w -= 2 * Math.PI; while(w <= -Math.PI) w += 2 * Math.PI;
+      p = "M" + (d.sx + R * Math.cos(a1)) + " " + (d.sy + R * Math.sin(a1)) + "A" + R + " " + R + " 0 0 " + (w > 0 ? 1 : 0) + " " + (d.sx + R * Math.cos(a2)) + " " + (d.sy + R * Math.sin(a2));
+      svg.appendChild(el("path", { d: p, "class": "bem", "vector-effect": "non-scaling-stroke" }));
+      var m = a1 + w / 2;
+      svg.appendChild(text(d.sx + (R + 16 * k) * Math.cos(m), d.sy + (R + 16 * k) * Math.sin(m) + 5 * k, grad(Math.abs(w)) + "°", "bemtext", 13));
+    }
+  }
+  function bemMitte(d){
+    if(d.t === "l") return { x: (d.x1 + d.x2) / 2, y: (d.y1 + d.y2) / 2 };
+    var a1 = Math.atan2(d.y1 - d.sy, d.x1 - d.sx), a2 = Math.atan2(d.y2 - d.sy, d.x2 - d.sx), w = a2 - a1;
+    while(w > Math.PI) w -= 2 * Math.PI; while(w <= -Math.PI) w += 2 * Math.PI;
+    var R = 30 / ppm(); return { x: d.sx + R * Math.cos(a1 + w / 2), y: d.sy + R * Math.sin(a1 + w / 2) };
+  }
+  // Werkzeug-Vorschau (Zirkel, Lineal-Linie, Geodreieck, neue Werkzeuge)
   function vorschau(){
     var k = 1 / ppm();
+    if(tmp.info){
+      [tmp.info.ref, tmp.info.gleich].forEach(function(l){ if(l) svg.appendChild(el("line", { x1: l.x1, y1: l.y1, x2: l.x2, y2: l.y2, "class": "ref", "vector-effect": "non-scaling-stroke" })); });
+      if(tmp.info.refA) svg.appendChild(bogenEl(tmp.info.refA, "ref"));
+      var ip = tmp.infoPos || tmp.b || tmp.cur || tmp.stift;
+      if(ip && tmp.info.sym) svg.appendChild(text(ip.x + 14 * k, ip.y + 26 * k, tmp.info.sym, "sym", 18));
+    }
+    if(tool === "kreis" && tmp.c){
+      var rk = feldWert() ? feldWert() * 10 : (tmp.rFix || (tmp.stift ? dist(tmp.c, tmp.stift) : 0));
+      if(rk > 0){
+        var wk = tmp.stift ? Math.atan2(tmp.stift.y - tmp.c.y, tmp.stift.x - tmp.c.x) : -Math.PI / 4;
+        svg.appendChild(el("circle", { cx: tmp.c.x, cy: tmp.c.y, r: rk, "class": "bogen vor", "vector-effect": "non-scaling-stroke" }));
+        svg.appendChild(el("line", { x1: tmp.c.x, y1: tmp.c.y, x2: tmp.c.x + rk * Math.cos(wk), y2: tmp.c.y + rk * Math.sin(wk), "class": "strecke vor", "vector-effect": "non-scaling-stroke" }));
+        svg.appendChild(text(tmp.c.x + rk / 2 * Math.cos(wk) + 8 * k, tmp.c.y + rk / 2 * Math.sin(wk) - 8 * k, "r = " + cm(rk) + " cm", "live", 15));
+      }
+      svg.appendChild(el("circle", { cx: tmp.c.x, cy: tmp.c.y, r: 3 * k, "class": "einstich" }));
+      if(tmp.konz) svg.appendChild(text(tmp.c.x - 22 * k, tmp.c.y - 10 * k, "◎", "sym", 18));
+    }
+    if(tool === "rechteck" && tmp.a && tmp.b){
+      var a = tmp.a, b = tmp.b;
+      svg.appendChild(el("polygon", { points: [a.x, a.y, b.x, a.y, b.x, b.y, a.x, b.y].join(" "), "class": "strecke vor flaeche", "vector-effect": "non-scaling-stroke" }));
+      svg.appendChild(text(Math.min(a.x, b.x), Math.min(a.y, b.y) - 8 * k, cm(Math.abs(b.x - a.x)) + " × " + cm(Math.abs(b.y - a.y)) + " cm", "live", 15));
+    }
+    if(tool === "vieleck" && tmp.poly && tmp.poly.length && tmp.cur){
+      var lp = tmp.poly[tmp.poly.length - 1];
+      svg.appendChild(el("line", { x1: lp.x, y1: lp.y, x2: tmp.cur.x, y2: tmp.cur.y, "class": "strecke vor", "vector-effect": "non-scaling-stroke" }));
+      svg.appendChild(text((lp.x + tmp.cur.x) / 2, (lp.y + tmp.cur.y) / 2 - 10 * k, cm(dist(lp, tmp.cur)) + " cm", "live", 15));
+      if(tmp.poly.length >= 3) svg.appendChild(el("circle", { cx: tmp.poly[0].x, cy: tmp.poly[0].y, r: 10 * k, "class": "fang", "vector-effect": "non-scaling-stroke" }));
+    }
+    if(tool === "kopieren" && tmp.kop){
+      svg.appendChild(el("polygon", { points: tmp.kop.P.map(function(q){ return (q.x + tmp.kop.dx) + "," + (q.y + tmp.kop.dy); }).join(" "), "class": "kopie", "vector-effect": "non-scaling-stroke" }));
+    }
+    if(tool === "bemassung" && tmp.m && tmp.m.length) tmp.m.forEach(function(q){ svg.appendChild(el("circle", { cx: q.x, cy: q.y, r: 8 * k, "class": "fang", "vector-effect": "non-scaling-stroke" })); });
     if(tmp.fang) svg.appendChild(el("circle", { cx: tmp.fang.x, cy: tmp.fang.y, r: 9 * k, "class": "fang", "vector-effect": "non-scaling-stroke" }));
     if(tool === "lineal" && tmp.a && tmp.b){
       svg.appendChild(el("line", { x1: tmp.a.x, y1: tmp.a.y, x2: tmp.b.x, y2: tmp.b.y, "class": "strecke vor", "vector-effect": "non-scaling-stroke" }));
       svg.appendChild(text((tmp.a.x + tmp.b.x) / 2, (tmp.a.y + tmp.b.y) / 2 - 10 * k, cm(dist(tmp.a, tmp.b)) + " cm", "live", 16));
     }
     if(tool === "zirkel" && tmp.c){
-      var c = tmp.c, r = tmp.r || (tmp.stift ? dist(c, tmp.stift) : 0);
+      var c = tmp.c, r = tmp.r || tmp.rFix || (tmp.stift ? dist(c, tmp.stift) : 0);
       if(r > 0){
         svg.appendChild(el("circle", { cx: c.x, cy: c.y, r: r, "class": "hilfskreis", "vector-effect": "non-scaling-stroke" }));
         if(tmp.bogen) svg.appendChild(bogenEl({ cx: c.x, cy: c.y, r: r, a0: tmp.bogen.a0, a1: tmp.bogen.a1 }, "bogen vor"));
@@ -265,6 +468,8 @@
     }
     if(ids.length > 2) return;
     drag = true;
+    var pw = welt(ev), gg = gdGriff(pw);
+    if(gg){ tmp.gd = { art: gg, ox: GD.x - pw.x, oy: GD.y - pw.y }; tmp.infoPos = null; return; }
     if(tool === "hand"){ tmp.pan = { cx: ev.clientX, cy: ev.clientY, v: Object.assign({}, view) }; return; }
     runter(welt(ev));
   });
@@ -279,6 +484,7 @@
       view.x = pinch.m.x - mxp / r.width * view.w; view.y = pinch.m.y - myp / r.height * view.h;
       setzeView(); zeichne(); return;
     }
+    if(drag && tmp.gd){ gdZiehen(welt(ev)); return; }
     if(drag && tool === "hand" && tmp.pan){
       var rr = svg.getBoundingClientRect();
       view.x = tmp.pan.v.x - (ev.clientX - tmp.pan.cx) / rr.width * view.w;
@@ -290,6 +496,7 @@
   function hoch(ev){
     delete zeiger[ev.pointerId];
     if(pinch){ if(!Object.keys(zeiger).length) pinch = null; return; }
+    if(drag && tmp.gd){ drag = false; delete tmp.gd; tmp.info = null; tmp.infoPos = null; zeichne(); return; }
     if(drag){ drag = false; los(welt(ev)); }
   }
   svg.addEventListener("pointerup", hoch);
@@ -297,12 +504,27 @@
   svg.addEventListener("wheel", function(ev){ ev.preventDefault(); var p = welt(ev); zoom(ev.deltaY < 0 ? 1.15 : 1 / 1.15, p.x, p.y); }, { passive: false });
   function hover(p){ if(tool === "hand" || tool === "radieren") return; var f = fang(p); var alt = tmp.fang; tmp.fang = f; if((alt && !f) || f && (!alt || alt.x !== f.x || alt.y !== f.y)) zeichne(); }
 
-  function abbrechen(){ drag = false; if(tool === "lineal") tmp = {}; else if(tool === "zirkel"){ if(tmp.bogen) tmp.bogen = null; else if(!tmp.r){ tmp = {}; step = 0; } } else if(tool === "hand") tmp = {}; zeichne(); hinweis(); }
+  function abbrechen(){ drag = false; delete tmp.gd; tmp.info = null; if(tool === "lineal" || tool === "kreis" || tool === "rechteck" || tool === "kopieren"){ tmp = {}; if(tool === "kreis") step = 0; } else if(tool === "vieleck") tmp.cur = null; else if(tool === "zirkel"){ if(tmp.bogen) tmp.bogen = null; else if(!tmp.r){ tmp = {}; step = 0; } } else if(tool === "hand") tmp = {}; zeichne(); hinweis(); }
   function reset(){ tmp = {}; step = 0; }
 
   function runter(p){
     var f = fang(p);
-    if(tool === "lineal"){ tmp = { a: f || p, af: f, b: f || p }; zeichne(); return; }
+    if(tool === "lineal"){
+      if(GD.on && kanteAbstand(p) < 16 / ppm()){ var kp = kantePunkt(p); tmp = { a: kp.p, af: kp.f, b: kp.p, kante: true }; zeichne(); return; }
+      tmp = { a: f || p, af: f, b: f || p }; zeichne(); return;
+    }
+    if(tool === "kreis"){
+      var kz = f ? S.arcs.filter(function(a){ return Math.abs(a.cx - f.x) < 0.01 && Math.abs(a.cy - f.y) < 0.01; })[0] : null;
+      tmp = { c: f || p, cf: f, stift: null, konz: kz }; step = 1; zeichne(); hinweis(); return;
+    }
+    if(tool === "rechteck"){ tmp = { a: f || p, af: f, b: f || p }; zeichne(); return; }
+    if(tool === "vieleck"){ tmp.poly = tmp.poly || []; tmp.cur = vieleckPunkt(p); zeichne(); return; }
+    if(tool === "kopieren"){
+      var D = dreiecke(), d = null;
+      for(var i = D.length - 1; i >= 0; i--) if(inDreieck(p, D[i].P)){ d = D[i]; break; }
+      if(!d){ tmp = {}; hinweis("hKopieNix"); return; }
+      tmp = { kop: { P: d.P.map(function(q){ return { x: q.x, y: q.y }; }), start: p, dx: 0, dy: 0 } }; zeichne(); return;
+    }
     if(tool === "zirkel"){
       if(step === 2 && tmp.c && tmp.r){ var w = Math.atan2(p.y - tmp.c.y, p.x - tmp.c.x); tmp.bogen = { a0: w, a1: w, last: w }; zeichne(); return; }
       tmp = { c: f || p, cf: f, stift: null }; step = 1; zeichne(); hinweis(); return;
@@ -316,10 +538,36 @@
   function bewegt(p){
     var f;
     if(tool === "lineal" && tmp.a){
-      var L = feldWert();
-      if(L){ var w = Math.atan2(p.y - tmp.a.y, p.x - tmp.a.x); tmp.b = { x: tmp.a.x + L * 10 * Math.cos(w), y: tmp.a.y + L * 10 * Math.sin(w) }; tmp.bf = null; }
+      var L = feldWert(), r;
+      tmp.info = null;
+      if(tmp.kante){
+        if(L){ var q0 = gdLokal(tmp.a).x, q1 = gdLokal(p).x, sg = q1 >= q0 ? 1 : -1; tmp.b = { x: tmp.a.x + sg * L * 10 * Math.cos(GD.w), y: tmp.a.y + sg * L * 10 * Math.sin(GD.w) }; tmp.bf = null; }
+        else { var kp = kantePunkt(p); tmp.b = kp.p; tmp.bf = kp.f; }
+      }
+      else if(L){ r = richtungsFang(tmp.a, p, L * 10); tmp.b = r.p; tmp.bf = null; tmp.info = r.info; }
+      else { f = fang(p); if(f){ tmp.b = f; tmp.bf = f; } else { r = richtungsFang(tmp.a, p); tmp.b = r.p; tmp.bf = null; tmp.info = r.info; } }
+      zeichne(); return;
+    }
+    if(tool === "kreis" && step === 1 && tmp.c){
+      tmp.info = null; tmp.rFix = null;
+      if(!feldWert()){
+        f = fang(p); if(f && f.x === tmp.c.x && f.y === tmp.c.y) f = null; tmp.stift = f || p;
+        if(!f){ var rs = radFang(tmp.c, dist(tmp.c, p)); if(rs){ tmp.rFix = rs.r; tmp.info = { sym: "⌒", ref: rs.ref, refA: rs.refA }; } }
+      } else tmp.stift = p;
+      zeichne(); return;
+    }
+    if(tool === "rechteck" && tmp.a){
+      var wh = feldZwei();
+      if(wh){ tmp.b = { x: tmp.a.x + (p.x >= tmp.a.x ? 1 : -1) * wh[0] * 10, y: tmp.a.y + (p.y >= tmp.a.y ? 1 : -1) * wh[1] * 10 }; tmp.bf = null; }
       else { f = fang(p); tmp.b = f || p; tmp.bf = f; }
       zeichne(); return;
+    }
+    if(tool === "vieleck" && tmp.poly){ tmp.cur = vieleckPunkt(p); zeichne(); return; }
+    if(tool === "kopieren" && tmp.kop){
+      var dx = p.x - tmp.kop.start.x, dy = p.y - tmp.kop.start.y, tol = 18 / ppm(), best = null;
+      tmp.kop.P.forEach(function(v){ S.pts.forEach(function(q){ var dd = Math.hypot(v.x + dx - q.x, v.y + dy - q.y); if(dd < tol){ tol = dd; best = { dx: q.x - v.x, dy: q.y - v.y }; } }); });
+      if(best){ dx = best.dx; dy = best.dy; }
+      tmp.kop.dx = dx; tmp.kop.dy = dy; zeichne(); return;
     }
     if(tool === "zirkel"){
       if(tmp.bogen){
@@ -330,7 +578,11 @@
         if(tmp.bogen.a0 - tmp.bogen.a1 > 2 * Math.PI) tmp.bogen.a1 = tmp.bogen.a0 - 2 * Math.PI;
         zeichne(); return;
       }
-      if(step === 1 && tmp.c && !feldWert()){ f = fang(p); if(f && f.x === tmp.c.x && f.y === tmp.c.y) f = null; tmp.stift = f || p; zeichne(); return; }
+      if(step === 1 && tmp.c && !feldWert()){
+        f = fang(p); if(f && f.x === tmp.c.x && f.y === tmp.c.y) f = null; tmp.stift = f || p; tmp.rFix = null; tmp.info = null;
+        if(!f){ var rz = radFang(tmp.c, dist(tmp.c, p)); if(rz){ tmp.rFix = rz.r; tmp.info = { sym: "⌒", ref: rz.ref, refA: rz.refA }; } }
+        zeichne(); return;
+      }
     }
     if(tool === "geo" && step === 2){ geoWinkel(p); zeichne(); return; }
     if(tool !== "hand"){ tmp.fang = fang(p); zeichne(); }
@@ -364,11 +616,11 @@
         zeichne(); return;
       }
       if(step === 1 && tmp.c){
-        var R = feldWert() ? feldWert() * 10 : (tmp.stift ? dist(tmp.c, tmp.stift) : 0);
+        var R = feldWert() ? feldWert() * 10 : (tmp.rFix || (tmp.stift ? dist(tmp.c, tmp.stift) : 0)); tmp.info = null;
         if(R < 1){ hinweis("hZ0"); zeichne(); return; }
         // Einstich als Punkt festhalten (sonst kann man später nicht messen/verbinden)
         if(!(tmp.cf && tmp.cf.pid)){ merke(); var c = sicherePunkt(tmp.cf, tmp.c.x, tmp.c.y); tmp.c = { x: c.x, y: c.y }; schnitteAlt = true; }
-        tmp.r = R; step = 2; zeichne(); hinweis(); return;
+        tmp.r = R; tmp.rFix = null; step = 2; zeichne(); hinweis(); return;
       }
     }
     if(tool === "geo"){
@@ -389,52 +641,165 @@
       zeichne(); return;
     }
     if(tool === "radieren"){ radiere(p); return; }
+    if(tool === "kreis" && tmp.c){
+      var Rk = feldWert() ? feldWert() * 10 : (tmp.rFix || (tmp.stift ? dist(tmp.c, tmp.stift) : 0));
+      if(Rk < 1){ tmp = {}; step = 0; zeichne(); hinweis(); return; }
+      merke(); var M = sicherePunkt(tmp.cf, tmp.c.x, tmp.c.y);
+      S.arcs.push({ cx: M.x, cy: M.y, r: Rk, a0: 0, a1: 2 * Math.PI }); tmp = {}; step = 0; fertig(); return;
+    }
+    if(tool === "rechteck" && tmp.a){
+      var a = tmp.a, e = tmp.b, ef = tmp.bf, af = tmp.af; tmp = {};
+      if(!e || Math.abs(e.x - a.x) < 1 || Math.abs(e.y - a.y) < 1){ zeichne(); return; }
+      merke();
+      var P1 = sicherePunkt(af, a.x, a.y), P2 = neuerPunkt(e.x, a.y), P3 = sicherePunkt(ef, e.x, e.y), P4 = neuerPunkt(a.x, e.y);
+      [[P1, P2], [P2, P3], [P3, P4], [P4, P1]].forEach(function(s){ S.lines.push({ x1: s[0].x, y1: s[0].y, x2: s[1].x, y2: s[1].y }); });
+      fertig(); return;
+    }
+    if(tool === "vieleck" && tmp.poly){
+      var q = tmp.cur || vieleckPunkt(p), poly = tmp.poly; tmp.cur = null; tmp.info = null;
+      if(poly.length >= 3 && q.f && q.f.pid === poly[0].pid){
+        merke(); var l0 = poly[poly.length - 1]; S.lines.push({ x1: l0.x, y1: l0.y, x2: poly[0].x, y2: poly[0].y }); tmp = {}; fertig(); return;
+      }
+      var last = poly[poly.length - 1];
+      if(last && dist(last, q) < 1){ zeichne(); return; }
+      merke(); var P = sicherePunkt(q.f, q.x, q.y);
+      if(last) S.lines.push({ x1: last.x, y1: last.y, x2: P.x, y2: P.y });
+      poly.push({ x: P.x, y: P.y, pid: P.id }); fertig(); return;
+    }
+    if(tool === "bemassung"){
+      var bq = f ? { x: f.x, y: f.y } : { x: p.x, y: p.y };
+      tmp.m = (tmp.m || []).concat([bq]);
+      if(bemArt === "l" && tmp.m.length === 2){
+        if(dist(tmp.m[0], tmp.m[1]) > 0.5){ merke(); S.dims.push({ t: "l", x1: tmp.m[0].x, y1: tmp.m[0].y, x2: tmp.m[1].x, y2: tmp.m[1].y }); }
+        tmp = {}; fertig(); return;
+      }
+      if(bemArt === "w" && tmp.m.length === 3){
+        var m3 = tmp.m; tmp = {};
+        if(dist(m3[0], m3[1]) > 0.5 && dist(m3[2], m3[1]) > 0.5){ merke(); S.dims.push({ t: "w", x1: m3[0].x, y1: m3[0].y, sx: m3[1].x, sy: m3[1].y, x2: m3[2].x, y2: m3[2].y }); }
+        fertig(); return;
+      }
+      zeichne(); return;
+    }
+    if(tool === "text"){
+      var tx = String(document.getElementById("feld").value).trim();
+      if(!tx){ hinweis("hTextLeer"); document.getElementById("feld").focus(); return; }
+      merke(); S.texte.push({ x: p.x, y: p.y, s: tx }); fertig(); return;
+    }
+    if(tool === "kopieren" && tmp.kop){
+      var kop = tmp.kop; tmp = {};
+      var ddx = kop.dx, ddy = kop.dy;
+      if(Math.hypot(ddx, ddy) < 1){ var xs = kop.P.map(function(v){ return v.x; }); ddx = Math.max.apply(null, xs) - Math.min.apply(null, xs) + 10; ddy = 0; }
+      merke();
+      var neu = [], pids = [], lis = [];
+      kop.P.forEach(function(v){
+        var x = v.x + ddx, y = v.y + ddy, alt = null;
+        S.pts.forEach(function(q){ if(Math.hypot(q.x - x, q.y - y) < 0.01) alt = q; });
+        if(alt) neu.push(alt); else { var np = neuerPunkt(x, y); neu.push(np); pids.push(np.id); }
+      });
+      [[0, 1], [1, 2], [2, 0]].forEach(function(s){ lis.push(S.lines.length); S.lines.push({ x1: neu[s[0]].x, y1: neu[s[0]].y, x2: neu[s[1]].x, y2: neu[s[1]].y }); });
+      letzteKopie = { pids: pids, lis: lis };
+      fertig(); return;
+    }
+  }
+  function vieleckPunkt(p){
+    tmp.info = null;
+    var f = fang(p), last = tmp.poly && tmp.poly.length ? tmp.poly[tmp.poly.length - 1] : null;
+    if(f) return { x: f.x, y: f.y, f: f };
+    if(last){ var r = richtungsFang(last, p); tmp.info = r.info; return { x: r.p.x, y: r.p.y }; }
+    return { x: p.x, y: p.y };
+  }
+  function feldZwei(){
+    var z = String(document.getElementById("feld").value).replace(/,/g, ".").match(/\d+(\.\d+)?/g);
+    if(!z) return null;
+    var w = parseFloat(z[0]), h = z.length > 1 ? parseFloat(z[1]) : w;
+    return w > 0 && h > 0 ? [w, h] : null;
   }
   function fertig(){ schnitteAlt = true; meldung = null; zeichne(); hinweis(); aufgabeAnzeigen(); }
   function radiere(p){
     var tol = 14 / ppm(), best = null, bd = tol;
     S.pts.forEach(function(q, i){ var d = dist(p, q); if(d < bd){ bd = d; best = ["pts", i]; } });
     if(!best){
+      S.texte.forEach(function(n, i){ if(p.x > n.x - 1 && p.x < n.x + n.s.length * 2.9 + 1 && p.y > n.y - 5.5 && p.y < n.y + 1.5){ bd = 0; best = ["texte", i]; } });
+      S.dims.forEach(function(d0, i){ var d = dist(p, bemMitte(d0)); if(d < bd + 2){ bd = d; best = ["dims", i]; } });
+    }
+    if(!best){
       S.lines.forEach(function(l, i){ var d = abstandStrecke(p, l); if(d < bd){ bd = d; best = ["lines", i]; } });
       S.arcs.forEach(function(a, i){ var w = Math.atan2(p.y - a.cy, p.x - a.cx), d = Math.abs(Math.hypot(p.x - a.cx, p.y - a.cy) - a.r); if(d < bd && imBogen(a, w)){ bd = d; best = ["arcs", i]; } });
     }
     if(!best) return;
-    merke(); S[best[0]].splice(best[1], 1); fertig();
+    merke(); S[best[0]].splice(best[1], 1); letzteKopie = null; fertig();
   }
   function meldeMessung(s){ document.getElementById("messung").textContent = s; }
 
   // ---------- Werkzeugleiste ----------
-  var TOOLS = ["punkt", "lineal", "zirkel", "geo", "messen", "radieren", "hand"];
+  var TOOLS = ["punkt", "lineal", "zirkel", "kreis", "geo", "rechteck", "vieleck", "messen", "bemassung", "text", "kopieren", "radieren", "hand"];
+  var FELD = { lineal: ["fLaenge", "cm", "frei"], zirkel: ["fRadius", "cm", "frei"], kreis: ["fRadius", "cm", "frei"], geo: ["fWinkel", "°", "frei"], rechteck: ["fMasse", "cm", "frei2"], text: ["fText", "", "textPh"] };
+  function feldTexte(){
+    var fc = FELD[tool]; if(!fc) return;
+    document.getElementById("feldlabel").textContent = t(fc[0]);
+    document.getElementById("einheit").textContent = fc[1];
+    document.getElementById("feld").placeholder = t(fc[2]);
+  }
   function waehle(tl){
     tool = tl; reset(); tmp = {};
     document.querySelectorAll(".wz").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.t === tl ? "true" : "false"); });
     var feld = document.getElementById("feldbox");
-    feld.hidden = !(tl === "lineal" || tl === "zirkel" || tl === "geo");
-    document.getElementById("feldlabel").textContent = t(tl === "lineal" ? "fLaenge" : tl === "zirkel" ? "fRadius" : "fWinkel");
-    document.getElementById("einheit").textContent = tl === "geo" ? "°" : "cm";
-    document.getElementById("feld").value = "";
+    feld.hidden = !FELD[tl];
+    var fe = document.getElementById("feld");
+    fe.setAttribute("inputmode", tl === "text" ? "text" : "decimal");
+    feld.classList.toggle("breit", tl === "text" || tl === "rechteck");
+    fe.value = "";
+    feldTexte();
     meldeMessung("");
     zeichne(); hinweis();
   }
   function hinweis(key){
     var k = key;
     if(!k){
-      k = tool === "punkt" ? "hPunkt" : tool === "lineal" ? "hLineal" : tool === "messen" ? "hMessen" : tool === "radieren" ? "hRad" : tool === "hand" ? "hHand"
-        : tool === "zirkel" ? (step === 2 ? "hZ2" : step === 1 ? "hZ1" : "hZ0") : (step === 2 ? "hG2" : step === 1 ? "hG1" : "hG0");
+      k = { punkt: "hPunkt", lineal: "hLineal", messen: "hMessen", radieren: "hRad", hand: "hHand", rechteck: "hRechteck", vieleck: "hVieleck", text: "hText", kopieren: "hKopie",
+        bemassung: bemArt === "l" ? "hBemL" : "hBemW", kreis: step === 1 ? "hKreis1" : "hKreis0" }[tool] || (tool === "zirkel" ? (step === 2 ? "hZ2" : step === 1 ? "hZ1" : "hZ0") : (step === 2 ? "hG2" : step === 1 ? "hG1" : "hG0"));
     }
     var h = document.getElementById("hinweis");
     h.textContent = t(k);
     h.classList.toggle("warn", !!key);
-    document.getElementById("neuEinstich").hidden = !(tool === "zirkel" && step === 2);
+    optionen();
+  }
+  // werkzeugabhängige Knöpfe neben dem Eingabefeld (werden bei jedem hinweis() neu beschriftet → Sprachwechsel)
+  function optionen(){
+    var o = document.getElementById("optionen"), B = [];
+    if(tool === "zirkel" && step === 2) B.push(["neuEinstich", t("neuEinstich"), function(){ reset(); zeichne(); hinweis(); }]);
+    if(tool === "vieleck" && tmp.poly && tmp.poly.length) B.push(["fertigV", t("fertig"), function(){ reset(); zeichne(); hinweis(); }]);
+    if(tool === "bemassung"){
+      B.push(["bemL", t("bemLaenge"), function(){ bemArt = "l"; tmp = {}; zeichne(); hinweis(); }, bemArt === "l"]);
+      B.push(["bemW", t("bemWinkel"), function(){ bemArt = "w"; tmp = {}; zeichne(); hinweis(); }, bemArt === "w"]);
+    }
+    if(tool === "kopieren" && letzteKopie){
+      B.push(["drehL", "↺ 15°", function(){ kopieDrehen(-15); }, null, t("drehen")]);
+      B.push(["drehR", "↻ 15°", function(){ kopieDrehen(15); }, null, t("drehen")]);
+      B.push(["spiegeln", t("spiegeln"), kopieSpiegeln]);
+    }
+    o.innerHTML = "";
+    B.forEach(function(b){
+      var e = document.createElement("button"); e.type = "button"; e.className = "knopf hell"; e.id = b[0]; e.textContent = b[1];
+      if(b[3] != null) e.setAttribute("aria-pressed", b[3] ? "true" : "false");
+      if(b[4]) e.title = b[4];
+      e.addEventListener("click", b[2]); o.appendChild(e);
+    });
   }
   document.getElementById("feld").addEventListener("input", function(){ if(tool === "zirkel" && step === 2 && feldWert()){ tmp.r = feldWert() * 10; zeichne(); } });
-  document.getElementById("neuEinstich").addEventListener("click", function(){ reset(); zeichne(); hinweis(); });
   document.getElementById("rueck").addEventListener("click", rueck);
-  document.getElementById("leer").addEventListener("click", function(){ if(!S.pts.length && !S.lines.length && !S.arcs.length) return; merke(); S = { pts: [], lines: [], arcs: [], nr: 0 }; reset(); fertig(); });
+  document.getElementById("leer").addEventListener("click", function(){ if(!S.pts.length && !S.lines.length && !S.arcs.length && !S.texte.length && !S.dims.length) return; merke(); S = leeresBlatt(); letzteKopie = null; reset(); fertig(); });
   document.getElementById("fit").addEventListener("click", einpassen);
   document.getElementById("zplus").addEventListener("click", function(){ zoom(1.3); });
   document.getElementById("zminus").addEventListener("click", function(){ zoom(1 / 1.3); });
   document.getElementById("masse").addEventListener("change", function(){ zeigeMasse = this.checked; zeichne(); });
+  document.getElementById("hilfen").addEventListener("change", function(){ hilfen = this.checked; });
+  document.getElementById("gdBtn").addEventListener("click", function(){
+    GD.on = !GD.on; this.setAttribute("aria-pressed", GD.on ? "true" : "false");
+    if(GD.on){ GD.w = 0; GD.x = view.x + view.w / 2; GD.y = view.y + view.h / 2 + Math.min(40, view.h / 4); }
+    zeichne();
+    var h = document.getElementById("hinweis"); h.classList.remove("warn"); h.textContent = GD.on ? t("hGeo") : ""; if(!GD.on) hinweis();
+  });
   TOOLS.forEach(function(tl){ document.querySelector('.wz[data-t="' + tl + '"]').addEventListener("click", function(){ waehle(tl); }); });
   document.addEventListener("keydown", function(e){ if((e.ctrlKey || e.metaKey) && e.key === "z"){ e.preventDefault(); rueck(); } if(e.key === "Escape"){ abbrechen(); reset(); zeichne(); hinweis(); } });
   window.addEventListener("resize", function(){ zeichne(); });
@@ -483,7 +848,7 @@
     if(meldung) h += '<p class="meldung ' + meldung[0] + '">' + meldung[1] + "</p>";
     box.innerHTML = h;
     document.getElementById("pruefen").addEventListener("click", pruefen);
-    document.getElementById("neuA").addEventListener("click", function(){ merke(); S = { pts: [], lines: [], arcs: [], nr: 0 }; reset(); neueAufgabe(); fertig(); einpassenStart(); });
+    document.getElementById("neuA").addEventListener("click", function(){ merke(); S = leeresBlatt(); letzteKopie = null; reset(); neueAufgabe(); fertig(); einpassenStart(); });
   }
   function pruefen(){
     var D = dreiecke(), soll = [aufg.m.a, aufg.m.b, aufg.m.c].sort(function(x, y){ return x - y; }), best = null, be = 1e9;
@@ -524,10 +889,10 @@
     document.getElementById("rueck").title = t("rueck"); document.getElementById("rueck").querySelector("span").textContent = t("rueck");
     document.getElementById("leer").title = t("leer"); document.getElementById("leer").querySelector("span").textContent = t("leer");
     document.getElementById("fit").title = t("fit"); document.getElementById("zplus").title = t("zplus"); document.getElementById("zminus").title = t("zminus");
-    document.getElementById("neuEinstich").textContent = t("neuEinstich");
     document.getElementById("tMasse").textContent = t("masse");
-    document.getElementById("feld").placeholder = t("frei");
-    document.getElementById("feldlabel").textContent = t(tool === "lineal" ? "fLaenge" : tool === "zirkel" ? "fRadius" : "fWinkel");
+    feldTexte();
+    document.getElementById("gdBtn").title = t("geoEin"); document.getElementById("gdBtn").setAttribute("aria-label", t("geoEin"));
+    document.getElementById("tHilfen").textContent = t("hilfen"); document.getElementById("hilfenBox").title = t("hilfenTitel");
     hinweis(); aufgabeAnzeigen(); zeichne();
   }
   window.MS_LANG = { apply: function(l){ if(DT[l]){ lang = l; texte(); } } };
