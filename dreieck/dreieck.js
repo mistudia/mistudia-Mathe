@@ -27,14 +27,18 @@
   var zeigeMasse = true;
   var modus = "frei", aufg = null, meldung = null;
   var schnitte = [], schnitteAlt = true;
-  var hilfen = true, bemArt = "l", letzteKopie = null;
+  var hilfen = true, bemArt = "l", letzteKopie = null, raster = false, auswahl = null, zukunft = [];
   // Geodreieck (Overlay): Nullpunkt x/y in mm, Drehung w; lokale Hypotenuse von −80 bis 80 mm, Spitze bei (0, −80)
   var GD = { on: false, x: 60, y: 60, w: 0 };
 
-  function merke(){ hist.push(JSON.stringify(S)); if(hist.length > 100) hist.shift(); schnitteAlt = true; }
-  function rueck(){ if(!hist.length) return; S = JSON.parse(hist.pop()); S.texte = S.texte || []; S.dims = S.dims || []; letzteKopie = null; schnitteAlt = true; reset(); zeichne(); hinweis(); }
+  function merke(){ hist.push(JSON.stringify(S)); if(hist.length > 100) hist.shift(); zukunft = []; auswahl = null; schnitteAlt = true; }
+  function laden(json){ S = JSON.parse(json); S.texte = S.texte || []; S.dims = S.dims || []; letzteKopie = null; auswahl = null; schnitteAlt = true; reset(); speichern(); zeichne(); hinweis(); }
+  function rueck(){ if(!hist.length) return; zukunft.push(JSON.stringify(S)); laden(hist.pop()); }
+  function vor(){ if(!zukunft.length) return; hist.push(JSON.stringify(S)); laden(zukunft.pop()); }
+  function speichern(){ try{ localStorage.setItem("msDreieckBlatt", JSON.stringify(S)); }catch(e){} }
   function name(i){ var b = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; return i < 26 ? b[i] : b[i % 26] + "′".repeat(Math.floor(i / 26)); }
-  function neuerPunkt(x, y){ var p = { id: ++S.nr, x: x, y: y, n: name(S.pts.length) }; S.pts.push(p); return p; }
+  function freierName(){ for(var i = 0; ; i++){ var n = name(i); if(!S.pts.some(function(q){ return q.n === n; })) return n; } }
+  function neuerPunkt(x, y){ var p = { id: ++S.nr, x: x, y: y, n: freierName() }; S.pts.push(p); return p; }
   function punkt(id){ for(var i = 0; i < S.pts.length; i++) if(S.pts[i].id === id) return S.pts[i]; return null; }
 
   // ---------- Geometrie ----------
@@ -97,6 +101,7 @@
     schnittpunkte().forEach(function(q){ var d = dist(p, q); if(d < bd){ bd = d; best = { x: q.x, y: q.y, schnitt: true }; } });
     if(best) return best;
     S.lines.forEach(function(l){ [{ x: l.x1, y: l.y1 }, { x: l.x2, y: l.y2 }].forEach(function(q){ var d = dist(p, q); if(d < bd){ bd = d; best = { x: q.x, y: q.y }; } }); });
+    if(!best && raster) best = { x: Math.round(p.x / 5) * 5, y: Math.round(p.y / 5) * 5, raster: true };
     return best;
   }
   function sicherePunkt(f, x, y){ // vorhandenen Punkt nehmen oder neuen anlegen
@@ -119,7 +124,7 @@
     if(best){ w = best[0] + Math.round((w - best[0]) / Math.PI) * Math.PI; info = { sym: best[1], ref: best[2] }; }
     if(!festL){
       var L0 = L, tol = 8 / ppm(), gl = null;
-      S.lines.forEach(function(l){ var len = Math.hypot(l.x2 - l.x1, l.y2 - l.y1); if(Math.abs(len - L0) < tol){ tol = Math.abs(len - L0); gl = l; L = len; } });
+      S.lines.forEach(function(l){ var len = Math.hypot(l.x2 - l.x1, l.y2 - l.y1); if(!l.h && Math.abs(len - L0) < tol){ tol = Math.abs(len - L0); gl = l; L = len; } });
       if(gl){ info = info || { sym: "", ref: null }; info.gleich = gl; info.sym = (info.sym ? info.sym + " " : "") + "="; }
     }
     return { p: { x: a.x + L * Math.cos(w), y: a.y + L * Math.sin(w) }, info: info };
@@ -226,9 +231,202 @@
   }
   function kopieSpiegeln(){ if(!letzteKopie) return; var c = kopieMitte(); kopieTrafo(function(x, y){ return { x: 2 * c.x - x, y: y }; }); }
 
+  // ---------- Konstruieren (wie GeoGebra): Mittelpunkt, Lot, Parallele, Mittelsenkrechte, Winkelhalbierende, Kreis durch 3 Punkte ----------
+  var KONSTR = ["mitte", "lot", "parallele", "msenk", "whalb", "kreis3"];
+  function linieBei(p){ var tol = 14 / ppm(), best = -1; S.lines.forEach(function(l, i){ var d = abstandStrecke(p, l); if(d < tol){ tol = d; best = i; } }); return best; }
+  function hilfslinie(q, dx, dy, L){ var n = Math.hypot(dx, dy) || 1; dx /= n; dy /= n; S.lines.push({ x1: q.x - dx * L, y1: q.y - dy * L, x2: q.x + dx * L, y2: q.y + dy * L, h: 1 }); }
+  function abstandUnendlich(p, l){ var dx = l.x2 - l.x1, dy = l.y2 - l.y1, n = Math.hypot(dx, dy) || 1; return Math.abs((p.x - l.x1) * dy - (p.y - l.y1) * dx) / n; }
+  function punktDa(q){ return S.pts.some(function(r){ return dist(r, q) < 0.01; }); }
+  function konstruiere(p){
+    var f = fang(p), q = f ? { x: f.x, y: f.y } : null;
+    if(tool === "lot" || tool === "parallele"){
+      if(step === 0){ var i = linieBei(p); if(i < 0){ hinweis("hLinieWaehlen"); return; } tmp = { l: S.lines[i] }; step = 1; zeichne(); hinweis(); return; }
+      var z = q || p, l = tmp.l, dx = l.x2 - l.x1, dy = l.y2 - l.y1, L;
+      if(tool === "lot"){ var t0 = dx; dx = -dy; dy = t0; L = Math.max(60, abstandUnendlich(z, l) + 30); } else L = Math.max(60, Math.hypot(l.x2 - l.x1, l.y2 - l.y1) * 0.75);
+      merke(); hilfslinie(z, dx, dy, L); reset(); fertig(); return;
+    }
+    if(tool === "mitte" || tool === "msenk"){
+      var A, B;
+      if(q){ tmp.m = (tmp.m || []).concat([q]); if(tmp.m.length < 2){ zeichne(); return; } A = tmp.m[0]; B = tmp.m[1]; }
+      else {
+        if(tmp.m && tmp.m.length){ zeichne(); return; }
+        var i2 = linieBei(p); if(i2 < 0){ hinweis("hLinieWaehlen"); return; }
+        var l2 = S.lines[i2]; A = { x: l2.x1, y: l2.y1 }; B = { x: l2.x2, y: l2.y2 };
+      }
+      tmp = {};
+      if(dist(A, B) < 0.5){ zeichne(); return; }
+      var M = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+      merke();
+      if(tool === "mitte"){ if(!punktDa(M)) neuerPunkt(M.x, M.y); }
+      else hilfslinie(M, -(B.y - A.y), B.x - A.x, Math.max(40, dist(A, B) * 0.8));
+      fertig(); return;
+    }
+    // whalb, kreis3: drei Punkte
+    tmp.m = (tmp.m || []).concat([q || { x: p.x, y: p.y }]);
+    if(tmp.m.length < 3){ zeichne(); return; }
+    var P = tmp.m; tmp = {};
+    if(tool === "whalb"){
+      var S0 = P[1], u1 = { x: P[0].x - S0.x, y: P[0].y - S0.y }, u2 = { x: P[2].x - S0.x, y: P[2].y - S0.y }, n1 = Math.hypot(u1.x, u1.y), n2 = Math.hypot(u2.x, u2.y);
+      if(n1 < 0.5 || n2 < 0.5){ zeichne(); return; }
+      var bx = u1.x / n1 + u2.x / n2, by = u1.y / n1 + u2.y / n2;
+      if(Math.hypot(bx, by) < 1e-6){ bx = -u1.y / n1; by = u1.x / n1; }
+      var bn = Math.hypot(bx, by), Lw = Math.max(60, Math.max(n1, n2) * 1.2);
+      merke(); S.lines.push({ x1: S0.x, y1: S0.y, x2: S0.x + bx / bn * Lw, y2: S0.y + by / bn * Lw, h: 1 }); fertig(); return;
+    }
+    var ax = P[0].x, ay = P[0].y, bx2 = P[1].x, by2 = P[1].y, cx = P[2].x, cy = P[2].y, d = 2 * (ax * (by2 - cy) + bx2 * (cy - ay) + cx * (ay - by2));
+    if(Math.abs(d) < 1e-3){ zeichne(); hinweis("hKollinear"); return; }
+    var a2 = ax * ax + ay * ay, b2 = bx2 * bx2 + by2 * by2, c2 = cx * cx + cy * cy;
+    var ux = (a2 * (by2 - cy) + b2 * (cy - ay) + c2 * (ay - by2)) / d, uy = (a2 * (cx - bx2) + b2 * (ax - cx) + c2 * (bx2 - ax)) / d;
+    merke(); S.arcs.push({ cx: ux, cy: uy, r: Math.hypot(ax - ux, ay - uy), a0: 0, a1: 2 * Math.PI });
+    if(!punktDa({ x: ux, y: uy })) neuerPunkt(ux, uy);
+    fertig();
+  }
+
+  // ---------- Trimmen (wie Onshape): Stück bis zu den nächsten Schnittpunkten entfernen ----------
+  function winkelVon(a, p){ return Math.atan2(p.y - a.cy, p.x - a.cx); }
+  function punkteAuf(typ, idx){
+    var o = typ === "l" ? S.lines[idx] : S.arcs[idx], r = [];
+    S.lines.forEach(function(l, i){
+      if(typ === "l" && i === idx) return;
+      r = r.concat(typ === "l" ? ll(o, l) : kl(o, l).filter(function(q){ return imBogen(o, winkelVon(o, q)); }));
+    });
+    S.arcs.forEach(function(a, i){
+      if(typ === "a" && i === idx) return;
+      if(typ === "l") r = r.concat(kl(a, o).filter(function(q){ return imBogen(a, winkelVon(a, q)); }));
+      else if(Math.abs(a.cx - o.cx) > 1e-6 || Math.abs(a.cy - o.cy) > 1e-6) r = r.concat(kk(o, a).filter(function(q){ return imBogen(o, winkelVon(o, q)) && imBogen(a, winkelVon(a, q)); }));
+    });
+    S.pts.forEach(function(q){
+      var d = typ === "l" ? abstandStrecke(q, o) : Math.abs(Math.hypot(q.x - o.cx, q.y - o.cy) - o.r);
+      if(d < 0.3 && (typ === "l" || imBogen(o, winkelVon(o, q)))) r.push({ x: q.x, y: q.y });
+    });
+    return r;
+  }
+  function trimme(p){
+    var tol = 14 / ppm(), best = null, eps = 1e-4;
+    S.lines.forEach(function(l, i){ var d = abstandStrecke(p, l); if(d < tol){ tol = d; best = ["l", i]; } });
+    S.arcs.forEach(function(a, i){ var d = Math.abs(Math.hypot(p.x - a.cx, p.y - a.cy) - a.r); if(d < tol && imBogen(a, winkelVon(a, p))){ tol = d; best = ["a", i]; } });
+    if(!best){ hinweis("hTrimNix"); return; }
+    var Q = punkteAuf(best[0], best[1]);
+    merke(); letzteKopie = null;
+    if(best[0] === "l"){
+      var l = S.lines[best[1]], dx = l.x2 - l.x1, dy = l.y2 - l.y1, A = dx * dx + dy * dy || 1;
+      var us = Q.map(function(q){ return ((q.x - l.x1) * dx + (q.y - l.y1) * dy) / A; }).filter(function(u){ return u > eps && u < 1 - eps; });
+      var u0 = Math.max(0, Math.min(1, ((p.x - l.x1) * dx + (p.y - l.y1) * dy) / A)), lo = 0, hi = 1;
+      us.forEach(function(u){ if(u < u0 && u > lo) lo = u; if(u > u0 && u < hi) hi = u; });
+      var neu = [];
+      var st = function(a, b){ var o = { x1: l.x1 + a * dx, y1: l.y1 + a * dy, x2: l.x1 + b * dx, y2: l.y1 + b * dy }; if(l.h) o.h = 1; return o; };
+      if(lo > eps) neu.push(st(0, lo)); if(hi < 1 - eps) neu.push(st(hi, 1));
+      Array.prototype.splice.apply(S.lines, [best[1], 1].concat(neu));
+    } else {
+      var a = S.arcs[best[1]], s0 = Math.min(a.a0, a.a1), e0 = Math.max(a.a0, a.a1), voll = e0 - s0 >= 2 * Math.PI - 1e-6, span = voll ? 2 * Math.PI : e0 - s0;
+      var ts = Q.map(function(q){ return normWinkel(winkelVon(a, q) - s0); }).filter(function(t){ return voll || (t > eps && t < span - eps); }).sort(function(x, y){ return x - y; });
+      var t1 = normWinkel(winkelVon(a, p) - s0), neuA = [];
+      var bg = function(x, y){ return { cx: a.cx, cy: a.cy, r: a.r, a0: x, a1: y }; };
+      if(voll){
+        if(ts.length >= 2){
+          var lo2 = null, hi2 = null;
+          ts.forEach(function(t){ if(t < t1) lo2 = t; if(t > t1 && hi2 === null) hi2 = t; });
+          if(lo2 === null) lo2 = ts[ts.length - 1] - 2 * Math.PI; if(hi2 === null) hi2 = ts[0] + 2 * Math.PI;
+          if(lo2 + 2 * Math.PI - hi2 > eps) neuA.push(bg(s0 + hi2, s0 + lo2 + 2 * Math.PI));
+        }
+      } else {
+        var lo3 = 0, hi3 = span;
+        ts.forEach(function(t){ if(t < t1 && t > lo3) lo3 = t; if(t > t1 && t < hi3) hi3 = t; });
+        if(lo3 > eps) neuA.push(bg(s0, s0 + lo3)); if(hi3 < span - eps) neuA.push(bg(s0 + hi3, e0));
+      }
+      Array.prototype.splice.apply(S.arcs, [best[1], 1].concat(neuA));
+    }
+    fertig();
+  }
+
+  // ---------- Auswählen (Fenster wie im CAD), verschieben, löschen; Punkte ziehen ----------
+  function leereAuswahl(){ return { pts: [], lines: [], arcs: [], texte: [], dims: [] }; }
+  function auswahlZahl(){ return auswahl ? auswahl.pts.length + auswahl.lines.length + auswahl.arcs.length + auswahl.texte.length + auswahl.dims.length : 0; }
+  function bogenProben(a){ var s0 = Math.min(a.a0, a.a1), e0 = Math.max(a.a0, a.a1), r = []; for(var i = 0; i <= 48; i++){ var w = s0 + (e0 - s0) * i / 48; r.push({ x: a.cx + a.r * Math.cos(w), y: a.cy + a.r * Math.sin(w) }); } return r; }
+  function textBox(n){ return [{ x: n.x, y: n.y - 5 }, { x: n.x + n.s.length * 2.9, y: n.y + 1 }]; }
+  function inRect(q, R){ return q.x >= R.x0 && q.x <= R.x1 && q.y >= R.y0 && q.y <= R.y1; }
+  function streckeTrifft(l, R){
+    if(inRect({ x: l.x1, y: l.y1 }, R) || inRect({ x: l.x2, y: l.y2 }, R)) return true;
+    return [[R.x0, R.y0, R.x1, R.y0], [R.x1, R.y0, R.x1, R.y1], [R.x1, R.y1, R.x0, R.y1], [R.x0, R.y1, R.x0, R.y0]].some(function(e){ return ll(l, { x1: e[0], y1: e[1], x2: e[2], y2: e[3] }).length > 0; });
+  }
+  function fensterWahl(a, b){
+    var R = { x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: Math.min(a.y, b.y), y1: Math.max(a.y, b.y) }, kreuz = b.x < a.x, W = leereAuswahl();
+    var test = function(P){ return kreuz ? P.some(function(q){ return inRect(q, R); }) : P.every(function(q){ return inRect(q, R); }); };
+    S.pts.forEach(function(q){ if(inRect(q, R)) W.pts.push(q.id); });
+    S.lines.forEach(function(l, i){ if(kreuz ? streckeTrifft(l, R) : test([{ x: l.x1, y: l.y1 }, { x: l.x2, y: l.y2 }])) W.lines.push(i); });
+    S.arcs.forEach(function(c, i){ if(test(bogenProben(c))) W.arcs.push(i); });
+    S.texte.forEach(function(n, i){ var B = textBox(n); if(kreuz ? !(B[1].x < R.x0 || B[0].x > R.x1 || B[1].y < R.y0 || B[0].y > R.y1) : test(B)) W.texte.push(i); });
+    S.dims.forEach(function(d, i){ if(test(d.t === "l" ? [{ x: d.x1, y: d.y1 }, { x: d.x2, y: d.y2 }] : [{ x: d.x1, y: d.y1 }, { x: d.sx, y: d.sy }, { x: d.x2, y: d.y2 }])) W.dims.push(i); });
+    return W;
+  }
+  function treffer(p){ // nächstes Element unter dem Finger: [Art, Index]
+    var tol = 14 / ppm(), best = null, bd = tol;
+    S.pts.forEach(function(q, i){ var d = dist(p, q); if(d < bd){ bd = d; best = ["pts", i]; } });
+    if(best) return best;
+    S.texte.forEach(function(n, i){ if(p.x > n.x - 1 && p.x < n.x + n.s.length * 2.9 + 1 && p.y > n.y - 5.5 && p.y < n.y + 1.5){ bd = 0; best = ["texte", i]; } });
+    S.dims.forEach(function(d0, i){ var d = dist(p, bemMitte(d0)); if(d < bd + 2){ bd = d; best = ["dims", i]; } });
+    if(best) return best;
+    S.lines.forEach(function(l, i){ var d = abstandStrecke(p, l); if(d < bd){ bd = d; best = ["lines", i]; } });
+    S.arcs.forEach(function(a, i){ var d = Math.abs(Math.hypot(p.x - a.cx, p.y - a.cy) - a.r); if(d < bd && imBogen(a, winkelVon(a, p))){ bd = d; best = ["arcs", i]; } });
+    return best;
+  }
+  function auswahlAus(tr){ var W = leereAuswahl(); if(tr[0] === "pts") W.pts.push(S.pts[tr[1]].id); else W[tr[0]].push(tr[1]); return W; }
+  function imAuswahl(tr){ if(!auswahl || !tr) return false; return tr[0] === "pts" ? auswahl.pts.indexOf(S.pts[tr[1]].id) >= 0 : auswahl[tr[0]].indexOf(tr[1]) >= 0; }
+  function verschiebeAuswahl(orig, dx, dy){
+    S = JSON.parse(orig);
+    var A = auswahl, alt = [];
+    A.pts.forEach(function(id){ var q = punkt(id); if(q){ alt.push({ x: q.x, y: q.y }); q.x += dx; q.y += dy; } });
+    var haengt = function(x, y){ return alt.some(function(o){ return Math.abs(o.x - x) < 0.01 && Math.abs(o.y - y) < 0.01; }); };
+    S.lines.forEach(function(l, i){ var g = A.lines.indexOf(i) >= 0; if(g || haengt(l.x1, l.y1)){ l.x1 += dx; l.y1 += dy; } if(g || haengt(l.x2, l.y2)){ l.x2 += dx; l.y2 += dy; } });
+    S.arcs.forEach(function(a, i){ if(A.arcs.indexOf(i) >= 0 || haengt(a.cx, a.cy)){ a.cx += dx; a.cy += dy; } });
+    S.texte.forEach(function(n, i){ if(A.texte.indexOf(i) >= 0){ n.x += dx; n.y += dy; } });
+    S.dims.forEach(function(d, i){
+      var g = A.dims.indexOf(i) >= 0;
+      if(g || haengt(d.x1, d.y1)){ d.x1 += dx; d.y1 += dy; } if(g || haengt(d.x2, d.y2)){ d.x2 += dx; d.y2 += dy; }
+      if(d.t === "w" && (g || haengt(d.sx, d.sy))){ d.sx += dx; d.sy += dy; }
+    });
+    schnitteAlt = true;
+  }
+  function auswahlLoeschen(){
+    if(!auswahlZahl()) return;
+    var A = auswahl; merke();
+    S.pts = S.pts.filter(function(q){ return A.pts.indexOf(q.id) < 0; });
+    ["lines", "arcs", "texte", "dims"].forEach(function(k){ S[k] = S[k].filter(function(x, i){ return A[k].indexOf(i) < 0; }); });
+    auswahl = null; letzteKopie = null; fertig();
+  }
+  function allesWaehlen(){
+    auswahl = leereAuswahl();
+    S.pts.forEach(function(q){ auswahl.pts.push(q.id); });
+    ["lines", "arcs", "texte", "dims"].forEach(function(k){ S[k].forEach(function(x, i){ auswahl[k].push(i); }); });
+    if(!auswahlZahl()) auswahl = null;
+    zeichne(); hinweis();
+  }
+
+  // ---------- Bild speichern (PNG) ----------
+  function bildSpeichern(){
+    var gdAn = GD.on, tAlt = tmp, aAlt = auswahl; GD.on = false; tmp = {}; auswahl = null; zeichne();
+    var w = svg.clientWidth, h = svg.clientHeight, klon = svg.cloneNode(true), css = "";
+    GD.on = gdAn; tmp = tAlt; auswahl = aAlt; zeichne();
+    Array.prototype.forEach.call(document.styleSheets, function(sh){ try{ Array.prototype.forEach.call(sh.cssRules, function(r){ css += r.cssText + "\n"; }); }catch(e){} });
+    klon.insertBefore(el("rect", { x: view.x, y: view.y, width: view.w, height: view.h, fill: "#ffffff" }), klon.firstChild);
+    klon.insertBefore(el("style", {}, css), klon.firstChild);
+    klon.setAttribute("xmlns", NS); klon.setAttribute("width", w); klon.setAttribute("height", h);
+    var img = new Image();
+    img.onload = function(){
+      var c = document.createElement("canvas"), f = 2; c.width = w * f; c.height = h * f;
+      var g = c.getContext("2d"); g.fillStyle = "#ffffff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob(function(b){
+        if(!b) return;
+        var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "konstruktion.png";
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 3000);
+      }, "image/png");
+    };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(klon));
+  }
+
   // ---------- Dreiecke finden ----------
   function verbunden(p, q){
-    return S.lines.some(function(l){ return abstandStrecke(p, l) < 0.6 && abstandStrecke(q, l) < 0.6; });
+    return S.lines.some(function(l){ return !l.h && abstandStrecke(p, l) < 0.6 && abstandStrecke(q, l) < 0.6; });
   }
   function dreiecke(){
     var P = S.pts, n = P.length, r = [];
@@ -270,7 +468,8 @@
   function einpassen(){
     var xs = [], ys = [];
     S.pts.forEach(function(p){ xs.push(p.x); ys.push(p.y); });
-    S.lines.forEach(function(l){ xs.push(l.x1, l.x2); ys.push(l.y1, l.y2); });
+    S.lines.forEach(function(l){ if(!l.h){ xs.push(l.x1, l.x2); ys.push(l.y1, l.y2); } });
+    S.texte.forEach(function(n){ xs.push(n.x, n.x + n.s.length * 2.9); ys.push(n.y - 5, n.y); });
     S.arcs.forEach(function(a){ xs.push(a.cx - a.r, a.cx + a.r); ys.push(a.cy - a.r, a.cy + a.r); });
     if(!xs.length){ view = { x: -15, y: -15, w: 180, h: 120 }; setzeView(); zeichne(); return; }
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
@@ -296,11 +495,11 @@
     while(svg.lastChild) svg.removeChild(svg.lastChild);
     // Karopapier (5 mm)
     var defs = el("defs", {}), pat = el("pattern", { id: "karo", width: 5, height: 5, patternUnits: "userSpaceOnUse" });
-    pat.appendChild(el("path", { d: "M5 0L0 0L0 5", fill: "none", stroke: "#b9d3ee", "stroke-width": 0.6, "vector-effect": "non-scaling-stroke" }));
+    pat.appendChild(el("path", { d: "M5 0L0 0L0 5", fill: "none", stroke: "#7fa8d6", "stroke-width": 0.9, "vector-effect": "non-scaling-stroke" }));
     defs.appendChild(pat); svg.appendChild(defs);
     svg.appendChild(el("rect", { x: view.x, y: view.y, width: view.w, height: view.h, fill: "url(#karo)" }));
     S.arcs.forEach(function(a){ svg.appendChild(bogenEl(a, "bogen")); });
-    S.lines.forEach(function(l){ svg.appendChild(el("line", { x1: l.x1, y1: l.y1, x2: l.x2, y2: l.y2, "class": "strecke", "vector-effect": "non-scaling-stroke" })); });
+    S.lines.forEach(function(l){ svg.appendChild(el("line", { x1: l.x1, y1: l.y1, x2: l.x2, y2: l.y2, "class": l.h ? "strecke hilf" : "strecke", "vector-effect": "non-scaling-stroke" })); });
     S.dims.forEach(zeichneBem);
     S.texte.forEach(function(n){ svg.appendChild(el("text", { x: n.x, y: n.y, "class": "notiz", "font-size": 5, "stroke-width": 1 }, n.s)); });
     // Dreiecke + Maße
@@ -335,7 +534,21 @@
       if(Math.abs(s1[0] - s2[0]) < 0.6 && Math.abs(s1[1] - s2[1]) < 0.6 && Math.abs(s1[2] - s2[2]) < 0.6)
         kon = t("kongruent", { a: D[i].P.map(function(q){ return q.n; }).join(""), b: D[j].P.map(function(q){ return q.n; }).join("") });
     }
-    document.getElementById("info").textContent = kon;
+    var inf = [];
+    if(D.length && zeigeMasse){
+      var dU = D[D.length - 1], sU = (dU.a + dU.b + dU.c) / 2, fl = Math.sqrt(Math.max(0, sU * (sU - dU.a) * (sU - dU.b) * (sU - dU.c)));
+      inf.push(t("umfang", { n: dU.P.map(function(q){ return q.n; }).join(""), u: cm(dU.a + dU.b + dU.c), a: zahl(fl / 100, 2) }));
+    }
+    if(kon) inf.push(kon);
+    document.getElementById("info").textContent = inf.join("\n");
+    // Auswahl hervorheben
+    if(auswahl){
+      auswahl.lines.forEach(function(i){ var l = S.lines[i]; if(l) svg.appendChild(el("line", { x1: l.x1, y1: l.y1, x2: l.x2, y2: l.y2, "class": "sel", "vector-effect": "non-scaling-stroke" })); });
+      auswahl.arcs.forEach(function(i){ if(S.arcs[i]) svg.appendChild(bogenEl(S.arcs[i], "sel")); });
+      auswahl.texte.forEach(function(i){ var n = S.texte[i]; if(!n) return; var B = textBox(n); svg.appendChild(el("rect", { x: B[0].x - 1, y: B[0].y - 1, width: B[1].x - B[0].x + 2, height: B[1].y - B[0].y + 2, "class": "selbox", "vector-effect": "non-scaling-stroke" })); });
+      auswahl.dims.forEach(function(i){ if(S.dims[i]){ var m = bemMitte(S.dims[i]); svg.appendChild(el("circle", { cx: m.x, cy: m.y, r: 9 * k, "class": "selp", "vector-effect": "non-scaling-stroke" })); } });
+      auswahl.pts.forEach(function(id){ var q = punkt(id); if(q) svg.appendChild(el("circle", { cx: q.x, cy: q.y, r: 10 * k, "class": "selp", "vector-effect": "non-scaling-stroke" })); });
+    }
     // Punkte
     var dz = D.length ? D[D.length - 1] : null;
     S.pts.forEach(function(p){
@@ -351,6 +564,7 @@
     });
     zeichneGeo();
     vorschau();
+    document.getElementById("rueck").disabled = !hist.length; document.getElementById("vor").disabled = !zukunft.length;
   }
   function zeichneBem(d){
     var k = 1 / ppm(), p, pf = 7 * k;
@@ -412,7 +626,19 @@
     if(tool === "kopieren" && tmp.kop){
       svg.appendChild(el("polygon", { points: tmp.kop.P.map(function(q){ return (q.x + tmp.kop.dx) + "," + (q.y + tmp.kop.dy); }).join(" "), "class": "kopie", "vector-effect": "non-scaling-stroke" }));
     }
-    if(tool === "bemassung" && tmp.m && tmp.m.length) tmp.m.forEach(function(q){ svg.appendChild(el("circle", { cx: q.x, cy: q.y, r: 8 * k, "class": "fang", "vector-effect": "non-scaling-stroke" })); });
+    if(tmp.rahmen){
+      var ra = tmp.rahmen.a, rb = tmp.rahmen.b;
+      svg.appendChild(el("rect", { x: Math.min(ra.x, rb.x), y: Math.min(ra.y, rb.y), width: Math.abs(rb.x - ra.x), height: Math.abs(rb.y - ra.y), "class": rb.x < ra.x ? "rahmen kreuz" : "rahmen", "vector-effect": "non-scaling-stroke" }));
+    }
+    if((tool === "lot" || tool === "parallele") && tmp.l){
+      var tl0 = tmp.l;
+      svg.appendChild(el("line", { x1: tl0.x1, y1: tl0.y1, x2: tl0.x2, y2: tl0.y2, "class": "ref", "vector-effect": "non-scaling-stroke" }));
+      if(tmp.cur){
+        var ddx = tl0.x2 - tl0.x1, ddy = tl0.y2 - tl0.y1, dn = Math.hypot(ddx, ddy) || 1; if(tool === "lot"){ var sw = ddx; ddx = -ddy; ddy = sw; }
+        svg.appendChild(el("line", { x1: tmp.cur.x - ddx / dn * 80, y1: tmp.cur.y - ddy / dn * 80, x2: tmp.cur.x + ddx / dn * 80, y2: tmp.cur.y + ddy / dn * 80, "class": "strecke hilf vor", "vector-effect": "non-scaling-stroke" }));
+      }
+    }
+    if(tmp.m && tmp.m.length) tmp.m.forEach(function(q){ svg.appendChild(el("circle", { cx: q.x, cy: q.y, r: 8 * k, "class": "fang", "vector-effect": "non-scaling-stroke" })); });
     if(tmp.fang) svg.appendChild(el("circle", { cx: tmp.fang.x, cy: tmp.fang.y, r: 9 * k, "class": "fang", "vector-effect": "non-scaling-stroke" }));
     if(tool === "lineal" && tmp.a && tmp.b){
       svg.appendChild(el("line", { x1: tmp.a.x, y1: tmp.a.y, x2: tmp.b.x, y2: tmp.b.y, "class": "strecke vor", "vector-effect": "non-scaling-stroke" }));
@@ -502,9 +728,9 @@
   svg.addEventListener("pointerup", hoch);
   svg.addEventListener("pointercancel", function(ev){ delete zeiger[ev.pointerId]; pinch = null; if(drag){ drag = false; abbrechen(); } });
   svg.addEventListener("wheel", function(ev){ ev.preventDefault(); var p = welt(ev); zoom(ev.deltaY < 0 ? 1.15 : 1 / 1.15, p.x, p.y); }, { passive: false });
-  function hover(p){ if(tool === "hand" || tool === "radieren") return; var f = fang(p); var alt = tmp.fang; tmp.fang = f; if((alt && !f) || f && (!alt || alt.x !== f.x || alt.y !== f.y)) zeichne(); }
+  function hover(p){ if(tool === "hand" || tool === "radieren" || tool === "auswahl" || tool === "trimmen") return; var f = fang(p); var alt = tmp.fang; tmp.fang = f; if((alt && !f) || f && (!alt || alt.x !== f.x || alt.y !== f.y)) zeichne(); }
 
-  function abbrechen(){ drag = false; delete tmp.gd; tmp.info = null; if(tool === "lineal" || tool === "kreis" || tool === "rechteck" || tool === "kopieren"){ tmp = {}; if(tool === "kreis") step = 0; } else if(tool === "vieleck") tmp.cur = null; else if(tool === "zirkel"){ if(tmp.bogen) tmp.bogen = null; else if(!tmp.r){ tmp = {}; step = 0; } } else if(tool === "hand") tmp = {}; zeichne(); hinweis(); }
+  function abbrechen(){ drag = false; delete tmp.gd; tmp.info = null; if(tool === "auswahl"){ if(tmp.zieh && tmp.zieh.moved){ var aw = auswahl; S = JSON.parse(tmp.zieh.orig); hist.pop(); auswahl = aw; schnitteAlt = true; } tmp = {}; } else if(KONSTR.indexOf(tool) >= 0 || tool === "trimmen"){ tmp = {}; step = 0; } else if(tool === "lineal" || tool === "kreis" || tool === "rechteck" || tool === "kopieren"){ tmp = {}; if(tool === "kreis") step = 0; } else if(tool === "vieleck") tmp.cur = null; else if(tool === "zirkel"){ if(tmp.bogen) tmp.bogen = null; else if(!tmp.r){ tmp = {}; step = 0; } } else if(tool === "hand") tmp = {}; zeichne(); hinweis(); }
   function reset(){ tmp = {}; step = 0; }
 
   function runter(p){
@@ -518,6 +744,13 @@
       tmp = { c: f || p, cf: f, stift: null, konz: kz }; step = 1; zeichne(); hinweis(); return;
     }
     if(tool === "rechteck"){ tmp = { a: f || p, af: f, b: f || p }; zeichne(); return; }
+    if(tool === "auswahl"){
+      var tr = treffer(p);
+      if(tr && tr[0] === "pts" && !imAuswahl(tr)) auswahl = auswahlAus(tr); // Punkt direkt ziehen (Zugmodus)
+      if(auswahlZahl() && imAuswahl(tr)){ tmp = { zieh: { start: p, orig: JSON.stringify(S), p0: tr[0] === "pts" ? { x: S.pts[tr[1]].x, y: S.pts[tr[1]].y } : null, moved: false } }; zeichne(); return; }
+      tmp = { rahmen: { a: p, b: p } }; return;
+    }
+    if((tool === "lot" || tool === "parallele") && step === 1){ tmp.cur = f ? { x: f.x, y: f.y } : p; zeichne(); return; }
     if(tool === "vieleck"){ tmp.poly = tmp.poly || []; tmp.cur = vieleckPunkt(p); zeichne(); return; }
     if(tool === "kopieren"){
       var D = dreiecke(), d = null;
@@ -563,6 +796,17 @@
       zeichne(); return;
     }
     if(tool === "vieleck" && tmp.poly){ tmp.cur = vieleckPunkt(p); zeichne(); return; }
+    if(tool === "auswahl"){
+      if(tmp.zieh){
+        var zx = p.x - tmp.zieh.start.x, zy = p.y - tmp.zieh.start.y;
+        if(!tmp.zieh.moved){ if(Math.hypot(zx, zy) * ppm() < 4) return; var aw = auswahl; merke(); auswahl = aw; tmp.zieh.moved = true; }
+        if(tmp.zieh.p0 && raster){ zx = Math.round((tmp.zieh.p0.x + zx) / 5) * 5 - tmp.zieh.p0.x; zy = Math.round((tmp.zieh.p0.y + zy) / 5) * 5 - tmp.zieh.p0.y; }
+        verschiebeAuswahl(tmp.zieh.orig, zx, zy); zeichne(); return;
+      }
+      if(tmp.rahmen){ tmp.rahmen.b = p; zeichne(); return; }
+      return;
+    }
+    if((tool === "lot" || tool === "parallele") && step === 1){ f = fang(p); tmp.cur = f ? { x: f.x, y: f.y } : p; zeichne(); return; }
     if(tool === "kopieren" && tmp.kop){
       var dx = p.x - tmp.kop.start.x, dy = p.y - tmp.kop.start.y, tol = 18 / ppm(), best = null;
       tmp.kop.P.forEach(function(v){ S.pts.forEach(function(q){ var dd = Math.hypot(v.x + dx - q.x, v.y + dy - q.y); if(dd < tol){ tol = dd; best = { dx: q.x - v.x, dy: q.y - v.y }; } }); });
@@ -641,6 +885,19 @@
       zeichne(); return;
     }
     if(tool === "radieren"){ radiere(p); return; }
+    if(tool === "trimmen"){ trimme(p); return; }
+    if(KONSTR.indexOf(tool) >= 0){ tmp.fang = null; tmp.cur = null; konstruiere(p); return; }
+    if(tool === "auswahl"){
+      if(tmp.zieh){ var mv = tmp.zieh.moved; tmp = {}; if(mv) fertig(); else { zeichne(); hinweis(); } return; }
+      if(tmp.rahmen){
+        var rr = tmp.rahmen; tmp = {};
+        if(dist(rr.a, rr.b) * ppm() < 6){ var tq = treffer(p); auswahl = tq ? auswahlAus(tq) : null; }
+        else auswahl = fensterWahl(rr.a, rr.b);
+        if(!auswahlZahl()) auswahl = null;
+        zeichne(); hinweis(); return;
+      }
+      return;
+    }
     if(tool === "kreis" && tmp.c){
       var Rk = feldWert() ? feldWert() * 10 : (tmp.rFix || (tmp.stift ? dist(tmp.c, tmp.stift) : 0));
       if(Rk < 1){ tmp = {}; step = 0; zeichne(); hinweis(); return; }
@@ -714,25 +971,23 @@
     var w = parseFloat(z[0]), h = z.length > 1 ? parseFloat(z[1]) : w;
     return w > 0 && h > 0 ? [w, h] : null;
   }
-  function fertig(){ schnitteAlt = true; meldung = null; zeichne(); hinweis(); aufgabeAnzeigen(); }
+  function fertig(){ schnitteAlt = true; meldung = null; speichern(); zeichne(); hinweis(); aufgabeAnzeigen(); }
   function radiere(p){
-    var tol = 14 / ppm(), best = null, bd = tol;
-    S.pts.forEach(function(q, i){ var d = dist(p, q); if(d < bd){ bd = d; best = ["pts", i]; } });
-    if(!best){
-      S.texte.forEach(function(n, i){ if(p.x > n.x - 1 && p.x < n.x + n.s.length * 2.9 + 1 && p.y > n.y - 5.5 && p.y < n.y + 1.5){ bd = 0; best = ["texte", i]; } });
-      S.dims.forEach(function(d0, i){ var d = dist(p, bemMitte(d0)); if(d < bd + 2){ bd = d; best = ["dims", i]; } });
-    }
-    if(!best){
-      S.lines.forEach(function(l, i){ var d = abstandStrecke(p, l); if(d < bd){ bd = d; best = ["lines", i]; } });
-      S.arcs.forEach(function(a, i){ var w = Math.atan2(p.y - a.cy, p.x - a.cx), d = Math.abs(Math.hypot(p.x - a.cx, p.y - a.cy) - a.r); if(d < bd && imBogen(a, w)){ bd = d; best = ["arcs", i]; } });
-    }
+    var best = treffer(p);
     if(!best) return;
     merke(); S[best[0]].splice(best[1], 1); letzteKopie = null; fertig();
   }
   function meldeMessung(s){ document.getElementById("messung").textContent = s; }
 
   // ---------- Werkzeugleiste ----------
-  var TOOLS = ["punkt", "lineal", "zirkel", "kreis", "geo", "rechteck", "vieleck", "messen", "bemassung", "text", "kopieren", "radieren", "hand"];
+  var GRUPPEN = { zeichnen: ["punkt", "lineal", "zirkel", "kreis", "geo", "rechteck", "vieleck"], konstr: ["mitte", "lot", "parallele", "msenk", "whalb", "kreis3"],
+    messen: ["messen", "bemassung", "text"], bearb: ["auswahl", "trimmen", "kopieren", "radieren", "hand"] };
+  var TOOLS = [].concat(GRUPPEN.zeichnen, GRUPPEN.konstr, GRUPPEN.messen, GRUPPEN.bearb), gruppe = "zeichnen";
+  function zeigeGruppe(g){
+    gruppe = g;
+    document.querySelectorAll(".kat").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.k === g ? "true" : "false"); });
+    document.querySelectorAll(".wz").forEach(function(b){ b.hidden = GRUPPEN[g].indexOf(b.dataset.t) < 0; });
+  }
   var FELD = { lineal: ["fLaenge", "cm", "frei"], zirkel: ["fRadius", "cm", "frei"], kreis: ["fRadius", "cm", "frei"], geo: ["fWinkel", "°", "frei"], rechteck: ["fMasse", "cm", "frei2"], text: ["fText", "", "textPh"] };
   function feldTexte(){
     var fc = FELD[tool]; if(!fc) return;
@@ -742,6 +997,8 @@
   }
   function waehle(tl){
     tool = tl; reset(); tmp = {};
+    if(tl !== "auswahl") auswahl = null;
+    for(var g in GRUPPEN) if(GRUPPEN[g].indexOf(tl) >= 0 && g !== gruppe) zeigeGruppe(g);
     document.querySelectorAll(".wz").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.t === tl ? "true" : "false"); });
     var feld = document.getElementById("feldbox");
     feld.hidden = !FELD[tl];
@@ -757,7 +1014,8 @@
     var k = key;
     if(!k){
       k = { punkt: "hPunkt", lineal: "hLineal", messen: "hMessen", radieren: "hRad", hand: "hHand", rechteck: "hRechteck", vieleck: "hVieleck", text: "hText", kopieren: "hKopie",
-        bemassung: bemArt === "l" ? "hBemL" : "hBemW", kreis: step === 1 ? "hKreis1" : "hKreis0" }[tool] || (tool === "zirkel" ? (step === 2 ? "hZ2" : step === 1 ? "hZ1" : "hZ0") : (step === 2 ? "hG2" : step === 1 ? "hG1" : "hG0"));
+        bemassung: bemArt === "l" ? "hBemL" : "hBemW", kreis: step === 1 ? "hKreis1" : "hKreis0",
+        mitte: "hMitte", lot: step === 1 ? "hLot1" : "hLot0", parallele: step === 1 ? "hPar1" : "hPar0", msenk: "hMsenk", whalb: "hWhalb", kreis3: "hKreis3", auswahl: "hAuswahl", trimmen: "hTrim" }[tool] || (tool === "zirkel" ? (step === 2 ? "hZ2" : step === 1 ? "hZ1" : "hZ0") : (step === 2 ? "hG2" : step === 1 ? "hG1" : "hG0"));
     }
     var h = document.getElementById("hinweis");
     h.textContent = t(k);
@@ -772,6 +1030,10 @@
     if(tool === "bemassung"){
       B.push(["bemL", t("bemLaenge"), function(){ bemArt = "l"; tmp = {}; zeichne(); hinweis(); }, bemArt === "l"]);
       B.push(["bemW", t("bemWinkel"), function(){ bemArt = "w"; tmp = {}; zeichne(); hinweis(); }, bemArt === "w"]);
+    }
+    if(tool === "auswahl"){
+      B.push(["alle", t("alle"), allesWaehlen]);
+      if(auswahlZahl()){ B.push(["loeschen", t("loeschen", { n: auswahlZahl() }), auswahlLoeschen]); B.push(["aufheben", t("aufheben"), function(){ auswahl = null; zeichne(); hinweis(); }]); }
     }
     if(tool === "kopieren" && letzteKopie){
       B.push(["drehL", "↺ 15°", function(){ kopieDrehen(-15); }, null, t("drehen")]);
@@ -788,6 +1050,10 @@
   }
   document.getElementById("feld").addEventListener("input", function(){ if(tool === "zirkel" && step === 2 && feldWert()){ tmp.r = feldWert() * 10; zeichne(); } });
   document.getElementById("rueck").addEventListener("click", rueck);
+  document.getElementById("vor").addEventListener("click", vor);
+  document.getElementById("bild").addEventListener("click", bildSpeichern);
+  document.getElementById("raster").addEventListener("change", function(){ raster = this.checked; try{ localStorage.setItem("msDreieckRaster", raster ? "1" : "0"); }catch(e){} });
+  document.querySelectorAll(".kat").forEach(function(b){ b.addEventListener("click", function(){ zeigeGruppe(b.dataset.k); if(GRUPPEN[b.dataset.k].indexOf(tool) < 0) waehle(GRUPPEN[b.dataset.k][0]); }); });
   document.getElementById("leer").addEventListener("click", function(){ if(!S.pts.length && !S.lines.length && !S.arcs.length && !S.texte.length && !S.dims.length) return; merke(); S = leeresBlatt(); letzteKopie = null; reset(); fertig(); });
   document.getElementById("fit").addEventListener("click", einpassen);
   document.getElementById("zplus").addEventListener("click", function(){ zoom(1.3); });
@@ -801,7 +1067,16 @@
     var h = document.getElementById("hinweis"); h.classList.remove("warn"); h.textContent = GD.on ? t("hGeo") : ""; if(!GD.on) hinweis();
   });
   TOOLS.forEach(function(tl){ document.querySelector('.wz[data-t="' + tl + '"]').addEventListener("click", function(){ waehle(tl); }); });
-  document.addEventListener("keydown", function(e){ if((e.ctrlKey || e.metaKey) && e.key === "z"){ e.preventDefault(); rueck(); } if(e.key === "Escape"){ abbrechen(); reset(); zeichne(); hinweis(); } });
+  document.addEventListener("keydown", function(e){
+    var imFeld = e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA");
+    var k = (e.key || "").toLowerCase();
+    if((e.ctrlKey || e.metaKey) && (k === "y" || (k === "z" && e.shiftKey))){ e.preventDefault(); vor(); return; }
+    if((e.ctrlKey || e.metaKey) && k === "z"){ e.preventDefault(); rueck(); return; }
+    if(imFeld) return;
+    if((e.ctrlKey || e.metaKey) && k === "a"){ e.preventDefault(); if(tool !== "auswahl") waehle("auswahl"); allesWaehlen(); return; }
+    if((e.key === "Delete" || e.key === "Backspace") && auswahlZahl()){ e.preventDefault(); auswahlLoeschen(); return; }
+    if(e.key === "Escape"){ abbrechen(); reset(); if(tool === "auswahl") auswahl = null; zeichne(); hinweis(); }
+  });
   window.addEventListener("resize", function(){ zeichne(); });
 
   // ---------- Aufgaben ----------
@@ -886,7 +1161,10 @@
     document.getElementById("titel").textContent = t("titel");
     document.getElementById("tabFrei").textContent = t("tabFrei"); document.getElementById("tabAufg").textContent = t("tabAufg");
     TOOLS.forEach(function(tl){ var b = document.querySelector('.wz[data-t="' + tl + '"]'); b.querySelector("span").textContent = t("w_" + tl); b.title = t("w_" + tl); });
-    document.getElementById("rueck").title = t("rueck"); document.getElementById("rueck").querySelector("span").textContent = t("rueck");
+    ["rueck", "vor"].forEach(function(id){ var b = document.getElementById(id); b.title = t(id); b.setAttribute("aria-label", t(id)); });
+    document.querySelectorAll(".kat").forEach(function(b){ b.textContent = t("k_" + b.dataset.k); });
+    document.getElementById("bild").title = t("bild"); document.getElementById("bild").querySelector("span").textContent = t("bild");
+    document.getElementById("tRaster").textContent = t("raster");
     document.getElementById("leer").title = t("leer"); document.getElementById("leer").querySelector("span").textContent = t("leer");
     document.getElementById("fit").title = t("fit"); document.getElementById("zplus").title = t("zplus"); document.getElementById("zminus").title = t("zminus");
     document.getElementById("tMasse").textContent = t("masse");
@@ -896,8 +1174,15 @@
     hinweis(); aufgabeAnzeigen(); zeichne();
   }
   window.MS_LANG = { apply: function(l){ if(DT[l]){ lang = l; texte(); } } };
+  var hatBlatt = false;
+  try{
+    var gs = JSON.parse(localStorage.getItem("msDreieckBlatt") || "null");
+    if(gs && Array.isArray(gs.pts) && Array.isArray(gs.lines) && Array.isArray(gs.arcs)){ S = gs; S.texte = S.texte || []; S.dims = S.dims || []; S.nr = S.nr || 0; hatBlatt = S.pts.length + S.lines.length + S.arcs.length + S.texte.length > 0; }
+    raster = localStorage.getItem("msDreieckRaster") === "1"; document.getElementById("raster").checked = raster;
+  }catch(e){}
+  zeigeGruppe("zeichnen");
   waehle("lineal");
   setzeModus("frei");
   texte();
-  setTimeout(zeichne, 50);
+  setTimeout(function(){ if(hatBlatt) einpassen(); else zeichne(); }, 50);
 })();
