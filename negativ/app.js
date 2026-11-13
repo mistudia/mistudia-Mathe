@@ -23,6 +23,7 @@
   function zk(v){ return v < 0 ? "(" + z(v) + ")" : z(v); } // in Klammern, wenn negativ
   function lies(s){ s = String(s).trim().replace(/[−–]/g, "-").replace(",", ".").replace(/\s/g, ""); if(s === "" || s === "-") return NaN; return Number(s); }
   function zuf(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+  function sicht(e, an){ if(an) e.removeAttribute("hidden"); else e.setAttribute("hidden", ""); } // SVG kennt .hidden nicht
   function bdi(s){ return '<bdi dir="ltr">' + s + "</bdi>"; }
 
   // ---------- Zahlenstrahl ----------
@@ -212,9 +213,9 @@
   function zeigeAufgabe(){
     $("auftrag").innerHTML = aufgabeText();
     $("meldung").textContent = ""; $("meldung").className = "meldung";
-    $("zsLoes").hidden = true;
+    sicht($("zsLoes"), false);
     var zs = $("zsUeb");
-    zs.hidden = auf.typ !== "ablesen";
+    sicht(zs, auf.typ === "ablesen");
     if(auf.typ === "ablesen") zahlenstrahl(zs, { min: -20, max: 20, marken: [{ v: auf.a, text: "?" }] });
     var z2 = $("antwortzeile"); z2.innerHTML = "";
     if(auf.typ === "vergleich"){
@@ -245,7 +246,7 @@
     var s = $("zsLoes"), B;
     if(auf.typ === "temp" || auf.typ === "plusminus" || (auf.typ === "maldurch" && auf.op === "*")){
       var L = loesung(auf.a, auf.op, auf.b); B = bereich(L.werte, 20);
-      zahlenstrahl(s, { min: B.min, max: B.max, pfeile: L.pfeile, marken: [{ v: L.r, text: z(L.r) }] }); s.hidden = false;
+      zahlenstrahl(s, { min: B.min, max: B.max, pfeile: L.pfeile, marken: [{ v: L.r, text: z(L.r) }] }); sicht(s, true);
       if(!ok) m.innerHTML += '<br><span class="muted" style="font-weight:400">' + L.schritte.join(" · ") + "</span>";
     } else if(auf.typ === "maldurch" && !ok){
       m.innerHTML += '<br><span class="muted" style="font-weight:400">' + loesung(auf.a, auf.op, auf.b).schritte.join(" · ") + "</span>";
@@ -253,7 +254,7 @@
       var mk = auf.typ === "vergleich" ? [{ v: auf.a, text: z(auf.a) }, { v: auf.b, cls: "b", text: z(auf.b) }] : auf.typ === "ablesen" ? [{ v: auf.a, text: z(auf.a) }] : [{ v: auf.a, text: z(auf.a) }, { v: -auf.a, cls: "b", text: z(-auf.a) }];
       var pf = auf.typ === "betrag" ? [{ von: 0, bis: auf.a, cls: auf.a < 0 ? "minus" : "plus", text: String(Math.abs(auf.a)) }] : [];
       B = bereich(mk.map(function(q){ return q.v; }), 20);
-      zahlenstrahl(s, { min: B.min, max: B.max, marken: auf.typ === "betrag" ? [mk[0]] : mk, pfeile: pf }); s.hidden = false;
+      zahlenstrahl(s, { min: B.min, max: B.max, marken: auf.typ === "betrag" ? [mk[0]] : mk, pfeile: pf }); sicht(s, true);
       if(auf.typ === "vergleich" && !ok) m.innerHTML += '<br><span class="muted" style="font-weight:400">' + t("vErkl", { k: bdi(z(Math.min(auf.a, auf.b))), g: bdi(z(Math.max(auf.a, auf.b))) }) + "</span>";
     }
     $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });
