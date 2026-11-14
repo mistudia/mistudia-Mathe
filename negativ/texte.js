@@ -315,3 +315,37 @@ pt: {
   };
   for(var l in X) for(var k in X[l]) NT[l][k] = X[l][k];
 })();
+
+// Ergänzung: alle Vorzeichen-Varianten
+(function(){
+  var X = {
+  de: { tVarianten: "Alle Vorzeichen-Varianten", varH: "Die gleichen Beträge {a} und {b} mit allen Vorzeichen. Tippe auf eine Zeile, um sie oben ausführlich zu sehen.",
+    varMerk: "Beim Mal und Geteilt ändert sich nur das Vorzeichen des Ergebnisses, der Betrag bleibt gleich. Beim Plus und Minus kann sich auch der Betrag ändern.",
+    malUm2: "Das Minus vor dem zweiten Faktor dreht die Richtung um → {r}." },
+  en: { tVarianten: "All sign combinations", varH: "The same absolute values {a} and {b} with every sign. Tap a row to see it in detail above.",
+    varMerk: "With multiplication and division only the sign of the result changes, the absolute value stays the same. With addition and subtraction the absolute value can change too.",
+    malUm2: "The minus in front of the second factor turns the direction around → {r}." },
+  es: { tVarianten: "Todas las combinaciones de signos", varH: "Los mismos valores absolutos {a} y {b} con todos los signos. Toca una fila para verla en detalle arriba.",
+    varMerk: "Al multiplicar y dividir solo cambia el signo del resultado; el valor absoluto es el mismo. Al sumar y restar también puede cambiar el valor absoluto.",
+    malUm2: "El menos delante del segundo factor invierte la dirección → {r}." },
+  zh: { tVarianten: "所有正负号组合", varH: "绝对值同样是 {a} 和 {b}，换上各种正负号。点按一行，可以在上面看到详细过程。",
+    varMerk: "乘法和除法只改变结果的符号，绝对值不变。加法和减法的结果，绝对值也可能改变。",
+    malUm2: "第二个因数前的负号让方向反过来 → {r}。" },
+  fr: { tVarianten: "Toutes les combinaisons de signes", varH: "Les mêmes distances à zéro {a} et {b} avec tous les signes. Touche une ligne pour la voir en détail plus haut.",
+    varMerk: "Pour la multiplication et la division, seul le signe du résultat change, la distance à zéro reste la même. Pour l’addition et la soustraction, la distance à zéro peut aussi changer.",
+    malUm2: "Le moins devant le second facteur inverse le sens → {r}." },
+  ru: { tVarianten: "Все варианты знаков", varH: "Те же модули {a} и {b} со всеми знаками. Нажми на строку, чтобы увидеть её подробно выше.",
+    varMerk: "При умножении и делении меняется только знак результата, модуль остаётся прежним. При сложении и вычитании может измениться и модуль.",
+    malUm2: "Минус перед вторым множителем меняет направление → {r}." },
+  ar: { tVarianten: "كل احتمالات الإشارات", varH: "القيمتان المطلقتان نفسهما {a} و {b} بكل الإشارات. اضغط على صف لتراه مفصلًا في الأعلى.",
+    varMerk: "في الضرب والقسمة تتغير إشارة الناتج فقط وتبقى القيمة المطلقة نفسها. أما في الجمع والطرح فقد تتغير القيمة المطلقة أيضًا.",
+    malUm2: "إشارة السالب قبل العامل الثاني تعكس الاتجاه ← {r}." },
+  ja: { tVarianten: "符号の組み合わせをすべて", varH: "絶対値は同じ {a} と {b} で、符号だけを変えたもの。行をタップすると、上でくわしく見られます。",
+    varMerk: "かけ算とわり算では答えの符号だけが変わり、絶対値は同じです。たし算とひき算では絶対値も変わることがあります。",
+    malUm2: "2つ目の数の−で向きが反対になる → {r}。" },
+  pt: { tVarianten: "Todas as combinações de sinais", varH: "Os mesmos valores absolutos {a} e {b} com todos os sinais. Toca numa linha para a ver em detalhe acima.",
+    varMerk: "Na multiplicação e na divisão só muda o sinal do resultado; o valor absoluto fica igual. Na adição e na subtração o valor absoluto também pode mudar.",
+    malUm2: "O menos antes do segundo fator inverte o sentido → {r}." }
+  };
+  for(var l in X) for(var k in X[l]) NT[l][k] = X[l][k];
+})();

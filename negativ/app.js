@@ -180,7 +180,7 @@
       h += '<tr class="' + (an === p[0] + p[1] ? "an" : "") + '"><td>(' + (p[0] === "-" ? "−" : "+") + ") " + o + " (" + (p[1] === "-" ? "−" : "+") + ")</td><td>=</td><td>(" + rr + ")</td></tr>";
     });
     $("regeln").innerHTML = h;
-    vier();
+    vier(); varianten();
   }
   // Alle vier Rechenarten mit denselben Zahlen a und b
   function vz(v){ return v < 0 ? "(−)" : v > 0 ? "(+)" : "0"; }
@@ -207,7 +207,7 @@
       else if(op === "-"){ S = [t("minusUm", { u: bdi(z(a) + " − " + zk(b) + " = " + z(a) + " + " + zk(-b)) })].concat(plusSchritte(a, -b)); pf = loesung(a, "-", b).pfeile; }
       else {
         var L = loesung(a, op, b); S = L.schritte.slice(); pf = L.pfeile;
-        if(op === "*" && !pf.length && Number.isInteger(b) && Math.abs(b) >= 1 && Math.abs(b) <= 10){ var L2 = loesung(b, "*", a); pf = L2.pfeile; S.unshift(L2.schritte[0]); } // Vertauschen: b-mal a
+        if(op === "*" && !pf.length && Number.isInteger(b) && Math.abs(b) >= 1 && Math.abs(b) <= 10){ var L2 = loesung(b, "*", a); pf = L2.pfeile; S.unshift(t("malSpr", { a: Math.abs(b), b: bdi(zk(a)), p: bdi(z(Math.abs(b) * a)) }) + (b < 0 ? " " + t("malUm2", { r: bdi(z(a * b)) }) : "")); } // Vertauschen: |b|-mal a
         if(op === ":" && b !== 0 && Number.isInteger(r)){
           S.push(t("probe", { p: bdi(zk(r) + " · " + zk(b) + " = " + z(a)) }));
           if(Math.abs(r) >= 1 && Math.abs(r) <= 12){ var sch = (a < 0 ? -1 : 1) * Math.abs(b); pf = []; for(var i = 0; i < Math.abs(r); i++) pf.push({ von: i * sch, bis: (i + 1) * sch, cls: sch < 0 ? "minus" : "plus", text: i === 0 ? z(sch) : "" }); }
@@ -221,6 +221,26 @@
       var werte = [a, isFinite(r) ? r : 0]; pf.forEach(function(p){ werte.push(p.von, p.bis); });
       var B = bereich(werte, 20); zahlenstrahl(sv, { min: B.min, max: B.max, pfeile: pf, marken: mk });
     });
+  }
+  // Alle Vorzeichen-Varianten: gleiche Beträge, vier Vorzeichenpaare × vier Rechenarten
+  function varianten(){
+    var a = lies($("ra").value), b = lies($("rb").value), tb = $("varianten");
+    if(!isFinite(a) || !isFinite(b)){ tb.innerHTML = ""; return; }
+    var A = Math.abs(a), B = Math.abs(b);
+    $("varH").innerHTML = t("varH", { a: "<b>" + bdi(z(A)) + "</b>", b: "<b>" + bdi(z(B)) + "</b>" });
+    var paare = [[A, B], [A, -B], [-A, B], [-A, -B]], h = "";
+    [["+", "regelPlus"], ["-", "regelMinus"], ["*", "regelMal"], [":", "regelGeteilt"]].forEach(function(o){
+      var op = o[0];
+      h += '<div class="vbox"><div class="vkopf">' + opZ(op) + "</div>";
+      paare.forEach(function(p){
+        var x = p[0], y = p[1], r = rechne(x, op, y), ex = isFinite(r) && Math.abs(r * 100 - Math.round(r * 100)) > 1e-9, an = x === a && y === b;
+        h += '<button type="button" class="vzeile' + (an ? " an" : "") + '" data-a="' + x + '" data-b="' + y + '">' + bdi(z(x) + " " + opZ(op) + " " + zk(y) + (isFinite(r) ? (ex ? " ≈ " : " = ") + "<b>" + z(r) + "</b>" : " = –")) + "</button>";
+      });
+      h += "</div>";
+    });
+    tb.innerHTML = h;
+    tb.querySelectorAll(".vzeile").forEach(function(z1){ z1.addEventListener("click", function(){ $("ra").value = z(Number(z1.dataset.a)).replace("−", "-"); $("rb").value = z(Number(z1.dataset.b)).replace("−", "-"); rechnen(); $("tVier").scrollIntoView({ behavior: "smooth", block: "start" }); }); });
+    $("varMerk").textContent = t("varMerk");
   }
   $("neuesBsp").addEventListener("click", function(){
     var b, q, a;
@@ -327,7 +347,7 @@
     document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
     $("tZieh").textContent = t("zieh");
     $("tVergleich").textContent = t("tVergleich"); $("tAlltag").textContent = t("tAlltag");
-    $("tRechnen").textContent = t("tRechnen"); $("tVier").textContent = t("tVier"); $("neuesBsp").textContent = t("neuesBsp"); $("tRegeln").textContent = t("tRegeln"); $("regelHinweis").textContent = t("regelHinweis");
+    $("tRechnen").textContent = t("tRechnen"); $("tVier").textContent = t("tVier"); $("tVarianten").textContent = t("tVarianten"); $("neuesBsp").textContent = t("neuesBsp"); $("tRegeln").textContent = t("tRegeln"); $("regelHinweis").textContent = t("regelHinweis");
     entdecken(); vergleich(); alltag(); rechnen();
     if(auf){
       var alt = $("meldung").innerHTML, war = beantwortet, eing = $("antwort") ? $("antwort").value : "";

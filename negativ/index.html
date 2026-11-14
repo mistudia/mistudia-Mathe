@@ -80,6 +80,15 @@
   .vier .regel { margin: 0 0 4px; font-size: 14px; color: var(--muted); line-height: 1.4; }
   .vier ol { margin: 4px 0 0; padding-inline-start: 20px; font-size: 16px; line-height: 1.45; }
   @media (max-width: 760px) { .vier { grid-template-columns: 1fr; } }
+  .tabwrap { overflow-x: auto; }
+  .varianten { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0; }
+  .vbox { border: 1px solid #c9dcf2; border-radius: 12px; overflow: hidden; background: #ffffff; min-width: 0; }
+  .vkopf { background: #e3eefc; color: var(--blue); font: 800 22px system-ui, sans-serif; text-align: center; padding: 4px; }
+  .vzeile { display: block; width: 100%; border: 0; border-top: 1px solid #e3eefc; background: #ffffff; color: var(--text); font: 17px system-ui, sans-serif; padding: 7px 6px; text-align: center; cursor: pointer; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .vzeile:hover { background: #f4f8ff; } .vzeile.an { background: #fef3c7; }
+  @media (max-width: 860px) { .varianten { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .vzeile { font-size: 15px; padding: 6px 2px; } }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; }
   .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
   @media (max-width: 600px) {
     body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
@@ -142,6 +151,12 @@
       <h2 id="tVier"></h2>
       <div class="reihe2"><p class="zeile" id="vierH"></p> <button type="button" class="knopf hell" id="neuesBsp"></button></div>
       <div class="vier" id="vier"></div>
+    </div>
+    <div class="karte">
+      <h2 id="tVarianten"></h2>
+      <p class="zeile" id="varH"></p>
+      <div class="varianten" id="varianten"></div>
+      <p class="merke" id="varMerk"></p>
     </div>
     <div class="karte">
       <h2 id="tRegeln"></h2>
