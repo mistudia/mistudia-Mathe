@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     exponential/index.html – Exponentialfunktionen (miStudia Mathe)
+     Parameter a, b, c, d bzw. a · e^(k·x) + d mit Graph, Asymptote, Faktor-
+     Treppe „· b“, Eigenschaften und Wertetabelle; Wachstum und Zerfall
+     (Prozent, Verdopplung, Halbwertszeit) im Vergleich zu linear; Üben.
+     Logik: app.js, Texte: texte.js (9 Sprachen), Sprache aus dem Startmenü.
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Exponentialfunktionen</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 19px; margin: 4px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  .reihe label { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; max-width: 100%; }
+  input.zahl { width: 180px; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; font-variant-numeric: tabular-nums; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .knopf:disabled { opacity: 0.5; cursor: default; }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; margin: 8px 0; }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .fehler { color: var(--schlecht); font-weight: 700; }
+  .wahl { display: inline-flex; background: #e3eefc; border-radius: 12px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+  .wahl button { font: 700 15px system-ui, sans-serif; padding: 7px 12px; border: 0; border-radius: 9px; background: transparent; color: var(--blue); cursor: pointer; }
+  .wahl button[aria-pressed="true"] { background: var(--blue); color: #ffffff; }
+  select { font: 18px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; max-width: 100%; }
+  .zwei { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+  @media (max-width: 760px) { .zwei { grid-template-columns: 1fr; } }
+  svg.bild { width: 100%; height: auto; display: block; user-select: none; -webkit-user-select: none; }
+  #raster, #uRaster { touch-action: none; cursor: pointer; max-width: 520px; }
+  #koSvg { touch-action: none; max-width: 520px; }
+  #figSvg { max-width: 420px; margin: 0 auto; }
+  .farben { display: inline-flex; gap: 6px; }
+  .farben button { width: 34px; height: 34px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 0 2px var(--line); cursor: pointer; padding: 0; }
+  .farben button[aria-pressed="true"] { box-shadow: 0 0 0 3px #1a2233; }
+  .zelle { stroke: #c7d2e0; stroke-width: 1; fill: #ffffff; }
+  .achse { stroke: #dc2626; stroke-width: 3.5; stroke-dasharray: 10 7; fill: none; }
+  .zentrum { fill: #dc2626; stroke: #ffffff; stroke-width: 2; }
+  .fig { fill: #c7d2fe; stroke: #3730a3; stroke-width: 4; stroke-linejoin: round; }
+  .figL { fill: none; stroke: #3730a3; stroke-width: 20; stroke-linecap: round; stroke-linejoin: round; }
+  .kopie { fill: rgba(249,115,22,0.30); stroke: #ea580c; stroke-width: 3; stroke-dasharray: 6 4; }
+  .kopieL { fill: none; stroke: rgba(234,88,12,0.55); stroke-width: 12; stroke-linecap: round; }
+  .kopie.deckt, .kopieL.deckt { stroke: #16a34a; } .kopie.deckt { fill: rgba(22,163,74,0.25); }
+  .info { font-size: 18px; line-height: 1.7; }
+  .info b { color: var(--blue); }
+  input[type=range] { width: 100%; max-width: 420px; }
+  .gitter { stroke: #dbe7f6; stroke-width: 1; } .ko-achse { stroke: #1a2233; stroke-width: 1.6; } .ko-zahl { fill: #4f5b6e; font: 12px system-ui, sans-serif; text-anchor: middle; }
+  .dreieck { fill: rgba(37,99,235,0.18); stroke: #2563eb; stroke-width: 2.5; stroke-linejoin: round; }
+  .bilddr { fill: rgba(220,38,38,0.15); stroke: #dc2626; stroke-width: 2.5; stroke-dasharray: 7 5; stroke-linejoin: round; }
+  .verb { stroke: #94a3b8; stroke-width: 1.4; stroke-dasharray: 3 4; }
+  .punkt { fill: #2563eb; stroke: #ffffff; stroke-width: 2; cursor: grab; } .punktB { fill: #dc2626; stroke: #ffffff; stroke-width: 2; }
+  .plab { font: 700 15px system-ui, sans-serif; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+  table.ko { border-collapse: collapse; font-size: 17px; font-variant-numeric: tabular-nums; margin: 6px 0; }
+  table.ko td, table.ko th { border: 1px solid var(--line); padding: 5px 10px; text-align: center; white-space: nowrap; }
+  table.ko th { background: #e3eefc; color: var(--blue); }
+  .graph { stroke: #2563eb; stroke-width: 3; fill: none; } .graphS { stroke: #dc2626; stroke-width: 3; fill: none; stroke-dasharray: 9 6; }
+  .urteilZ { font-size: 20px; font-weight: 800; margin: 8px 0; line-height: 1.4; }
+  .urteilZ.ja { color: var(--gut); } .urteilZ.nein { color: #6b7280; }
+  input.klein { width: 70px; font-size: 20px; }
+  .legende { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 15px; }
+  .legende i { display: inline-block; width: 22px; height: 0; border-top: 3px solid; vertical-align: 4px; margin-inline-end: 4px; }
+  .fehlt { fill: none; stroke: #16a34a; stroke-width: 4; } .falschZ { stroke: #dc2626; stroke-width: 4; }
+  .eing { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 14px; margin: 8px 0; }
+  .eing label { font-weight: 700; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .eing input.zahl { width: 130px; font-size: 20px; }
+  .einh { font-weight: 600; color: var(--muted); }
+  .wege { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
+  .wege > div { border: 1px solid #c9dcf2; border-radius: 12px; padding: 10px 12px; background: #fbfdff; min-width: 0; }
+  .wege h3 { margin: 0 0 6px; font-size: 16px; color: var(--blue); }
+  .wege p { margin: 3px 0; font-size: 16.5px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+  @media (max-width: 860px) { .wege { grid-template-columns: 1fr; } }
+  .ergebnisZ { font-size: 23px; font-weight: 800; color: var(--blue); margin: 8px 0; line-height: 1.4; }
+  #streifen, #zzGraph { width: 100%; height: auto; display: block; }
+  .st-rand { fill: #ffffff; stroke: #1a2233; stroke-width: 2; } .st-teil { fill: #93c5fd; } .st-plus { fill: #86efac; } .st-minus { fill: #fca5a5; }
+  .st-txt { font: 700 15px system-ui, sans-serif; fill: #1a2233; text-anchor: middle; } .st-klein { font: 13px system-ui, sans-serif; fill: #4f5b6e; text-anchor: middle; }
+  .tabelle { max-height: 340px; overflow: auto; border: 1px solid #c9dcf2; border-radius: 10px; }
+  table.zt { border-collapse: collapse; width: 100%; font-size: 16px; font-variant-numeric: tabular-nums; }
+  table.zt th, table.zt td { border-bottom: 1px solid #e2e8f0; padding: 6px 10px; text-align: end; white-space: nowrap; }
+  table.zt th { position: sticky; top: 0; background: #e3eefc; color: var(--blue); }
+  table.zt td:first-child, table.zt th:first-child { text-align: center; }
+  .balkenZ { fill: #2563eb; } .balkenE { fill: #93c5fd; } .linieE { stroke: #f59e0b; stroke-width: 3; fill: none; stroke-dasharray: 8 5; }
+  .regler { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 16px; margin: 8px 0; }
+  .regler label { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; font-weight: 700; }
+  .regler b { min-width: 3.2em; text-align: end; font-variant-numeric: tabular-nums; color: var(--blue); }
+  .regler input[type=range] { width: 100%; }
+  .formel { font-size: 26px; font-weight: 800; color: var(--blue); direction: ltr; text-align: center; margin: 6px 0; }
+  .formel sup { font-size: 62%; }
+  #gSvg, #wSvg, #uSvg { width: 100%; height: auto; display: block; }
+  .gitter { stroke: #dbe7f6; stroke-width: 1; } .achse { stroke: #1a2233; stroke-width: 1.6; } .ko-zahl { fill: #4f5b6e; font: 12px system-ui, sans-serif; text-anchor: middle; }
+  .graph { fill: none; stroke: #2563eb; stroke-width: 3.2; } .graph2 { fill: none; stroke: #f59e0b; stroke-width: 2.6; stroke-dasharray: 8 6; }
+  .asym { stroke: #dc2626; stroke-width: 2; stroke-dasharray: 8 6; } .punkt { fill: #2563eb; stroke: #ffffff; stroke-width: 2; }
+  .treppe { stroke: #16a34a; stroke-width: 2.4; fill: none; } .treppeT { font: 700 14px system-ui, sans-serif; fill: #15803d; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+  .eigen { font-size: 17px; line-height: 1.7; }
+  .eigen b { color: var(--blue); }
+  table.wt { border-collapse: collapse; font-size: 16px; direction: ltr; font-variant-numeric: tabular-nums; margin: 6px 0; }
+  table.wt td, table.wt th { border: 1px solid var(--line); padding: 4px 9px; text-align: center; white-space: nowrap; }
+  table.wt th { background: #e3eefc; color: var(--blue); }
+  /* Üben */
+  .auftrag { font-size: 20px; line-height: 1.5; margin: 4px 0 10px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  .lauf { font-size: 17px; line-height: 1.6; margin: 6px 0; padding-inline-start: 22px; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .tabs button { padding: 8px 12px; font-size: 14px; }
+    .regeln { grid-template-columns: 1fr; }
+    .sieb button { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Exponentialfunktionen</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="param" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="wachstum" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+
+  <section id="s_param">
+    <div class="karte">
+      <div class="reihe"><div class="wahl" id="form"><button type="button" data-f="b" aria-pressed="true">a · b<sup>x − c</sup> + d</button><button type="button" data-f="e" aria-pressed="false">a · e<sup>k · x</sup> + d</button></div></div>
+      <p class="formel" id="formel"></p>
+      <div class="regler" id="regler"></div>
+      <div class="zwei">
+        <svg id="gSvg" viewBox="0 0 420 420"></svg>
+        <div><div class="eigen" id="eigen"></div><div style="overflow-x:auto"><table class="wt" id="wt"></table></div></div>
+      </div>
+      <p class="merke" id="pMerke"></p>
+    </div>
+  </section>
+
+  <section id="s_wachstum" hidden>
+    <div class="karte">
+      <div class="reihe"><label><span id="tModell"></span> <select id="modell"></select></label></div>
+      <p class="zeile" id="mText"></p>
+      <div class="eing" id="mEing"></div>
+      <p class="fehler" id="mFehler"></p>
+      <p class="formel" id="mFormel"></p>
+      <div class="zwei">
+        <svg id="wSvg" viewBox="0 0 420 300"></svg>
+        <div><div class="eigen" id="mErg"></div><div class="legende" id="mLeg"></div></div>
+      </div>
+      <div class="tabelle" style="max-height:260px"><table class="zt" id="mTab"></table></div>
+      <p class="merke" id="mMerke"></p>
+    </div>
+  </section>
+
+  <section id="s_ueben" hidden>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <p class="auftrag" id="auftrag"></p>
+      <svg id="uSvg" viewBox="0 0 420 300" style="max-width:420px"></svg>
+      <div class="antwortzeile" id="antwortzeile"></div>
+      <p class="meldung" id="meldung"></p>
+      <ol class="lauf" id="uLauf" hidden></ol>
+      <p><button type="button" class="knopf hell" id="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>
