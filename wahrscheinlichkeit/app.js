@@ -171,21 +171,26 @@
   function setzeEreignis(ev, still){
     ereignis = ev; auswahl = {};
     if(ev) B.blaetter.forEach(function(b){ if(ev.test(b)) auswahl[b.key] = 1; });
-    if(!still){ simReset(); baum(); }
+    if(!still){ simReset(); if(tab === "baum") baum(); }
   }
   function klick(key){ if(auswahl[key]) delete auswahl[key]; else auswahl[key] = 1; ereignis = null; simReset(); baum(); }
   function gewaehlt(){ return B.blaetter.filter(function(b){ return auswahl[b.key]; }); }
   function pfadZeile(b){ return bdi("P" + pfadText(b.pfad) + " = " + b.ps.map(function(p){ return fmt(p, "bruch"); }).join(" · ") + " = " + fmt(b.p)); }
   function summe(L){ return L.reduce(function(s, b){ return add(s, b.p); }, F(0)); }
 
+  // Ereignis-Knöpfe (im Baum-Reiter mit „Auswahl löschen“, in der Simulation ohne)
+  function ereigKnoepfe(box, mitLeer){
+    var h = "";
+    EL.forEach(function(ev){ h += '<button type="button" data-id="' + ev.id + '" aria-pressed="' + (ereignis && ereignis.id === ev.id ? "true" : "false") + '">' + ev.txt + "</button>"; });
+    if(mitLeer) h += '<button type="button" data-id="" aria-pressed="false">' + t("eLeer") + "</button>";
+    box.innerHTML = h;
+    box.querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ setzeEreignis(b.dataset.id ? EL.filter(function(x){ return x.id === b.dataset.id; })[0] : null); }); });
+  }
+
   // ---------- Reiter Baumdiagramm ----------
   function baum(){
     zeichneBaum($("baum"), B, { stufen: E.stufen, auswahl: auswahl, klick: klick });
-    var h = "";
-    EL.forEach(function(ev){ h += '<button type="button" data-id="' + ev.id + '" aria-pressed="' + (ereignis && ereignis.id === ev.id ? "true" : "false") + '">' + ev.txt + "</button>"; });
-    h += '<button type="button" data-id="" aria-pressed="false">' + t("eLeer") + "</button>";
-    $("ereignisse").innerHTML = h;
-    $("ereignisse").querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ setzeEreignis(b.dataset.id ? EL.filter(function(x){ return x.id === b.dataset.id; })[0] : null); }); });
+    ereigKnoepfe($("ereignisse"), true);
     var G = gewaehlt(), R = [];
     $("tEreignis").textContent = t("ereignisL") + " " + (ereignis ? ereignis.txt : G.length ? t("eigeneAusw") : "–");
     if(!G.length){
@@ -341,7 +346,10 @@
     simZeigen();
   }
   function simZeigen(){
+    // ohne gewähltes Ereignis wären alle Knöpfe gesperrt → erstes Ereignis vorwählen
+    if(!gewaehlt().length && EL.length) setzeEreignis(EL[0], true);
     var G = gewaehlt(), S = summe(G);
+    ereigKnoepfe($("simEreignisse"), false);
     $("simH").textContent = t("simH");
     $("simEreig").textContent = G.length ? t("ereignisL") + " " + (ereignis ? ereignis.txt : t("eigeneAusw")) : t("simKein");
     var kn = $("simKnoepfe"); kn.innerHTML = "";
