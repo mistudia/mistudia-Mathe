@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     wahrscheinlichkeit/index.html – Wahrscheinlichkeit & Baumdiagramme (miStudia Mathe)
+     Baumdiagramme (Münze, Würfel, Urne mit/ohne Zurücklegen, Glücksrad, eigenes
+     Experiment), Pfad- und Summenregel, Gegenereignis, Simulation, Üben.
+     Logik: app.js, Texte: texte.js (9 Sprachen), Sprache aus dem Startmenü.
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Wahrscheinlichkeit</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --kalt: #2563eb; --warm: #dc2626; --gut: #15803d; --schlecht: #b91c1c; --plus: #16a34a; --minus: #c026d3; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 19px; margin: 16px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .entdecken { display: grid; grid-template-columns: 170px 1fr; gap: 14px; align-items: start; }
+  #thermo { width: 100%; max-width: 170px; height: auto; touch-action: none; cursor: ns-resize; user-select: none; -webkit-user-select: none; }
+  .zs.breit { grid-column: 1 / -1; }
+  .zs { width: 100%; height: auto; display: block; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .zs.ziehbar { cursor: ew-resize; touch-action: none; }
+  .gross { font-size: 34px; font-weight: 800; margin: 4px 0; font-variant-numeric: tabular-nums; }
+  .gross.kalt { color: var(--kalt); } .gross.warm { color: var(--warm); }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .vergleich { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 18px; }
+  input.zahl { width: 84px; font: 20px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; }
+  input.zahl:focus, select:focus { outline: none; border-color: var(--blue); }
+  select { font: 20px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; }
+  .rel { font-size: 30px; font-weight: 800; color: var(--blue); min-width: 1.4em; text-align: center; }
+  .alltag { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+  .alltag div { background: #f4f8ff; border: 1px solid #c9dcf2; border-radius: 12px; padding: 8px 10px; font-size: 15px; line-height: 1.4; }
+  .alltag b { color: var(--kalt); font-size: 18px; display: block; }
+  .rechnen { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 20px; margin-bottom: 8px; }
+  .gleich { font-size: 24px; font-weight: 800; }
+  .ergebnis { font-size: 26px; font-weight: 800; color: var(--blue); min-width: 2em; }
+  .schritte { margin: 6px 0 0; padding-inline-start: 22px; font-size: 17px; line-height: 1.5; }
+  .plus { color: var(--plus); font-weight: 700; } .minus { color: var(--minus); font-weight: 700; } .start { color: var(--blue); font-weight: 700; }
+  table.regeln { border-collapse: collapse; font-size: 19px; margin: 6px 0; }
+  table.regeln td { border: 1px solid var(--line); padding: 6px 12px; text-align: center; }
+  table.regeln tr.an td { background: #fef3c7; font-weight: 800; }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .knopf.zeichen { font-size: 26px; min-width: 64px; padding: 6px 14px; }
+  .auftrag { font-size: 20px; line-height: 1.5; margin: 4px 0 10px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  /* SVG */
+  .achse { stroke: #1a2233; stroke-width: 2; }
+  .tick { stroke: #1a2233; stroke-width: 1.4; } .tick.klein { stroke: #8a94a6; stroke-width: 1; }
+  .tzahl { fill: #1a2233; font: 600 16px system-ui, sans-serif; text-anchor: middle; }
+  .tzahl.neg { fill: var(--kalt); } .tzahl.pos { fill: var(--warm); } .tzahl.null { font-weight: 800; }
+  .marke { fill: var(--blue); stroke: #ffffff; stroke-width: 2; }
+  .marke.b { fill: #f59e0b; }
+  .mtext { fill: var(--blue); font: 800 17px system-ui, sans-serif; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+  .mtext.b { fill: #b45309; }
+  .pfeil { fill: none; stroke-width: 3; stroke-linecap: round; }
+  .pfeil.plus { stroke: var(--plus); } .pfeil.minus { stroke: var(--minus); } .pfeil.start { stroke: var(--blue); } .pfeil.gestr { stroke-dasharray: 6 5; }
+  .ptext { font: 700 14px system-ui, sans-serif; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+  .ptext.plus { fill: var(--plus); } .ptext.minus { fill: var(--minus); } .ptext.start { fill: var(--blue); }
+  .reihe2 { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; }
+  .vier { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .vier > div { border: 1px solid #c9dcf2; border-radius: 12px; padding: 10px 12px; background: #fbfdff; min-width: 0; }
+  .vier h3 { margin: 0 0 4px; font-size: 22px; color: var(--blue); font-variant-numeric: tabular-nums; }
+  .vier .regel { margin: 0 0 4px; font-size: 14px; color: var(--muted); line-height: 1.4; }
+  .vier ol { margin: 4px 0 0; padding-inline-start: 20px; font-size: 16px; line-height: 1.45; }
+  @media (max-width: 760px) { .vier { grid-template-columns: 1fr; } }
+  .tabwrap { overflow-x: auto; }
+  .varianten { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0; }
+  .vbox { border: 1px solid #c9dcf2; border-radius: 12px; overflow: hidden; background: #ffffff; min-width: 0; }
+  .vkopf { background: #e3eefc; color: var(--blue); font: 800 22px system-ui, sans-serif; text-align: center; padding: 4px; }
+  .vzeile { display: block; width: 100%; border: 0; border-top: 1px solid #e3eefc; background: #ffffff; color: var(--text); font: 17px system-ui, sans-serif; padding: 7px 6px; text-align: center; cursor: pointer; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .vzeile:hover { background: #f4f8ff; } .vzeile.an { background: #fef3c7; }
+  @media (max-width: 860px) { .varianten { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .vzeile { font-size: 15px; padding: 6px 2px; } }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  .reihe label { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; max-width: 100%; }
+  .wahl { display: inline-flex; background: #e3eefc; border-radius: 12px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+  .wahl button { font: 700 15px system-ui, sans-serif; padding: 7px 12px; border: 0; border-radius: 9px; background: transparent; color: var(--blue); cursor: pointer; }
+  .wahl button[aria-pressed="true"] { background: var(--blue); color: #ffffff; }
+  .ereig { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .ereig button { font: 600 15px system-ui, sans-serif; padding: 7px 12px; border-radius: 999px; border: 2px solid var(--line); background: #ffffff; color: var(--text); cursor: pointer; }
+  .ereig button[aria-pressed="true"] { border-color: var(--blue); background: #e3eefc; color: var(--blue); }
+  #baum, #uBaum { width: 100%; height: auto; display: block; user-select: none; -webkit-user-select: none; }
+  #simGraph { width: 100%; height: auto; display: block; }
+  .lauf { font-size: 18px; line-height: 1.7; margin: 6px 0; padding-inline-start: 22px; font-variant-numeric: tabular-nums; }
+  .ergebnisZ { font-size: 22px; font-weight: 800; color: var(--blue); margin: 8px 0; }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; margin: 8px 0; }
+  .werte { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin: 8px 0; }
+  .werte div { background: #f4f8ff; border-radius: 12px; padding: 8px 10px; font-size: 16px; }
+  .werte b { font-size: 21px; font-variant-numeric: tabular-nums; }
+  .wurf { font-size: 20px; min-height: 1.5em; }
+  /* SVG */
+  .b-kante { stroke: #64748b; stroke-width: 2; } .b-kante.an { stroke: var(--blue); stroke-width: 3.5; }
+  .b-p { font: 700 15px system-ui, sans-serif; fill: #1a2233; paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  .b-knoten text { font: 800 13px system-ui, sans-serif; fill: #ffffff; text-anchor: middle; }
+  .b-zeile { fill: transparent; cursor: pointer; } .b-zeile.an { fill: #fef3c7; } .b-zeile:hover { fill: #f4f8ff; } .b-zeile.an:hover { fill: #fde68a; }
+  .b-blatt { font: 700 16px system-ui, sans-serif; fill: #1a2233; pointer-events: none; } .b-knoten, .b-p { pointer-events: none; }
+  .s-achse { stroke: #1a2233; stroke-width: 1.5; } .s-gitter { stroke: #dbe7f6; stroke-width: 1; } .s-zahl { fill: #4f5b6e; font: 13px system-ui, sans-serif; }
+  .s-linie { fill: none; stroke: var(--blue); stroke-width: 2.5; } .s-p { stroke: #dc2626; stroke-width: 2; stroke-dasharray: 7 5; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .entdecken { grid-template-columns: 110px 1fr; gap: 8px; }
+    .gross { font-size: 28px; } .zeile { font-size: 16px; }
+    .tabs button { padding: 8px 12px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Wahrscheinlichkeit</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="baum" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="sim" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+
+  <div class="karte" id="eingabe">
+    <div class="reihe">
+      <label><span id="tVersuch"></span> <select id="versuch"></select></label>
+      <label><span id="tStufen"></span> <select id="stufen"><option>1</option><option selected>2</option><option>3</option></select></label>
+    </div>
+    <div class="reihe" id="urneBox" hidden>
+      <label><span id="tRot"></span> <select id="nRot"></select></label>
+      <label><span id="tBlau"></span> <select id="nBlau"></select></label>
+    </div>
+    <div class="reihe" id="eigenBox" hidden>
+      <label><span id="tPTreffer"></span> <input class="zahl" id="pTreffer" inputmode="text" value="1/4" autocomplete="off"></label>
+    </div>
+    <div class="reihe">
+      <div class="wahl" id="format"><button type="button" data-f="bruch" aria-pressed="true"></button><button type="button" data-f="dezimal" aria-pressed="false"></button><button type="button" data-f="prozent" aria-pressed="false"></button></div>
+    </div>
+    <p class="meldung schlecht" id="fehler"></p>
+  </div>
+
+  <section id="s_baum">
+    <div class="karte">
+      <p class="muted" id="hinweisKlick"></p>
+      <svg id="baum" viewBox="0 0 640 300"></svg>
+      <p class="zeile"><b id="tEreignis"></b></p>
+      <div class="ereig" id="ereignisse"></div>
+      <ol class="lauf" id="rechnung"></ol>
+      <p class="ergebnisZ" id="ergebnis"></p>
+      <p class="merke" id="regeln"></p>
+      <p class="merke" id="ohneHinweis" hidden></p>
+    </div>
+  </section>
+
+  <section id="s_sim" hidden>
+    <div class="karte">
+      <p class="zeile" id="simH"></p>
+      <p class="zeile"><b id="simEreig"></b></p>
+      <div class="reihe" id="simKnoepfe"></div>
+      <p class="wurf" id="letzte"></p>
+      <div class="werte" id="simWerte"></div>
+      <svg id="simGraph" viewBox="0 0 640 280"></svg>
+    </div>
+  </section>
+
+  <section id="s_ueben" hidden>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <p class="auftrag" id="auftrag"></p>
+      <svg id="uBaum" viewBox="0 0 640 300"></svg>
+      <div class="antwortzeile" id="antwortzeile"></div>
+      <p class="meldung" id="meldung"></p>
+      <ol class="lauf" id="uLauf" hidden></ol>
+      <p><button type="button" class="knopf hell" id="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>
