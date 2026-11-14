@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     teilbarkeit/index.html – Teilbarkeitsregeln (miStudia Mathe)
+     Regeln für 2, 3, 4, 5, 6, 8, 9, 10, 11, 25 an einer eigenen Zahl (mit
+     markierten Ziffern und „Warum?“), Teiler & Primzahlen (Teilerpaare,
+     Primfaktorbaum, Sieb des Eratosthenes), Üben.
+     Logik: app.js, Texte: texte.js (9 Sprachen), Sprache aus dem Startmenü.
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Teilbarkeitsregeln</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 19px; margin: 4px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  .reihe label { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; max-width: 100%; }
+  input.zahl { width: 180px; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; font-variant-numeric: tabular-nums; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .knopf:disabled { opacity: 0.5; cursor: default; }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; margin: 8px 0; }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .fehler { color: var(--schlecht); font-weight: 700; }
+  /* Regelkarten */
+  .regeln { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 10px; }
+  .regel { border: 2px solid var(--line); border-radius: 14px; padding: 10px 12px; background: #ffffff; min-width: 0; }
+  .regel.ja { border-color: #16a34a; background: #f0fdf4; }
+  .regel.nein { border-color: #b0b0b8; background: #fafafa; }
+  .regel .kopf { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .regel .d { font: 800 26px system-ui, sans-serif; color: #ffffff; background: var(--farbe, #4f46e5); border-radius: 10px; min-width: 46px; text-align: center; padding: 2px 8px; }
+  .regel .urteil { font-weight: 800; font-size: 17px; }
+  .regel.ja .urteil { color: var(--gut); } .regel.nein .urteil { color: #6b7280; }
+  .regel .text { font-size: 15px; line-height: 1.4; margin: 4px 0; }
+  .regel .anw { font-size: 16px; line-height: 1.5; margin: 4px 0; font-variant-numeric: tabular-nums; }
+  .regel .warum { font-size: 13.5px; color: var(--muted); line-height: 1.35; margin: 6px 0 0; }
+  .ziffern { display: inline-flex; gap: 2px; direction: ltr; flex-wrap: wrap; margin: 2px 0; }
+  .ziffern span { display: inline-block; min-width: 22px; padding: 2px 3px; text-align: center; font: 700 19px ui-monospace, "SF Mono", Menlo, Consolas, monospace; border-radius: 6px; background: #f1f5f9; color: var(--text); border: 1px solid #cbd5e1; }
+  .ziffern span.m { background: #fde68a; border-color: #d97706; }
+  .ziffern span.p { background: #bbf7d0; border-color: #16a34a; }
+  .ziffern span.n { background: #fecdd3; border-color: #e11d48; }
+  /* Teiler */
+  .teilerliste { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .teilerliste span { font: 700 17px system-ui, sans-serif; padding: 4px 10px; border-radius: 999px; background: #e0e7ff; color: #3730a3; font-variant-numeric: tabular-nums; }
+  .paare bdi, .lauf bdi { white-space: nowrap; }
+  .paare { font-size: 17px; line-height: 1.6; font-variant-numeric: tabular-nums; }
+  .ergebnisZ { font-size: 21px; font-weight: 800; color: var(--blue); margin: 8px 0; line-height: 1.45; }
+  #baumSvg { width: 100%; max-width: 520px; height: auto; display: block; }
+  .bk { stroke: #64748b; stroke-width: 2; }
+  .bz { font: 700 17px system-ui, sans-serif; fill: #1a2233; text-anchor: middle; }
+  .bp { fill: #4f46e5; } .bpt { font: 800 16px system-ui, sans-serif; fill: #ffffff; text-anchor: middle; }
+  .bn { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.5; }
+  /* Sieb */
+  .sieb { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; max-width: 520px; margin: 8px 0; direction: ltr; }
+  .sieb button { aspect-ratio: 1; font: 700 15px system-ui, sans-serif; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff; color: var(--text); cursor: pointer; padding: 0; position: relative; font-variant-numeric: tabular-nums; }
+  .sieb button.weg { color: #94a3b8; background: #f8fafc; text-decoration: line-through; text-decoration-thickness: 2px; }
+  .sieb button.prim { background: #4f46e5; color: #ffffff; border-color: #3730a3; }
+  .sieb button.eins { color: #94a3b8; background: #f1f5f9; }
+  .legende { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 15px; }
+  .legende i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-inline-end: 4px; }
+  /* Üben */
+  .auftrag { font-size: 20px; line-height: 1.5; margin: 4px 0 10px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  .lauf { font-size: 17px; line-height: 1.6; margin: 6px 0; padding-inline-start: 22px; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .tabs button { padding: 8px 12px; font-size: 14px; }
+    .regeln { grid-template-columns: 1fr; }
+    .sieb button { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Teilbarkeitsregeln</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="regeln" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="teiler" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+
+  <section id="s_regeln">
+    <div class="karte">
+      <div class="reihe"><label><span id="tZahl"></span> <input class="zahl" id="zahl" inputmode="numeric" autocomplete="off" value="1236"></label>
+        <button type="button" class="knopf hell" id="zufall"></button></div>
+      <p class="fehler" id="fehler"></p>
+      <p class="zeile" id="zusammen"></p>
+    </div>
+    <div class="regeln" id="regeln"></div>
+  </section>
+
+  <section id="s_teiler" hidden>
+    <div class="karte">
+      <div class="reihe"><label><span id="tZahl2"></span> <input class="zahl" id="zahl2" inputmode="numeric" autocomplete="off" value="36"></label></div>
+      <p class="fehler" id="fehler2"></p>
+      <h2 id="hPaare"></h2>
+      <div class="paare" id="paare"></div>
+      <div class="teilerliste" id="teilerliste"></div>
+      <p class="ergebnisZ" id="primUrteil"></p>
+      <h2 id="hFaktor"></h2>
+      <p class="ergebnisZ" id="zerlegung"></p>
+      <svg id="baumSvg" viewBox="0 0 300 200"></svg>
+      <p class="merke" id="merkPrim"></p>
+    </div>
+    <div class="karte">
+      <h2 id="hSieb"></h2>
+      <p class="zeile" id="siebText"></p>
+      <div class="reihe"><button type="button" class="knopf" id="siebWeiter"></button><button type="button" class="knopf hell" id="siebReset"></button></div>
+      <div class="sieb" id="sieb"></div>
+      <div class="legende" id="siebLeg"></div>
+    </div>
+  </section>
+
+  <section id="s_ueben" hidden>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <p class="auftrag" id="auftrag"></p>
+      <div class="antwortzeile" id="antwortzeile"></div>
+      <p class="meldung" id="meldung"></p>
+      <ol class="lauf" id="uLauf" hidden></ol>
+      <p><button type="button" class="knopf hell" id="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>
