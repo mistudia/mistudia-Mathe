@@ -73,6 +73,13 @@
   .pfeil.plus { stroke: var(--plus); } .pfeil.minus { stroke: var(--minus); } .pfeil.start { stroke: var(--blue); } .pfeil.gestr { stroke-dasharray: 6 5; }
   .ptext { font: 700 14px system-ui, sans-serif; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
   .ptext.plus { fill: var(--plus); } .ptext.minus { fill: var(--minus); } .ptext.start { fill: var(--blue); }
+  .reihe2 { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; }
+  .vier { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .vier > div { border: 1px solid #c9dcf2; border-radius: 12px; padding: 10px 12px; background: #fbfdff; min-width: 0; }
+  .vier h3 { margin: 0 0 4px; font-size: 22px; color: var(--blue); font-variant-numeric: tabular-nums; }
+  .vier .regel { margin: 0 0 4px; font-size: 14px; color: var(--muted); line-height: 1.4; }
+  .vier ol { margin: 4px 0 0; padding-inline-start: 20px; font-size: 16px; line-height: 1.45; }
+  @media (max-width: 760px) { .vier { grid-template-columns: 1fr; } }
   .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
   @media (max-width: 600px) {
     body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
@@ -122,14 +129,19 @@
     <div class="karte">
       <h2 id="tRechnen"></h2>
       <div class="rechnen">
-        <input class="zahl" id="ra" inputmode="numeric" value="-4">
+        <input class="zahl" id="ra" inputmode="numeric" value="-12">
         <select id="rop"><option value="+">+</option><option value="-">−</option><option value="*">·</option><option value=":">:</option></select>
-        <input class="zahl" id="rb" inputmode="numeric" value="7">
+        <input class="zahl" id="rb" inputmode="numeric" value="3">
         <span class="gleich">=</span> <span class="ergebnis" id="rerg"></span>
       </div>
       <svg class="zs" id="zsRech" viewBox="0 0 600 150"></svg>
       <ol class="schritte" id="rSchritte"></ol>
       <p class="zeile muted" id="rGeschichte"></p>
+    </div>
+    <div class="karte">
+      <h2 id="tVier"></h2>
+      <div class="reihe2"><p class="zeile" id="vierH"></p> <button type="button" class="knopf hell" id="neuesBsp"></button></div>
+      <div class="vier" id="vier"></div>
     </div>
     <div class="karte">
       <h2 id="tRegeln"></h2>
