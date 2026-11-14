@@ -4,6 +4,7 @@
 // Zurücklegen, Glücksrad, eigenes Treffer/Niete-Experiment; 1–3 Stufen.
 // Pfade antippen oder Ereignis wählen → Pfadregel (multiplizieren),
 // Summenregel (addieren), Gegenereignis. Anzeige als Bruch, Dezimalzahl, Prozent.
+// Vierfeldertafel: bedingte Wahrscheinlichkeit, Baum und umgekehrter Baum, Unabhängigkeit.
 // Simulation: relative Häufigkeit nähert sich der Wahrscheinlichkeit.
 // Üben: Pfad- und Ereigniswahrscheinlichkeiten mit Lösungsbaum.
 // Texte: wahrscheinlichkeit/texte.js (WT), Sprache aus dem Startmenü (MS_LANG).
@@ -36,8 +37,8 @@
     if(f === "prozent") return (genau100(a) ? "" : "≈ ") + zahl(num(a) * 100, 2) + " %";
     return a.d === 1 ? String(a.n) : a.n + "/" + a.d;
   }
-  function genau(a){ var d = a.d; while(d % 2 === 0) d /= 2; while(d % 5 === 0) d /= 5; return d === 1 && a.d <= 10000; }
-  function genau100(a){ return genau(a) && a.d <= 100 * 4; }
+  function genau(a){ return (a.n * 10000) % a.d === 0; }     // höchstens 4 Nachkommastellen
+  function genau100(a){ return (a.n * 10000) % a.d === 0; }  // Prozent mit höchstens 2 Nachkommastellen
   function liesWert(s){ // "3/8", "0,375", "37,5 %"
     s = String(s).trim().replace(/\s/g, "").replace(/,/g, ".").replace(/[−–]/g, "-");
     if(!s) return NaN;
@@ -55,7 +56,7 @@
 
   // ---------- Experimente ----------
   // Ergebnis: { k: Schlüssel, farbe }; Name und Kürzel kommen aus den Texten (k, k + "K")
-  var FARBE = { kopf: "#2563eb", zahl: "#d97706", sechs: "#16a34a", nicht6: "#64748b", rot: "#dc2626", blau: "#2563eb", gelb: "#eab308", treffer: "#16a34a", niete: "#64748b" };
+  var FARBE = { kopf: "#2563eb", zahl: "#d97706", sechs: "#16a34a", nicht6: "#64748b", rot: "#dc2626", blau: "#2563eb", gelb: "#eab308", treffer: "#16a34a", niete: "#64748b", A: "#7c3aed", nA: "#94a3b8", B: "#0d9488", nB: "#64748b" };
   var VERSUCHE = ["muenze", "wuerfel", "urneMit", "urneOhne", "rad", "eigen"];
   function experiment(art, stufen, r, b, pT){
     return { art: art, stufen: stufen, r: r, b: b, pT: pT,
@@ -114,7 +115,7 @@
         var an = c.blatt != null ? !!aus[B.blaetter[c.blatt].key] : unterAn(c);
         svg.appendChild(el("line", { x1: n.x + (n === B.wurzel ? 4 : 14), y1: n.y, x2: c.x - 14, y2: c.y, "class": "b-kante" + (an ? " an" : "") }));
         var mx = (n.x + c.x) / 2, my = (n.y + c.y) / 2;
-        svg.appendChild(el("text", { x: mx, y: c.y > n.y + 1 ? my + 17 : my - 6, "class": "b-p", "text-anchor": "middle" }, fmt(c.p)));
+        svg.appendChild(el("text", { x: mx, y: c.y > n.y + 1 ? my + 17 : my - 6, "class": "b-p", "text-anchor": "middle" }, (o.f || fmt)(c.p, o.format)));
         kanten(c);
       });
       if(n !== B.wurzel) knotenZeichnen(svg, n.x, n.y, n.o, 13);
@@ -126,7 +127,7 @@
     B.blaetter.forEach(function(b, i){
       var cy = 12 + i * zeile + zeile / 2, x = blattX;
       b.pfad.forEach(function(oo){ knotenZeichnen(svg, x, cy, oo, 9); x += 20; });
-      svg.appendChild(el("text", { x: blattX + 20 * stufen, y: cy + 6, "class": "b-blatt" }, o.verdeckt && !aus[b.key] ? "= ?" : o.verdeckt && o.nurZiel ? "= ?" : "= " + fmt(b.p)));
+      svg.appendChild(el("text", { x: blattX + 20 * stufen, y: cy + 6, "class": "b-blatt" }, o.verdeckt && !aus[b.key] ? "= ?" : o.verdeckt && o.nurZiel ? "= ?" : ("= " + (o.f || fmt)(b.p, o.format)).replace("= ≈", "≈")));
     });
   }
   function knotenZeichnen(svg, x, y, o, r){
@@ -205,6 +206,120 @@
     $("regeln").textContent = t("regelnText");
   }
 
+  // ---------- Reiter Vierfeldertafel & bedingte Wahrscheinlichkeit ----------
+  // Merkmale A/Ā (Zeilen) und B/B̄ (Spalten). Eingabe: P(A), P(B|A), P(B|Ā).
+  // Tafel M[r][c]: r = A, Ā, Summe; c = B, B̄, Summe.
+  var VPRESET = { med: ["1 %", "95 %", "10 %", 10000], regen: ["30 %", "40 %", "10 %", 1000], sport: ["60 %", "70 %", "40 %", 1000], eigen: ["1/4", "1/2", "1/3", 1000] };
+  var vPreset = "med", vFormat = "prozent", vAnsicht = "p", vFrage = "A|B";
+  var SYM = { A: "A", nA: "Ā", B: "B", nB: "B̄" }, ZEILE = { A: 0, nA: 1 }, SPALTE = { B: 0, nB: 1 };
+  var FRAGEN = ["B|A", "B|nA", "nB|A", "nB|nA", "A|B", "nA|B", "A|nB", "nA|nB"];
+  function sicher(a){ return a && Number.isSafeInteger(a.n) && Number.isSafeInteger(a.d) && a.d > 0; }
+  function addL(a, b){ var g = ggt(a.d, b.d), L = a.d / g * b.d; return F(a.n * (L / a.d) + b.n * (L / b.d), L); }
+  function mulK(a, b){ var g1 = ggt(a.n, b.d), g2 = ggt(b.n, a.d); return F((a.n / g1) * (b.n / g2), (a.d / g2) * (b.d / g1)); }
+  function div(a, b){ if(!b || b.n === 0) return null; var g1 = ggt(a.n, b.n), g2 = ggt(a.d, b.d); return F((a.n / g1) * (b.d / g2), (a.d / g2) * (b.n / g1)); }
+  function gleichB(a, b){ return a.n === b.n && a.d === b.d; }
+  function vf(a, f){ f = f || vFormat; if(sicher(a)) return fmt(a, f); return f === "prozent" ? "≈ " + zahl(num(a) * 100, 2) + " %" : "≈ " + zahl(num(a), 4); }
+  function vLies(s){ var r = liesBruch(s); if(!r) return null; if(r.d > 10000) r = F(Math.round(num(r) * 10000), 10000); return r; }
+  function vName(k, pr){ return t((pr || vPreset) + "_" + k); }
+  function istA(k){ return k === "A" || k === "nA"; }
+  function zelle(x, y){ var a = istA(x) ? x : y, b = istA(x) ? y : x; return [ZEILE[a], SPALTE[b]]; }
+  function randZelle(y){ return istA(y) ? [ZEILE[y], 2] : [2, SPALTE[y]]; }
+  function schnitt(x, y){ var a = istA(x) ? x : y, b = istA(x) ? y : x; return SYM[a] + "∩" + SYM[b]; }
+  function frageSym(q){ var p = q.split("|"); return "P(" + SYM[p[0]] + " | " + SYM[p[1]] + ")"; }
+  function frageName(q, pr){ var p = q.split("|"); return "P(" + vName(p[0], pr) + " | " + vName(p[1], pr) + ")"; }
+  function tafelHTML(M, o){ // o: {pr, wert(v, r, c), zaehler, nenner, luecke}
+    function mark(r, c){ var k = []; if(r === 2 || c === 2) k.push(r === 2 && c === 2 ? "gesamt" : "summe");
+      if(o.zaehler && o.zaehler[0] === r && o.zaehler[1] === c) k.push("zaehler");
+      if(o.nenner && o.nenner[0] === r && o.nenner[1] === c) k.push("nenner");
+      if(o.luecke && o.luecke[0] === r && o.luecke[1] === c) k.push("luecke");
+      return k.length ? ' class="' + k.join(" ") + '"' : ""; }
+    function kopf(k){ return "<th><b>" + SYM[k] + "</b><br><span>" + vName(k, o.pr) + "</span></th>"; }
+    var h = "<tr><th></th>" + kopf("B") + kopf("nB") + "<th><b>Σ</b></th></tr>";
+    ["A", "nA", null].forEach(function(z, r){
+      h += "<tr>" + (z ? kopf(z) : "<th><b>Σ</b></th>");
+      for(var c = 0; c < 3; c++) h += "<td" + mark(r, c) + ">" + (o.luecke && o.luecke[0] === r && o.luecke[1] === c ? "?" : bdi(o.wert(M[r][c], r, c))) + "</td>";
+      h += "</tr>";
+    });
+    return h;
+  }
+  var V = null;
+  function vRechnen(){
+    var pa = vLies($("vPA").value), pba = vLies($("vPBA").value), pbna = vLies($("vPBnA").value);
+    if(!pa || !pba || !pbna){ $("vFehler").textContent = t("vFehler"); return null; }
+    $("vFehler").textContent = "";
+    var eins = F(1), na = sub(eins, pa);
+    var M = [[mulK(pa, pba), mulK(pa, sub(eins, pba)), pa], [mulK(na, pbna), mulK(na, sub(eins, pbna)), na], [null, null, eins]];
+    M[2][0] = addL(M[0][0], M[1][0]); M[2][1] = addL(M[0][1], M[1][1]);
+    return { pa: pa, pba: pba, pbna: pbna, M: M };
+  }
+  function vExp(erst, p1, bed){
+    var zw = erst === "A" ? "B" : "A";
+    return { stufen: 2, stufe: function(i, pfad){
+      var L = i === 0 ? [{ k: erst, p: p1 }, { k: "n" + erst, p: sub(F(1), p1) }] : (function(){ var q = bed[pfad[0].k]; return q ? [{ k: zw, p: q }, { k: "n" + zw, p: sub(F(1), q) }] : []; })();
+      return L.filter(function(o){ return o.p.n > 0; });
+    } };
+  }
+  function vWert(N){ return function(v){ return vAnsicht === "n" ? zahl(num(v) * N, 2) : vf(v); }; }
+  function vier(){
+    var R = vRechnen(); V = R;
+    var N = Number($("vN").value);
+    sicht($("vNBox"), vAnsicht === "n");
+    var pr = function(a){ return sicher(a) ? fmt(a, "prozent").replace("≈ ", "") : zahl(num(a) * 100, 2) + " %"; };
+    $("vKontext").innerHTML = R ? t(vPreset + "_ctx", { pa: bdi(pr(R.pa)), pba: bdi(pr(R.pba)), pbna: bdi(pr(R.pbna)) }) : t(vPreset + "_ctx", { pa: "?", pba: "?", pbna: "?" });
+    $("vLegende").innerHTML = ["A", "nA", "B", "nB"].map(function(k){ return "<b>" + SYM[k] + "</b> = " + vName(k); }).join(" · ");
+    if(!R){ ["vTab", "vRechnung", "vDeutung", "vUnab"].forEach(function(id){ $(id).innerHTML = ""; }); leer($("vBaum1")); leer($("vBaum2")); sicht($("vBayes"), false); return; }
+    var M = R.M, q = vFrage.split("|"), x = q[0], y = q[1], zc = zelle(x, y), nc = randZelle(y);
+    $("vTab").innerHTML = tafelHTML(M, { wert: vWert(N), zaehler: zc, nenner: nc });
+    // bedingte Wahrscheinlichkeit
+    var zae = M[zc[0]][zc[1]], nen = M[nc[0]][nc[1]], p = div(zae, nen);
+    var kopfQ = frageSym(vFrage) + (vPreset === "eigen" ? "" : " = " + frageName(vFrage));
+    var h = bdi(kopfQ) + "<br>";
+    if(!p) h += bdi(frageSym(vFrage) + " : ") + t("vNichtDef", { y: vName(y) });
+    else if(vAnsicht === "n") h += bdi(frageSym(vFrage) + ' = <span class="zT">' + zahl(num(zae) * N, 2) + '</span> : <span class="nT">' + zahl(num(nen) * N, 2) + "</span> = " + vf(p));
+    else h += bdi(frageSym(vFrage) + ' = <span class="zT">P(' + schnitt(x, y) + ")</span> : " + '<span class="nT">P(' + SYM[y] + ")</span> = " + vf(zae) + " : " + vf(nen) + " = " + vf(p));
+    $("vRechnung").innerHTML = h.replace(/= ≈/g, "≈").replace(/ %/g, "\u00a0%").replace(/≈ /g, "≈\u00a0");
+    $("vDeutung").innerHTML = !p ? "" : vAnsicht === "n" ? t("vDeutungN", { y: vName(y), x: vName(x), ny: bdi(zahl(num(nen) * N, 2)), nxy: bdi(zahl(num(zae) * N, 2)), p: bdi(vf(p)) }) : t("vDeutung", { y: vName(y), x: vName(x), p: bdi(vf(p)) });
+    var bay = vPreset === "med" && vFrage === "A|B" && p;
+    sicht($("vBayes"), !!bay);
+    if(bay) $("vBayes").innerHTML = t("vBayes", { pba: bdi(pr(R.pba)), p: bdi(vf(p, "prozent")) });
+    // Bäume
+    var pB = M[2][0], bedA = { A: R.pba, nA: R.pbna }, bedB = {};
+    if(pB.n > 0) bedB.B = div(M[0][0], pB);
+    if(M[2][1].n > 0) bedB.nB = div(M[0][1], M[2][1]);
+    var E1 = vExp("A", R.pa, bedA), E2 = vExp("B", pB, bedB);
+    zeichneBaum($("vBaum1"), baumBauen(E1), { stufen: 2, format: vFormat, f: vf });
+    zeichneBaum($("vBaum2"), baumBauen(E2), { stufen: 2, format: vFormat, f: vf });
+    // Unabhängigkeit
+    var prod = mulK(M[0][2], M[2][0]), un = gleichB(M[0][0], prod);
+    $("vUnab").innerHTML = bdi("P(A∩B) = " + vf(M[0][0]) + (un ? " = " : " ≠ ") + "P(A) · P(B) = " + vf(M[0][2]) + " · " + vf(M[2][0]) + " = " + vf(prod)) + "<br>" +
+      bdi("P(B | A) = " + vf(R.pba) + (un ? " = " : " ≠ ") + "P(B) = " + vf(M[2][0])) + "<br>" + t(un ? "vUnab" : "vAbh");
+    $("vUnab").innerHTML = $("vUnab").innerHTML.replace(/= ≈/g, "≈");
+  }
+  function vierTexte(){
+    $("tVPreset").textContent = t("vBeispiel");
+    $("vPreset").innerHTML = ["med", "regen", "sport", "eigen"].map(function(k){ return '<option value="' + k + '">' + t("vp_" + k) + "</option>"; }).join(""); $("vPreset").value = vPreset;
+    $("vFormat").querySelectorAll("button").forEach(function(b){ b.textContent = t("f_" + b.dataset.f); });
+    $("vAnsicht").querySelectorAll("button").forEach(function(b){ b.textContent = t(b.dataset.a === "p" ? "vAnteile" : "vAnzahl"); });
+    $("tVN").textContent = t("vN");
+    $("vTafelH").textContent = t("vTafelH"); $("vErkl").textContent = t("vErkl");
+    $("vBedH").textContent = t("vBedH"); $("tVFrage").textContent = t("vFrageL"); $("vFormelErkl").textContent = t("vFormel");
+    $("vFrage").innerHTML = FRAGEN.map(function(q){ return '<option value="' + q + '">' + frageSym(q) + (vPreset === "eigen" ? "" : " – " + frageName(q)) + "</option>"; }).join(""); $("vFrage").value = vFrage;
+    $("vBaumH").textContent = t("vBaumH"); $("tVBaum1").textContent = t("vBaum1"); $("tVBaum2").textContent = t("vBaum2"); $("vBaumErkl").textContent = t("vBaumErkl");
+    $("vUnabH").textContent = t("vUnabH");
+  }
+  function vSetzePreset(k){
+    vPreset = k; var P = VPRESET[k];
+    var z = function(s){ return komma() ? s.replace(".", ",") : s; };
+    $("vPA").value = z(P[0]); $("vPBA").value = z(P[1]); $("vPBnA").value = z(P[2]); $("vN").value = String(P[3]);
+  }
+  $("vPreset").addEventListener("change", function(){ vSetzePreset($("vPreset").value); vierTexte(); vier(); });
+  ["vPA", "vPBA", "vPBnA"].forEach(function(id){ $(id).addEventListener("input", vier); });
+  $("vN").addEventListener("change", vier);
+  $("vFrage").addEventListener("change", function(){ vFrage = $("vFrage").value; vier(); });
+  $("vFormat").querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ vFormat = b.dataset.f; $("vFormat").querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); vier(); }); });
+  $("vAnsicht").querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ vAnsicht = b.dataset.a; $("vAnsicht").querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); vier(); }); });
+  vSetzePreset("med");
+
   // ---------- Reiter Simulation ----------
   var sim = { n: 0, k: 0, verlauf: [], letzte: null };
   function simReset(){ sim = { n: 0, k: 0, verlauf: [], letzte: null }; if(tab === "sim") simZeigen(); }
@@ -264,8 +379,28 @@
     if(X.art === "rad") return t("expRad", { k: k });
     return t(X.art === "urneMit" ? "expUrneMit" : "expUrneOhne", { r: X.r, b: X.b, k: k });
   }
+  function neueVier(){
+    var pr = wahl(["med", "regen", "sport"]), n = wahl([100, 200, 400]), nA = zuf(Math.round(n * 0.2), Math.round(n * 0.7)), nnA = n - nA;
+    var a = zuf(Math.max(1, Math.round(nA * 0.1)), nA - 1), c = zuf(Math.max(1, Math.round(nnA * 0.1)), nnA - 1);
+    var M = [[a, nA - a, nA], [c, nnA - c, nnA], [a + c, n - a - c, n]], typ = wahl(["luecke", "bed", "bed"]);
+    auf = { typ: "vier", art: typ, pr: pr, M: M, n: n };
+    if(typ === "luecke"){
+      var Z = [[0, 0], [0, 1], [1, 0], [1, 1], [0, 2], [1, 2], [2, 0], [2, 1]], z = wahl(Z);
+      // zwei Felder verdecken wäre zu schwer: nur eines, Rest bekannt
+      auf.luecke = z; auf.l = M[z[0]][z[1]];
+    } else {
+      var q = wahl(FRAGEN), qq = q.split("|");
+      auf.q = q; auf.zc = zelle(qq[0], qq[1]); auf.nc = randZelle(qq[1]);
+      auf.l = F(M[auf.zc[0]][auf.zc[1]], M[auf.nc[0]][auf.nc[1]]);
+    }
+    zeige();
+  }
+  function vierAuftrag(){
+    return t("uKtx_" + auf.pr, { n: auf.n }) + " " + (auf.art === "luecke" ? t("aufVierLuecke") : t("aufVierBed", { q: bdi(frageSym(auf.q) + " = " + frageName(auf.q, auf.pr)) }));
+  }
   function neueAufgabe(){
     beantwortet = false;
+    if(Math.random() < 0.35) return neueVier();
     var art = wahl(["muenze", "wuerfel", "urneMit", "urneOhne", "urneOhne", "rad"]), st = art === "rad" ? 2 : wahl([2, 2, 3]);
     var r = zuf(2, 6), b = zuf(2, 5), X = experiment(art, st, r, b, F(1, 4)), BB = baumBauen(X), typ = wahl(["pfad", "ereignis", "ereignis"]);
     if(typ === "pfad"){
@@ -278,22 +413,47 @@
     }
     zeige();
   }
+  function zahlW(v){ return String(v); }
   function zeige(){
-    $("auftrag").innerHTML = expText(auf.X) + " " + auf.txt;
+    var vt = auf.typ === "vier";
+    $("auftrag").innerHTML = vt ? vierAuftrag() : expText(auf.X) + " " + auf.txt;
     $("meldung").textContent = ""; $("meldung").className = "meldung"; sicht($("uLauf"), false);
-    var sv = $("uBaum"); sicht(sv, auf.typ === "pfad");
+    var sv = $("uBaum"); sicht(sv, auf.typ === "pfad"); sicht($("uTafel"), vt);
+    if(vt) $("uTafel").innerHTML = '<table class="vt">' + tafelHTML(auf.M, { pr: auf.pr, wert: zahlW, luecke: auf.luecke }) + "</table>";
     if(auf.typ === "pfad") zeichneBaum(sv, auf.B, { stufen: auf.X.stufen, auswahl: auf.aus, verdeckt: true, nurZiel: true });
     var z = $("antwortzeile"); z.innerHTML = "";
     var inp = document.createElement("input"); inp.className = "zahl"; inp.id = "uAntwort"; inp.setAttribute("inputmode", "text"); inp.setAttribute("autocomplete", "off"); inp.placeholder = t("eingabe"); inp.style.width = "130px";
     inp.addEventListener("keydown", function(e){ if(e.key === "Enter") pruefe(inp.value); });
     var pb = document.createElement("button"); pb.type = "button"; pb.className = "knopf"; pb.id = "pruefen"; pb.textContent = t("pruefen"); pb.addEventListener("click", function(){ pruefe(inp.value); });
-    var hi = document.createElement("span"); hi.className = "muted"; hi.textContent = t("eingabeH");
+    var hi = document.createElement("span"); hi.className = "muted"; hi.textContent = vt && auf.art === "luecke" ? t("eingabeZ") : t("eingabeH");
     z.appendChild(inp); z.appendChild(pb); z.appendChild(hi);
     $("weiter").textContent = t("weiter"); $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });
+  }
+  function pruefeVier(v){
+    var lu = auf.art === "luecke", ok = lu ? Math.abs(v - auf.l) < 1e-9 : Math.abs(v - num(auf.l)) <= 0.005;
+    beantwortet = true; anzahl++; if(ok) punkte++;
+    var lt = lu ? String(auf.l) : fmt(auf.l, "bruch") + " ≈ " + zahl(num(auf.l) * 100, 2) + " %";
+    var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
+    var M = auf.M, L = [];
+    if(lu){
+      var r = auf.luecke[0], c = auf.luecke[1], f;
+      if(c === 2) f = M[r][0] + " + " + M[r][1];
+      else if(r === 2) f = M[0][c] + " + " + M[1][c];
+      else f = M[r][2] + " − " + M[r][1 - c];
+      L.push(t("lueckeRech") + " " + bdi(f + " = " + auf.l));
+      $("uTafel").innerHTML = '<table class="vt">' + tafelHTML(M, { pr: auf.pr, wert: zahlW, zaehler: auf.luecke }) + "</table>";
+    } else {
+      var qq = auf.q.split("|"), z = M[auf.zc[0]][auf.zc[1]], nn = M[auf.nc[0]][auf.nc[1]];
+      L.push(t("bedRech", { y: vName(qq[1], auf.pr) }) + " " + bdi(frageSym(auf.q) + ' = <span class="zT">' + z + '</span> : <span class="nT">' + nn + "</span> = " + fmt(auf.l, "bruch") + " ≈ " + zahl(num(auf.l) * 100, 2) + " %"));
+      $("uTafel").innerHTML = '<table class="vt">' + tafelHTML(M, { pr: auf.pr, wert: zahlW, zaehler: auf.zc, nenner: auf.nc }) + "</table>";
+    }
+    $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);
+    $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });
   }
   function pruefe(e){
     if(beantwortet) return;
     var v = liesWert(e); if(!isFinite(v)) return;
+    if(auf.typ === "vier") return pruefeVier(v);
     var ok = Math.abs(v - num(auf.l)) <= 0.005;
     beantwortet = true; anzahl++; if(ok) punkte++;
     var lt = fmt(auf.l, "bruch") + " ≈ " + zahl(num(auf.l) * 100, 2) + " %";
@@ -315,8 +475,8 @@
   function zeigeTab(k){
     tab = k;
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
-    ["baum", "sim", "ueben"].forEach(function(x){ sicht($("s_" + x), x === k); });
-    sicht($("eingabe"), k !== "ueben");
+    ["baum", "vier", "sim", "ueben"].forEach(function(x){ sicht($("s_" + x), x === k); });
+    sicht($("eingabe"), k === "baum" || k === "sim");
     if(k === "ueben" && !auf) neueAufgabe();
     alles(true);
   }
@@ -336,10 +496,12 @@
       $("hinweisKlick").textContent = t("hinweisKlick"); $("ohneHinweis").textContent = t("ohneHinweis");
       var altId = ereignis && ereignis.id; lesen(); if(altId){ ereignis = EL.filter(function(x){ return x.id === altId; })[0] || null; if(ereignis) setzeEreignis(ereignis, true); }
     }
-    if(tab === "baum") baum(); else if(tab === "sim") simZeigen();
+    if(!nurRechnen) vierTexte();
+    if(tab === "baum") baum(); else if(tab === "sim") simZeigen(); else if(tab === "vier") vier();
     if(!nurRechnen && auf){
       var war = beantwortet, eing = $("uAntwort") ? $("uAntwort").value : null, gut = $("meldung").classList.contains("gut");
-      if(auf.ev){ var ev = ereignisse(auf.X).filter(function(x){ return x.id === auf.ev.id; })[0]; if(ev){ auf.ev = ev; auf.txt = t("aufEreig", { e: ev.txt }); } }
+      if(auf.typ === "vier"){ /* Auftrag wird in zeige() neu beschriftet */ }
+      else if(auf.ev){ var ev = ereignisse(auf.X).filter(function(x){ return x.id === auf.ev.id; })[0]; if(ev){ auf.ev = ev; auf.txt = t("aufEreig", { e: ev.txt }); } }
       else { var bl = auf.B.blaetter.filter(function(b){ return auf.aus[b.key]; })[0]; auf.txt = t("aufPfad", { p: pfadText(bl.pfad) }); }
       zeige();
       if(war){ beantwortet = false; anzahl--; if(gut) punkte--; pruefe(eing || "-1"); }

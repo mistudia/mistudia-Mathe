@@ -2,7 +2,8 @@
 <!-- ============================================================
      wahrscheinlichkeit/index.html – Wahrscheinlichkeit & Baumdiagramme (miStudia Mathe)
      Baumdiagramme (Münze, Würfel, Urne mit/ohne Zurücklegen, Glücksrad, eigenes
-     Experiment), Pfad- und Summenregel, Gegenereignis, Simulation, Üben.
+     Experiment), Pfad- und Summenregel, Gegenereignis, Vierfeldertafel und
+     bedingte Wahrscheinlichkeit (mit umgekehrtem Baum), Simulation, Üben.
      Logik: app.js, Texte: texte.js (9 Sprachen), Sprache aus dem Startmenü.
      ============================================================ -->
 <html lang="de">
@@ -114,6 +115,26 @@
   .b-blatt { font: 700 16px system-ui, sans-serif; fill: #1a2233; pointer-events: none; } .b-knoten, .b-p { pointer-events: none; }
   .s-achse { stroke: #1a2233; stroke-width: 1.5; } .s-gitter { stroke: #dbe7f6; stroke-width: 1; } .s-zahl { fill: #4f5b6e; font: 13px system-ui, sans-serif; }
   .s-linie { fill: none; stroke: var(--blue); stroke-width: 2.5; } .s-p { stroke: #dc2626; stroke-width: 2; stroke-dasharray: 7 5; }
+  /* Vierfeldertafel */
+  table.vt { border-collapse: collapse; font-size: 18px; margin: 6px 0; font-variant-numeric: tabular-nums; min-width: 300px; }
+  table.vt th, table.vt td { border: 1px solid var(--line); padding: 7px 10px; white-space: nowrap; text-align: center; color: var(--text); }
+  table.vt th { background: #e3eefc; font-size: 15px; line-height: 1.25; white-space: normal; }
+  table.vt th b { font-size: 18px; color: var(--blue); }
+  table.vt th span { font-weight: 600; color: var(--text); }
+  table.vt td.summe { background: #f4f8ff; font-weight: 700; }
+  table.vt td.gesamt { background: #e3eefc; font-weight: 800; }
+  table.vt td.zaehler { background: #fef3c7; box-shadow: inset 0 0 0 3px #d97706; font-weight: 800; }
+  table.vt td.nenner { background: #dbeafe; box-shadow: inset 0 0 0 3px #2563eb; font-weight: 800; }
+  table.vt td.luecke { background: #fef3c7; font-weight: 800; color: #b45309; }
+  .zT { background: #fef3c7; box-shadow: inset 0 0 0 2px #d97706; border-radius: 6px; padding: 0 5px; }
+  .nT { background: #dbeafe; box-shadow: inset 0 0 0 2px #2563eb; border-radius: 6px; padding: 0 5px; }
+  .zwei { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .zwei > div { min-width: 0; }
+  .zwei svg { width: 100%; height: auto; display: block; }
+  @media (max-width: 860px) { .zwei { grid-template-columns: 1fr; } }
+  #vFrage { max-width: 100%; font-size: 17px; }
+  #vRechnung { font-size: 20px; line-height: 1.6; }
+  @media (max-width: 600px) { table.vt { font-size: 16px; } table.vt th, table.vt td { padding: 6px 6px; } }
   .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
   @media (max-width: 600px) {
     body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
@@ -129,6 +150,7 @@
   <h1 id="titel">Wahrscheinlichkeit</h1>
   <div class="tabs" role="tablist">
     <button type="button" role="tab" data-tab="baum" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="vier" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="sim" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
   </div>
@@ -164,6 +186,50 @@
     </div>
   </section>
 
+  <section id="s_vier" hidden>
+    <div class="karte">
+      <div class="reihe"><label><span id="tVPreset"></span> <select id="vPreset"></select></label></div>
+      <p class="zeile" id="vKontext"></p>
+      <div class="reihe">
+        <label><bdi dir="ltr">P(A) =</bdi> <input class="zahl" id="vPA" inputmode="text" autocomplete="off" style="width:110px"></label>
+        <label><bdi dir="ltr">P(B | A) =</bdi> <input class="zahl" id="vPBA" inputmode="text" autocomplete="off" style="width:110px"></label>
+        <label><bdi dir="ltr">P(B | Ā) =</bdi> <input class="zahl" id="vPBnA" inputmode="text" autocomplete="off" style="width:110px"></label>
+      </div>
+      <p class="muted" id="vLegende"></p>
+      <div class="reihe">
+        <div class="wahl" id="vFormat"><button type="button" data-f="bruch" aria-pressed="false"></button><button type="button" data-f="dezimal" aria-pressed="false"></button><button type="button" data-f="prozent" aria-pressed="true"></button></div>
+        <div class="wahl" id="vAnsicht"><button type="button" data-a="p" aria-pressed="true"></button><button type="button" data-a="n" aria-pressed="false"></button></div>
+        <label id="vNBox" hidden><span id="tVN"></span> <select id="vN"><option>100</option><option selected>1000</option><option>10000</option></select></label>
+      </div>
+      <p class="meldung schlecht" id="vFehler"></p>
+    </div>
+    <div class="karte">
+      <h2 id="vTafelH"></h2>
+      <div class="tabwrap"><table class="vt" id="vTab"></table></div>
+      <p class="merke" id="vErkl"></p>
+    </div>
+    <div class="karte">
+      <h2 id="vBedH"></h2>
+      <div class="reihe"><label><span id="tVFrage"></span> <select id="vFrage"></select></label></div>
+      <p class="muted" id="vFormelErkl"></p>
+      <p class="ergebnisZ" id="vRechnung"></p>
+      <p class="zeile" id="vDeutung"></p>
+      <p class="merke" id="vBayes" hidden></p>
+    </div>
+    <div class="karte">
+      <h2 id="vBaumH"></h2>
+      <div class="zwei">
+        <div><p class="zeile"><b id="tVBaum1"></b></p><svg id="vBaum1" viewBox="0 0 400 200"></svg></div>
+        <div><p class="zeile"><b id="tVBaum2"></b></p><svg id="vBaum2" viewBox="0 0 400 200"></svg></div>
+      </div>
+      <p class="muted" id="vBaumErkl"></p>
+    </div>
+    <div class="karte">
+      <h2 id="vUnabH"></h2>
+      <p class="zeile" id="vUnab"></p>
+    </div>
+  </section>
+
   <section id="s_sim" hidden>
     <div class="karte">
       <p class="zeile" id="simH"></p>
@@ -180,6 +246,7 @@
       <span class="punkte" id="punkte"></span>
       <p class="auftrag" id="auftrag"></p>
       <svg id="uBaum" viewBox="0 0 640 300"></svg>
+      <div class="tabwrap" id="uTafel" hidden></div>
       <div class="antwortzeile" id="antwortzeile"></div>
       <p class="meldung" id="meldung"></p>
       <ol class="lauf" id="uLauf" hidden></ol>
