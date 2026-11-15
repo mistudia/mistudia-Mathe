@@ -112,6 +112,7 @@
     .regeln { grid-template-columns: 1fr; }
     .sieb button { font-size: 13px; }
   }
+  .zzR { width: 170px; max-width: 55vw; }
 </style>
 </head>
 <body>
@@ -160,9 +161,9 @@
   <section id="s_zz" hidden>
     <div class="karte">
       <div class="eing">
-        <label><span id="tK0"></span> <input class="zahl" id="zzK" inputmode="decimal" autocomplete="off"> <span class="einh" id="eK0"></span></label>
-        <label><span id="tZzp"></span> <input class="zahl" id="zzP" inputmode="decimal" autocomplete="off"> <span class="einh">%</span></label>
-        <label><span id="tN"></span> <input class="zahl" id="zzN" inputmode="numeric" autocomplete="off" style="width:90px"></label>
+        <label><span id="tK0"></span> <input class="zahl" id="zzK" inputmode="decimal" autocomplete="off"> <span class="einh" id="eK0"></span> <input type="range" class="zzR" id="zzKR" min="100" max="10000" step="100"></label>
+        <label><span id="tZzp"></span> <input class="zahl" id="zzP" inputmode="decimal" autocomplete="off"> <span class="einh">%</span> <input type="range" class="zzR" id="zzPR" min="0.5" max="12" step="0.5"></label>
+        <label><span id="tN"></span> <input class="zahl" id="zzN" inputmode="numeric" autocomplete="off" style="width:90px"> <input type="range" class="zzR" id="zzNR" min="1" max="40" step="1"></label>
       </div>
       <p class="fehler" id="zzFehler"></p>
       <p class="ergebnisZ" id="zzErgebnis"></p>

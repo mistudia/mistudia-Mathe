@@ -127,6 +127,9 @@
   function zinseszins(){
     $("eK0").textContent = waehrung();
     var K = lies($("zzK").value), p = lies($("zzP").value), n = lies($("zzN").value);
+    // Schieberegler an die Eingaben angleichen (Kapital-Regler passend zur Währung)
+    $("zzKR").min = 100 * gf(); $("zzKR").max = 10000 * gf(); $("zzKR").step = 100 * gf();
+    if(K > 0) $("zzKR").value = K; if(p > 0) $("zzPR").value = p; if(n >= 1) $("zzNR").value = n;
     var ok = K > 0 && p > 0 && p <= 100 && n >= 1 && n <= 60 && Math.round(n) === n;
     $("zzFehler").textContent = ok ? "" : t("fehlerZZ");
     if(!ok){ ["zzErgebnis", "zzFormel", "zzVerdopp", "zzTab"].forEach(function(id){ $(id).innerHTML = ""; }); leer($("zzGraph")); return; }
@@ -157,6 +160,7 @@
     $("zzMerke").textContent = t("zzMerke");
   }
   ["zzK", "zzP", "zzN"].forEach(function(id){ $(id).addEventListener("input", zinseszins); });
+  [["zzKR", "zzK"], ["zzPR", "zzP"], ["zzNR", "zzN"]].forEach(function(x){ $(x[0]).addEventListener("input", function(){ var v = String(Number($(x[0]).value)); $(x[1]).value = komma() ? v.replace(".", ",") : v; zinseszins(); }); });
 
   // ---------- Reiter Üben ----------
   var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
