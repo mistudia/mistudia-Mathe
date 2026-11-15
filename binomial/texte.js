@@ -1,7 +1,7 @@
 // Texte für „Binomialverteilung“ (binomial/app.js) in 9 Sprachen.
 var BN = {
 de: {
-  titel: "Binomialverteilung", tab_vert: "Verteilung", tab_galton: "Galton-Brett", tab_ueben: "Üben", binkoSym: "(n über k)",
+  titel: "Binomialverteilung", tab_erkl: "Erklärung", tab_vert: "Verteilung", tab_galton: "Galton-Brett", tab_ueben: "Üben", binkoSym: "(n über k)",
   bspL: "Beispiel:", bsp_eigen: "eigene Werte", bsp_muenze: "10 Münzwürfe", bsp_wuerfel: "12-mal würfeln (Sechs)", bsp_mc: "Multiple Choice raten", bsp_ausschuss: "Ausschuss in der Produktion", bsp_elfmeter: "Elfmeterschießen",
   bt_eigen: "Wähle n (Anzahl der Versuche) und p (Trefferwahrscheinlichkeit).", bt_muenze: "Eine Münze wird 10-mal geworfen. X = Anzahl „Kopf“ (p = 0,5).", bt_wuerfel: "Ein Würfel wird 12-mal geworfen. X = Anzahl der Sechsen (p = 1/6).",
   bt_mc: "Ein Test hat 20 Fragen mit je 4 Antworten, eine ist richtig. Wer nur rät: X = Anzahl richtiger Antworten (p = 0,25).", bt_ausschuss: "5 % der Teile sind fehlerhaft. Es werden 50 Teile geprüft. X = Anzahl fehlerhafter Teile.", bt_elfmeter: "Eine Spielerin trifft 75 % ihrer Elfmeter. Sie schießt 8-mal. X = Anzahl der Treffer.",
@@ -21,7 +21,7 @@ de: {
   pruefen: "Prüfen", weiterA: "Nächste Aufgabe", punkte: "{p} von {n} richtig", richtig: "Richtig!", falsch: "Leider nicht. Richtig ist: {l}"
 },
 en: {
-  titel: "Binomial Distribution", tab_vert: "Distribution", tab_galton: "Galton board", tab_ueben: "Practice", binkoSym: "C(n, k)",
+  titel: "Binomial Distribution", tab_erkl: "Explanation", tab_vert: "Distribution", tab_galton: "Galton board", tab_ueben: "Practice", binkoSym: "C(n, k)",
   bspL: "Example:", bsp_eigen: "own values", bsp_muenze: "10 coin tosses", bsp_wuerfel: "12 dice rolls (six)", bsp_mc: "guessing a multiple-choice test", bsp_ausschuss: "faulty parts in production", bsp_elfmeter: "penalty shoot-out",
   bt_eigen: "Choose n (number of trials) and p (probability of success).", bt_muenze: "A coin is tossed 10 times. X = number of heads (p = 0.5).", bt_wuerfel: "A die is rolled 12 times. X = number of sixes (p = 1/6).",
   bt_mc: "A test has 20 questions with 4 answers each, one of them correct. Someone only guesses: X = number of correct answers (p = 0.25).", bt_ausschuss: "5 % of parts are faulty. 50 parts are checked. X = number of faulty parts.", bt_elfmeter: "A player scores 75 % of her penalties. She takes 8. X = number of goals.",
@@ -41,7 +41,7 @@ en: {
   pruefen: "Check", weiterA: "Next exercise", punkte: "{p} of {n} correct", richtig: "Correct!", falsch: "Not quite. The answer is: {l}"
 },
 es: {
-  titel: "Distribución binomial", tab_vert: "Distribución", tab_galton: "Tablero de Galton", tab_ueben: "Practicar", binkoSym: "C(n, k)",
+  titel: "Distribución binomial", tab_erkl: "Explicación", tab_vert: "Distribución", tab_galton: "Tablero de Galton", tab_ueben: "Practicar", binkoSym: "C(n, k)",
   bspL: "Ejemplo:", bsp_eigen: "valores propios", bsp_muenze: "10 lanzamientos de moneda", bsp_wuerfel: "12 tiradas de dado (seis)", bsp_mc: "test tipo test respondido al azar", bsp_ausschuss: "piezas defectuosas", bsp_elfmeter: "tanda de penaltis",
   bt_eigen: "Elige n (número de pruebas) y p (probabilidad de éxito).", bt_muenze: "Se lanza una moneda 10 veces. X = número de caras (p = 0,5).", bt_wuerfel: "Se lanza un dado 12 veces. X = número de seises (p = 1/6).",
   bt_mc: "Un test tiene 20 preguntas con 4 respuestas, una correcta. Quien contesta al azar: X = número de aciertos (p = 0,25).", bt_ausschuss: "El 5 % de las piezas es defectuoso. Se revisan 50 piezas. X = número de piezas defectuosas.", bt_elfmeter: "Una jugadora marca el 75 % de sus penaltis. Lanza 8. X = número de goles.",
@@ -61,7 +61,7 @@ es: {
   pruefen: "Comprobar", weiterA: "Siguiente ejercicio", punkte: "{p} de {n} correctas", richtig: "¡Correcto!", falsch: "No. La respuesta es: {l}"
 },
 zh: {
-  titel: "二项分布", tab_vert: "分布", tab_galton: "高尔顿板", tab_ueben: "练习", binkoSym: "C(n, k)",
+  titel: "二项分布", tab_erkl: "讲解", tab_vert: "分布", tab_galton: "高尔顿板", tab_ueben: "练习", binkoSym: "C(n, k)",
   bspL: "例子：", bsp_eigen: "自定义数值", bsp_muenze: "掷硬币 10 次", bsp_wuerfel: "掷骰子 12 次（六点）", bsp_mc: "选择题全靠猜", bsp_ausschuss: "生产中的次品", bsp_elfmeter: "点球大战",
   bt_eigen: "选择 n（试验次数）和 p（成功概率）。", bt_muenze: "掷一枚硬币 10 次。X = 正面次数（p = 0.5）。", bt_wuerfel: "掷一颗骰子 12 次。X = 六点出现次数（p = 1/6）。",
   bt_mc: "一份试卷有 20 道选择题，每题 4 个选项，只有一个正确。全靠猜：X = 答对题数（p = 0.25）。", bt_ausschuss: "5 % 的零件是次品。抽查 50 个零件。X = 次品数。", bt_elfmeter: "一名球员罚点球命中率 75 %。她罚 8 次。X = 进球数。",
@@ -81,7 +81,7 @@ zh: {
   pruefen: "检查", weiterA: "下一题", punkte: "答对 {p}/{n}", richtig: "正确！", falsch: "不对。正确答案：{l}"
 },
 fr: {
-  titel: "Loi binomiale", tab_vert: "Loi", tab_galton: "Planche de Galton", tab_ueben: "S’entraîner", binkoSym: "(k parmi n)",
+  titel: "Loi binomiale", tab_erkl: "Explication", tab_vert: "Loi", tab_galton: "Planche de Galton", tab_ueben: "S’entraîner", binkoSym: "(k parmi n)",
   bspL: "Exemple :", bsp_eigen: "valeurs libres", bsp_muenze: "10 lancers de pièce", bsp_wuerfel: "12 lancers de dé (six)", bsp_mc: "QCM au hasard", bsp_ausschuss: "pièces défectueuses", bsp_elfmeter: "séance de tirs au but",
   bt_eigen: "Choisis n (nombre d’épreuves) et p (probabilité de succès).", bt_muenze: "On lance une pièce 10 fois. X = nombre de « pile » (p = 0,5).", bt_wuerfel: "On lance un dé 12 fois. X = nombre de six (p = 1/6).",
   bt_mc: "Un QCM a 20 questions à 4 réponses, dont une juste. En répondant au hasard : X = nombre de bonnes réponses (p = 0,25).", bt_ausschuss: "5 % des pièces sont défectueuses. On contrôle 50 pièces. X = nombre de pièces défectueuses.", bt_elfmeter: "Une joueuse réussit 75 % de ses penalties. Elle en tire 8. X = nombre de buts.",
@@ -101,7 +101,7 @@ fr: {
   pruefen: "Vérifier", weiterA: "Exercice suivant", punkte: "{p} sur {n} justes", richtig: "Juste !", falsch: "Pas tout à fait. La réponse est : {l}"
 },
 ru: {
-  titel: "Биномиальное распределение", tab_vert: "Распределение", tab_galton: "Доска Гальтона", tab_ueben: "Тренировка", binkoSym: "C(n, k)",
+  titel: "Биномиальное распределение", tab_erkl: "Объяснение", tab_vert: "Распределение", tab_galton: "Доска Гальтона", tab_ueben: "Тренировка", binkoSym: "C(n, k)",
   bspL: "Пример:", bsp_eigen: "свои значения", bsp_muenze: "10 бросков монеты", bsp_wuerfel: "12 бросков кубика (шестёрка)", bsp_mc: "тест наугад", bsp_ausschuss: "брак на производстве", bsp_elfmeter: "серия пенальти",
   bt_eigen: "Выбери n (число испытаний) и p (вероятность успеха).", bt_muenze: "Монету бросают 10 раз. X = число выпадений орла (p = 0,5).", bt_wuerfel: "Кубик бросают 12 раз. X = число шестёрок (p = 1/6).",
   bt_mc: "В тесте 20 вопросов по 4 варианта, один верный. Отвечают наугад: X = число верных ответов (p = 0,25).", bt_ausschuss: "5 % деталей бракованные. Проверяют 50 деталей. X = число бракованных.", bt_elfmeter: "Футболистка забивает 75 % пенальти. Она бьёт 8 раз. X = число голов.",
@@ -121,7 +121,7 @@ ru: {
   pruefen: "Проверить", weiterA: "Следующее задание", punkte: "{p} из {n} верно", richtig: "Верно!", falsch: "Неверно. Правильно: {l}"
 },
 ar: {
-  titel: "التوزيع ذو الحدين", tab_vert: "التوزيع", tab_galton: "لوح غالتون", tab_ueben: "تمرين", binkoSym: "C(n, k)",
+  titel: "التوزيع ذو الحدين", tab_erkl: "الشرح", tab_vert: "التوزيع", tab_galton: "لوح غالتون", tab_ueben: "تمرين", binkoSym: "C(n, k)",
   bspL: "مثال:", bsp_eigen: "قيم خاصة", bsp_muenze: "رمي قطعة نقود 10 مرات", bsp_wuerfel: "رمي حجر نرد 12 مرة (ستة)", bsp_mc: "التخمين في اختبار متعدد الخيارات", bsp_ausschuss: "القطع المعيبة في الإنتاج", bsp_elfmeter: "ركلات الترجيح",
   bt_eigen: "اختر n (عدد المحاولات) وp (احتمال النجاح).", bt_muenze: "تُرمى قطعة نقود 10 مرات. X = عدد مرات ظهور الصورة (p = 0,5).", bt_wuerfel: "يُرمى حجر نرد 12 مرة. X = عدد مرات ظهور الستة (p = 1/6).",
   bt_mc: "اختبار من 20 سؤالًا لكل منها 4 إجابات واحدة صحيحة. من يخمّن فقط: X = عدد الإجابات الصحيحة (p = 0,25).", bt_ausschuss: "5 % من القطع معيبة. تُفحص 50 قطعة. X = عدد القطع المعيبة.", bt_elfmeter: "لاعبة تسجل 75 % من ركلات الجزاء. تسدد 8 مرات. X = عدد الأهداف.",
@@ -141,7 +141,7 @@ ar: {
   pruefen: "تحقق", weiterA: "التمرين التالي", punkte: "{p} من {n} صحيحة", richtig: "صحيح!", falsch: "ليس تمامًا. الجواب الصحيح: {l}"
 },
 ja: {
-  titel: "二項分布", tab_vert: "分布", tab_galton: "ゴルトンボード", tab_ueben: "練習", binkoSym: "ₙCₖ",
+  titel: "二項分布", tab_erkl: "説明", tab_vert: "分布", tab_galton: "ゴルトンボード", tab_ueben: "練習", binkoSym: "ₙCₖ",
   bspL: "例：", bsp_eigen: "自分で入力", bsp_muenze: "コインを 10 回投げる", bsp_wuerfel: "さいころを 12 回（6 の目）", bsp_mc: "選択問題を当てずっぽうで", bsp_ausschuss: "製造の不良品", bsp_elfmeter: "PK 戦",
   bt_eigen: "n（試行回数）と p（成功確率）を選ぼう。", bt_muenze: "コインを 10 回投げる。X = 表の回数（p = 0.5）。", bt_wuerfel: "さいころを 12 回投げる。X = 6 の目の回数（p = 1/6）。",
   bt_mc: "4 択の問題が 20 問、正解は 1 つずつ。当てずっぽうで答える：X = 正解数（p = 0.25）。", bt_ausschuss: "部品の 5 % が不良品。50 個を調べる。X = 不良品の数。", bt_elfmeter: "PK の成功率 75 % の選手が 8 回蹴る。X = 成功数。",
@@ -161,7 +161,7 @@ ja: {
   pruefen: "答え合わせ", weiterA: "次の問題", punkte: "{n} 問中 {p} 問正解", richtig: "正解！", falsch: "ざんねん。正解は {l}"
 },
 pt: {
-  titel: "Distribuição binomial", tab_vert: "Distribuição", tab_galton: "Tabuleiro de Galton", tab_ueben: "Praticar", binkoSym: "C(n, k)",
+  titel: "Distribuição binomial", tab_erkl: "Explicação", tab_vert: "Distribuição", tab_galton: "Tabuleiro de Galton", tab_ueben: "Praticar", binkoSym: "C(n, k)",
   bspL: "Exemplo:", bsp_eigen: "valores próprios", bsp_muenze: "10 lançamentos de moeda", bsp_wuerfel: "12 lançamentos de dado (seis)", bsp_mc: "escolha múltipla ao acaso", bsp_ausschuss: "peças defeituosas", bsp_elfmeter: "desempate por penáltis",
   bt_eigen: "Escolhe n (número de provas) e p (probabilidade de sucesso).", bt_muenze: "Lança-se uma moeda 10 vezes. X = número de caras (p = 0,5).", bt_wuerfel: "Lança-se um dado 12 vezes. X = número de seis (p = 1/6).",
   bt_mc: "Um teste tem 20 perguntas com 4 respostas, uma certa. Quem responde ao acaso: X = número de respostas certas (p = 0,25).", bt_ausschuss: "5 % das peças são defeituosas. Verificam-se 50 peças. X = número de peças defeituosas.", bt_elfmeter: "Uma jogadora marca 75 % dos penáltis. Remata 8 vezes. X = número de golos.",

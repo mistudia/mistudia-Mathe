@@ -168,7 +168,7 @@
   $("weiter").addEventListener("click", neueAufgabe);
 
   // ---------- Reiter & Texte ----------
-  var tab = "vert", TABS = ["vert", "galton", "ueben"];
+  var tab = "erkl", TABS = ["erkl", "vert", "galton", "ueben"];
   function zeigeTab(k){
     tab = k;
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
@@ -192,7 +192,7 @@
     if(tab === "vert") vert(); else if(tab === "galton") galton();
     if(!nurRechnen && auf){ var war = beantwortet, e = letzte, gut = $("meldung").classList.contains("gut"); zeige(); if(war){ beantwortet = false; anzahl--; if(gut) punkte--; $("uAntwort").value = e; pruefe(e); } }
   }
-  window.MS_LANG = { apply: function(l){ if(BN[l]){ lang = l; alles(); } } };
+  window.MS_LANG = { apply: function(l){ if(BN[l]){ lang = l; alles(); if(window.MS_BIN_ERKL) MS_BIN_ERKL.sprache(l); } } };
   $("bsp").innerHTML = '<option value="muenze"></option>'; $("bsp").value = "muenze"; $("n").value = 10; $("p").value = 0.5; pFest = 0.5;
   alles();
 })();
