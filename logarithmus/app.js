@@ -50,7 +50,7 @@
         d += (an ? "L" : "M") + X(xx).toFixed(1) + " " + Y(yy).toFixed(1); an = true; }
       var clip = "c" + Math.random().toString(36).slice(2);
       var cp = el("clipPath", { id: clip }); cp.appendChild(el("rect", { x: L, y: T, width: R - L, height: B - T })); sv.appendChild(cp);
-      sv.appendChild(el("path", { d: d, "class": k.cls || "graph", "clip-path": "url(#" + clip + ")" }));
+      k._el = el("path", { d: d, "class": k.cls || "graph", "clip-path": "url(#" + clip + ")" }); sv.appendChild(k._el);
     });
     (o.treppe || []).forEach(function(s){
       if(s.y1 < o.y0 || s.y1 > o.y1 || s.y2 < o.y0 || s.y2 > o.y1) return;
@@ -58,6 +58,9 @@
       sv.appendChild(el("text", { x: X(s.x2) + 5, y: (Y(s.y1) + Y(s.y2)) / 2 + 5, "class": "treppeT" }, s.txt));
     });
     (o.punkte || []).forEach(function(p){ if(p[1] >= o.y0 && p[1] <= o.y1 && p[0] >= o.x0 && p[0] <= o.x1){ sv.appendChild(el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 6, "class": "punkt" })); if(p[2]) sv.appendChild(el("text", { x: X(p[0]) + 8, y: Y(p[1]) - 8, "class": "treppeT", style: "fill:#1d4ed8" }, p[2])); } });
+    // Werte ablesen + Wertetabelle (/graph-ablesen.js), nur bei Erkunden-Graphen (o.abl)
+    if(window.MS_ABL){ if(o.abl) MS_ABL.an(sv, { x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, L: L, R: R, T: T, B: B, xName: o.abl.x || "x",
+      kurven: (o.kurven || []).map(function(k, i){ return o.abl.namen[i] ? { f: k.f, el: k._el, name: o.abl.namen[i] } : null; }) }); else MS_ABL.aus(sv); }
   }
 
 
@@ -108,7 +111,7 @@
     if($("zeigeExp").checked){ kurven.push({ f: umk, cls: "graph2" }); kurven.push({ f: function(x){ return x; }, cls: "graph3" }); }
     var tr = [];
     if($("zeigeTreppe").checked && b > 1) [1, b, b * b].forEach(function(x, i, A){ if(i < 2) tr.push({ x1: c + A[i], y1: f(c + A[i]), x2: c + A[i + 1], y2: f(c + A[i + 1]), txt: (a > 0 ? "+" : "−") + zahl(Math.abs(a)) }); });
-    plot($("gSvg"), { x0: -4, x1: 8, y0: -5, y1: 7, sx: 1, sy: 1, kurven: kurven, asymV: c, treppe: tr, punkte: [[c + 1, d, "(" + zahl(c + 1) + " | " + zahl(d) + ")"]] });
+    plot($("gSvg"), { x0: -4, x1: 8, y0: -5, y1: 7, sx: 1, sy: 1, kurven: kurven, abl: { namen: ["f(x)", "f⁻¹(x)", null] }, asymV: c, treppe: tr, punkte: [[c + 1, d, "(" + zahl(c + 1) + " | " + zahl(d) + ")"]] });
     var E = [];
     var steigt = (a > 0) === (b > 1);
     E.push("<b>" + t("dbL") + "</b> " + bdi("x > " + zahl(c)));

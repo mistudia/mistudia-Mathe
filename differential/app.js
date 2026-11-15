@@ -63,12 +63,15 @@
         if(!isFinite(y) || Math.abs(y - (o.y0 + o.y1) / 2) > 50 * (o.y1 - o.y0) || (py != null && Math.abs(y - py) > 4 * (o.y1 - o.y0))){ auf = false; py = isFinite(y) ? y : null; continue; }
         d += (auf ? "L" : "M") + X(x).toFixed(1) + " " + Y(y).toFixed(1); auf = true; py = y;
       }
-      g.appendChild(el("path", { d: d, "class": k.cls }));
+      k._el = el("path", { d: d, "class": k.cls }); g.appendChild(k._el);
     });
     (o.linien || []).forEach(function(l){ g.appendChild(el("line", { x1: X(l.x1), y1: Y(l.y1), x2: X(l.x2), y2: Y(l.y2), "class": l.cls })); });
     (o.polys || []).forEach(function(p){ g.appendChild(el("polyline", { points: p.pts.map(function(q){ return X(q[0]).toFixed(1) + "," + Y(q[1]).toFixed(1); }).join(" "), "class": p.cls })); });
     (o.punkte || []).forEach(function(p){ if(p.y < o.y0 - 1e-9 || p.y > o.y1 + 1e-9) return; sv.appendChild(el("circle", { cx: X(p.x), cy: Y(p.y), r: p.r || 5, "class": p.cls || "pt" })); if(p.txt) sv.appendChild(el("text", { x: X(p.x) + (p.dx || 8), y: Y(p.y) + (p.dy || -8), "class": "lab" + (p.tcls ? " " + p.tcls : "") }, p.txt)); });
     (o.texte || []).forEach(function(p){ sv.appendChild(el("text", { x: X(p.x), y: Y(p.y), "class": "lab " + (p.cls || ""), "text-anchor": p.anker || "middle" }, p.txt)); });
+    // Werte ablesen + Wertetabelle (/graph-ablesen.js), nur bei Erkunden-Graphen (o.abl)
+    if(window.MS_ABL){ if(o.abl) MS_ABL.an(sv, { x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, L: L, R: R, T: T, B: B, xName: o.abl.x || "x",
+      kurven: (o.kurven || []).map(function(k, i){ return o.abl.namen[i] ? { f: function(x){ return (k.von != null && x < k.von) || (k.bis != null && x > k.bis) ? NaN : k.f(x); }, el: k._el, name: o.abl.namen[i] } : null; }) }); else MS_ABL.aus(sv); }
     return { X: X, Y: Y };
   }
   function yBereich(fs, x0, x1, min, max){
@@ -102,7 +105,7 @@
     // Graph
     var xa = Math.min(x0, x0 + h) - 2.5, xb = Math.max(x0, x0 + h) + 2.5; if(F.von != null){ xa = Math.max(xa, -0.5); }
     var yr = yBereich([F.f], xa, xb, -12, 12); yr[0] = Math.min(yr[0], Math.min(y0, y1) - 1); yr[1] = Math.max(yr[1], Math.max(y0, y1) + 1);
-    plot($("aSvg"), { x0: xa, x1: xb, y0: yr[0], y1: yr[1],
+    plot($("aSvg"), { x0: xa, x1: xb, y0: yr[0], y1: yr[1], abl: { namen: ["f(x)"] },
       kurven: [{ f: F.f, cls: "k-f", von: F.von }],
       linien: [{ x1: xa, y1: y0 + ms * (xa - x0), x2: xb, y2: y0 + ms * (xb - x0), cls: "k-s" }, { x1: xa, y1: y0 + m * (xa - x0), x2: xb, y2: y0 + m * (xb - x0), cls: "k-t" },
                { x1: x0, y1: y0, x2: x0 + h, y2: y0, cls: "k-dr" }, { x1: x0 + h, y1: y0, x2: x0 + h, y2: y1, cls: "k-dr" }],
@@ -130,7 +133,7 @@
       "<tr><th>" + esc(t("links")) + "</th>" + hs.map(function(q){ return "<td>" + zahl((D.f(-q) - f0) / (-q), 3) + "</td>"; }).join("") + "</tr>" +
       "<tr><th>" + esc(t("rechts")) + "</th>" + hs.map(function(q){ return "<td>" + zahl((D.f(q) - f0) / q, 3) + "</td>"; }).join("") + "</tr>";
     $("dText").textContent = t("d_" + dbW);
-    plot($("dSvg"), { x0: -2.5, x1: 2.5, y0: -2, y1: 3, H: 300,
+    plot($("dSvg"), { x0: -2.5, x1: 2.5, y0: -2, y1: 3, H: 300, abl: { namen: ["f(x)"] },
       kurven: dbW === "sprung" ? [{ f: D.f, cls: "k-f", bis: 0 }, { f: D.f, cls: "k-f", von: 1e-9 }] : [{ f: D.f, cls: "k-f" }],
       linien: [{ x1: -2.5, y1: f0 + ml * (-2.5), x2: 2.5, y2: f0 + ml * 2.5, cls: "k-l" }, { x1: -2.5, y1: f0 + mr * (-2.5), x2: 2.5, y2: f0 + mr * 2.5, cls: "k-r" }],
       punkte: [{ x: 0, y: f0, txt: "P", cls: "pt" }, { x: -h, y: D.f(-h), cls: "pt-l" }, { x: h, y: D.f(h), cls: "pt-r" }].concat(dbW === "sprung" ? [{ x: 0, y: 1, cls: "pt-offen" }] : []) });
@@ -193,7 +196,7 @@
     $("bF").innerHTML = bdi("f(x) = " + E.f);
     $("bSchritte").innerHTML = E.s.map(function(s){ return '<li><span class="sh">' + esc(t(s[0])) + "</span>" + bdi(s[1]) + "</li>"; }).join("");
     var yr = yBereich([E.fn, E.d], E.r[0], E.r[1], -12, 12);
-    plot($("rSvg"), { x0: E.r[0], x1: E.r[1], y0: Math.min(yr[0], -0.5), y1: Math.max(yr[1], 0.5), H: 300, kurven: [{ f: E.fn, cls: "k-f" }, { f: E.d, cls: "k-fa" }] });
+    plot($("rSvg"), { x0: E.r[0], x1: E.r[1], y0: Math.min(yr[0], -0.5), y1: Math.max(yr[1], 0.5), H: 300, abl: { namen: ["f(x)", "f′(x)"] }, kurven: [{ f: E.fn, cls: "k-f" }, { f: E.d, cls: "k-fa" }] });
     $("rLeg").innerHTML = legende([["l-f", "f"], ["l-fa", t("leg_fa")]]);
   }
   function wichtig(){
@@ -227,7 +230,7 @@
     var nst = []; for(var x = 0; x < 40; x += 0.01){ if(G(x) * G(x + 0.01) < 0) nst.push(x + 0.005); }
     $("gErg").innerHTML = gm > 0 ? t("g_erg", { x: zahl(xm, 2), g: zahl(gm, 2) }) + (nst.length >= 2 ? "<br>" + t("g_zone", { a: zahl(nst[0], 1), b: zahl(nst[nst.length - 1], 1) }) : "") : t("g_kein");
     var yr = yBereich([K, E, G], 0, 32, -800, 3000);
-    plot($("gSvg"), { x0: 0, x1: 32, y0: Math.min(yr[0], -200), y1: yr[1], xName: "x",
+    plot($("gSvg"), { x0: 0, x1: 32, y0: Math.min(yr[0], -200), y1: yr[1], xName: "x", abl: { namen: ["K(x)", "E(x)", "G(x)"] },
       kurven: [{ f: K, cls: "k-K" }, { f: E, cls: "k-E" }, { f: G, cls: "k-G" }],
       linien: [{ x1: xm, y1: 0, x2: xm, y2: gm, cls: "k-dr" }],
       punkte: [{ x: xm, y: gm, txt: t("max"), cls: "pt-max" }] });
@@ -242,7 +245,7 @@
       ["st_neben", "2x + y = " + Lz + "  ⇒  y = " + Lz + " " + M + " 2x"], ["st_ziel", "A = x · y"], ["st_einsetzen", "A(x) = x · (" + Lz + " " + M + " 2x) = " + Lz + "x " + M + " 2x²"],
       ["st_abl", "A′(x) = " + Lz + " " + M + " 4x,   A″(x) = " + M + "4"], ["st_null", Lz + " " + M + " 4x = 0  ⇒  x = " + Lz + " : 4 = " + zahl(xm)], ["st_pruef", "A″(" + zahl(xm) + ") = " + M + "4 < 0  ⇒  " + t("max")]]);
     $("zErg").innerHTML = t("z_erg", { x: zahl(xm), y: zahl(Lz - 2 * xm), a: zahl(A(xm)) }) + "<br>" + t("z_jetzt", { x: zahl(x, 1), a: zahl(A(x), 1) });
-    plot($("zSvg"), { x0: 0, x1: Lz / 2, y0: 0, y1: A(xm) * 1.15, H: 280, xName: "x", kurven: [{ f: A, cls: "k-G" }], linien: [{ x1: x, y1: 0, x2: x, y2: A(x), cls: "k-dr" }], punkte: [{ x: xm, y: A(xm), txt: t("max"), cls: "pt-max" }, { x: x, y: A(x), cls: "pt" }] });
+    plot($("zSvg"), { x0: 0, x1: Lz / 2, y0: 0, y1: A(xm) * 1.15, H: 280, xName: "x", abl: { namen: ["A(x)"] }, kurven: [{ f: A, cls: "k-G" }], linien: [{ x1: x, y1: 0, x2: x, y2: A(x), cls: "k-dr" }], punkte: [{ x: xm, y: A(xm), txt: t("max"), cls: "pt-max" }, { x: x, y: A(x), cls: "pt" }] });
     // Skizze: Mauer oben, Beet darunter (maßstabsgetreu: ganze Zaunlänge = Breite der Skizze)
     var sv = $("zSkizze"); leer(sv); var W = 300, sk = (W - 40) / Lz, bw = (Lz - 2 * x) * sk, bh = x * sk, H2 = Math.max(60, 18 + bh + 26);
     sv.setAttribute("viewBox", "0 0 " + W + " " + H2);
@@ -261,7 +264,7 @@
       ["st_pruef", "O″(r) = 4π + " + br(4 * V, "r³") + " > 0  ⇒  " + t("min")]]);
     $("doErg").innerHTML = t("d_erg", { r: zahl(rm), h: zahl(hm), o: zahl(O(rm), 1) }) + "<br>" + t("d_jetzt", { r: zahl(r, 1), o: zahl(O(r), 1) });
     var yr = [0, O(rm) * 3];
-    plot($("doSvg"), { x0: 0, x1: 15, y0: yr[0], y1: yr[1], H: 280, xName: "r", kurven: [{ f: O, cls: "k-G", von: 0.3 }], linien: [{ x1: r, y1: 0, x2: r, y2: O(r), cls: "k-dr" }], punkte: [{ x: rm, y: O(rm), txt: t("min"), cls: "pt-max" }, { x: r, y: O(r), cls: "pt" }] });
+    plot($("doSvg"), { x0: 0, x1: 15, y0: yr[0], y1: yr[1], H: 280, xName: "r", abl: { x: "r", namen: ["O(r)"] }, kurven: [{ f: O, cls: "k-G", von: 0.3 }], linien: [{ x1: r, y1: 0, x2: r, y2: O(r), cls: "k-dr" }], punkte: [{ x: rm, y: O(rm), txt: t("min"), cls: "pt-max" }, { x: r, y: O(r), cls: "pt" }] });
   }
 
   // ---------- Reiter 4: Differentialgleichungen ----------
@@ -288,7 +291,7 @@
     var feld = []; for(var i = 0; i <= 16; i++) for(var j = 1; j <= 10; j++){ var tx = t1 * i / 16, fy = yr[1] * j / 10.5; feld.push([tx, fy, D.rhs(k, S, fy)]); }
     var polys = [];
     if($("dEuler").checked){ var dt = t1 / 8, pts = [[0, f0]], y = f0; for(var s = 1; s <= 8; s++){ y = y + dt * D.rhs(k, S, y); pts.push([s * dt, y]); } polys.push({ pts: pts, cls: "k-eu" }); }
-    plot($("dgSvg"), { x0: 0, x1: t1, y0: yr[0], y1: yr[1], xName: "t", feld: feld, kurven: [{ f: f, cls: "k-f" }], polys: polys, punkte: [{ x: 0, y: f0, cls: "pt", txt: "f(0)" }].concat($("dEuler").checked ? polys[0].pts.slice(1).map(function(q){ return { x: q[0], y: q[1], r: 3.5, cls: "pt-eu" }; }) : []), linien: D.S && dgW === "kuehl" ? [{ x1: 0, y1: S, x2: t1, y2: S, cls: "k-dr" }] : dgW === "logist" ? [{ x1: 0, y1: S, x2: t1, y2: S, cls: "k-dr" }] : [] });
+    plot($("dgSvg"), { x0: 0, x1: t1, y0: yr[0], y1: yr[1], xName: "t", abl: { x: "t", namen: ["f(t)"] }, feld: feld, kurven: [{ f: f, cls: "k-f" }], polys: polys, punkte: [{ x: 0, y: f0, cls: "pt", txt: "f(0)" }].concat($("dEuler").checked ? polys[0].pts.slice(1).map(function(q){ return { x: q[0], y: q[1], r: 3.5, cls: "pt-eu" }; }) : []), linien: D.S && dgW === "kuehl" ? [{ x1: 0, y1: S, x2: t1, y2: S, cls: "k-dr" }] : dgW === "logist" ? [{ x1: 0, y1: S, x2: t1, y2: S, cls: "k-dr" }] : [] });
     sicht($("eulerT"), $("dEuler").checked); $("eulerT").textContent = t("eulerT");
   }
 
@@ -326,7 +329,7 @@
       ["l_s7", dotT("ẏ") + " = " + zahl(y0) + " · " + kl(k) + " · " + e(kk + "t") + " = " + kl(k) + " · y  ✓"]]);
     var kurven = [-3, -2, -1, 1, 2, 3, 4].map(function(c){ return { f: function(x){ return c * Math.exp(k * x); }, cls: "k-schar" }; });
     kurven.push({ f: function(x){ return y0 * Math.exp(k * x); }, cls: "k-f" });
-    plot($("lSvg"), { x0: -2, x1: 3, y0: -6, y1: 8, H: 320, xName: "t", kurven: kurven, punkte: [{ x: 0, y: y0, txt: "y(0)", cls: "pt" }] });
+    plot($("lSvg"), { x0: -2, x1: 3, y0: -6, y1: 8, H: 320, xName: "t", abl: { x: "t", namen: kurven.map(function(k, i){ return i === kurven.length - 1 ? "y(t)" : null; }) }, kurven: kurven, punkte: [{ x: 0, y: y0, txt: "y(0)", cls: "pt" }] });
   }
   var PDGL = [{ g: "ÿ = 6y + ẏ", p: 1, q: 6 }, { g: "ÿ = 4y", p: 0, q: 4 }, { g: "ÿ = " + M + "3ẏ " + M + " 2y", p: -3, q: -2 }, { g: "ÿ = 2ẏ " + M + " y", p: 2, q: -1 }, { g: "ÿ = ẏ + 2y", p: 1, q: 2 }];
   var pW = 0;
@@ -354,7 +357,7 @@
       ["f_s2", "s = ∫ (g · t + v₀) dt = ½ g t² + v₀ t + C₂;   s(0) = C₂ = 0   ⇒   s(t) = " + zahl(g / 2, 3) + "t²" + (v0 ? " + " + v0 + "t" : "")],
       ["f_s3", "v(" + zahl(tt, 1) + ") = " + zahl(v(tt)) + " m/s,   s(" + zahl(tt, 1) + ") = " + zahl(s(tt)) + " m"]]);
     var ymax = Math.max(s(5), v(5)) * 1.1;
-    plot($("fSvg"), { x0: 0, x1: 5, y0: 0, y1: ymax, H: 320, xName: "t", kurven: [{ f: s, cls: "k-f" }, { f: v, cls: "k-fa" }], linien: [{ x1: tt, y1: 0, x2: tt, y2: Math.max(s(tt), v(tt)), cls: "k-dr" }],
+    plot($("fSvg"), { x0: 0, x1: 5, y0: 0, y1: ymax, H: 320, xName: "t", abl: { x: "t", namen: ["s(t)", "v(t)"] }, kurven: [{ f: s, cls: "k-f" }, { f: v, cls: "k-fa" }], linien: [{ x1: tt, y1: 0, x2: tt, y2: Math.max(s(tt), v(tt)), cls: "k-dr" }],
       punkte: [{ x: tt, y: s(tt), cls: "pt", txt: zahl(s(tt), 1) + " m" }, { x: tt, y: v(tt), cls: "pt-r", txt: zahl(v(tt), 1) + " m/s", dy: 16 }] });
     $("fLeg").innerHTML = legende([["l-f", t("leg_sF")], ["l-fa", t("leg_vF")]]);
   }

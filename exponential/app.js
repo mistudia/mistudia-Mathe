@@ -46,7 +46,7 @@
         d += (an ? "L" : "M") + X(xx).toFixed(1) + " " + Y(yy).toFixed(1); an = true; }
       var clip = "c" + Math.random().toString(36).slice(2);
       var cp = el("clipPath", { id: clip }); cp.appendChild(el("rect", { x: L, y: T, width: R - L, height: B - T })); sv.appendChild(cp);
-      sv.appendChild(el("path", { d: d, "class": k.cls || "graph", "clip-path": "url(#" + clip + ")" }));
+      k._el = el("path", { d: d, "class": k.cls || "graph", "clip-path": "url(#" + clip + ")" }); sv.appendChild(k._el);
     });
     (o.treppe || []).forEach(function(s){
       if(s.y1 < o.y0 || s.y1 > o.y1 || s.y2 < o.y0 || s.y2 > o.y1) return;
@@ -54,6 +54,9 @@
       sv.appendChild(el("text", { x: X(s.x2) + 5, y: (Y(s.y1) + Y(s.y2)) / 2 + 5, "class": "treppeT" }, s.txt));
     });
     (o.punkte || []).forEach(function(p){ if(p[1] >= o.y0 && p[1] <= o.y1 && p[0] >= o.x0 && p[0] <= o.x1){ sv.appendChild(el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 6, "class": "punkt" })); if(p[2]) sv.appendChild(el("text", { x: X(p[0]) + 8, y: Y(p[1]) - 8, "class": "treppeT", style: "fill:#1d4ed8" }, p[2])); } });
+    // Werte ablesen + Wertetabelle (/graph-ablesen.js), nur bei Erkunden-Graphen (o.abl)
+    if(window.MS_ABL){ if(o.abl) MS_ABL.an(sv, { x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, L: L, R: R, T: T, B: B, xName: o.abl.x || "x",
+      kurven: (o.kurven || []).map(function(k, i){ return o.abl.namen[i] ? { f: k.f, el: k._el, name: o.abl.namen[i] } : null; }) }); else MS_ABL.aus(sv); }
   }
 
   // ---------- Reiter Parameter ----------
@@ -83,7 +86,7 @@
     $("formel").innerHTML = formelHTML();
     var f = fP(), b = form === "e" ? Math.exp(P.k) : P.b, a = P.a, d = P.d, c = form === "e" ? 0 : P.c;
     var tr = []; for(var x = -2; x < 4; x++){ var y1 = f(x), y2 = f(x + 1); if(Math.abs(b - 1) > 1e-9) tr.push({ x1: x, y1: y1, x2: x + 1, y2: y2, txt: "· " + zahl(b) }); }
-    plot($("gSvg"), { x0: -4, x1: 6, y0: -4, y1: 10, sx: 1, sy: 1, kurven: [{ f: f }], asym: d, treppe: b > 1 ? tr.slice(2, 5) : tr.slice(0, 3), punkte: [[0, f(0)]] });
+    plot($("gSvg"), { x0: -4, x1: 6, y0: -4, y1: 10, sx: 1, sy: 1, kurven: [{ f: f }], abl: { namen: ["f(x)"] }, asym: d, treppe: b > 1 ? tr.slice(2, 5) : tr.slice(0, 3), punkte: [[0, f(0)]] });
     var E = [];
     var mono = Math.abs(b - 1) < 1e-9 ? "konst" : (a > 0) === (b > 1) ? "steigt" : "faellt";
     E.push("<b>" + t("monoL") + "</b> " + t("m_" + mono) + (mono === "konst" ? "" : " " + t(b > 1 ? "grund_wachs" : "grund_zerf", { b: bdi(zahl(b)) })));
@@ -135,7 +138,7 @@
     E.push(t("linVergl", { l: bdi(zg(lin(D)) + (me ? " " + me : "")), e: bdi(zg(N(D)) + (me ? " " + me : "")) }));
     $("mErg").innerHTML = E.join("<br>");
     var ymax = Math.max(N(0), N(D), lin(D)) * 1.1, ymin = Math.min(0, lin(D));
-    plot($("wSvg"), { W: 420, H: 300, x0: 0, x1: D, y0: ymin, y1: ymax, kurven: [{ f: N }, { f: lin, cls: "graph2" }], asym: 0, punkte: [[D, N(D)]] });
+    plot($("wSvg"), { W: 420, H: 300, x0: 0, x1: D, y0: ymin, y1: ymax, kurven: [{ f: N }, { f: lin, cls: "graph2" }], abl: { x: "t", namen: ["N(t)", t("legLin")] }, asym: 0, punkte: [[D, N(D)]] });
     $("mLeg").innerHTML = '<span><i style="border-color:#2563eb"></i>' + t("legExp") + '</span><span><i style="border-color:#f59e0b;border-top-style:dashed"></i>' + t("legLin") + "</span>";
     var schritt = Math.max(1, Math.ceil(D / 20)), h = "<tr><th>t (" + zt + ")</th><th>N(t)</th><th>" + t("legLin") + "</th></tr>";
     for(var x = 0; x <= D + 1e-9; x += schritt) h += "<tr><td>" + zahl(x) + "</td><td>" + zahl(N(x)) + "</td><td>" + zahl(lin(x)) + "</td></tr>";

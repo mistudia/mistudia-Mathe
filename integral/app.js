@@ -97,7 +97,7 @@
         var y = k.fn[k.F ? "F" : "f"](x); if(!isFinite(y) || Y(y) < -1500 || Y(y) > 1900){ neu = true; continue; }
         d += (neu ? "M" : "L") + X(x).toFixed(1) + " " + Y(y).toFixed(1); neu = false;
       }
-      svg.appendChild(el("path", { d: d, "class": k.cls }));
+      k._el = el("path", { d: d, "class": k.cls }); svg.appendChild(k._el);
     });
     (o.grenzen || []).forEach(function(g){
       svg.appendChild(el("line", { x1: X(g.x), y1: GT, x2: X(g.x), y2: GB, "class": "g-grenze" }));
@@ -106,6 +106,9 @@
     });
     (o.punkte || []).forEach(function(p){ svg.appendChild(el("circle", { cx: X(p.x), cy: cl(p.y), r: 5, "class": "g-null" })); });
     (o.namen || []).forEach(function(n){ svg.appendChild(el("text", { x: X(n.x), y: Math.max(GT + 14, Math.min(GB - 6, cl(n.y) + 5)), "class": "g-name", "text-anchor": "middle", fill: n.farbe || "#1a2233" }, n.text)); });
+    // Werte ablesen + Wertetabelle (/graph-ablesen.js), nur bei Erkunden-Graphen (o.abl)
+    if(window.MS_ABL){ if(o.abl) MS_ABL.an(svg, { x0: x0, x1: x1, y0: lo, y1: hi, L: GL, R: GR, T: GT, B: GB,
+      kurven: (o.kurven || []).map(function(k, i){ return o.abl[i] ? { f: function(x){ return imDef(k.fn, x) ? k.fn[k.F ? "F" : "f"](x) : NaN; }, el: k._el, name: o.abl[i] } : null; }) }); else MS_ABL.aus(svg); }
   }
   function xBereich(a, b){
     var w = Math.max(b - a, 0.5), x0 = a - Math.max(0.4, 0.2 * w), x1 = b + Math.max(0.4, 0.2 * w);
@@ -159,7 +162,7 @@
     var E = eingaben(), svg = $("gR"); if(!E){ leer(svg); $("rWerte").innerHTML = ""; return; }
     var n = Number($("n").value); $("nWert").textContent = n;
     var R = riemannSumme(E.fn, E.a.v, E.b.v, n, art), I = integral(E.fn, E.a, E.b);
-    zeichne(svg, { xr: drag.xr || xBereich(E.a.v, E.b.v), kurven: [{ fn: E.fn, cls: "g-f" }], rects: R.rects, polys: R.polys, grenzen: [{ x: E.a.v, name: "a" }, { x: E.b.v, name: "b" }] });
+    zeichne(svg, { xr: drag.xr || xBereich(E.a.v, E.b.v), abl: ["f(x)"], kurven: [{ fn: E.fn, cls: "g-f" }], rects: R.rects, polys: R.polys, grenzen: [{ x: E.a.v, name: "a" }, { x: E.b.v, name: "b" }] });
     $("rWerte").innerHTML =
       "<div>" + t("breite") + "<br><b>" + bdi("Δx = " + z(R.dx)) + "</b></div>" +
       "<div>" + t("summe", { n: n }) + "<br><b>" + bdi("≈ " + z(R.s)) + "</b></div>" +
@@ -190,7 +193,7 @@
     $("sSchritte").innerHTML = S.map(function(s){ return "<li>" + s + "</li>"; }).join("");
     var I = integral(fn, E.a, E.b), at = z(E.a.v), bt = z(E.b.v);
     $("sBestimmt").innerHTML = bdi(int(at, bt) + " = [" + fn.Ftxt + "]<sub>" + at + "</sub><sup>" + bt + "</sup> = F(" + bt + ") − F(" + at + ") = " + (I.Fb.exakt ? I.Fb.txt : z(I.Fb.v)) + " − " + (I.Fa.v < 0 ? "(" : "") + (I.Fa.exakt ? I.Fa.txt : z(I.Fa.v)) + (I.Fa.v < 0 ? ")" : "") + " " + (I.exakt ? "= " + wertTxt({ v: I.v, txt: I.txt, exakt: true }) : "≈ " + z(I.v)));
-    zeichne(svg, { xr: xBereich(E.a.v, E.b.v), kurven: [{ fn: fn, cls: "g-f" }, { fn: fn, cls: "g-F", F: true }], polys: flaechenPolys(fn, null, E.a.v, E.b.v), punkte: [{ x: E.a.v, y: fn.F(E.a.v) }, { x: E.b.v, y: fn.F(E.b.v) }],
+    zeichne(svg, { xr: xBereich(E.a.v, E.b.v), abl: ["f(x)", "F(x)"], kurven: [{ fn: fn, cls: "g-f" }, { fn: fn, cls: "g-F", F: true }], polys: flaechenPolys(fn, null, E.a.v, E.b.v), punkte: [{ x: E.a.v, y: fn.F(E.a.v) }, { x: E.b.v, y: fn.F(E.b.v) }],
       namen: [{ x: E.b.v, y: fn.F(E.b.v) + 0, text: "F(b)", farbe: "var(--F)" }, { x: E.a.v, y: fn.F(E.a.v), text: "F(a)", farbe: "var(--F)" }] });
     $("sLegende").textContent = t("legende"); $("sHaupt").textContent = t("hauptsatz");
     var R = [[t("rPotenz"), "xⁿ", "xⁿ⁺¹ : (n + 1)"], [t("rFaktor"), "k · f(x)", "k · F(x)"], [t("rSumme"), "f(x) + g(x)", "F(x) + G(x)"], [t("rKonst"), "k", "k · x"],
@@ -256,7 +259,7 @@
     var kurven = [{ fn: E.fn, cls: "g-f" }]; if(gn) kurven.push({ fn: gn, cls: "g-g" });
     var namen = R.teile.map(function(tl, i){ var m = (tl.von.v + tl.bis.v) / 2, y = gn ? (E.fn.f(m) + gn.f(m)) / 2 : E.fn.f(m) / 2; return { x: m, y: y, text: "I" + tief(i + 1) }; });
     if(gn){ var xl = a.v + (b.v - a.v) * 0.85, dy = (Math.abs(E.fn.f(xl) - gn.f(xl)) < 0.3 ? 0.4 : 0); namen.push({ x: xl, y: E.fn.f(xl) + (E.fn.f(xl) >= gn.f(xl) ? 1 : -1) * dy, text: "f", farbe: "var(--f)" }, { x: xl + (b.v - a.v) * 0.04, y: gn.f(xl + (b.v - a.v) * 0.04), text: "g", farbe: "var(--g)" }); }
-    zeichne(svg, { xr: drag.xr || xBereich(a.v, b.v), kurven: kurven, polys: flaechenPolys(E.fn, gn, a.v, b.v), punkte: R.Z.map(function(n){ return { x: n.x, y: gn ? gn.f(n.x) : 0 }; }),
+    zeichne(svg, { xr: drag.xr || xBereich(a.v, b.v), abl: ["f(x)", "g(x)"], kurven: kurven, polys: flaechenPolys(E.fn, gn, a.v, b.v), punkte: R.Z.map(function(n){ return { x: n.x, y: gn ? gn.f(n.x) : 0 }; }),
       grenzen: zwei && $("schnitt").checked ? [] : [{ x: a.v, name: "a" }, { x: b.v, name: "b" }], namen: namen });
   }
 

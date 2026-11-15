@@ -169,6 +169,7 @@
 <script src="/funktionen/lexikon.js"></script>
 <script src="/funktionen/alltag-bilder.js"></script>
 <script src="/funktionen/alltag.js"></script>
+<script src="/graph-ablesen.js"></script>
 <script>
 var L = {
   de: { title:"Parameter bei Sinusfunktionen", vergleich:"im Vergleich zu", effA:"streckt/staucht entlang y-Achse", effB:"streckt/staucht entlang x-Achse", effC:"verschiebt entlang x-Achse", effD:"verschiebt entlang y-Achse",
@@ -382,6 +383,15 @@ function zeichne(){
     }
     // Legende
     schild(svg, W - MR - 6, MT + 14, "f(x) = sin(x)", "#d04848", "end");
+  }
+  // Werte ablesen + Wertetabelle (/graph-ablesen.js) – nicht im Übungsmodus
+  if(window.MS_ABL){
+    if(modus === "ueben") MS_ABL.aus(svg);
+    else {
+      var sk = function(q){ return function(x){ return q.a * Math.sin(q.b * x + q.c) + q.d; }; };
+      var ks = modus === "bsp" && alleZeigen ? ["f", "g", "h", "i", "j"].map(function(k){ return { f: sk(BSP[k]), farbe: BSP[k].col, name: k + "(x)" }; }) : [{ f: sk(P), farbe: "#1a2b6b", name: "f(x)" }];
+      MS_ABL.an(svg, { x0: X0, x1: X1, y0: -YM, y1: YM, L: ML, R: W - MR, T: MT, B: H - MB, kurven: ks });
+    }
   }
   live();
 }
