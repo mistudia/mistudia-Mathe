@@ -286,6 +286,17 @@
     if(tab === "zwei") zwei(); else if(tab === "drei") drei(); else if(tab === "geraden") geraden();
     if(!nurRechnen && auf){ var war = beantwortet, e = letzte, gut = $("meldung").classList.contains("gut"); zeige(); if(war){ beantwortet = false; anzahl--; if(gut) punkte--; if(Array.isArray(e)) e.forEach(function(v, i){ if($("uA" + i)) $("uA" + i).value = v; }); pruefe(e); } }
   }
+  // Alltagsbeispiel laden (aus alltag-daten.js): {op, a, b, k} → 2D, {A, B, C} → 3D
+  window.MS_VEK = { laden: function(w){
+    if(w.A){
+      zeigeTab("drei");
+      ["A", "B", "C"].forEach(function(n){ w[n].forEach(function(v, i){ $("d" + n + i).value = komma() ? String(v).replace(".", ",") : String(v); }); });
+      drei(); $("dEing").scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      A2 = w.a.slice(); B2 = w.b.slice(); if(w.k != null) $("k").value = w.k;
+      zeigeTab("zwei"); setzeOp(w.op); $("vSvg").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  } };
   window.MS_LANG = { apply: function(l){ if(VK[l]){ lang = l; alles(); } } };
   alles();
 })();
