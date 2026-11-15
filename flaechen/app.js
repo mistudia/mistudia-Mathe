@@ -322,6 +322,13 @@
     if(tab === "figur") figur(); else if(tab === "zus") zus();
     if(!nurRechnen && auf){ var war = beantwortet, e = letzte, gut = $("meldung").classList.contains("gut"); zeige(); if(war){ beantwortet = false; anzahl--; if(gut) punkte--; $("uAntwort").value = e; pruefe(e); } }
   }
+  // Alltagsbeispiel laden (aus alltag-daten.js)
+  window.MS_FLAECHE = { laden: function(w){
+    typ = w.typ; einheit = w.einheit; for(var k in w.P) werte[typ + k] = w.P[k];
+    $("figur").value = typ; $("einheit").value = einheit; $("warum").value = 0;
+    paramsBauen(); zeigeTab("figur");
+    $("figur").scrollIntoView({ behavior: "smooth", block: "start" });
+  } };
   window.MS_LANG = { apply: function(l){ if(FL[l]){ lang = l; alles(); } } };
   alles();
 })();
