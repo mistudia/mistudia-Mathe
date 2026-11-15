@@ -290,7 +290,7 @@ function wendeSpracheAn(){
 function setLang(l){
   lang=l;
   wendeSpracheAn();
-  neueAufgabe();
+  if(typeof A!=="undefined"&&A&&A.eigen) setzeAufgabe(A.typ,A.a,A.b,true); else neueAufgabe();
 }
 
 /* ---------- Monome: {c, x, y} ---------- */
@@ -323,7 +323,11 @@ function neueAufgabe(){
   const typ=["quadPlus","quadMinus","diff"][rnd(3)];
   let a=zufallsMonom(), b=zweitesMonom();
   if(stufe==="schwer"&&a.x===b.x&&a.y===b.y&&a.c===b.c)b.c=b.c+1;
-  A={typ:typ,a:a,b:b};
+  setzeAufgabe(typ,a,b,false);
+}
+// baut die Aufgabe (a ± b)… aus Formeltyp und zwei Monomen auf – auch für eigene Aufgaben (eigen.js)
+function setzeAufgabe(typ,a,b,eigen){
+  A={typ:typ,a:a,b:b,eigen:!!eigen};
   // Klammern: (a ± b) · (a ± b)  bzw. (a + b) · (a − b)
   A.s1 = typ==="quadMinus" ? -1 : 1;   // Vorzeichen von b in Klammer 1
   A.s2 = typ==="quadPlus" ? 1 : -1;    // Vorzeichen von b in Klammer 2
@@ -623,6 +627,9 @@ neueAufgabe();
 
 </script>
 <script src="msm-i18n.js"></script>
+<script src="eigen.js"></script>
+<script src="/alltag.js"></script>
+<script src="alltag-daten.js"></script>
 <script src="/home-button.js"></script>
 </body>
 </html>
