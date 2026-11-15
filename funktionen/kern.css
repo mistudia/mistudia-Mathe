@@ -128,3 +128,24 @@ h1 { text-align: center; color: var(--blue); margin: 0 0 14px; font-size: 28px; 
 .form-live .f { font: 21px "Cambria Math", Cambria, "Times New Roman", serif; }
 .regler-hinweis { font-size: 14px; color: var(--muted); text-align: center; margin: -4px 0 8px; }
 .regler.aus .regel { opacity: 0.5; }
+
+/* ---------- Wertetabelle unter dem Graphen (kern.js) ---------- */
+.wt { margin: 8px 0 4px; border: 2px solid var(--kartenrand); border-radius: 12px; background: #ffffff; padding: 4px 10px; }
+.wt summary { cursor: pointer; font-weight: 700; color: var(--blue); font-size: 16px; padding: 6px 0; }
+.wt-h { margin: 0 0 6px; font-size: 14px; color: var(--muted); }
+.wt-scroll { max-height: 240px; overflow-y: auto; border: 1px solid #b0b0b8; border-radius: 10px; }
+.wt table { width: 100%; border-collapse: collapse; font-size: 16px; color: var(--text); }
+.wt th { position: sticky; top: 0; background: #e3eefc; color: var(--text); font-size: 18px; font-style: italic; padding: 5px 8px; border-bottom: 1px solid #b0b0b8; }
+.wt td { padding: 3px 8px; border-bottom: 1px solid #e2e8f0; text-align: center; }
+.wt td input { width: 100%; max-width: 140px; font: 17px system-ui, sans-serif; padding: 5px 8px; border: 2px solid #b0b0b8; border-radius: 8px; text-align: center; color: var(--text); background: #ffffff; }
+.wt td input:focus { outline: none; border-color: var(--blue); }
+.wt td input.wt-falsch { border-color: #b91c1c; background: #fef2f2; }
+.wt .wt-y { font-size: 18px; font-weight: 700; color: #6d28d9; white-space: nowrap; }
+.wt-akt { white-space: nowrap; width: 1%; }
+.wt-akt button { width: 32px; height: 32px; border-radius: 8px; border: 2px solid #b0b0b8; background: #ffffff; color: var(--text); font: 700 18px system-ui; cursor: pointer; padding: 0; margin: 0 2px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+.wt-akt .wt-ziel { color: #6d28d9; }
+.wt-knoepfe { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 8px 0 6px; font-size: 14px; }
+.wt-knoepfe button { font: 700 14px system-ui, sans-serif; padding: 7px 12px; border-radius: 10px; border: 2px solid var(--blue); background: #ffffff; color: var(--blue); cursor: pointer; }
+.wt-knoepfe label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text); }
+/* offene Tabelle: Graph-Box nicht mehr „kleben“ lassen, sonst wäre ihr unteres Ende nicht erreichbar */
+.graph-box:has(.wt[open]) { position: static; }

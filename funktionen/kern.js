@@ -335,18 +335,32 @@ var FK = (function(){
     this.v = { x0: -6, x1: 6, y0: -4, y1: 4 };
     this.layers = null; this.ptr = new Map(); this.start = null;
     var self = this;
+    this.kurven = []; this.hover = null; this.pin = null; this.tipp0 = null; this.tab = null;
     svg.addEventListener("pointerdown", function(e){
+      self.tipp0 = self.ptr.size ? null : { x: e.clientX, y: e.clientY, id: e.pointerId };
       svg.setPointerCapture && (function(){ try { svg.setPointerCapture(e.pointerId); } catch(er){} })();
       self.ptr.set(e.pointerId, { x: e.clientX, y: e.clientY });
       self.beginne();
     });
     svg.addEventListener("pointermove", function(e){
-      if(!self.ptr.has(e.pointerId)) return;
+      if(!self.ptr.has(e.pointerId)){
+        if(e.pointerType === "mouse"){ var r0 = svg.getBoundingClientRect(); self.hover = { px: e.clientX - r0.left, py: e.clientY - r0.top }; self.zeichneAblesen(); }
+        return;
+      }
+      if(self.tipp0 && Math.hypot(e.clientX - self.tipp0.x, e.clientY - self.tipp0.y) > 6) self.tipp0 = null;
+      if(self.tipp0) return;
+      self.hover = null;
       self.ptr.set(e.pointerId, { x: e.clientX, y: e.clientY });
       self.bewege(); e.preventDefault();
     });
-    function ende(e){ if(!self.ptr.has(e.pointerId)) return; self.ptr.delete(e.pointerId); self.beginne(); }
+    function ende(e){
+      if(!self.ptr.has(e.pointerId)) return; self.ptr.delete(e.pointerId); self.beginne();
+      if(e.type === "pointerup" && self.tipp0 && self.tipp0.id === e.pointerId && !self.ptr.size){ var r1 = svg.getBoundingClientRect(); self.tippen(e.clientX - r1.left, e.clientY - r1.top); }
+      self.tipp0 = null;
+    }
     svg.addEventListener("pointerup", ende); svg.addEventListener("pointercancel", ende);
+    svg.addEventListener("pointerleave", function(e){ if(e.pointerType === "mouse" && self.hover){ self.hover = null; self.zeichneAblesen(); } });
+    if(this.opts.tabelle !== false) this.tabelleBauen();
     svg.addEventListener("wheel", function(e){
       e.preventDefault();
       var r = svg.getBoundingClientRect();
@@ -426,27 +440,39 @@ var FK = (function(){
     for(var y = Math.ceil(v.y0 / gy) * gy; y <= v.y1; y += gy){
       var py = Y(y); g.appendChild(E("line", { x1: 0, y1: py, x2: W, y2: py, stroke: "#e2e8f0" }));
     }
-    var ax = Math.min(Math.max(Y(0), 0), H), ay = Math.min(Math.max(X(0), 0), W);
-    g.appendChild(E("line", { x1: 0, y1: ax, x2: W, y2: ax, stroke: "#444", "stroke-width": 1.5 }));
-    g.appendChild(E("line", { x1: ay, y1: 0, x2: ay, y2: H, stroke: "#444", "stroke-width": 1.5 }));
+    // Liegt eine Achse außerhalb des Ausschnitts, stehen ihre Zahlen auf einem Streifen am Rand
+    // (mit Pfeil in Richtung der Achse) – statt einer falschen Achse am Rand.
+    var xUnten = Y(0) > H, xOben = Y(0) < 0, yLinks = X(0) < 0, yRechts = X(0) > W;
+    var ax = xUnten ? H - 22 : xOben ? 2 : Y(0), ay = yLinks ? 48 : yRechts ? W : X(0);
+    if(xUnten || xOben){ var by = xUnten ? H - 24 : 0;
+      g.appendChild(E("rect", { x: 0, y: by, width: W, height: 24, fill: "#f1f5f9", opacity: 0.94 }));
+      g.appendChild(E("line", { x1: 0, y1: xUnten ? by : 24, x2: W, y2: xUnten ? by : 24, stroke: "#64748b", "stroke-width": 1.2, "stroke-dasharray": "6 4" }));
+    } else g.appendChild(E("line", { x1: 0, y1: ax, x2: W, y2: ax, stroke: "#444", "stroke-width": 1.5 }));
+    if(yLinks || yRechts){ var bx = yLinks ? 0 : W - 52;
+      g.appendChild(E("rect", { x: bx, y: 0, width: 52, height: H, fill: "#f1f5f9", opacity: 0.94 }));
+      g.appendChild(E("line", { x1: yLinks ? 52 : bx, y1: 0, x2: yLinks ? 52 : bx, y2: H, stroke: "#64748b", "stroke-width": 1.2, "stroke-dasharray": "6 4" }));
+    } else g.appendChild(E("line", { x1: ay, y1: 0, x2: ay, y2: H, stroke: "#444", "stroke-width": 1.5 }));
+    this.rand = { xUnten: xUnten, xOben: xOben, yLinks: yLinks, yRechts: yRechts };
     var stellen = function(st){ return Math.max(0, -Math.floor(Math.log10(st) + 1e-9)); };
     for(var x2 = Math.ceil(v.x0 / gx) * gx; x2 <= v.x1; x2 += gx){
       if(Math.abs(x2) < gx / 2) continue;
-      var px2 = X(x2); if(px2 < 12 || px2 > W - 12) continue;
-      g.appendChild(E("text", { x: px2, y: Math.min(Math.max(ax + 15, 14), H - 4), "text-anchor": "middle", "paint-order": "stroke", stroke: "#fff", "stroke-width": 3 }, zahl(x2, stellen(gx))));
+      var px2 = X(x2); if(px2 < 12 || px2 > W - 12 || (yLinks && px2 < 60) || (yRechts && px2 > W - 60)) continue;
+      g.appendChild(E("text", { x: px2, y: xUnten ? H - 7 : xOben ? 17 : Math.min(Math.max(ax + 15, 14), H - 4), "text-anchor": "middle", "paint-order": "stroke", stroke: "#fff", "stroke-width": 3 }, zahl(x2, stellen(gx))));
     }
     for(var y2 = Math.ceil(v.y0 / gy) * gy; y2 <= v.y1; y2 += gy){
       if(Math.abs(y2) < gy / 2) continue;
-      var py2 = Y(y2); if(py2 < 10 || py2 > H - 8) continue;
-      var lx = Math.min(Math.max(ay - 5, 30), W - 4);
+      var py2 = Y(y2); if(py2 < 10 || py2 > H - 8 || (xUnten && py2 > H - 30) || (xOben && py2 < 32)) continue;
+      var lx = yRechts ? W - 4 : Math.min(Math.max(ay - 5, 30), W - 4);
       g.appendChild(E("text", { x: lx, y: py2 + 4, "text-anchor": "end", "paint-order": "stroke", stroke: "#fff", "stroke-width": 3 }, zahl(y2, stellen(gy))));
     }
-    g.appendChild(E("text", { x: W - 6, y: Math.min(Math.max(ax - 6, 12), H - 4), "text-anchor": "end", "font-style": "italic", "font-size": 14 }, "x"));
-    g.appendChild(E("text", { x: Math.min(Math.max(ay + 6, 6), W - 14), y: 14, "font-style": "italic", "font-size": 14 }, "y"));
+    g.appendChild(E("text", { x: W - 6, y: xUnten ? H - 30 : xOben ? 42 : Math.min(Math.max(ax - 6, 12), H - 4), "text-anchor": "end", "font-style": "italic", "font-size": 14, "font-weight": (xUnten || xOben) ? 700 : 400, fill: (xUnten || xOben) ? "#475569" : "#333" }, (xUnten ? "x ↓" : xOben ? "x ↑" : "x")));
+    g.appendChild(E("text", { x: yRechts ? W - 58 : yLinks ? 58 : Math.min(Math.max(ay + 6, 6), W - 14), y: 14, "font-style": "italic", "font-size": 14, "text-anchor": yRechts ? "end" : "start", "font-weight": (yLinks || yRechts) ? 700 : 400, fill: (yLinks || yRechts) ? "#475569" : "#333" }, (yLinks ? "← y" : yRechts ? "y →" : "y")));
     svg.appendChild(g);
     var inhalt = E("g", { "clip-path": "url(#fkClip)" }); svg.appendChild(inhalt);
-    this.inhalt = inhalt;
+    this.inhalt = inhalt; this.kurven = [];
     if(this.opts.zeichnen) this.opts.zeichnen(this);
+    this.tabelleZeichnen();
+    this.zeichneAblesen();
   };
   // brueche: x-Stellen (Polstellen/Lücken), an denen die Linie unterbrochen wird
   Graph.prototype.kurve = function(f, farbe, breite, strich, brueche){
@@ -462,6 +488,7 @@ var FK = (function(){
     var a = { d: d, fill: "none", stroke: farbe, "stroke-width": breite || 3, "stroke-linejoin": "round", "stroke-linecap": "round" };
     if(strich) a["stroke-dasharray"] = strich;
     this.inhalt.appendChild(E("path", a));
+    if(!strich) this.kurven.push({ f: f, farbe: farbe, breite: breite || 3 });
   };
   Graph.prototype.linie = function(x1, y1, x2, y2, farbe, breite, strich){
     var a = { x1: this.X(x1), y1: this.Y(y1), x2: this.X(x2), y2: this.Y(y2), stroke: farbe, "stroke-width": breite || 2 };
@@ -491,6 +518,157 @@ var FK = (function(){
     var self = this;
     this.inhalt.appendChild(E("polygon", { points: pts.map(function(p){ return self.X(p[0]).toFixed(1) + "," + self.Y(p[1]).toFixed(1); }).join(" "), fill: fuell, stroke: rand || "none", "stroke-width": 2 }));
   };
+
+  // ---------- Werte ablesen (Maus darüber / Tippen) ----------
+  // Hover (Maus) zeigt einen Ablesepunkt auf der nächstliegenden durchgezogenen Kurve,
+  // Tippen/Klicken lässt ihn stehen; erneutes Tippen auf den Punkt entfernt ihn.
+  function klemm(v, a, b){ return Math.min(Math.max(v, a), b); }
+  Graph.prototype.hauptKurve = function(){
+    var b = null; this.kurven.forEach(function(k){ if(!b || k.breite > b.breite) b = k; }); return b;
+  };
+  Graph.prototype.ablSchritt = function(){
+    var roh = (this.v.x1 - this.v.x0) / (this.W || 600) * 12;
+    var s = Math.pow(10, Math.floor(Math.log10(roh))); return { s: s, d: Math.max(0, -Math.round(Math.log10(s))) };
+  };
+  Graph.prototype.weltX = function(px){ var v = this.v; return v.x0 + px / (this.W || 600) * (v.x1 - v.x0); };
+  Graph.prototype.naechste = function(x, py){
+    var self = this, best = -1, bd = Infinity;
+    this.kurven.forEach(function(k, i){ var y = k.f(x); var d = isFinite(y) ? Math.abs(self.Y(y) - py) : 1e9; if(d < bd){ bd = d; best = i; } });
+    return best < 0 ? 0 : best;
+  };
+  Graph.prototype.tippen = function(px, py){
+    if(!this.kurven.length || !this.X) return;
+    if(this.pin){ var k = this.kurven[Math.min(this.pin.k, this.kurven.length - 1)], y = k.f(this.pin.x);
+      if(Math.abs(this.X(this.pin.x) - px) < 16 && (!isFinite(y) || Math.abs(klemm(this.Y(y), 0, this.H) - py) < 16)){ this.pin = null; this.zeichneAblesen(); return; } }
+    var st = this.ablSchritt(), x = Math.round(this.weltX(px) / st.s) * st.s;
+    this.pin = { x: Number(x.toFixed(st.d)), d: st.d, k: this.naechste(x, py) };
+    this.hover = null; this.zeichneAblesen();
+  };
+  Graph.prototype.zeichneAblesen = function(){
+    if(this.ablG){ this.ablG.remove(); this.ablG = null; }
+    if(!this.X || !this.kurven.length) return;
+    var self = this, g = E("g", { "pointer-events": "none" });
+    var R = this.rand || {}, W = this.W, H = this.H;
+    var achseY = R.xUnten ? H - 24 : R.xOben ? 24 : this.Y(0), achseX = R.yLinks ? 52 : R.yRechts ? W - 52 : this.X(0);
+    function ziel(x, d, k, stark){
+      var y = k.f(x), px = self.X(x), farbe = k.farbe, xs = zahl(x, d), txt, py, pyc;
+      var lin = { stroke: farbe, "stroke-width": stark ? 2 : 1.5, "stroke-dasharray": "5 4", opacity: stark ? 1 : 0.7 };
+      if(!isFinite(y)){
+        g.appendChild(E("line", Object.assign({ x1: px, y1: 0, x2: px, y2: H }, lin)));
+        txt = "(" + xs + " | —)"; pyc = 40;
+      } else {
+        py = self.Y(y); pyc = klemm(py, 0, H);
+        var ay = Math.abs(y), yd = ay < 100 ? 2 : ay < 10000 ? 1 : 0;
+        g.appendChild(E("line", Object.assign({ x1: px, y1: pyc, x2: px, y2: achseY }, lin)));
+        if(py >= 0 && py <= H){
+          g.appendChild(E("line", Object.assign({ x1: px, y1: py, x2: achseX, y2: py }, lin)));
+          g.appendChild(E("circle", { cx: px, cy: py, r: stark ? 7 : 6, fill: stark ? farbe : "#ffffff", stroke: stark ? "#ffffff" : farbe, "stroke-width": stark ? 2.5 : 3 }));
+        }
+        txt = (py < 0 ? "↑ " : py > H ? "↓ " : "") + "(" + xs + " | " + zahl(y, yd) + ")";
+      }
+      var w = txt.length * 7.8 + 16, h = 24, lx = px + 12, ly = pyc - 36;
+      if(lx + w > W - 4) lx = px - 12 - w;
+      if(lx < 4) lx = 4;
+      if(ly < 4) ly = pyc + 12;
+      var unten = R.xUnten ? H - 28 : H - 2, oben = R.xOben ? 28 : 4;
+      if(ly < oben) ly = oben;
+      if(ly + h > unten) ly = unten - h;
+      g.appendChild(E("rect", { x: lx, y: ly, width: w, height: h, rx: 7, fill: "#ffffff", stroke: farbe, "stroke-width": 2, opacity: stark ? 1 : 0.92 }));
+      g.appendChild(E("text", { x: lx + w / 2, y: ly + 16.5, "text-anchor": "middle", fill: "#1a2233", "font-size": 14, "font-weight": 700, "font-family": "system-ui, sans-serif", direction: "ltr", "unicode-bidi": "embed" }, txt));
+    }
+    if(this.hover){
+      var st = this.ablSchritt(), x = Math.round(this.weltX(this.hover.px) / st.s) * st.s;
+      ziel(Number(x.toFixed(st.d)), st.d, this.kurven[this.naechste(x, this.hover.py)], false);
+    }
+    if(this.pin) ziel(this.pin.x, this.pin.d, this.kurven[Math.min(this.pin.k, this.kurven.length - 1)], true);
+    this.svg.appendChild(g); this.ablG = g;
+  };
+
+  // ---------- Wertetabelle unter dem Graphen ----------
+  // Eigene x-Werte eintragen → f(x) der Hauptkurve; Punkte erscheinen im Graphen,
+  // ⌖ verschiebt den Ausschnitt zum Punkt.
+  function xLesen(s){
+    s = String(s).trim().replace(/[−–]/g, "-").replace(/\s+/g, "").replace(",", ".");
+    if(!s) return NaN;
+    var m = s.match(/^(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);
+    if(m) return +m[2] ? +m[1] / +m[2] : NaN;
+    return /^-?(\d+\.?\d*|\.\d+)$/.test(s) ? +s : NaN;
+  }
+  var ZIEL_SVG = '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 1v5M10 14v5M1 10h5M14 10h5" stroke="currentColor" stroke-width="2"/></svg>';
+  Graph.prototype.tabelleBauen = function(){
+    var wrap = this.svg.closest(".graph-wrap"); if(!wrap) return;
+    var self = this, det = document.createElement("details");
+    det.className = "wt";
+    det.innerHTML = '<summary></summary><p class="wt-h"></p><div class="wt-scroll" dir="ltr"><table><thead><tr><th class="m">x</th><th class="m">f(x)</th><th></th></tr></thead><tbody></tbody></table></div>' +
+      '<div class="wt-knoepfe"><button type="button" class="wt-neu"></button><button type="button" class="wt-auto"></button><label><input type="checkbox" class="wt-zeig" checked> <span></span></label></div>';
+    var ref = wrap.nextElementSibling && wrap.nextElementSibling.classList.contains("legende") ? wrap.nextElementSibling : wrap;
+    ref.parentNode.insertBefore(det, ref.nextSibling);
+    var T = this.tab = { det: det, body: det.querySelector("tbody"), xs: [], lang: null };
+    det.addEventListener("toggle", function(){ if(det.open && !T.xs.length) self.tabAuto(); else self.zeichne(); });
+    det.querySelector(".wt-auto").addEventListener("click", function(){ self.tabAuto(); });
+    det.querySelector(".wt-neu").addEventListener("click", function(){
+      var n = T.xs.filter(isFinite), st = n.length >= 2 ? n[n.length - 1] - n[n.length - 2] : 1;
+      T.xs.push(n.length ? Number((n[n.length - 1] + (st || 1)).toFixed(8)) : 0);
+      self.tabZeilen(); self.zeichne();
+      var inp = T.body.querySelectorAll("input"); if(inp.length){ inp[inp.length - 1].focus(); inp[inp.length - 1].select(); }
+    });
+    det.querySelector(".wt-zeig").addEventListener("change", function(){ self.zeichne(); });
+    T.body.addEventListener("input", function(e){
+      var i = +e.target.dataset.i; if(isNaN(i)) return;
+      T.xs[i] = xLesen(e.target.value); e.target.classList.toggle("wt-falsch", !isFinite(T.xs[i]) && e.target.value.trim() !== "");
+      self.zeichne();
+    });
+    T.body.addEventListener("click", function(e){
+      var b = e.target.closest("button"); if(!b) return; var i = +b.dataset.i;
+      if(b.classList.contains("wt-weg")){ T.xs.splice(i, 1); self.tabZeilen(); self.zeichne(); return; }
+      if(b.classList.contains("wt-ziel")){
+        var x = T.xs[i], k = self.hauptKurve(); if(!isFinite(x) || !k) return;
+        var y = k.f(x), v = self.v, w = v.x1 - v.x0, h = v.y1 - v.y0;
+        self.v = { x0: x - w / 2, x1: x + w / 2, y0: isFinite(y) ? y - h / 2 : v.y0, y1: isFinite(y) ? y + h / 2 : v.y1 };
+        self.pin = { x: x, d: 6, k: Math.max(0, self.kurven.indexOf(k)) };
+        self.zeichne();
+      }
+    });
+  };
+  Graph.prototype.tabAuto = function(){
+    var v = this.v, st = schoen(v.x1 - v.x0, 6), xs = [];
+    for(var x = Math.ceil(v.x0 / st) * st; x <= v.x1 + 1e-9 && xs.length < 12; x += st) xs.push(Number(x.toFixed(10)));
+    this.tab.xs = xs; this.tabZeilen(); this.zeichne();
+  };
+  Graph.prototype.tabZeilen = function(){
+    var T = this.tab, h = "";
+    T.xs.forEach(function(x, i){
+      h += '<tr><td><input type="text" inputmode="decimal" autocomplete="off" data-i="' + i + '" value="' + (isFinite(x) ? zahl(x, 6) : "") + '"></td><td class="wt-y m"></td>' +
+        '<td class="wt-akt"><button type="button" class="wt-ziel" data-i="' + i + '">' + ZIEL_SVG + '</button><button type="button" class="wt-weg" data-i="' + i + '">×</button></td></tr>';
+    });
+    T.body.innerHTML = h; T.lang = null;
+  };
+  Graph.prototype.tabelleZeichnen = function(){
+    var T = this.tab; if(!T) return;
+    if(T.lang !== lang){
+      T.lang = lang;
+      T.det.querySelector("summary").textContent = t("wtTitel");
+      T.det.querySelector(".wt-h").textContent = t("wtHinweis");
+      T.det.querySelector(".wt-neu").textContent = t("wtNeu");
+      T.det.querySelector(".wt-auto").textContent = t("wtAuto");
+      T.det.querySelector(".wt-zeig + span").textContent = t("wtPunkte");
+      T.body.querySelectorAll(".wt-ziel").forEach(function(b){ b.title = t("wtZiel"); b.setAttribute("aria-label", t("wtZiel")); });
+      T.body.querySelectorAll(".wt-weg").forEach(function(b){ b.title = t("wtWeg"); b.setAttribute("aria-label", t("wtWeg")); });
+      T.body.querySelectorAll("input").forEach(function(e){ e.setAttribute("aria-label", t("wtX")); e.placeholder = "x"; });
+    }
+    if(!T.det.open) return;
+    var k = this.hauptKurve(), self = this, zeig = T.det.querySelector(".wt-zeig").checked;
+    var zellen = T.body.querySelectorAll(".wt-y");
+    T.xs.forEach(function(x, i){
+      var y = (k && isFinite(x)) ? k.f(x) : NaN, ay = Math.abs(y);
+      if(zellen[i]) zellen[i].textContent = isFinite(x) ? (isFinite(y) ? zahl(y, ay < 100 ? 3 : 2) : "—") : "";
+      if(zeig && isFinite(y) && isFinite(x)){
+        var px = self.X(x), py = self.Y(y);
+        self.inhalt.appendChild(E("circle", { cx: px, cy: py, r: 5.5, fill: "#7c3aed", stroke: "#ffffff", "stroke-width": 2 }));
+      }
+    });
+  };
+
 
   // Zoom-Knöpfe an einen Graphen hängen
   function knoepfe(box, graph, passend){
