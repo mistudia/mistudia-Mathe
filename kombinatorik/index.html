@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     kombinatorik/index.html – Kombinatorik (miStudia Mathe)
+     Permutation n!, Vierfeldertafel „mit/ohne Reihenfolge × mit/ohne
+     Wiederholung“ (n^k, n!/(n−k)!, (n+k−1 über k), (n über k)) mit
+     Reglern, Alltagsbeispiele mit kleinen Fällen zum Nachzählen, Üben.
+     Logik: app.js, Texte: texte.js (9 Sprachen), Sprache aus dem Startmenü.
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Kombinatorik</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --lila: #a21caf; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 20px; margin: 2px 0 8px; }
+  h3 { color: var(--blue); font-size: 17px; margin: 12px 0 6px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.5; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 6px 0; }
+  .reihe label { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; max-width: 100%; }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16.5px; line-height: 1.5; margin: 8px 0; }
+  select { font: 18px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; max-width: 100%; }
+  input.zahl { width: 200px; max-width: 100%; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; font-variant-numeric: tabular-nums; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  .regler { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 16px; margin: 8px 0; }
+  .regler label { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; font-weight: 700; }
+  .regler b { min-width: 2.2em; text-align: end; font-variant-numeric: tabular-nums; color: var(--blue); }
+  .regler input[type=range] { width: 100%; }
+  .wahl { display: inline-flex; background: #e3eefc; border-radius: 12px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+  .wahl button { font: 700 15px system-ui, sans-serif; padding: 7px 14px; border: 0; border-radius: 9px; background: transparent; color: var(--blue); cursor: pointer; }
+  .wahl button[aria-pressed="true"] { background: var(--blue); color: #ffffff; }
+  .frage { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin: 6px 0; font-size: 17px; font-weight: 700; }
+  /* Formeln */
+  .f { direction: ltr; unicode-bidi: isolate; display: inline-block; line-height: 2.2; font-variant-numeric: tabular-nums; }
+  .f sup, .f sub { line-height: 0; }
+  .br { margin: 0 2px; display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.25; }
+  .br > span { padding: 0 3px; white-space: nowrap; }
+  .br > span + span { border-top: 2px solid currentColor; }
+  .bk { display: inline-flex; align-items: center; vertical-align: middle; }
+  .bk::before, .bk::after { font-size: 2.3em; font-weight: 300; line-height: 1; }
+  .bk::before { content: "("; } .bk::after { content: ")"; }
+  .bk > span { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.2; padding: 0 1px; white-space: nowrap; }
+  sup { font-size: 65%; }
+  .formelGross { font-size: 26px; font-weight: 800; color: var(--blue); text-align: center; margin: 6px 0; display: flex; justify-content: center; }
+  .wert { font-size: 20px; font-weight: 700; text-align: center; margin: 6px 0; display: flex; justify-content: center; }
+  /* Permutations- und Möglichkeitslisten */
+  .liste { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; direction: ltr; }
+  .liste span { border: 1.5px solid var(--line); border-radius: 8px; padding: 3px 8px; font: 700 16px ui-monospace, Menlo, Consolas, monospace; background: #f8fafc; color: var(--text); }
+  /* Vierfeldertafel */
+  .tafel { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); gap: 6px; margin: 10px 0; }
+  .tafel .kopf { background: #e3eefc; color: var(--blue); font-weight: 800; border-radius: 10px; padding: 8px; text-align: center; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .tafel .ecke { background: transparent; }
+  .tafel .feld { border: 2px solid var(--line); border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; background: #ffffff; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text); font: inherit; }
+  .tafel .feld:hover { border-color: var(--blue); }
+  .tafel .feld.an { border-color: var(--lila); background: #fdf4ff; box-shadow: 0 0 0 2px var(--lila); }
+  .feld .bez { font-weight: 800; color: var(--lila); font-size: 16px; }
+  .feld .bez small { display: block; font-weight: 600; color: var(--muted); font-size: 13px; }
+  .feld .fo { font-size: 21px; font-weight: 700; }
+  .feld .zw { font-size: 16px; color: var(--muted); }
+  .feld .zw.nein { font-size: 14px; color: var(--schlecht); }
+  @media (max-width: 600px) {
+    .tafel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .tafel .ecke { display: none; }
+    .tafel .zkopf { grid-column: 1 / -1; padding: 5px; }
+    .feld .fo { font-size: 18px; }
+  }
+  table.zeichen { border-collapse: collapse; width: 100%; font-size: 16.5px; }
+  table.zeichen td { border-bottom: 1px solid #e2e8f0; padding: 6px 8px; vertical-align: top; line-height: 1.45; }
+  table.zeichen td:first-child { font-weight: 800; color: var(--blue); white-space: nowrap; width: 1%; }
+  .schritte { margin: 6px 0; padding-inline-start: 22px; font-size: 17px; line-height: 1.7; }
+  .schritte li { margin: 4px 0; }
+  .zwei { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .zwei { grid-template-columns: 1fr; } }
+  .box { border: 1px solid #c9dcf2; border-radius: 12px; padding: 10px 12px; background: #fbfdff; min-width: 0; }
+  .ergebnisZ { font-size: 22px; font-weight: 800; color: var(--blue); margin: 8px 0; }
+  /* Üben */
+  .auftrag { font-size: 20px; line-height: 1.5; margin: 4px 0 10px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .tabs button { padding: 8px 12px; font-size: 14px; }
+    .formelGross { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Kombinatorik</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="uebersicht" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="beispiele" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+
+  <section id="s_uebersicht">
+    <div class="karte">
+      <h2 id="permH"></h2>
+      <p class="formelGross"><span class="f">P<sub>n</sub> = n! = n · (n − 1) · … · 2 · 1</span></p>
+      <p class="zeile" id="permT"></p>
+      <div class="regler"><label><span>n =</span> <input type="range" id="pn" min="1" max="10" step="1" value="4"> <b id="pnW"></b></label></div>
+      <p class="zeile" id="permBsp"></p>
+      <p class="wert" id="permWert"></p>
+      <div id="permListeBox"><p class="zeile muted" id="permListe"></p><div class="liste" id="permAlle"></div></div>
+    </div>
+
+    <div class="karte">
+      <h2 id="tabH"></h2>
+      <p class="zeile" id="tabT"></p>
+      <div class="frage"><span id="f1"></span> <span class="wahl" id="w1"></span></div>
+      <div class="frage"><span id="f2"></span> <span class="wahl" id="w2"></span></div>
+      <div class="regler">
+        <label><span>n =</span> <input type="range" id="tn" min="1" max="12" step="1" value="5"> <b id="tnW"></b></label>
+        <label><span>k =</span> <input type="range" id="tk" min="1" max="8" step="1" value="2"> <b id="tkW"></b></label>
+      </div>
+      <p class="zeile muted" id="nkInfo"></p>
+      <div class="tafel" id="tafel"></div>
+      <p class="merke" id="erkl"></p>
+    </div>
+
+    <div class="karte">
+      <h2 id="buchH"></h2>
+      <table class="zeichen" id="buch"></table>
+    </div>
+  </section>
+
+  <section id="s_beispiele" hidden>
+    <div class="karte">
+      <div class="reihe"><label><span id="wahlL"></span> <select id="bsp"></select></label></div>
+      <h2 id="bTitel"></h2>
+      <div class="zwei">
+        <div class="box" id="bGross"></div>
+        <div class="box" id="bKlein"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s_ueben" hidden>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <h2 id="uNr"></h2>
+      <p class="auftrag" id="auftrag"></p>
+      <div class="antwortzeile"><label for="uAntwort" id="antwortL" style="font-weight:700"></label> <input class="zahl" id="uAntwort" inputmode="numeric" autocomplete="off"> <button type="button" class="knopf" id="pruefen"></button></div>
+      <p class="muted" id="tipp"></p>
+      <p class="meldung" id="meldung"></p>
+      <div id="uLoesung" hidden></div>
+      <p><button type="button" class="knopf hell" id="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>
