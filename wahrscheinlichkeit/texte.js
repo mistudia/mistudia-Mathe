@@ -466,3 +466,113 @@ Object.assign(WT.pt, {
   aufVierLuecke: "Que número vai na célula com «?»?", aufVierBed: "Calcula {q}.",
   eingabeZ: "número inteiro", lueckeRech: "Soma da linha ou coluna:", bedRech: "Célula comum a dividir pela soma de «{y}»:"
 });
+
+// ---------- Grundlagen (Laplace) ----------
+Object.assign(WT.de, {
+  tab_grund: "Grundlagen", gx_wuerfel: "ein Würfel", gx_zwei: "zwei Würfel", gx_muenze3: "drei Münzen", gx_karten: "Kartenspiel (32 Karten)",
+  gt_wuerfel: "Ein Würfel wird einmal geworfen.", gt_zwei: "Zwei Würfel werden geworfen (erster | zweiter). In der Tabelle steht die Augensumme.", gt_muenze3: "Drei Münzen werden geworfen (K = Kopf, Z = Zahl).", gt_karten: "Aus einem Skatblatt mit 32 Karten wird eine Karte gezogen.",
+  gEvL: "Ereignis E wählen – oder Ergebnisse antippen:",
+  ge_wuerfel_gerade: "gerade Zahl", ge_wuerfel_gr4: "größer als 4", ge_wuerfel_prim: "Primzahl", ge_wuerfel_sechs: "eine Sechs",
+  ge_zwei_s7: "Augensumme 7", ge_zwei_pasch: "Pasch", ge_zwei_s10: "Augensumme mindestens 10", ge_zwei_eine6: "mindestens eine Sechs",
+  ge_muenze3_genau2: "genau zweimal Kopf", ge_muenze3_mind1: "mindestens einmal Kopf", ge_muenze3_gleich: "alle gleich",
+  ge_karten_herz: "Herz", ge_karten_ass: "ein Ass", ge_karten_bild: "Bube, Dame oder König", ge_karten_rot: "rote Karte",
+  gKopf: "K", gZahl: "Z", gBube: "B", gDame: "D", gKoenig: "K", gAss: "A",
+  gMerke: "<b>Ergebnismenge Ω:</b> alle möglichen Ergebnisse. <b>Ereignis E:</b> eine Auswahl davon. Sind alle Ergebnisse gleich wahrscheinlich (Laplace-Experiment), gilt <b>P(E) = Anzahl günstige : Anzahl mögliche</b>. Das Gegenereignis Ē hat P(Ē) = 1 − P(E).",
+  aufLap: "Wie groß ist die Wahrscheinlichkeit für „{e}“?", lapWeg: "{k} günstige von {n} möglichen Ergebnissen:"
+});
+Object.assign(WT.en, {
+  tab_grund: "Basics", gx_wuerfel: "one die", gx_zwei: "two dice", gx_muenze3: "three coins", gx_karten: "card game (32 cards)",
+  gt_wuerfel: "A die is rolled once.", gt_zwei: "Two dice are rolled (first | second). The table shows the total.", gt_muenze3: "Three coins are tossed (H = heads, T = tails).", gt_karten: "One card is drawn from a pack of 32 cards (7 to ace).",
+  gEvL: "Choose an event E – or tap outcomes:",
+  ge_wuerfel_gerade: "even number", ge_wuerfel_gr4: "greater than 4", ge_wuerfel_prim: "prime number", ge_wuerfel_sechs: "a six",
+  ge_zwei_s7: "total 7", ge_zwei_pasch: "a double", ge_zwei_s10: "total at least 10", ge_zwei_eine6: "at least one six",
+  ge_muenze3_genau2: "exactly two heads", ge_muenze3_mind1: "at least one head", ge_muenze3_gleich: "all the same",
+  ge_karten_herz: "hearts", ge_karten_ass: "an ace", ge_karten_bild: "jack, queen or king", ge_karten_rot: "a red card",
+  gKopf: "H", gZahl: "T", gBube: "J", gDame: "Q", gKoenig: "K", gAss: "A",
+  gMerke: "<b>Sample space Ω:</b> all possible outcomes. <b>Event E:</b> a selection of them. If all outcomes are equally likely (Laplace experiment): <b>P(E) = favourable outcomes : possible outcomes</b>. The complementary event Ē has P(Ē) = 1 − P(E).",
+  aufLap: "What is the probability of “{e}”?", lapWeg: "{k} favourable out of {n} possible outcomes:"
+});
+Object.assign(WT.es, {
+  tab_grund: "Conceptos básicos", gx_wuerfel: "un dado", gx_zwei: "dos dados", gx_muenze3: "tres monedas", gx_karten: "baraja (32 cartas)",
+  gt_wuerfel: "Se lanza un dado una vez.", gt_zwei: "Se lanzan dos dados (primero | segundo). La tabla muestra la suma.", gt_muenze3: "Se lanzan tres monedas (C = cara, X = cruz).", gt_karten: "Se saca una carta de una baraja de 32 cartas (del 7 al as).",
+  gEvL: "Elige un suceso E, o toca resultados:",
+  ge_wuerfel_gerade: "número par", ge_wuerfel_gr4: "mayor que 4", ge_wuerfel_prim: "número primo", ge_wuerfel_sechs: "un seis",
+  ge_zwei_s7: "suma 7", ge_zwei_pasch: "dobles", ge_zwei_s10: "suma al menos 10", ge_zwei_eine6: "al menos un seis",
+  ge_muenze3_genau2: "exactamente dos caras", ge_muenze3_mind1: "al menos una cara", ge_muenze3_gleich: "las tres iguales",
+  ge_karten_herz: "corazones", ge_karten_ass: "un as", ge_karten_bild: "jota, reina o rey", ge_karten_rot: "carta roja",
+  gKopf: "C", gZahl: "X", gBube: "J", gDame: "Q", gKoenig: "K", gAss: "A",
+  gMerke: "<b>Espacio muestral Ω:</b> todos los resultados posibles. <b>Suceso E:</b> una selección de ellos. Si todos los resultados son igual de probables (experimento de Laplace): <b>P(E) = casos favorables : casos posibles</b>. El suceso contrario Ē tiene P(Ē) = 1 − P(E).",
+  aufLap: "¿Cuál es la probabilidad de «{e}»?", lapWeg: "{k} casos favorables de {n} posibles:"
+});
+Object.assign(WT.zh, {
+  tab_grund: "基础", gx_wuerfel: "一颗骰子", gx_zwei: "两颗骰子", gx_muenze3: "三枚硬币", gx_karten: "纸牌（32 张）",
+  gt_wuerfel: "掷一颗骰子一次。", gt_zwei: "掷两颗骰子（第一颗 | 第二颗）。表中是点数和。", gt_muenze3: "掷三枚硬币（正 = 正面，反 = 反面）。", gt_karten: "从 32 张牌（7 到 A）中抽一张。",
+  gEvL: "选择事件 E——或点击结果：",
+  ge_wuerfel_gerade: "偶数", ge_wuerfel_gr4: "大于 4", ge_wuerfel_prim: "质数", ge_wuerfel_sechs: "六点",
+  ge_zwei_s7: "点数和为 7", ge_zwei_pasch: "两颗相同", ge_zwei_s10: "点数和至少 10", ge_zwei_eine6: "至少一个六点",
+  ge_muenze3_genau2: "恰好两次正面", ge_muenze3_mind1: "至少一次正面", ge_muenze3_gleich: "三枚相同",
+  ge_karten_herz: "红桃", ge_karten_ass: "A", ge_karten_bild: "J、Q 或 K", ge_karten_rot: "红色牌",
+  gKopf: "正", gZahl: "反", gBube: "J", gDame: "Q", gKoenig: "K", gAss: "A",
+  gMerke: "<b>样本空间 Ω：</b>所有可能结果。<b>事件 E：</b>其中的一部分。若每个结果等可能（古典概型）：<b>P(E) = 有利结果数 : 所有结果数</b>。对立事件 Ē：P(Ē) = 1 − P(E)。",
+  aufLap: "“{e}”的概率是多少？", lapWeg: "{n} 个可能结果中有 {k} 个有利："
+});
+Object.assign(WT.fr, {
+  tab_grund: "Bases", gx_wuerfel: "un dé", gx_zwei: "deux dés", gx_muenze3: "trois pièces", gx_karten: "jeu de 32 cartes",
+  gt_wuerfel: "On lance un dé une fois.", gt_zwei: "On lance deux dés (premier | second). Le tableau donne la somme.", gt_muenze3: "On lance trois pièces (P = pile, F = face).", gt_karten: "On tire une carte d’un jeu de 32 cartes (du 7 à l’as).",
+  gEvL: "Choisis un événement E – ou touche des issues :",
+  ge_wuerfel_gerade: "nombre pair", ge_wuerfel_gr4: "plus grand que 4", ge_wuerfel_prim: "nombre premier", ge_wuerfel_sechs: "un six",
+  ge_zwei_s7: "somme 7", ge_zwei_pasch: "un double", ge_zwei_s10: "somme au moins 10", ge_zwei_eine6: "au moins un six",
+  ge_muenze3_genau2: "exactement deux piles", ge_muenze3_mind1: "au moins un pile", ge_muenze3_gleich: "toutes identiques",
+  ge_karten_herz: "cœur", ge_karten_ass: "un as", ge_karten_bild: "valet, dame ou roi", ge_karten_rot: "carte rouge",
+  gKopf: "P", gZahl: "F", gBube: "V", gDame: "D", gKoenig: "R", gAss: "A",
+  gMerke: "<b>Univers Ω :</b> toutes les issues possibles. <b>Événement E :</b> une partie d’entre elles. Si toutes les issues sont équiprobables : <b>P(E) = nombre d’issues favorables : nombre d’issues possibles</b>. L’événement contraire Ē a P(Ē) = 1 − P(E).",
+  aufLap: "Quelle est la probabilité de « {e} » ?", lapWeg: "{k} issues favorables sur {n} possibles :"
+});
+Object.assign(WT.ru, {
+  tab_grund: "Основы", gx_wuerfel: "один кубик", gx_zwei: "два кубика", gx_muenze3: "три монеты", gx_karten: "колода из 32 карт",
+  gt_wuerfel: "Кубик бросают один раз.", gt_zwei: "Бросают два кубика (первый | второй). В таблице – сумма очков.", gt_muenze3: "Бросают три монеты (О = орёл, Р = решка).", gt_karten: "Из колоды в 32 карты (от 7 до туза) вынимают одну карту.",
+  gEvL: "Выбери событие E – или нажимай на исходы:",
+  ge_wuerfel_gerade: "чётное число", ge_wuerfel_gr4: "больше 4", ge_wuerfel_prim: "простое число", ge_wuerfel_sechs: "шестёрка",
+  ge_zwei_s7: "сумма 7", ge_zwei_pasch: "дубль", ge_zwei_s10: "сумма не меньше 10", ge_zwei_eine6: "хотя бы одна шестёрка",
+  ge_muenze3_genau2: "ровно два орла", ge_muenze3_mind1: "хотя бы один орёл", ge_muenze3_gleich: "все одинаковые",
+  ge_karten_herz: "черви", ge_karten_ass: "туз", ge_karten_bild: "валет, дама или король", ge_karten_rot: "красная карта",
+  gKopf: "О", gZahl: "Р", gBube: "В", gDame: "Д", gKoenig: "К", gAss: "Т",
+  gMerke: "<b>Пространство исходов Ω:</b> все возможные исходы. <b>Событие E:</b> часть из них. Если все исходы равновозможны: <b>P(E) = число благоприятных : число всех исходов</b>. Противоположное событие Ē: P(Ē) = 1 − P(E).",
+  aufLap: "Какова вероятность события «{e}»?", lapWeg: "{k} благоприятных из {n} возможных:"
+});
+Object.assign(WT.ar, {
+  tab_grund: "الأساسيات", gx_wuerfel: "حجر نرد واحد", gx_zwei: "حجرا نرد", gx_muenze3: "ثلاث قطع نقود", gx_karten: "أوراق لعب (32 ورقة)",
+  gt_wuerfel: "يُرمى حجر نرد مرة واحدة.", gt_zwei: "يُرمى حجرا نرد (الأول | الثاني). في الجدول مجموع النقاط.", gt_muenze3: "تُرمى ثلاث قطع نقود (ص = صورة، ك = كتابة).", gt_karten: "تُسحب ورقة واحدة من 32 ورقة (من 7 إلى الآس).",
+  gEvL: "اختر حدثًا E – أو اضغط على النتائج:",
+  ge_wuerfel_gerade: "عدد زوجي", ge_wuerfel_gr4: "أكبر من 4", ge_wuerfel_prim: "عدد أولي", ge_wuerfel_sechs: "ستة",
+  ge_zwei_s7: "المجموع 7", ge_zwei_pasch: "عددان متساويان", ge_zwei_s10: "المجموع 10 على الأقل", ge_zwei_eine6: "ستة واحدة على الأقل",
+  ge_muenze3_genau2: "صورتان بالضبط", ge_muenze3_mind1: "صورة واحدة على الأقل", ge_muenze3_gleich: "كلها متماثلة",
+  ge_karten_herz: "قلب", ge_karten_ass: "آس", ge_karten_bild: "ولد أو بنت أو ملك", ge_karten_rot: "ورقة حمراء",
+  gKopf: "ص", gZahl: "ك", gBube: "J", gDame: "Q", gKoenig: "K", gAss: "A",
+  gMerke: "<b>فضاء العينة Ω:</b> كل النتائج الممكنة. <b>الحدث E:</b> مجموعة منها. إذا كانت كل النتائج متساوية الاحتمال (تجربة لابلاس): <b>P(E) = عدد الحالات المواتية : عدد الحالات الممكنة</b>. الحدث المتمم Ē: P(Ē) = 1 − P(E).",
+  aufLap: "ما احتمال «{e}»؟", lapWeg: "{k} حالات مواتية من {n} حالة ممكنة:"
+});
+Object.assign(WT.ja, {
+  tab_grund: "基本", gx_wuerfel: "さいころ 1 個", gx_zwei: "さいころ 2 個", gx_muenze3: "硬貨 3 枚", gx_karten: "トランプ（32 枚）",
+  gt_wuerfel: "さいころを 1 回投げる。", gt_zwei: "さいころを 2 個投げる（1 個目 | 2 個目）。表は目の和。", gt_muenze3: "硬貨を 3 枚投げる（表・裏）。", gt_karten: "7〜A の 32 枚のトランプから 1 枚引く。",
+  gEvL: "事象 E を選ぼう――または結果をタップ：",
+  ge_wuerfel_gerade: "偶数", ge_wuerfel_gr4: "4 より大きい", ge_wuerfel_prim: "素数", ge_wuerfel_sechs: "6 の目",
+  ge_zwei_s7: "目の和が 7", ge_zwei_pasch: "ぞろ目", ge_zwei_s10: "目の和が 10 以上", ge_zwei_eine6: "少なくとも 1 つ 6",
+  ge_muenze3_genau2: "ちょうど 2 枚表", ge_muenze3_mind1: "少なくとも 1 枚表", ge_muenze3_gleich: "3 枚とも同じ",
+  ge_karten_herz: "ハート", ge_karten_ass: "エース", ge_karten_bild: "J・Q・K", ge_karten_rot: "赤いカード",
+  gKopf: "表", gZahl: "裏", gBube: "J", gDame: "Q", gKoenig: "K", gAss: "A",
+  gMerke: "<b>全事象 Ω：</b>起こりうるすべての結果。<b>事象 E：</b>そのうちの一部。どの結果も同様に確からしいとき：<b>P(E) = E が起こる場合の数 ÷ すべての場合の数</b>。余事象 Ē：P(Ē) = 1 − P(E)。",
+  aufLap: "「{e}」の確率は？", lapWeg: "{n} 通りのうち {k} 通り："
+});
+Object.assign(WT.pt, {
+  tab_grund: "Noções básicas", gx_wuerfel: "um dado", gx_zwei: "dois dados", gx_muenze3: "três moedas", gx_karten: "baralho de 32 cartas",
+  gt_wuerfel: "Lança-se um dado uma vez.", gt_zwei: "Lançam-se dois dados (primeiro | segundo). A tabela mostra a soma.", gt_muenze3: "Lançam-se três moedas (F = face, C = coroa).", gt_karten: "Tira-se uma carta de um baralho de 32 cartas (do 7 ao ás).",
+  gEvL: "Escolhe um acontecimento E – ou toca nos resultados:",
+  ge_wuerfel_gerade: "número par", ge_wuerfel_gr4: "maior do que 4", ge_wuerfel_prim: "número primo", ge_wuerfel_sechs: "um seis",
+  ge_zwei_s7: "soma 7", ge_zwei_pasch: "números iguais", ge_zwei_s10: "soma pelo menos 10", ge_zwei_eine6: "pelo menos um seis",
+  ge_muenze3_genau2: "exatamente duas faces", ge_muenze3_mind1: "pelo menos uma face", ge_muenze3_gleich: "todas iguais",
+  ge_karten_herz: "copas", ge_karten_ass: "um ás", ge_karten_bild: "valete, dama ou rei", ge_karten_rot: "carta vermelha",
+  gKopf: "F", gZahl: "C", gBube: "V", gDame: "D", gKoenig: "R", gAss: "A",
+  gMerke: "<b>Espaço amostral Ω:</b> todos os resultados possíveis. <b>Acontecimento E:</b> uma seleção deles. Se todos os resultados são igualmente prováveis (Laplace): <b>P(E) = casos favoráveis : casos possíveis</b>. O acontecimento contrário Ē tem P(Ē) = 1 − P(E).",
+  aufLap: "Qual é a probabilidade de «{e}»?", lapWeg: "{k} casos favoráveis em {n} possíveis:"
+});

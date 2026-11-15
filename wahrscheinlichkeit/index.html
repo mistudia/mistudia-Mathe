@@ -135,6 +135,14 @@
   #vFrage { max-width: 100%; font-size: 17px; }
   #vRechnung { font-size: 20px; line-height: 1.6; }
   @media (max-width: 600px) { table.vt { font-size: 16px; } table.vt th, table.vt td { padding: 6px 6px; } }
+  /* Grundlagen */
+  .gOmega { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; direction: ltr; overflow-x: auto; }
+  .gErg { font: 700 18px system-ui, sans-serif; min-width: 44px; padding: 6px 8px; border-radius: 10px; border: 2px solid var(--line); background: #ffffff; color: var(--text); cursor: pointer; }
+  .gErg.wuerfel { font-size: 40px; line-height: 1; padding: 2px 6px; }
+  .gErg.rotK { color: #dc2626; }
+  .gErg.an { background: #fef3c7; border-color: #d97706; box-shadow: 0 0 0 2px #f59e0b; }
+  .gTab { border-collapse: collapse; } .gTab th { font-size: 26px; padding: 2px 4px; color: var(--text); } .gTab td { padding: 2px; } .gTab .gErg { min-width: 40px; font-size: 16px; }
+  @media (max-width: 600px) { .gTab th { font-size: 20px; } .gTab .gErg { min-width: 34px; padding: 5px 4px; font-size: 14px; } }
   .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
   @media (max-width: 600px) {
     body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
@@ -149,7 +157,8 @@
   <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
   <h1 id="titel">Wahrscheinlichkeit</h1>
   <div class="tabs" role="tablist">
-    <button type="button" role="tab" data-tab="baum" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="grund" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="baum" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="vier" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="sim" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
@@ -173,7 +182,20 @@
     <p class="meldung schlecht" id="fehler"></p>
   </div>
 
-  <section id="s_baum">
+  <section id="s_grund">
+    <div class="karte">
+      <div class="reihe"><label><span id="tGExp"></span> <select id="gExp"></select></label></div>
+      <p class="zeile" id="gText"></p>
+      <p class="zeile"><b id="gEvText"></b></p>
+      <div class="wahl" id="gEvents" style="margin-bottom:10px"></div>
+      <div class="gOmega" id="gOmega"></div>
+      <p class="zeile" id="gErgebnis"></p>
+      <p class="ergebnisZ" id="gP"></p>
+      <p class="merke" id="gMerke"></p>
+    </div>
+  </section>
+
+  <section id="s_baum" hidden>
     <div class="karte">
       <p class="muted" id="hinweisKlick"></p>
       <svg id="baum" viewBox="0 0 640 300"></svg>

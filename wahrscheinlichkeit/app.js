@@ -211,6 +211,55 @@
     $("regeln").textContent = t("regelnText");
   }
 
+  // ---------- Reiter Grundlagen (Laplace) ----------
+  // Ergebnisse je Versuch; Ereignisse als Filter; Klick auf ein Ergebnis schaltet es ein/aus.
+  var GW = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+  function istPrim(n){ return n === 2 || n === 3 || n === 5; }
+  var GEXP = {
+    wuerfel: { omega: function(){ return [1, 2, 3, 4, 5, 6].map(function(w){ return { id: String(w), w: w }; }); }, ev: { gerade: function(o){ return o.w % 2 === 0; }, gr4: function(o){ return o.w > 4; }, prim: function(o){ return istPrim(o.w); }, sechs: function(o){ return o.w === 6; } } },
+    zwei: { omega: function(){ var L = []; for(var a = 1; a <= 6; a++) for(var b = 1; b <= 6; b++) L.push({ id: a + "-" + b, a: a, b: b }); return L; }, ev: { s7: function(o){ return o.a + o.b === 7; }, pasch: function(o){ return o.a === o.b; }, s10: function(o){ return o.a + o.b >= 10; }, eine6: function(o){ return o.a === 6 || o.b === 6; } } },
+    muenze3: { omega: function(){ var L = []; ["K", "Z"].forEach(function(x){ ["K", "Z"].forEach(function(y){ ["K", "Z"].forEach(function(z){ L.push({ id: x + y + z, s: [x, y, z] }); }); }); }); return L; }, ev: { genau2: function(o){ return o.s.filter(function(c){ return c === "K"; }).length === 2; }, mind1: function(o){ return o.s.indexOf("K") >= 0; }, gleich: function(o){ return o.s[0] === o.s[1] && o.s[1] === o.s[2]; } } },
+    karten: { omega: function(){ var L = []; ["♥", "♦", "♠", "♣"].forEach(function(f){ ["7", "8", "9", "10", "B", "D", "K", "A"].forEach(function(r){ L.push({ id: f + r, f: f, r: r }); }); }); return L; }, ev: { herz: function(o){ return o.f === "♥"; }, ass: function(o){ return o.r === "A"; }, bild: function(o){ return o.r === "B" || o.r === "D" || o.r === "K"; }, rot: function(o){ return o.f === "♥" || o.f === "♦"; } } }
+  };
+  var gExp = "wuerfel", gWahl = {}, gEv = "gerade";
+  function gText(exp, o){
+    if(exp === "wuerfel") return GW[o.w - 1];
+    if(exp === "zwei") return o.a + "|" + o.b;
+    if(exp === "muenze3") return o.s.map(function(c){ return t(c === "K" ? "gKopf" : "gZahl"); }).join("");
+    var r = { B: t("gBube"), D: t("gDame"), K: t("gKoenig"), A: t("gAss") }[o.r] || o.r; return o.f + r;
+  }
+  function gSetzeEv(k){ gEv = k; var f = GEXP[gExp].ev[k]; gWahl = {}; GEXP[gExp].omega().forEach(function(o){ if(f(o)) gWahl[o.id] = 1; }); grund(); }
+  function grund(){
+    var E = GEXP[gExp], O = E.omega(), n = O.length, k = O.filter(function(o){ return gWahl[o.id]; }).length;
+    var box = $("gEvents"); box.innerHTML = "";
+    Object.keys(E.ev).forEach(function(x){ var b = document.createElement("button"); b.type = "button"; b.textContent = t("ge_" + gExp + "_" + x); b.setAttribute("aria-pressed", x === gEv ? "true" : "false"); b.addEventListener("click", function(){ gSetzeEv(x); }); box.appendChild(b); });
+    var h = "";
+    if(gExp === "zwei"){
+      h = '<table class="gTab"><tr><th></th>' + [1, 2, 3, 4, 5, 6].map(function(b){ return "<th>" + GW[b - 1] + "</th>"; }).join("") + "</tr>";
+      for(var a = 1; a <= 6; a++){ h += "<tr><th>" + GW[a - 1] + "</th>"; for(var b = 1; b <= 6; b++){ var id = a + "-" + b; h += '<td><button type="button" class="gErg' + (gWahl[id] ? " an" : "") + '" data-id="' + id + '">' + (a + b) + "</button></td>"; } h += "</tr>"; }
+      h += "</table>";
+    } else h = O.map(function(o){ return '<button type="button" class="gErg ' + gExp + (gWahl[o.id] ? " an" : "") + (gExp === "karten" && (o.f === "♥" || o.f === "♦") ? " rotK" : "") + '" data-id="' + o.id + '">' + gText(gExp, o) + "</button>"; }).join("");
+    $("gOmega").innerHTML = h;
+    $("gOmega").querySelectorAll(".gErg").forEach(function(b){ b.addEventListener("click", function(){ var id = b.dataset.id; if(gWahl[id]) delete gWahl[id]; else gWahl[id] = 1; gEv = null; grund(); }); });
+    var P = F(k, n), Q = F(n - k, n);
+    $("gErgebnis").innerHTML = bdi("|Ω| = " + n + ", |E| = " + k);
+    $("gP").innerHTML = (bdi("P(E) = |E| : |Ω| = " + k + "/" + n + (P.d !== n ? " = " + fmt(P, "bruch") : "") + " = " + fmt(P, "dezimal") + " = " + fmt(P, "prozent")) + "<br>" + bdi("P(Ē) = 1 − P(E) = " + fmt(Q, "bruch") + " = " + fmt(Q, "prozent"))).replace(/= ≈/g, "≈");
+    $("gText").textContent = t("gt_" + gExp); $("gEvText").textContent = t("gEvL"); $("gMerke").innerHTML = t("gMerke"); $("tGExp").textContent = t("versuch");
+  }
+  $("gExp").addEventListener("change", function(){ gExp = $("gExp").value; gSetzeEv(Object.keys(GEXP[gExp].ev)[0]); });
+  // Laplace-Aufgabe für den Üben-Reiter
+  function neueLaplace(){
+    var ex = wahl(Object.keys(GEXP)), evs = Object.keys(GEXP[ex].ev), ev = wahl(evs), O = GEXP[ex].omega(), k = O.filter(GEXP[ex].ev[ev]).length;
+    auf = { typ: "lap", ex: ex, ev: ev, k: k, n: O.length, l: F(k, O.length) }; zeige();
+  }
+  function pruefeLap(v){
+    var ok = Math.abs(v - num(auf.l)) <= 0.005; beantwortet = true; anzahl++; if(ok) punkte++;
+    var lt = fmt(auf.l, "bruch") + " = " + fmt(auf.l, "prozent");
+    var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
+    $("uLauf").innerHTML = "<li>" + t("lapWeg", { k: auf.k, n: auf.n }) + " " + bdi("P = " + auf.k + "/" + auf.n + " = " + fmt(auf.l, "bruch")) + "</li>"; sicht($("uLauf"), true);
+    $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });
+  }
+
   // ---------- Reiter Vierfeldertafel & bedingte Wahrscheinlichkeit ----------
   // Merkmale A/Ā (Zeilen) und B/B̄ (Spalten). Eingabe: P(A), P(B|A), P(B|Ā).
   // Tafel M[r][c]: r = A, Ā, Summe; c = B, B̄, Summe.
@@ -408,7 +457,7 @@
   }
   function neueAufgabe(){
     beantwortet = false;
-    if(Math.random() < 0.35) return neueVier();
+    var zz = Math.random(); if(zz < 0.3) return neueVier(); if(zz < 0.5) return neueLaplace();
     var art = wahl(["muenze", "wuerfel", "urneMit", "urneOhne", "urneOhne", "rad"]), st = art === "rad" ? 2 : wahl([2, 2, 3]);
     var r = zuf(2, 6), b = zuf(2, 5), X = experiment(art, st, r, b, F(1, 4)), BB = baumBauen(X), typ = wahl(["pfad", "ereignis", "ereignis"]);
     if(typ === "pfad"){
@@ -423,8 +472,8 @@
   }
   function zahlW(v){ return String(v); }
   function zeige(){
-    var vt = auf.typ === "vier";
-    $("auftrag").innerHTML = vt ? vierAuftrag() : expText(auf.X) + " " + auf.txt;
+    var vt = auf.typ === "vier", lp = auf.typ === "lap";
+    $("auftrag").innerHTML = lp ? t("gt_" + auf.ex) + " " + t("aufLap", { e: t("ge_" + auf.ex + "_" + auf.ev) }) : vt ? vierAuftrag() : expText(auf.X) + " " + auf.txt;
     $("meldung").textContent = ""; $("meldung").className = "meldung"; sicht($("uLauf"), false);
     var sv = $("uBaum"); sicht(sv, auf.typ === "pfad"); sicht($("uTafel"), vt);
     if(vt) $("uTafel").innerHTML = '<table class="vt">' + tafelHTML(auf.M, { pr: auf.pr, wert: zahlW, luecke: auf.luecke }) + "</table>";
@@ -462,6 +511,7 @@
     if(beantwortet) return;
     var v = liesWert(e); if(!isFinite(v)) return;
     if(auf.typ === "vier") return pruefeVier(v);
+    if(auf.typ === "lap") return pruefeLap(v);
     var ok = Math.abs(v - num(auf.l)) <= 0.005;
     beantwortet = true; anzahl++; if(ok) punkte++;
     var lt = fmt(auf.l, "bruch") + " ≈ " + zahl(num(auf.l) * 100, 2) + " %";
@@ -479,11 +529,11 @@
   ["versuch", "stufen", "nRot", "nBlau"].forEach(function(id){ $(id).addEventListener("change", function(){ simReset(); lesen(); alles(true); }); });
   $("pTreffer").addEventListener("input", function(){ simReset(); lesen(); alles(true); });
   $("format").querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ format = b.dataset.f; $("format").querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); alles(true); }); });
-  var tab = "baum";
+  var tab = "grund";
   function zeigeTab(k){
     tab = k;
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
-    ["baum", "vier", "sim", "ueben"].forEach(function(x){ sicht($("s_" + x), x === k); });
+    ["grund", "baum", "vier", "sim", "ueben"].forEach(function(x){ sicht($("s_" + x), x === k); });
     sicht($("eingabe"), k === "baum" || k === "sim");
     if(k === "ueben" && !auf) neueAufgabe();
     alles(true);
@@ -504,11 +554,11 @@
       $("hinweisKlick").textContent = t("hinweisKlick"); $("ohneHinweis").textContent = t("ohneHinweis");
       var altId = ereignis && ereignis.id; lesen(); if(altId){ ereignis = EL.filter(function(x){ return x.id === altId; })[0] || null; if(ereignis) setzeEreignis(ereignis, true); }
     }
-    if(!nurRechnen) vierTexte();
-    if(tab === "baum") baum(); else if(tab === "sim") simZeigen(); else if(tab === "vier") vier();
+    if(!nurRechnen){ vierTexte(); $("gExp").innerHTML = Object.keys(GEXP).map(function(x){ return '<option value="' + x + '">' + t("gx_" + x) + "</option>"; }).join(""); $("gExp").value = gExp; }
+    if(tab === "grund") grund(); else if(tab === "baum") baum(); else if(tab === "sim") simZeigen(); else if(tab === "vier") vier();
     if(!nurRechnen && auf){
       var war = beantwortet, eing = $("uAntwort") ? $("uAntwort").value : null, gut = $("meldung").classList.contains("gut");
-      if(auf.typ === "vier"){ /* Auftrag wird in zeige() neu beschriftet */ }
+      if(auf.typ === "vier" || auf.typ === "lap"){ /* Auftrag wird in zeige() neu beschriftet */ }
       else if(auf.ev){ var ev = ereignisse(auf.X).filter(function(x){ return x.id === auf.ev.id; })[0]; if(ev){ auf.ev = ev; auf.txt = t("aufEreig", { e: ev.txt }); } }
       else { var bl = auf.B.blaetter.filter(function(b){ return auf.aus[b.key]; })[0]; auf.txt = t("aufPfad", { p: pfadText(bl.pfad) }); }
       zeige();
@@ -517,5 +567,6 @@
   }
   window.MS_LANG = { apply: function(l){ if(WT[l]){ lang = l; alles(); } } };
   $("versuch").innerHTML = '<option value="muenze">muenze</option>';
+  sicht($("eingabe"), false); gSetzeEv("gerade");
   alles();
 })();
