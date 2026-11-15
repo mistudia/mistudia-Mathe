@@ -2,7 +2,7 @@
 // ux_*: Kontext der Übungen ({mu}, {s}); e_*: Einheiten.
 var NV = {
 de: {
-  titel: "Normalverteilung", tab_glocke: "Glockenkurve", tab_naeherung: "Binomial → Normal", tab_ueben: "Üben",
+  titel: "Normalverteilung", tab_erkl: "Erklärung", tab_glocke: "Glockenkurve", tab_naeherung: "Binomial → Normal", tab_ueben: "Üben",
   bspL: "Beispiel:", bsp_koerper: "Körpergröße", bsp_iq: "Intelligenztest", bsp_abfuell: "Abfüllmenge", bsp_pruefung: "Prüfungspunkte", bsp_lampe: "Lebensdauer einer Lampe", bsp_eigen: "eigene Werte (Standardnormalverteilung)",
   bt_koerper: "Die Körpergröße erwachsener Frauen ist etwa normalverteilt mit μ = 170 cm und σ = 8 cm (vereinfacht).", bt_iq: "IQ-Werte sind so gemacht, dass μ = 100 und σ = 15 ist.", bt_abfuell: "Eine Maschine füllt Packungen mit μ = 500 g und σ = 4 g.",
   bt_pruefung: "Punkte in einer Prüfung: μ = 60, σ = 12.", bt_lampe: "Lebensdauer einer Lampe: μ = 1000 h, σ = 80 h.", bt_eigen: "Mit μ = 0 und σ = 1 heißt sie Standardnormalverteilung – ihre Werte sind Φ(z).",
@@ -21,7 +21,7 @@ de: {
   pruefen: "Prüfen", weiterA: "Nächste Aufgabe", punkte: "{p} von {n} richtig", richtig: "Richtig!", falsch: "Leider nicht. Richtig ist: {l}"
 },
 en: {
-  titel: "Normal Distribution", tab_glocke: "Bell curve", tab_naeherung: "Binomial → normal", tab_ueben: "Practice",
+  titel: "Normal Distribution", tab_erkl: "Explanation", tab_glocke: "Bell curve", tab_naeherung: "Binomial → normal", tab_ueben: "Practice",
   bspL: "Example:", bsp_koerper: "body height", bsp_iq: "IQ test", bsp_abfuell: "filling quantity", bsp_pruefung: "exam points", bsp_lampe: "lifetime of a lamp", bsp_eigen: "own values (standard normal)",
   bt_koerper: "The height of adult women is roughly normally distributed with μ = 170 cm and σ = 8 cm (simplified).", bt_iq: "IQ scores are designed so that μ = 100 and σ = 15.", bt_abfuell: "A machine fills packs with μ = 500 g and σ = 4 g.",
   bt_pruefung: "Points in an exam: μ = 60, σ = 12.", bt_lampe: "Lifetime of a lamp: μ = 1000 h, σ = 80 h.", bt_eigen: "With μ = 0 and σ = 1 it is called the standard normal distribution – its values are Φ(z).",
@@ -40,7 +40,7 @@ en: {
   pruefen: "Check", weiterA: "Next exercise", punkte: "{p} of {n} correct", richtig: "Correct!", falsch: "Not quite. The answer is: {l}"
 },
 es: {
-  titel: "Distribución normal", tab_glocke: "Campana de Gauss", tab_naeherung: "Binomial → normal", tab_ueben: "Practicar",
+  titel: "Distribución normal", tab_erkl: "Explicación", tab_glocke: "Campana de Gauss", tab_naeherung: "Binomial → normal", tab_ueben: "Practicar",
   bspL: "Ejemplo:", bsp_koerper: "estatura", bsp_iq: "test de CI", bsp_abfuell: "cantidad envasada", bsp_pruefung: "puntos de un examen", bsp_lampe: "duración de una bombilla", bsp_eigen: "valores propios (normal estándar)",
   bt_koerper: "La estatura de las mujeres adultas es aproximadamente normal con μ = 170 cm y σ = 8 cm (simplificado).", bt_iq: "Los valores de CI se construyen para que μ = 100 y σ = 15.", bt_abfuell: "Una máquina llena paquetes con μ = 500 g y σ = 4 g.",
   bt_pruefung: "Puntos en un examen: μ = 60, σ = 12.", bt_lampe: "Duración de una bombilla: μ = 1000 h, σ = 80 h.", bt_eigen: "Con μ = 0 y σ = 1 se llama distribución normal estándar; sus valores son Φ(z).",
@@ -59,7 +59,7 @@ es: {
   pruefen: "Comprobar", weiterA: "Siguiente ejercicio", punkte: "{p} de {n} correctas", richtig: "¡Correcto!", falsch: "No. La respuesta es: {l}"
 },
 zh: {
-  titel: "正态分布", tab_glocke: "钟形曲线", tab_naeherung: "二项 → 正态", tab_ueben: "练习",
+  titel: "正态分布", tab_erkl: "讲解", tab_glocke: "钟形曲线", tab_naeherung: "二项 → 正态", tab_ueben: "练习",
   bspL: "例子：", bsp_koerper: "身高", bsp_iq: "智商测试", bsp_abfuell: "灌装量", bsp_pruefung: "考试分数", bsp_lampe: "灯泡寿命", bsp_eigen: "自定义（标准正态）",
   bt_koerper: "成年女性的身高近似服从 μ = 170 cm、σ = 8 cm 的正态分布（简化）。", bt_iq: "智商分数被设计为 μ = 100、σ = 15。", bt_abfuell: "机器灌装的每包重量 μ = 500 g、σ = 4 g。",
   bt_pruefung: "考试分数：μ = 60，σ = 12。", bt_lampe: "灯泡寿命：μ = 1000 h，σ = 80 h。", bt_eigen: "μ = 0、σ = 1 时称为标准正态分布——它的值就是 Φ(z)。",
@@ -78,7 +78,7 @@ zh: {
   pruefen: "检查", weiterA: "下一题", punkte: "答对 {p}/{n}", richtig: "正确！", falsch: "不对。正确答案：{l}"
 },
 fr: {
-  titel: "Loi normale", tab_glocke: "Courbe en cloche", tab_naeherung: "Binomiale → normale", tab_ueben: "S’entraîner",
+  titel: "Loi normale", tab_erkl: "Explication", tab_glocke: "Courbe en cloche", tab_naeherung: "Binomiale → normale", tab_ueben: "S’entraîner",
   bspL: "Exemple :", bsp_koerper: "taille", bsp_iq: "test de QI", bsp_abfuell: "quantité de remplissage", bsp_pruefung: "points d’examen", bsp_lampe: "durée de vie d’une lampe", bsp_eigen: "valeurs libres (loi normale centrée réduite)",
   bt_koerper: "La taille des femmes adultes suit à peu près une loi normale de paramètres μ = 170 cm et σ = 8 cm (simplifié).", bt_iq: "Les scores de QI sont construits pour que μ = 100 et σ = 15.", bt_abfuell: "Une machine remplit des paquets avec μ = 500 g et σ = 4 g.",
   bt_pruefung: "Points à un examen : μ = 60, σ = 12.", bt_lampe: "Durée de vie d’une lampe : μ = 1000 h, σ = 80 h.", bt_eigen: "Avec μ = 0 et σ = 1, c’est la loi normale centrée réduite – ses valeurs sont Φ(z).",
@@ -97,7 +97,7 @@ fr: {
   pruefen: "Vérifier", weiterA: "Exercice suivant", punkte: "{p} sur {n} justes", richtig: "Juste !", falsch: "Pas tout à fait. La réponse est : {l}"
 },
 ru: {
-  titel: "Нормальное распределение", tab_glocke: "Колоколообразная кривая", tab_naeherung: "Биномиальное → нормальное", tab_ueben: "Тренировка",
+  titel: "Нормальное распределение", tab_erkl: "Объяснение", tab_glocke: "Колоколообразная кривая", tab_naeherung: "Биномиальное → нормальное", tab_ueben: "Тренировка",
   bspL: "Пример:", bsp_koerper: "рост", bsp_iq: "тест IQ", bsp_abfuell: "масса упаковки", bsp_pruefung: "баллы за экзамен", bsp_lampe: "срок службы лампы", bsp_eigen: "свои значения (стандартное нормальное)",
   bt_koerper: "Рост взрослых женщин примерно нормально распределён с μ = 170 см и σ = 8 см (упрощённо).", bt_iq: "Баллы IQ устроены так, что μ = 100 и σ = 15.", bt_abfuell: "Автомат фасует упаковки с μ = 500 г и σ = 4 г.",
   bt_pruefung: "Баллы за экзамен: μ = 60, σ = 12.", bt_lampe: "Срок службы лампы: μ = 1000 ч, σ = 80 ч.", bt_eigen: "При μ = 0 и σ = 1 это стандартное нормальное распределение – его значения Φ(z).",
@@ -116,7 +116,7 @@ ru: {
   pruefen: "Проверить", weiterA: "Следующее задание", punkte: "{p} из {n} верно", richtig: "Верно!", falsch: "Неверно. Правильно: {l}"
 },
 ar: {
-  titel: "التوزيع الطبيعي", tab_glocke: "منحنى الجرس", tab_naeherung: "ذو الحدين ← طبيعي", tab_ueben: "تمرين",
+  titel: "التوزيع الطبيعي", tab_erkl: "الشرح", tab_glocke: "منحنى الجرس", tab_naeherung: "ذو الحدين ← طبيعي", tab_ueben: "تمرين",
   bspL: "مثال:", bsp_koerper: "طول الجسم", bsp_iq: "اختبار الذكاء", bsp_abfuell: "كمية التعبئة", bsp_pruefung: "درجات الامتحان", bsp_lampe: "عمر المصباح", bsp_eigen: "قيم خاصة (التوزيع الطبيعي المعياري)",
   bt_koerper: "طول النساء البالغات يتبع تقريبًا توزيعًا طبيعيًا بـ μ = 170 cm وσ = 8 cm (تبسيطًا).", bt_iq: "درجات الذكاء مصممة بحيث μ = 100 وσ = 15.", bt_abfuell: "آلة تعبئ العبوات بـ μ = 500 g وσ = 4 g.",
   bt_pruefung: "درجات امتحان: μ = 60، σ = 12.", bt_lampe: "عمر مصباح: μ = 1000 h، σ = 80 h.", bt_eigen: "عندما μ = 0 وσ = 1 يسمى التوزيع الطبيعي المعياري – وقيمه هي Φ(z).",
@@ -135,7 +135,7 @@ ar: {
   pruefen: "تحقق", weiterA: "التمرين التالي", punkte: "{p} من {n} صحيحة", richtig: "صحيح!", falsch: "ليس تمامًا. الجواب الصحيح: {l}"
 },
 ja: {
-  titel: "正規分布", tab_glocke: "つりがね型の曲線", tab_naeherung: "二項 → 正規", tab_ueben: "練習",
+  titel: "正規分布", tab_erkl: "説明", tab_glocke: "つりがね型の曲線", tab_naeherung: "二項 → 正規", tab_ueben: "練習",
   bspL: "例：", bsp_koerper: "身長", bsp_iq: "知能検査", bsp_abfuell: "充てん量", bsp_pruefung: "テストの得点", bsp_lampe: "電球の寿命", bsp_eigen: "自分で入力（標準正規分布）",
   bt_koerper: "成人女性の身長はおよそ μ = 170 cm、σ = 8 cm の正規分布に従う（単純化）。", bt_iq: "IQ は μ = 100、σ = 15 になるように作られています。", bt_abfuell: "機械が μ = 500 g、σ = 4 g で袋に詰めます。",
   bt_pruefung: "テストの得点：μ = 60、σ = 12。", bt_lampe: "電球の寿命：μ = 1000 時間、σ = 80 時間。", bt_eigen: "μ = 0、σ = 1 のとき標準正規分布といい、その値が Φ(z) です。",
@@ -154,7 +154,7 @@ ja: {
   pruefen: "答え合わせ", weiterA: "次の問題", punkte: "{n} 問中 {p} 問正解", richtig: "正解！", falsch: "ざんねん。正解は {l}"
 },
 pt: {
-  titel: "Distribuição normal", tab_glocke: "Curva em sino", tab_naeherung: "Binomial → normal", tab_ueben: "Praticar",
+  titel: "Distribuição normal", tab_erkl: "Explicação", tab_glocke: "Curva em sino", tab_naeherung: "Binomial → normal", tab_ueben: "Praticar",
   bspL: "Exemplo:", bsp_koerper: "altura", bsp_iq: "teste de QI", bsp_abfuell: "quantidade de enchimento", bsp_pruefung: "pontos num exame", bsp_lampe: "duração de uma lâmpada", bsp_eigen: "valores próprios (normal padrão)",
   bt_koerper: "A altura das mulheres adultas segue aproximadamente uma normal com μ = 170 cm e σ = 8 cm (simplificado).", bt_iq: "Os valores de QI são construídos para que μ = 100 e σ = 15.", bt_abfuell: "Uma máquina enche embalagens com μ = 500 g e σ = 4 g.",
   bt_pruefung: "Pontos num exame: μ = 60, σ = 12.", bt_lampe: "Duração de uma lâmpada: μ = 1000 h, σ = 80 h.", bt_eigen: "Com μ = 0 e σ = 1 chama-se distribuição normal padrão – os seus valores são Φ(z).",

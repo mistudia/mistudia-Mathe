@@ -150,7 +150,7 @@
   $("weiter").addEventListener("click", neueAufgabe);
 
   // ---------- Reiter & Texte ----------
-  var tab = "glocke", TABS = ["glocke", "naeherung", "ueben"];
+  var tab = "erkl", TABS = ["erkl", "glocke", "naeherung", "ueben"];
   function zeigeTab(k){
     tab = k;
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
@@ -174,7 +174,7 @@
     if(tab === "glocke") glocke(); else if(tab === "naeherung") naeherung();
     if(!nurRechnen && auf){ var war = beantwortet, e = letzte, gut = $("meldung").classList.contains("gut"); zeige(); if(war){ beantwortet = false; anzahl--; if(gut) punkte--; $("uAntwort").value = e; pruefe(e); } }
   }
-  window.MS_LANG = { apply: function(l){ if(NV[l]){ lang = l; alles(); } } };
+  window.MS_LANG = { apply: function(l){ if(NV[l]){ lang = l; alles(); if(window.MS_NV_ERKL) MS_NV_ERKL.sprache(l); } } };
   $("bsp").innerHTML = '<option value="koerper"></option>';
   alles();
 })();

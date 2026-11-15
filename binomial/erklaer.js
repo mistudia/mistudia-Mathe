@@ -342,7 +342,7 @@
     ".be-pfad{display:inline-flex;gap:2px;padding:3px 5px;border:1px solid #c9dcf2;border-radius:8px;background:#fff}" +
     ".be-pfad b{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;font-size:15px;color:#fff}" +
     ".be-t{background:#16a34a}.be-n{background:#dc2626}" +
-    "@media (max-width:560px){.be-tab{grid-template-columns:auto 1fr}.be-tab .be-kopf{display:none}.be-tab .be-wert{grid-column:2;text-align:start;padding-top:0}.be-tab .be-wert::before{content:attr(data-l) ': ';font-weight:400;color:var(--muted);font-size:14px}}";
+    "@media (max-width:560px){.be-tab{grid-template-columns:minmax(0,40%) minmax(0,1fr)}.be-tab .be-sym,.be-tab .be-wert{white-space:normal;overflow-wrap:anywhere}.be-tab .be-kopf{display:none}.be-tab .be-wert{grid-column:2;text-align:start;padding-top:0}.be-tab .be-wert::before{content:attr(data-l) ': ';font-weight:400;color:var(--muted);font-size:14px}}";
   document.head.appendChild(css);
 
   function schritte(){
