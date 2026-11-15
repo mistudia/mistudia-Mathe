@@ -1047,6 +1047,7 @@ var FA = (function(){
     liste.forEach(function(e, i){
       var ein = F[APP][i];
       h += '<div class="al-karte"><h3>' + FB.esc(e[0]) + "</h3><p>" + FB.text(e[1]) + "</p>";
+      if(window.FA_BILD && FA_BILD[APP] && FA_BILD[APP][i]){ try { h += '<div class="al-bild">' + FA_BILD[APP][i]() + "</div>"; } catch(x){} }
       if(ein && FORMEL){ var ft = ""; try { ft = FORMEL(ein); } catch(x){} if(ft) h += '<div class="al-formel"><span class="f" dir="ltr">' + FB.mathe(ft) + "</span></div>"; }
       h += '<details class="al-deut"><summary>' + FB.esc(ui("bedeutung")) + "</summary><p>" + FB.text(e[2]) + "</p></details>";
       if(ein && LADEN) h += '<button type="button" class="al-los" data-i="' + i + '">' + FB.esc(ui(APP === "waage" ? "waage" : "probieren")) + "</button>";

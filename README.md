@@ -49,3 +49,5 @@ Weitere Dateien: `manifest.webmanifest`, `sw.js` (Start ohne Netz), `icons/`, `p
 Erklär-Blasen: `/symbol-tipp.js` (gemeinsam, MS_TIPP.s/hinweis) – benutzt von kombinatorik, binomial, normalverteilung, exponential und über `funktionen/tipps.js` (Zeichen in den Analyse-Karten und Parameter-Buchstaben) von linear, quadratisch, polynom, rational. `MS_TIPP.auto(regeln, text, hinweisNach)` packt Zeichen in Textknoten automatisch ein (logarithmus, integral, vektoren, trigonometrie).
 
 Rechenwege: `funktionen/loesweg.js` (FL.weg/FL.html) zeigt, wie man Polynom = 0 löst (umstellen, x ausklammern, Wurzel ziehen, Mitternachtsformel, Substitution z = x², Lösung raten + Polynomdivision, sonst Näherung) – in den Rechenwegen von polynom/rational und in allen Übungen (funktionen/ueben.js: jeder Schritt hat nach dem Lösen einen Rechenweg).
+
+Zeichnungen zu den Alltagsbeispielen der Funktions-Kacheln: `funktionen/alltag-bilder.js` (FA_BILD[app][i], SVG ohne Sprachtexte; bei Achterbahn, Wurf, Brücke usw. ist die echte Funktion Teil des Bildes) – eingebunden in linear, quadratisch, polynom, rational, sinus, waage.
