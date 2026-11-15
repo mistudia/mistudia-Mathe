@@ -15,7 +15,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>miStudia Mathe</title>
-<link rel="canonical" href="https://math.mistudia.com/">
+<!-- SEO -->
+<link rel="alternate" hreflang="de" href="https://math.mistudia.com/?lang=de">
+<link rel="alternate" hreflang="en" href="https://math.mistudia.com/?lang=en">
+<link rel="alternate" hreflang="es" href="https://math.mistudia.com/?lang=es">
+<link rel="alternate" hreflang="zh" href="https://math.mistudia.com/?lang=zh">
+<link rel="alternate" hreflang="fr" href="https://math.mistudia.com/?lang=fr">
+<link rel="alternate" hreflang="ru" href="https://math.mistudia.com/?lang=ru">
+<link rel="alternate" hreflang="ar" href="https://math.mistudia.com/?lang=ar">
+<link rel="alternate" hreflang="ja" href="https://math.mistudia.com/?lang=ja">
+<link rel="alternate" hreflang="pt" href="https://math.mistudia.com/?lang=pt">
+<link rel="alternate" hreflang="x-default" href="https://math.mistudia.com/">
+<script>var MS_SEO = {"de":["miStudia Mathe","Üben mit Spaß – such dir eine App aus! Kostenlos üben mit miStudia, in 9 Sprachen."],"en":["miStudia Math","Practise with fun – pick an app! Free practice with miStudia, in 9 languages."],"es":["miStudia Matemáticas","Practica con diversión – ¡elige una app! Practica gratis con miStudia, en 9 idiomas."],"zh":["miStudia 数学","快乐练习——选一个应用吧！ 用 miStudia 免费练习，支持 9 种语言。"],"fr":["miStudia Maths","S’entraîner en s’amusant – choisis une appli ! S’entraîner gratuitement avec miStudia, en 9 langues."],"ru":["miStudia Математика","Учись с удовольствием – выбери приложение! Бесплатные упражнения с miStudia на 9 языках."],"ar":["miStudia الرياضيات","تعلّم بمتعة – اختر تطبيقًا! تدرّب مجانًا مع miStudia بتسع لغات."],"ja":["miStudia 算数・数学","楽しく練習――アプリを選んでね！ miStudia で無料練習（9か国語）。"],"pt":["miStudia Matemática","Pratique se divertindo – escolha um app! Pratique grátis com o miStudia, em 9 idiomas."]};</script>
+<script src="/sprache-url.js"></script>
+<!-- /SEO -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="miStudia Mathe">
 <meta property="og:locale" content="de_DE">
@@ -259,7 +272,7 @@ function render(){
   document.getElementById("imprint").textContent = u.imprint;
   document.querySelectorAll(".langs button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.l === lang ? "true" : "false"); });
   document.getElementById("grid").innerHTML = APPS.map(function(a){
-    return '<a class="tile" href="/' + a.slug + '/">' +
+    return '<a class="tile" href="/' + a.slug + '/' + (window.MS_URL_LANG ? "?lang=" + window.MS_URL_LANG : "") + '">' +
       '<span class="badge" style="background:' + a.color + ';font-size:' + (a.badge.length > 4 ? 15 : a.badge.length > 2 ? 19 : 26) + 'px">' + esc(a.badge) + '</span>' +
       '<span><b>' + esc(a.name[lang]) + '</b><span class="desc">' + esc(a.desc[lang]) + '</span>' +
       '<span class="grade">' + esc(a.grade[lang]) + '</span></span></a>';
@@ -269,6 +282,10 @@ document.querySelectorAll(".langs button").forEach(function(b){
   b.addEventListener("click", function(){
     lang = b.dataset.l;
     try { localStorage.setItem("msMathLang", lang); } catch(e){}
+    // eigene Adresse pro Sprache: ?lang=xx in die Adresszeile (teilbar, für Suchmaschinen)
+    window.MS_URL_LANG = lang;
+    try { history.replaceState(null, "", location.pathname + "?lang=" + lang); } catch(e){}
+    var c = document.querySelector('link[rel="canonical"]'); if(c) c.href = location.origin + location.pathname + "?lang=" + lang;
     render();
   });
 });
