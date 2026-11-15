@@ -159,15 +159,15 @@
       var s = 30, x0 = 30, y0 = 130;
       for(var i = 0; i < 10; i++) sv.appendChild(el("rect", { x: x0 + i * s, y: y0, width: s, height: 40, fill: i < n ? blau : hell, stroke: linie, "stroke-width": 1.5 }));
       sv.appendChild(el("rect", { x: x0, y: y0, width: 10 * s, height: 40, fill: "none", stroke: linie, "stroke-width": 3 }));
-      sv.appendChild(el("text", { x: x0 + 5 * s, y: y0 - 16, "text-anchor": "middle", "font-size": 18, "font-weight": "bold", fill: "#1e3a8a" }, "1 dm = 10 cm"));
+      sv.appendChild(el("text", { x: x0 + 5 * s, y: y0 - 16, "text-anchor": "middle", "font-size": 18, "font-weight": "bold", fill: "#1e3a8a" }, "10 cm = 1 dm"));
       for(var j = 0; j <= 10; j++) sv.appendChild(el("text", { x: x0 + j * s, y: y0 + 64, "text-anchor": "middle", "font-size": 12, fill: "#475569" }, j));
       sv.appendChild(el("text", { x: x0 + 10 * s, y: y0 + 82, "text-anchor": "end", "font-size": 13, fill: "#475569" }, "cm"));
     } else if(art === "flaeche"){
       var c = 24, ox = 50, oy = 20;
       for(var k = 0; k < 100; k++){ var r = Math.floor(k / 10), sp = k % 10; sv.appendChild(el("rect", { x: ox + sp * c, y: oy + (9 - r) * c, width: c, height: c, fill: k < n ? blau : hell, stroke: "#93c5fd", "stroke-width": 1 })); }
       sv.appendChild(el("rect", { x: ox, y: oy, width: 10 * c, height: 10 * c, fill: "none", stroke: linie, "stroke-width": 3 }));
-      sv.appendChild(el("text", { x: ox + 5 * c, y: oy + 10 * c + 22, "text-anchor": "middle", "font-size": 15, "font-weight": "bold", fill: "#1e3a8a" }, "10 cm"));
-      var t = el("text", { x: ox - 14, y: oy + 5 * c, "text-anchor": "middle", "font-size": 15, "font-weight": "bold", fill: "#1e3a8a", transform: "rotate(-90 " + (ox - 14) + " " + (oy + 5 * c) + ")" }, "10 cm"); sv.appendChild(t);
+      sv.appendChild(el("text", { x: ox + 5 * c, y: oy + 10 * c + 22, "text-anchor": "middle", "font-size": 15, "font-weight": "bold", fill: "#1e3a8a" }, "10 cm = 1 dm"));
+      var t = el("text", { x: ox - 14, y: oy + 5 * c, "text-anchor": "middle", "font-size": 15, "font-weight": "bold", fill: "#1e3a8a", transform: "rotate(-90 " + (ox - 14) + " " + (oy + 5 * c) + ")" }, "10 cm = 1 dm"); sv.appendChild(t);
       sv.appendChild(el("text", { x: ox + 10 * c + 8, y: oy + 14, "font-size": 14, "font-weight": "bold", fill: "#1e3a8a" }, "1 dm²"));
     } else {
       // Schrägbild: x nach rechts, y in die Tiefe, z nach oben; 1 Kästchen = 1 cm
