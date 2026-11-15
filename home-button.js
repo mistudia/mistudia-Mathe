@@ -79,3 +79,11 @@
   if(window.MS_F || document.querySelector('script[src="/formel.js"]')) return;
   var s = document.createElement("script"); s.src = "/formel.js"; document.head.appendChild(s);
 })();
+
+// ---------- Beispielbilder unten auf der Kachel (für Google Bilder): /beispiel-bilder.js + /beispiel-galerie.js ----------
+(function(){
+  if(location.pathname === "/" || document.querySelector('script[src="/beispiel-galerie.js"]')) return;
+  var a = document.createElement("script"); a.src = "/beispiel-bilder.js";
+  a.onload = function(){ var k = location.pathname.split("/").filter(Boolean)[0]; if(!window.MS_BB || !MS_BB[k]) return; var b = document.createElement("script"); b.src = "/beispiel-galerie.js"; document.head.appendChild(b); };
+  document.head.appendChild(a);
+})();

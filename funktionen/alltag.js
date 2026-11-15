@@ -1080,5 +1080,5 @@ var FA = (function(){
     ".al-deut summary{cursor:pointer;color:#1565c0;font-weight:700;font-size:14px}.al-deut p{background:#f4f8ff;border-radius:8px;padding:6px 8px;font-size:15px}" +
     ".al-los{margin-top:6px;font:700 14px system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:0;background:#1565c0;color:#fff;cursor:pointer}";
   document.head.appendChild(css);
-  return { einbauen: einbauen, texte: texte, zeigen: zeigen, D: D, F: F };
+  return { einbauen: einbauen, texte: texte, zeigen: zeigen, D: D, F: F, app: function(){ return APP; } };
 })();
