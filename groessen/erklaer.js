@@ -103,8 +103,8 @@
   var sec = document.createElement("section"); sec.className = "erk-karte"; sec.id = "erkKarte";
   sec.innerHTML = '<h2 id="kTitel"></h2><div class="erk-wahl" id="kWahl">' + ["laenge", "flaeche", "volumen"].map(function(k){ return '<button type="button" data-a="' + k + '"></button>'; }).join("") + "</div>" +
     '<h3 id="kTreppeH"></h3><div class="erk-scroll"><svg id="kTreppe" class="erk-treppe"></svg></div><p class="erk-klein" id="kTreppeT"></p>' +
-    '<h3 id="kBildH"></h3><div class="erk-bild"><svg id="kBild" viewBox="0 0 360 300"></svg><div><p id="kWarum"></p>' +
-    '<label class="erk-regler"><span id="kFuellL"></span> <input type="range" id="kFuell" min="0" max="100" step="1" value="37"></label><p class="erk-stand" id="kStand" dir="ltr"></p><p class="erk-klein" id="kLiter"></p></div></div>' +
+    '<h3 id="kBildH"></h3><div class="erk-bild"><svg id="kBild" viewBox="0 0 400 310"></svg><div><p id="kWarum"></p>' +
+    '<label class="erk-regler"><span id="kFuellL"></span> <input type="range" id="kFuell" min="0" max="100" step="1" value="37"></label><p class="erk-formel" id="kFormel" dir="ltr"></p><p class="erk-stand" id="kStand" dir="ltr"></p><p class="erk-klein" id="kLiter"></p></div></div>' +
     '<h3 id="kTafelH"></h3><p class="erk-klein" id="kTafelT"></p>' +
     '<div class="erk-zeile"><label><span id="kWertL"></span> <input id="kWert" inputmode="decimal" autocomplete="off"></label><select id="kEinh"></select></div>' +
     '<div class="erk-zeile"><label class="erk-regler"><span id="kKommaL"></span> <input type="range" id="kKomma" min="0" max="3" step="1"></label> <b id="kKommaW"></b></div>' +
@@ -116,16 +116,16 @@
     ".erk-wahl{display:flex;flex-wrap:wrap;gap:6px}.erk-wahl button{padding:9px 16px;border:2px solid #b0b0b8;border-radius:30px;background:#fff;color:#475569;font:bold 16px Arial,sans-serif;cursor:pointer}" +
     ".erk-wahl button.aktiv{background:var(--blau);border-color:var(--blau);color:#fff}" +
     ".erk-scroll{overflow-x:auto;max-width:100%}.erk-treppe{display:block;height:auto}.erk-klein{margin:4px 0;color:#475569;font-size:15px;line-height:1.5}" +
-    ".erk-bild{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:16px;align-items:center}.erk-bild svg{width:100%;height:auto;display:block}" +
+    ".erk-bild{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:16px;align-items:center}.erk-bild svg{width:100%;height:auto;display:block}" +
     ".erk-bild p{line-height:1.5}.erk-regler{display:flex;align-items:center;gap:8px;font-weight:bold;color:#475569;flex-wrap:wrap}" +
     ".erk-karte input[type=range]{width:220px;max-width:60vw;min-height:0;padding:0;border:0}" +
-    ".erk-stand{font-size:19px;font-weight:bold;color:#1d4ed8;margin:8px 0}" +
+    ".erk-formel{font-size:18px;font-weight:bold;color:#1e3a8a;background:#eff6ff;border-radius:10px;padding:8px 12px;line-height:1.7;margin:8px 0}.erk-formel:empty{display:none}.erk-stand{font-size:19px;font-weight:bold;color:#1d4ed8;margin:8px 0}" +
     ".erk-zeile{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}.erk-zeile label{display:inline-flex;gap:8px;align-items:center;font-weight:bold;color:#475569}" +
     "#kWert{width:140px;min-height:44px;border-color:#b0b0b8}#kEinh{min-height:44px;padding:6px 10px;border:2px solid #b0b0b8;border-radius:8px;font-size:18px;background:#fff;color:#1f2937}" +
     ".erk-tafel{border-collapse:collapse;margin:6px 0;font:bold 18px Arial,sans-serif}.erk-tafel th{background:#dbeafe;color:#1e3a8a;border:1px solid #94a3b8;padding:4px 6px;font-size:15px}" +
     ".erk-tafel th.an{background:#f59e0b;color:#fff}.erk-tafel td{border:1px solid #94a3b8;width:26px;height:36px;text-align:center;color:#1f2937;background:#fff}" +
-    ".erk-tafel td.null{color:#94a3b8}.erk-tafel td.grenze{border-right:3px solid #1e40af}.erk-tafel td.komma{border-right:4px solid #dc2626;position:relative}" +
-    ".erk-tafel td.komma::after{content:',';position:absolute;right:-7px;bottom:-4px;color:#dc2626;font-size:26px}" +
+    ".erk-tafel td.null{color:#94a3b8}.erk-tafel td.grenze{border-right:3px solid #1e40af}" +
+    ".erk-tafel td.kz{width:18px;min-width:18px;border:0;background:transparent;color:#dc2626;font:900 44px Georgia,'Times New Roman',serif;line-height:0;vertical-align:bottom;padding:0 1px 14px;text-align:center}.erk-tafel th.kz{background:transparent;border:0;padding:0}" +
     ".erk-tafel td.an{background:#fef3c7}.erk-fehler{color:#b91c1c;font-weight:bold;margin:4px 0}.erk-fehler:empty{display:none}" +
     ".erk-lesen{font-size:17px;line-height:1.7;margin:6px 0 0}.erk-lesen b{color:#1d4ed8}" +
     "@media (max-width:620px){.erk-bild{grid-template-columns:1fr}.erk-karte{padding:14px 10px}.erk-tafel td{width:20px;height:32px;font-size:16px}.erk-tafel th{font-size:13px;padding:3px 2px}}";
@@ -171,7 +171,7 @@
       sv.appendChild(el("text", { x: ox + 10 * c + 8, y: oy + 14, "font-size": 14, "font-weight": "bold", fill: "#1e3a8a" }, "1 dm²"));
     } else {
       // Schrägbild: x nach rechts, y in die Tiefe, z nach oben; 1 Kästchen = 1 cm
-      var u = 17, ox2 = 40, oy2 = 270, dk = 0.5;
+      var u = 17, ox2 = 40, oy2 = 268, dk = 0.5;
       var P = function(x, y, z){ return [ox2 + x * u + y * u * dk * 0.7071, oy2 - z * u - y * u * dk * 0.7071]; };
       var poly = function(pts, f, sw){ sv.appendChild(el("polygon", { points: pts.map(function(p){ return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "), fill: f, stroke: linie, "stroke-width": sw || 1 })); };
       var gitter = function(a, b, c2, d, m1, m2){ for(var i = 1; i < m1; i++){ var p = [a[0] + (b[0] - a[0]) * i / m1, a[1] + (b[1] - a[1]) * i / m1], q = [d[0] + (c2[0] - d[0]) * i / m1, d[1] + (c2[1] - d[1]) * i / m1]; sv.appendChild(el("line", { x1: p[0], y1: p[1], x2: q[0], y2: q[1], stroke: "#1e40af", "stroke-width": 0.6, opacity: 0.6 })); }
@@ -191,9 +191,9 @@
       quader(0, Z, 10 - R - 1, 10 - R, L, L + 1);
       // Kanten des großen Würfels
       [[P(0, 0, 0), P(10, 0, 0)], [P(10, 0, 0), P(10, 0, 10)], [P(10, 0, 10), P(0, 0, 10)], [P(0, 0, 10), P(0, 0, 0)], [P(10, 0, 0), P(10, 10, 0)], [P(10, 0, 10), P(10, 10, 10)], [P(0, 0, 10), P(0, 10, 10)], [P(10, 10, 0), P(10, 10, 10)], [P(0, 10, 10), P(10, 10, 10)]].forEach(function(k){ sv.appendChild(el("line", { x1: k[0][0], y1: k[0][1], x2: k[1][0], y2: k[1][1], stroke: linie, "stroke-width": 2.5 })); });
-      var m = P(5, 0, 0); sv.appendChild(el("text", { x: m[0], y: m[1] + 20, "text-anchor": "middle", "font-size": 14, "font-weight": "bold", fill: "#1e3a8a" }, "10 cm"));
-      var m2 = P(10, 5, 0); sv.appendChild(el("text", { x: m2[0] + 30, y: m2[1] + 4, "font-size": 14, "font-weight": "bold", fill: "#1e3a8a" }, "10 cm"));
-      var m3 = P(0, 0, 5); var tt = el("text", { x: m3[0] - 14, y: m3[1], "text-anchor": "middle", "font-size": 14, "font-weight": "bold", fill: "#1e3a8a", transform: "rotate(-90 " + (m3[0] - 14) + " " + m3[1] + ")" }, "10 cm"); sv.appendChild(tt);
+      var m = P(5, 0, 0); sv.appendChild(el("text", { x: m[0], y: m[1] + 20, "text-anchor": "middle", "font-size": 14, "font-weight": "bold", fill: "#1e3a8a" }, "10 cm = 1 dm"));
+      var m2 = P(10, 5, 0); sv.appendChild(el("text", { x: m2[0] + 8, y: m2[1] + 22, "font-size": 14, "font-weight": "bold", fill: "#1e3a8a" }, "10 cm = 1 dm"));
+      var m3 = P(0, 0, 5); var tt = el("text", { x: m3[0] - 14, y: m3[1], "text-anchor": "middle", "font-size": 14, "font-weight": "bold", fill: "#1e3a8a", transform: "rotate(-90 " + (m3[0] - 14) + " " + m3[1] + ")" }, "10 cm = 1 dm"); sv.appendChild(tt);
       var m4 = P(10, 10, 10); sv.appendChild(el("text", { x: m4[0] - 10, y: m4[1] - 8, "text-anchor": "end", "font-size": 14, "font-weight": "bold", fill: "#1e3a8a" }, "1 dm³ = 1 l"));
     }
     var gr = A.max === 10 ? "dm" : A.gross;
@@ -213,7 +213,7 @@
     var ziff = fehler ? "" : String(ganz), start = N - ziff.length; // erste signifikante Stelle
     var ende = []; S.reduce(function(a, b, i){ ende[i] = a + b - 1; return a + b; }, 0);
     var c = ende[ki];
-    var h = "<tr>" + A.e.map(function(u, i){ return '<th colspan="' + S[i] + '"' + (i === ki ? ' class="an"' : "") + ">" + u + "</th>"; }).join("") + "</tr><tr>";
+    var h = "<tr>" + A.e.map(function(u, i){ return '<th colspan="' + S[i] + '"' + (i === ki ? ' class="an"' : "") + ">" + u + "</th>" + (i === ki && i < A.e.length - 1 ? '<th class="kz"></th>' : ""); }).join("") + "</tr><tr>";
     var einh = 0;
     for(var j = 0; j < N; j++){
       while(j > ende[einh]) einh++;
@@ -223,9 +223,10 @@
         if(!d && ((j <= c && j >= Math.min(start, c)) || (j > c && j < start))){ d = "0"; cls.push("null"); }
         if(j === N - 1 && ganz === 0){ d = "0"; }
       }
-      if(j === c) cls.push("komma"); else if(j === ende[einh]) cls.push("grenze");
+      if(j === ende[einh] && j !== c) cls.push("grenze");
       if(einh === ki) cls.push("an");
       h += '<td class="' + cls.join(" ") + '">' + d + "</td>";
+      if(j === c && j < N - 1) h += '<td class="kz">,</td>';
     }
     $("kTafel").innerHTML = h + "</tr>";
     $("kLesen").innerHTML = fehler ? "" : A.e.map(function(u, i){ var w = zf(ganz / A.f[i]) + " " + u; return i === ki ? "<b>" + w + "</b>" : w; }).join(" = ");
@@ -239,7 +240,8 @@
       $("kEinh").innerHTML = A.e.map(function(u){ return "<option>" + u + "</option>"; }).join("");
       $("kEinh").value = A.start[1]; var sv = String(A.start[0]); $("kWert").value = komma() ? sv.replace(".", ",") : sv;
       $("kKomma").max = A.e.length - 1; $("kKomma").value = A.e.indexOf(A.start[1]); }
-    $("kWarum").textContent = tx("w_" + art); $("kLiter").textContent = art === "volumen" ? tx("liter") : "";
+    $("kWarum").textContent = tx("w_" + art);
+    $("kFormel").innerHTML = art === "volumen" ? "10 cm · 10 cm · 10 cm = 1000 cm³<br>1 dm · 1 dm · 1 dm = 1 dm³" : ""; $("kLiter").textContent = art === "volumen" ? tx("liter") : "";
     treppe(); bild(); tafel();
   }
   function texte(){
