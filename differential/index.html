@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     differential/index.html – Differentialrechnung (miStudia Mathe)
+     Änderungsrate (Sekante → Tangente, Differenzierbarkeit), Ableitungsregeln
+     (Potenz, Faktor, Summe, Produkt, Quotient, Kette), Optimierung (Gewinn,
+     Zaun, Dose), Differentialgleichungen (Richtungsfeld, Euler), Üben.
+     Logik: app.js, Texte: texte.js (9 Sprachen), Sprache aus dem Startmenü.
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Differentialrechnung</title>
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 20px; margin: 2px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 22px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 16px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.5; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 6px 0; }
+  .reihe label { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; max-width: 100%; }
+  select { font: 18px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; max-width: 100%; }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .knopf:disabled { opacity: 0.5; cursor: default; }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16.5px; line-height: 1.5; margin: 8px 0; }
+  .regler { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px 16px; margin: 8px 0; }
+  .regler label { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; font-weight: 700; }
+  .regler b { min-width: 3.5em; text-align: end; font-variant-numeric: tabular-nums; color: var(--blue); }
+  .regler input[type=range] { width: 100%; }
+  .wahl { display: inline-flex; background: #e3eefc; border-radius: 12px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+  .wahl button { font: 700 15px system-ui, sans-serif; padding: 7px 12px; border: 0; border-radius: 9px; background: transparent; color: var(--blue); cursor: pointer; }
+  .wahl button[aria-pressed="true"] { background: var(--blue); color: #ffffff; }
+  .f { direction: ltr; unicode-bidi: isolate; display: inline-block; line-height: 2.1; font-variant-numeric: tabular-nums; max-width: 100%; }
+  .f sup, .f sub { line-height: 0; }
+  .br { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.25; margin: 0 2px; }
+  .br > span { padding: 0 3px; white-space: nowrap; }
+  .br > span + span { border-top: 2px solid currentColor; }
+  .lim { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.1; }
+  .lim small { font-size: 11px; }
+  .formel { font-size: 19px; margin: 6px 0; overflow-x: auto; }
+  .formelGross { font-size: 22px; font-weight: 700; color: var(--blue); margin: 6px 0; overflow-x: auto; }
+  svg.graph { width: 100%; height: auto; display: block; user-select: none; -webkit-user-select: none; }
+  .g-gitter { stroke: #e2e8f0; stroke-width: 1; } .g-achse { stroke: #1a2233; stroke-width: 1.5; } .g-zahl { fill: #4f5b6e; font: 12px system-ui, sans-serif; text-anchor: middle; }
+  .k-f { fill: none; stroke: #2563eb; stroke-width: 3; } .k-fa { fill: none; stroke: #dc2626; stroke-width: 2.6; stroke-dasharray: 8 5; }
+  .k-s { stroke: #f59e0b; stroke-width: 2.5; } .k-t { stroke: #16a34a; stroke-width: 2.5; stroke-dasharray: 9 6; } .k-dr { stroke: #64748b; stroke-width: 1.6; stroke-dasharray: 4 4; }
+  .k-l { stroke: #2563eb; stroke-width: 2; stroke-dasharray: 7 5; opacity: 0.8; } .k-r { stroke: #dc2626; stroke-width: 2; stroke-dasharray: 7 5; opacity: 0.8; }
+  .k-K { fill: none; stroke: #dc2626; stroke-width: 2.5; } .k-E { fill: none; stroke: #16a34a; stroke-width: 2.5; } .k-G { fill: none; stroke: #2563eb; stroke-width: 3.2; }
+  .k-feld { stroke: #94a3b8; stroke-width: 1.6; } .k-eu { fill: none; stroke: #f97316; stroke-width: 2.5; }
+  .pt { fill: #1a2233; stroke: #ffffff; stroke-width: 2; } .pt-q { fill: #f59e0b; stroke: #ffffff; stroke-width: 2; } .pt-l { fill: #2563eb; } .pt-r { fill: #dc2626; } .pt-offen { fill: #ffffff; stroke: #2563eb; stroke-width: 2.5; }
+  .pt-max { fill: #16a34a; stroke: #ffffff; stroke-width: 2; } .pt-eu { fill: #f97316; }
+  .lab { font: 700 14px system-ui, sans-serif; fill: #1a2233; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; } .lab-dr { fill: #475569; font-size: 13px; }
+  .mauer { fill: #78716c; } .beet { fill: #bbf7d0; stroke: #15803d; stroke-width: 2.5; }
+  .legende { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14.5px; margin: 4px 0; }
+  .legende i { display: inline-block; width: 22px; height: 0; border-top: 3px solid; vertical-align: 4px; margin-inline-end: 4px; }
+  .legende .l-f { border-color: #2563eb; } .legende .l-s { border-color: #f59e0b; } .legende .l-t { border-color: #16a34a; border-top-style: dashed !important; } .legende .l-fa { border-color: #dc2626; border-top-style: dashed !important; }
+  .legende .l-l { border-color: #2563eb; border-top-style: dashed !important; } .legende .l-r { border-color: #dc2626; border-top-style: dashed !important; } .legende .l-K { border-color: #dc2626; } .legende .l-E { border-color: #16a34a; } .legende .l-G { border-color: #2563eb; }
+  .tabelle { overflow-x: auto; }
+  table.tw { border-collapse: collapse; font-size: 15.5px; font-variant-numeric: tabular-nums; margin: 6px 0; direction: ltr; }
+  table.tw th, table.tw td { border: 1px solid #c9dcf2; padding: 5px 9px; text-align: center; white-space: nowrap; }
+  table.tw th { background: #e3eefc; color: var(--blue); text-align: start; }
+  ol.weg { margin: 6px 0; padding-inline-start: 22px; font-size: 16.5px; line-height: 1.5; }
+  ol.weg li { margin: 5px 0; }
+  .sh { display: block; font-size: 14px; color: var(--muted); }
+  .zwei { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+  @media (max-width: 760px) { .zwei { grid-template-columns: 1fr; } }
+  .ergebnis { font-size: 18px; font-weight: 700; color: var(--gut); margin: 8px 0; line-height: 1.5; }
+  .lw-h { font-size: 14px; color: #4f5b6e; margin-top: 6px } .lw-f { margin: 2px 0 }
+  .check { font-weight: 700; display: inline-flex; gap: 6px; align-items: center; }
+  .auftrag { font-size: 20px; line-height: 1.5; margin: 4px 0 10px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  input.zahl { width: 180px; max-width: 100%; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .tabs button { padding: 7px 10px; font-size: 13.5px; }
+    .formel { font-size: 17px; } .formelGross { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Differentialrechnung</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="aend" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="regeln" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="opt" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="dgl" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+
+  <section id="s_aend">
+    <div class="karte">
+      <div class="reihe"><label><span data-t="fktL"></span> <select id="fkt"></select></label></div>
+      <div class="regler">
+        <label><span data-t="x0L"></span> <input type="range" id="x0" min="-3" max="3" step="0.1" value="1"> <b id="x0W"></b></label>
+        <label><span data-t="hL"></span> <input type="range" id="h" min="0.01" max="3" step="0.01" value="1.5"> <b id="hW"></b></label>
+      </div>
+      <div class="reihe"><button type="button" class="knopf hell" id="anim" data-t="animL"></button></div>
+      <p class="muted" id="tipH" style="font-size:14px;margin:2px 0"></p>
+      <svg class="graph" id="aSvg" viewBox="0 0 640 360"></svg>
+      <div id="aLeg"></div>
+      <p class="formel" id="aFkt"></p>
+      <h2 data-t="sekH"></h2>
+      <p class="zeile" data-t="sekT"></p>
+      <p class="formel" id="sekF"></p>
+      <h2 data-t="tanH"></h2>
+      <p class="zeile" data-t="tanT"></p>
+      <p class="formel" id="tanF"></p>
+      <p class="zeile" data-t="tabH" style="font-weight:700"></p>
+      <div class="tabelle"><table class="tw" id="hTab"></table></div>
+      <p class="merke" data-t="alltag"></p>
+    </div>
+    <div class="karte">
+      <h2 data-t="diffH"></h2>
+      <p class="zeile" data-t="diffT"></p>
+      <div class="reihe"><select id="dbWahl"></select></div>
+      <div class="regler"><label><span>h =</span> <input type="range" id="hd" min="0.05" max="2" step="0.05" value="1"> <b id="hdW"></b></label></div>
+      <svg class="graph" id="dSvg" viewBox="0 0 640 300"></svg>
+      <div id="dLeg"></div>
+      <div class="tabelle"><table class="tw" id="dTab"></table></div>
+      <p class="merke" id="dText"></p>
+    </div>
+  </section>
+
+  <section id="s_regeln" hidden>
+    <div class="karte">
+      <div class="wahl" id="rWahl"></div>
+      <h2 id="rH" style="margin-top:12px"></h2>
+      <p class="formelGross" id="rFormel"></p>
+      <p class="merke" id="rErkl"></p>
+      <div class="wahl" id="bWahl"></div>
+      <div class="zwei" style="margin-top:8px">
+        <div>
+          <p class="formel" id="bF" style="font-weight:700"></p>
+          <ol class="weg" id="bSchritte"></ol>
+        </div>
+        <div>
+          <h2 data-t="graphH" style="font-size:17px"></h2>
+          <svg class="graph" id="rSvg" viewBox="0 0 640 300"></svg>
+          <div id="rLeg"></div>
+          <p class="muted" data-t="graphT" style="font-size:14.5px"></p>
+        </div>
+      </div>
+    </div>
+    <div class="karte">
+      <h2 data-t="wichtigH"></h2>
+      <div class="tabelle"><table class="tw" id="wTab"></table></div>
+    </div>
+  </section>
+
+  <section id="s_opt" hidden>
+    <div class="karte">
+      <div class="reihe"><label><span data-t="szL"></span> <select id="szWahl"></select></label></div>
+      <div id="o_gewinn">
+        <p class="zeile" id="gText"></p>
+        <div class="regler">
+          <label><span data-t="pL"></span> <input type="range" id="op" min="20" max="60" step="1" value="40"> <b id="opW"></b></label>
+          <label><span data-t="fL"></span> <input type="range" id="oF" min="0" max="400" step="10" value="100"> <b id="oFW"></b></label>
+        </div>
+        <div class="zwei">
+          <div><svg class="graph" id="gSvg" viewBox="0 0 640 360"></svg><div id="gLeg"></div></div>
+          <div><ol class="weg" id="gWeg"></ol></div>
+        </div>
+        <p class="ergebnis" id="gErg"></p>
+      </div>
+      <div id="o_zaun" hidden>
+        <p class="zeile" id="zText"></p>
+        <div class="regler">
+          <label><span data-t="lL"></span> <input type="range" id="oL" min="20" max="200" step="10" value="60"> <b id="oLW"></b></label>
+          <label><span data-t="xL"></span> <input type="range" id="ox" min="0" max="30" step="0.5" value="10"> <b id="oxW"></b></label>
+        </div>
+        <div class="zwei">
+          <div><svg class="graph" id="zSkizze" viewBox="0 0 300 160" style="max-width:340px"></svg><svg class="graph" id="zSvg" viewBox="0 0 640 280"></svg></div>
+          <div><ol class="weg" id="zWeg"></ol></div>
+        </div>
+        <p class="ergebnis" id="zErg"></p>
+      </div>
+      <div id="o_dose" hidden>
+        <p class="zeile" id="doText"></p>
+        <div class="regler">
+          <label><span data-t="vL"></span> <input type="range" id="oV" min="100" max="2000" step="50" value="330"> <b id="oVW"></b></label>
+          <label><span data-t="rL"></span> <input type="range" id="or" min="1" max="15" step="0.1" value="5"> <b id="orW"></b></label>
+        </div>
+        <div class="zwei">
+          <div><svg class="graph" id="doSvg" viewBox="0 0 640 280"></svg></div>
+          <div><ol class="weg" id="doWeg"></ol></div>
+        </div>
+        <p class="ergebnis" id="doErg"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="s_dgl" hidden>
+    <div class="karte">
+      <h2 data-t="dglH"></h2>
+      <p class="merke" data-t="dglE"></p>
+      <div class="reihe"><label><span data-t="dglL"></span> <select id="dgWahl"></select></label></div>
+      <p class="zeile" id="dgT"></p>
+      <p class="formelGross" id="dgGl"></p>
+      <div class="regler">
+        <label><span data-t="kL"></span> <input type="range" id="dk"> <b id="dkW"></b></label>
+        <label><span data-t="f0L"></span> <input type="range" id="df0"> <b id="df0W"></b></label>
+        <label id="dSBox"><span data-t="sL"></span> <input type="range" id="dS"> <b id="dSW"></b></label>
+      </div>
+      <label class="check" id="dEulerL"><input type="checkbox" id="dEuler"> x</label>
+      <svg class="graph" id="dgSvg" viewBox="0 0 640 360"></svg>
+      <p class="zeile" id="dgLoes"></p>
+      <p class="merke" id="eulerT" hidden></p>
+    </div>
+  </section>
+
+  <section id="s_ueben" hidden>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <h2 id="uNr"></h2>
+      <p class="auftrag" id="auftrag"></p>
+      <div class="antwortzeile"><label for="uAntwort" data-t="antwortL" style="font-weight:700"></label> <input class="zahl" id="uAntwort" inputmode="decimal" autocomplete="off"> <button type="button" class="knopf" id="pruefen" data-t="pruefen"></button></div>
+      <p class="muted" data-t="rundHinweis"></p>
+      <p class="meldung" id="meldung"></p>
+      <div id="uWeg" class="zeile" hidden></div>
+      <p><button type="button" class="knopf hell" id="weiter" data-t="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="/funktionen/texte.js"></script>
+<script src="/funktionen/kern.js"></script>
+<script src="/funktionen/loesweg.js"></script>
+<script src="/symbol-tipp.js"></script>
+<script src="app.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>
