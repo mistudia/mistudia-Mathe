@@ -211,6 +211,11 @@
     if(tab === "was") was(); else if(tab === "funktion") funktion(); else if(tab === "gleichung") gleichung();
     if(!nurRechnen && auf){ var war = beantwortet, e = letzte, gut = $("meldung").classList.contains("gut"); zeige(); if(war){ beantwortet = false; anzahl--; if(gut) punkte--; $("uAntwort").value = e; pruefe(e); } }
   }
+  // Alltagsbeispiel laden (aus alltag-daten.js): {b, x} → Reiter „Was ist …“, {a, b, c} → Gleichung
+  window.MS_LOG = { laden: function(w){
+    if(w.c != null){ setz("ga", w.a); setz("gb", w.b); setz("gc", w.c); zeigeTab("gleichung"); $("ga").scrollIntoView({ behavior: "smooth", block: "center" }); }
+    else { setz("lb", w.b); setz("lx", w.x); zeigeTab("was"); $("lb").scrollIntoView({ behavior: "smooth", block: "center" }); }
+  } };
   window.MS_LANG = { apply: function(l){ if(LG[l]){ lang = l; alles(); } } };
   alles();
 })();
