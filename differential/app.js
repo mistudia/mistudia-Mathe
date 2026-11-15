@@ -292,6 +292,79 @@
     sicht($("eulerT"), $("dEuler").checked); $("eulerT").textContent = t("eulerT");
   }
 
+  // ---------- Reiter 4, Teil 2: Grundbegriffe, Lösen, Prüfen, freier Fall ----------
+  var dgNav = "begr", quizA = {};
+  var dotT = function(s){ return tp(s, "tip_dot"); };
+  function dglTeil(){
+    document.querySelectorAll("#dgNav button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.n === dgNav ? "true" : "false"); });
+    ["vorg", "begr", "loes", "pruef", "fall"].forEach(function(n){ sicht($("dg_" + n), n === dgNav); });
+    if(dgNav === "vorg") dgl(); else if(dgNav === "begr") begriffe(); else if(dgNav === "loes") loesen(); else if(dgNav === "pruef") pruefen(); else fall();
+  }
+  var QUIZ = [{ g: "ẏ = 2y", o: 1, e: 1 }, { g: "ÿ = 6y + ẏ", o: 2, e: 1 }, { g: "ÿ " + M + " 6y " + M + " ẏ = 0", o: 2, e: 0 }, { g: "y′ + 3y = x", o: 1, e: 0 }, { g: "y‴ = x · y′", o: 3, e: 1 }, { g: "s̈ = g", o: 2, e: 1 }];
+  function begriffe(){
+    $("bTab").innerHTML = "<tr><th></th><th>y(t)</th><th>y(x)</th><th>Leibniz</th></tr>" +
+      [["b_s1", dotT("ẏ"), "y′", br("dy", "dt")], ["b_s2", dotT("ÿ"), "y″", br("d²y", "dt²")], ["b_sn", "–", "y⁽ⁿ⁾", br("dⁿy", "dtⁿ")]].map(function(r){ return "<tr><th>" + esc(t(r[0])) + "</th><td>" + bdi(r[1]) + "</td><td>" + bdi(r[2]) + "</td><td>" + bdi(r[3]) + "</td></tr>"; }).join("");
+    $("bOrd").innerHTML = '<div class="bsp2"><div>' + bdi(dotT("ẏ") + " = 2y") + " → " + esc(t("b_ord1")) + "</div><div>" + bdi(dotT("ÿ") + " = 6y + ẏ") + " → " + esc(t("b_ord2")) + "</div><div>" + bdi("y⁽ⁿ⁾ = …") + " → n</div></div>";
+    $("bExpl").innerHTML = '<div class="bsp2"><div><b class="ok-t">✓ ' + esc(t("expl")) + "</b><br>" + bdi("ÿ = 6y + ẏ") + '<br><span class="muted">' + esc(t("b_expl")) + '</span></div><div><b class="no-t">' + esc(t("impl")) + "</b><br>" + bdi("ÿ " + M + " 6y " + M + " ẏ = 0") + '<br><span class="muted">' + esc(t("b_impl")) + "</span></div></div>";
+    var alle = true;
+    $("bQuiz").innerHTML = '<div class="quiz">' + QUIZ.map(function(q, i){ var a = quizA[i] || {}; var ok = a.o === q.o && a.e === q.e; if(!ok) alle = false;
+      return "<div><b>" + bdi(q.g) + "</b> <span>" + esc(t("b_ordL")) + '</span> <span class="wahl">' + [1, 2, 3].map(function(o){ return '<button type="button" data-q="' + i + '" data-o="' + o + '" aria-pressed="' + (a.o === o) + '">' + o + "</button>"; }).join("") + '</span> <span class="wahl">' + [1, 0].map(function(e){ return '<button type="button" data-q="' + i + '" data-e="' + e + '" aria-pressed="' + (a.e === e) + '">' + esc(t(e ? "expl" : "impl")) + "</button>"; }).join("") + "</span> " +
+        (a.o != null && a.e != null ? (ok ? '<span class="ok">✓</span>' : '<span class="no">✗</span>') : "") + "</div>"; }).join("") + "</div>" + (alle ? '<p class="ergebnis">' + esc(t("b_alle")) + "</p>" : "");
+    $("bQuiz").querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ var i = +b.dataset.q; quizA[i] = quizA[i] || {}; if(b.dataset.o) quizA[i].o = +b.dataset.o; else quizA[i].e = +b.dataset.e; begriffe(); }); });
+  }
+  function loesen(){
+    var k = Number($("lk").value); if(Math.abs(k) < 0.05) k = 0.1; var y0 = Number($("ly0").value);
+    $("lkW").textContent = zahl(k); $("ly0W").textContent = zahl(y0);
+    var kk = zahl(k), C = tp("C", "tip_C"), e = function(x){ return "e" + sp(x); };
+    $("lWeg").innerHTML = zeilen([
+      ["l_s1", br("dy", "dt") + " = " + kl(k) + " · y"],
+      ["l_s2", br("1", "y") + " dy = " + kl(k) + " dt"],
+      ["l_s3", "∫ " + br("1", "y") + " dy = ∫ " + kl(k) + " dt   ⇒   ln|y| = " + kk + "t + C₁"],
+      ["l_s4", "|y| = " + e(kk + "t + C₁") + " = " + e("C₁") + " · " + e(kk + "t") + "   ⇒   y = " + C + " · " + e(kk + "t")],
+      ["l_s5", "y(0) = " + C + " · e⁰ = C = " + zahl(y0)],
+      ["l_s6", "y(t) = " + zahl(y0) + " · " + e(kk + "t")],
+      ["l_s7", dotT("ẏ") + " = " + zahl(y0) + " · " + kl(k) + " · " + e(kk + "t") + " = " + kl(k) + " · y  ✓"]]);
+    var kurven = [-3, -2, -1, 1, 2, 3, 4].map(function(c){ return { f: function(x){ return c * Math.exp(k * x); }, cls: "k-schar" }; });
+    kurven.push({ f: function(x){ return y0 * Math.exp(k * x); }, cls: "k-f" });
+    plot($("lSvg"), { x0: -2, x1: 3, y0: -6, y1: 8, H: 320, xName: "t", kurven: kurven, punkte: [{ x: 0, y: y0, txt: "y(0)", cls: "pt" }] });
+  }
+  var PDGL = [{ g: "ÿ = 6y + ẏ", p: 1, q: 6 }, { g: "ÿ = 4y", p: 0, q: 4 }, { g: "ÿ = " + M + "3ẏ " + M + " 2y", p: -3, q: -2 }, { g: "ÿ = 2ẏ " + M + " y", p: 2, q: -1 }, { g: "ÿ = ẏ + 2y", p: 1, q: 2 }];
+  var pW = 0;
+  function pruefen(){
+    var P = PDGL[pW], a = Number($("pa").value), C = Number($("pc").value); $("paW").textContent = a; $("pcW").textContent = C;
+    var e = "e" + sp((a === 1 ? "" : a === -1 ? M : a) + "t"), ce = (C === 1 ? "" : C + " · ") + e;
+    $("pVor").innerHTML = bdi("y = " + ce);
+    var l = a * a, r = P.p * a + P.q, gleich = l === r;
+    var rTxt = (P.p ? (P.p === 1 ? "" : P.p === -1 ? M : P.p + " · ") + "(" + a * C + " · " + e + ")" : "") + (P.q ? (P.p ? (P.q > 0 ? " + " : " " + M + " ") + Math.abs(P.q) : P.q) + " · (" + ce + ")" : "");
+    $("pWeg").innerHTML = zeilen([
+      ["p_s1", dotT("ẏ") + " = " + (a * C) + " · " + e + ",   " + dotT("ÿ") + " = " + (a * a * C) + " · " + e],
+      ["p_s2", (a * a * C) + " · " + e + " = " + rTxt.replace(/\+ −/g, M)],
+      ["p_s3", (a * a) + " " + (gleich ? "=" : "≠") + " " + (P.p ? P.p + " · " + kl(a) : "") + (P.q ? (P.p ? (P.q > 0 ? " + " : " " + M + " ") + Math.abs(P.q) : P.q) : "") + " = " + r]]);
+    $("pErg").textContent = t(gleich ? "p_ja" : "p_nein"); $("pErg").style.color = gleich ? "" : "var(--schlecht)";
+    var D = P.p * P.p + 4 * P.q, wurzeln = D < 0 ? [] : D === 0 ? [P.p / 2] : [(P.p - Math.sqrt(D)) / 2, (P.p + Math.sqrt(D)) / 2];
+    $("pTipp").innerHTML = esc(t("p_tipp")) + " " + bdi("a² " + (P.p ? (P.p > 0 ? M + " " : "+ ") + (Math.abs(P.p) === 1 ? "" : Math.abs(P.p)) + "a " : "") + (P.q ? (P.q > 0 ? M + " " : "+ ") + Math.abs(P.q) + " " : "") + "= 0   ⇒   a = " + wurzeln.map(function(w){ return zahl(w); }).join(" " + t("oder") + " "));
+  }
+  var ORTE = { erde: 9.81, mond: 1.62, mars: 3.71 }, fOrt = "erde";
+  function fall(){
+    var g = ORTE[fOrt], v0 = Number($("fv0").value), tt = Number($("ft").value); $("fv0W").textContent = v0 + " m/s"; $("ftW").textContent = zahl(tt, 1) + " s";
+    var gT = tp("g", "tip_g"), s = function(x){ return 0.5 * g * x * x + v0 * x; }, v = function(x){ return g * x + v0; };
+    $("fWeg").innerHTML = zeilen([
+      ["f_geg", "s̈ = " + gT + " = " + zahl(g) + " m/s²,   ṡ(0) = " + tp("v₀", "tip_v0") + " = " + v0 + ",   s(0) = 0"],
+      ["f_s1", "v = ṡ = ∫ g dt = g · t + C₁;   ṡ(0) = C₁ = " + v0 + "   ⇒   v(t) = " + zahl(g) + "t" + (v0 ? " + " + v0 : "")],
+      ["f_s2", "s = ∫ (g · t + v₀) dt = ½ g t² + v₀ t + C₂;   s(0) = C₂ = 0   ⇒   s(t) = " + zahl(g / 2, 3) + "t²" + (v0 ? " + " + v0 + "t" : "")],
+      ["f_s3", "v(" + zahl(tt, 1) + ") = " + zahl(v(tt)) + " m/s,   s(" + zahl(tt, 1) + ") = " + zahl(s(tt)) + " m"]]);
+    var ymax = Math.max(s(5), v(5)) * 1.1;
+    plot($("fSvg"), { x0: 0, x1: 5, y0: 0, y1: ymax, H: 320, xName: "t", kurven: [{ f: s, cls: "k-f" }, { f: v, cls: "k-fa" }], linien: [{ x1: tt, y1: 0, x2: tt, y2: Math.max(s(tt), v(tt)), cls: "k-dr" }],
+      punkte: [{ x: tt, y: s(tt), cls: "pt", txt: zahl(s(tt), 1) + " m" }, { x: tt, y: v(tt), cls: "pt-r", txt: zahl(v(tt), 1) + " m/s", dy: 16 }] });
+    $("fLeg").innerHTML = legende([["l-f", t("leg_sF")], ["l-fa", t("leg_vF")]]);
+  }
+  ["lk", "ly0"].forEach(function(id){ $(id).addEventListener("input", loesen); });
+  ["pa", "pc"].forEach(function(id){ $(id).addEventListener("input", pruefen); });
+  $("pDgl").addEventListener("change", function(){ pW = +$("pDgl").value; pruefen(); });
+  ["fv0", "ft"].forEach(function(id){ $(id).addEventListener("input", fall); });
+  $("fOrt").addEventListener("change", function(){ fOrt = $("fOrt").value; fall(); });
+  document.querySelectorAll("#dgNav button").forEach(function(b){ b.addEventListener("click", function(){ dgNav = b.dataset.n; dglTeil(); }); });
+
   // ---------- Reiter 5: Üben ----------
   var auf = null, nr = 0, punkte = 0, gemacht = 0, status = null;
   function pol(c){ // [a3, a2, a1, a0] → Text
@@ -315,6 +388,15 @@
       return { txt: t("u_kette", { x: x0, f: "(" + pol([a, b]) + ")" + hoch(n) }), soll: w, weg: ["u(z) = z" + hoch(n) + ",  v(x) = " + pol([a, b]) + ",  u′(z) = " + n + "z" + (n > 2 ? hoch(n - 1) : "") + ",  v′(x) = " + zahl(a), "f′(x) = " + n + " · (" + pol([a, b]) + ")" + (n > 2 ? hoch(n - 1) : "") + " · " + kl(a), "f′(" + x0 + ") = " + n + " · " + kl(inn) + (n > 2 ? hoch(n - 1) : "") + " · " + kl(a) + " = " + zahl(w)] }; },
     zaun: function(){ var L = wahl([40, 60, 80, 100, 120, 36, 50]);
       return { txt: t("u_zaun", { l: L }), soll: L / 4, weg: ["A(x) = x · (" + L + " " + M + " 2x) = " + L + "x " + M + " 2x²", "A′(x) = " + L + " " + M + " 4x = 0  ⇒  x = " + zahl(L / 4), "A″(x) = " + M + "4 < 0  ⇒  " + t("max")] }; },
+    dgl_ord: function(){ var q = wahl(QUIZ.concat([{ g: "y⁗ + y = 0", o: 4 }, { g: "ẏ = " + M + "0,3 · y".replace("0,3", zahl(0.3)), o: 1 }]));
+      return { txt: t("u_ord", { g: q.g }), soll: q.o, weg: [q.g + "  →  " + (q.o === 1 ? "ẏ / y′" : q.o === 2 ? "ÿ / y″" : q.o === 3 ? "y‴" : "y⁗") + "  ⇒  " + q.o] }; },
+    dgl_trenn: function(){ var k = wahl([0.5, 1, 2, -1, -0.5, 0.2]), a = wahl([1, 2, 3, 5, 10]), w = a * Math.exp(k);
+      return { txt: t("u_trenn", { k: zahl(k), a: a }), soll: w, weg: [br("1", "y") + " dy = " + kl(k) + " dt  ⇒  ln|y| = " + zahl(k) + "t + C₁  ⇒  y = C · e" + sp(zahl(k) + "t"), "y(0) = C = " + a + "  ⇒  y(t) = " + a + " · e" + sp(zahl(k) + "t"), "y(1) = " + a + " · e" + sp(zahl(k)) + " ≈ " + zahl(w)] }; },
+    dgl_char: function(){ var r1 = zuf(1, 4), r2 = -zuf(1, 3), p = r1 + r2, q = -r1 * r2;
+      var g = "ÿ = " + (p ? (p === 1 ? "" : p === -1 ? M : p) + "ẏ + " : "") + q + "y";
+      return { txt: t("u_char", { g: g }), soll: r1, weg: ["ẏ = a · eᵃᵗ,  ÿ = a² · eᵃᵗ", "a² · eᵃᵗ = " + (p ? p + " · a · eᵃᵗ + " : "") + q + " · eᵃᵗ  ⇒  a² = " + (p ? p + "a + " : "") + q, "a² " + (p ? (p > 0 ? M + " " + p : "+ " + (-p)) + "a " : "") + M + " " + q + " = 0  ⇒  a = " + r1 + " " + t("oder") + " a = " + r2 + "  ⇒  a = " + r1] }; },
+    dgl_fall: function(){ var tt = wahl([1, 2, 3, 4, 1.5, 2.5]), g = 9.81, w = 0.5 * g * tt * tt;
+      return { txt: t("u_fall", { g: zahl(g), t: zahl(tt) }), soll: w, weg: ["s̈ = g  ⇒  ṡ = g · t  ⇒  s = ½ · g · t²", "s(" + zahl(tt) + ") = ½ · " + zahl(g) + " · " + zahl(tt) + "² ≈ " + zahl(w)] }; },
     gewinn: function(){ var b = 2 * zuf(4, 15), c = zuf(10, 60);
       return { txt: t("u_gewinn", { g: pol([-1, b, -c]) }), soll: b / 2, weg: ["G′(x) = " + M + "2x + " + b + " = 0  ⇒  x = " + (b / 2), "G″(x) = " + M + "2 < 0  ⇒  " + t("max")] }; }
   };
@@ -353,7 +435,7 @@
     if(k === "ueben" && !auf) neueAufgabe();
     rechnen();
   }
-  function rechnen(){ if(tab === "aend"){ aend(); diffb(); } else if(tab === "regeln"){ regeln(); wichtig(); } else if(tab === "opt") opt(); else if(tab === "dgl") dgl(); }
+  function rechnen(){ if(tab === "aend"){ aend(); diffb(); } else if(tab === "regeln"){ regeln(); wichtig(); } else if(tab === "opt") opt(); else if(tab === "dgl") dglTeil(); }
   document.querySelectorAll(".tabs button").forEach(function(b){ b.addEventListener("click", function(){ zeigeTab(b.dataset.tab); }); });
   ["x0", "h"].forEach(function(id){ $(id).addEventListener("input", function(){ if(anim && id === "h"){ cancelAnimationFrame(anim); anim = null; } aend(); }); });
   $("fkt").addEventListener("change", function(){ fktW = $("fkt").value; var F = FKT[fktW]; $("x0").min = F.x0[0]; $("x0").max = F.x0[1]; $("x0").value = F.x0[2]; aend(); });
@@ -378,6 +460,8 @@
     sel("dbWahl", Object.keys(DB), "db_", dbW);
     sel("szWahl", ["gewinn", "zaun", "dose"], "sz_", szW);
     sel("dgWahl", Object.keys(DG), "dg_", dgW);
+    sel("pDgl", PDGL.map(function(x, i){ return i; }), function(i){ return PDGL[i].g; }, pW);
+    sel("fOrt", Object.keys(ORTE), function(k){ return t("f_" + k) + " (g = " + zahl(ORTE[k]) + " m/s²)"; }, fOrt);
     $("tipH").textContent = window.MS_TIPP ? MS_TIPP.hinweis(lang) : "";
     $("dEulerL").lastChild.textContent = " " + t("eulerL");
     if(auf) auf = erzeuge(auf.typ, auf.seed);

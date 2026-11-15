@@ -24,6 +24,13 @@
   #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
   h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
   h2 { color: var(--blue); font-size: 20px; margin: 2px 0 8px; }
+  h3 { color: var(--blue); font-size: 17px; margin: 14px 0 4px; }
+  #dgNav { margin: 4px 0 10px; }
+  .k-schar { fill: none; stroke: #cbd5e1; stroke-width: 1.6; } .ok-t { color: var(--gut); } .no-t { color: var(--schlecht); }
+  .quiz { display: grid; gap: 8px; } .quiz > div { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; border: 1px solid #c9dcf2; border-radius: 10px; padding: 6px 10px; }
+  .quiz .ok { color: var(--gut); font-weight: 800; } .quiz .no { color: var(--schlecht); font-weight: 800; }
+  .bsp2 { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .bsp2 > div { border: 1px solid #c9dcf2; border-radius: 10px; padding: 6px 12px; background: #fbfdff; }
   .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 22px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
   .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 16px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
   .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
@@ -213,18 +220,71 @@
     <div class="karte">
       <h2 data-t="dglH"></h2>
       <p class="merke" data-t="dglE"></p>
-      <div class="reihe"><label><span data-t="dglL"></span> <select id="dgWahl"></select></label></div>
-      <p class="zeile" id="dgT"></p>
-      <p class="formelGross" id="dgGl"></p>
-      <div class="regler">
-        <label><span data-t="kL"></span> <input type="range" id="dk"> <b id="dkW"></b></label>
-        <label><span data-t="f0L"></span> <input type="range" id="df0"> <b id="df0W"></b></label>
-        <label id="dSBox"><span data-t="sL"></span> <input type="range" id="dS"> <b id="dSW"></b></label>
+      <div class="wahl" id="dgNav"><button type="button" data-n="begr" data-t="nav_begr"></button><button type="button" data-n="vorg" data-t="nav_vorg"></button><button type="button" data-n="loes" data-t="nav_loes"></button><button type="button" data-n="pruef" data-t="nav_pruef"></button><button type="button" data-n="fall" data-t="nav_fall"></button></div>
+      <div id="dg_vorg" class="dg-teil">
+        <div class="reihe"><label><span data-t="dglL"></span> <select id="dgWahl"></select></label></div>
+        <p class="zeile" id="dgT"></p>
+        <p class="formelGross" id="dgGl"></p>
+        <div class="regler">
+          <label><span data-t="kL"></span> <input type="range" id="dk"> <b id="dkW"></b></label>
+          <label><span data-t="f0L"></span> <input type="range" id="df0"> <b id="df0W"></b></label>
+          <label id="dSBox"><span data-t="sL"></span> <input type="range" id="dS"> <b id="dSW"></b></label>
+        </div>
+        <label class="check" id="dEulerL"><input type="checkbox" id="dEuler"> x</label>
+        <svg class="graph" id="dgSvg" viewBox="0 0 640 360"></svg>
+        <p class="zeile" id="dgLoes"></p>
+        <p class="merke" id="eulerT" hidden></p>
       </div>
-      <label class="check" id="dEulerL"><input type="checkbox" id="dEuler"> x</label>
-      <svg class="graph" id="dgSvg" viewBox="0 0 640 360"></svg>
-      <p class="zeile" id="dgLoes"></p>
-      <p class="merke" id="eulerT" hidden></p>
+      <div id="dg_begr" class="dg-teil" hidden>
+        <p class="zeile" data-t="b_def"></p>
+        <h3 data-t="b_schreibH"></h3>
+        <div class="tabelle"><table class="tw" id="bTab"></table></div>
+        <p class="zeile" data-t="b_punkt"></p>
+        <h3 data-t="b_ordH"></h3>
+        <p class="zeile" data-t="b_ord"></p>
+        <div id="bOrd"></div>
+        <h3 data-t="b_explH"></h3>
+        <div id="bExpl"></div>
+        <p class="merke" data-t="b_part"></p>
+        <h3 data-t="b_quizH"></h3>
+        <div id="bQuiz"></div>
+      </div>
+      <div id="dg_loes" class="dg-teil" hidden>
+        <p class="zeile" data-t="l_text"></p>
+        <div class="regler">
+          <label><span data-t="kL"></span> <input type="range" id="lk" min="-1" max="2" step="0.1" value="2"> <b id="lkW"></b></label>
+          <label><span data-t="y0L"></span> <input type="range" id="ly0" min="0.5" max="5" step="0.5" value="1"> <b id="ly0W"></b></label>
+        </div>
+        <div class="zwei">
+          <div><ol class="weg" id="lWeg"></ol></div>
+          <div><svg class="graph" id="lSvg" viewBox="0 0 640 320"></svg><p class="muted" data-t="l_C" style="font-size:14.5px"></p></div>
+        </div>
+      </div>
+      <div id="dg_pruef" class="dg-teil" hidden>
+        <p class="zeile" data-t="p_text"></p>
+        <div class="reihe"><label><span data-t="p_dglL"></span> <select id="pDgl"></select></label></div>
+        <div class="regler">
+          <label><span data-t="aL"></span> <input type="range" id="pa" min="-4" max="4" step="1" value="3"> <b id="paW"></b></label>
+          <label><span data-t="cL"></span> <input type="range" id="pc" min="1" max="5" step="1" value="1"> <b id="pcW"></b></label>
+        </div>
+        <p class="formelGross" id="pVor"></p>
+        <ol class="weg" id="pWeg"></ol>
+        <p class="ergebnis" id="pErg"></p>
+        <p class="merke" id="pTipp"></p>
+      </div>
+      <div id="dg_fall" class="dg-teil" hidden>
+        <p class="zeile" data-t="f_text"></p>
+        <div class="reihe"><label><span data-t="f_ortL"></span> <select id="fOrt"></select></label></div>
+        <div class="regler">
+          <label><span data-t="v0L"></span> <input type="range" id="fv0" min="0" max="20" step="1" value="0"> <b id="fv0W"></b></label>
+          <label><span data-t="tL"></span> <input type="range" id="ft" min="0" max="5" step="0.1" value="2"> <b id="ftW"></b></label>
+        </div>
+        <div class="zwei">
+          <div><svg class="graph" id="fSvg" viewBox="0 0 640 320"></svg><div id="fLeg"></div></div>
+          <div><ol class="weg" id="fWeg"></ol></div>
+        </div>
+      </div>
+      <p class="merke" data-t="merkeDgl" style="border-color:#a21caf;background:#fdf4ff"></p>
     </div>
   </section>
 
@@ -243,6 +303,7 @@
   <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
 </div>
 <script src="texte.js"></script>
+<script src="texte2.js"></script>
 <script src="/funktionen/texte.js"></script>
 <script src="/funktionen/kern.js"></script>
 <script src="/funktionen/loesweg.js"></script>
