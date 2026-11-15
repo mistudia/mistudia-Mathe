@@ -50,7 +50,11 @@
   .regel .d { font: 800 26px system-ui, sans-serif; color: #ffffff; background: var(--farbe, #4f46e5); border-radius: 10px; min-width: 46px; text-align: center; padding: 2px 8px; }
   .regel .urteil { font-weight: 800; font-size: 17px; }
   .regel.ja .urteil { color: var(--gut); } .regel.nein .urteil { color: #6b7280; }
-  .regel .text { font-size: 15px; line-height: 1.4; margin: 4px 0; }
+  .regel { position: relative; overflow: hidden; }
+  .regel > * { position: relative; z-index: 1; }
+  /* die Zahl, durch die geteilt wird, groß und durchscheinend im Hintergrund */
+  .regel::before { content: attr(data-d); position: absolute; inset-inline-end: 10px; top: 50%; transform: translateY(-50%); font: 900 190px/1 system-ui, sans-serif; color: var(--farbe, #4f46e5); opacity: 0.1; pointer-events: none; z-index: 2; }
+  .regel .text { font-size: 17px; font-weight: 700; line-height: 1.4; margin: 6px 0; color: var(--farbe, #1a2233); background: #ffffff80; border-inline-start: 4px solid var(--farbe, #4f46e5); border-radius: 6px; padding: 5px 8px; }
   .regel .anw { font-size: 16px; line-height: 1.5; margin: 4px 0; font-variant-numeric: tabular-nums; }
   .regel .warum { font-size: 13.5px; color: var(--muted); line-height: 1.35; margin: 6px 0 0; }
   .ziffern { display: inline-flex; gap: 2px; direction: ltr; flex-wrap: wrap; margin: 2px 0; }

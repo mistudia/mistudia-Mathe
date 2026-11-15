@@ -1,6 +1,6 @@
 // ============================================================
 // teilbarkeit/app.js – Teilbarkeitsregeln
-// Regeln: 2, 3, 4, 5, 6, 8, 9, 10, 11, 25 an einer eigenen Zahl – die
+// Regeln: 2, 3, 4, 5, 6, 7, 8, 9 an einer eigenen Zahl – die
 // entscheidenden Ziffern werden markiert, dazu Rechnung und „Warum?“.
 // Teiler & Primzahlen: Teilerpaare, Teilermenge, Primzahl ja/nein,
 // Primfaktorzerlegung mit Baum, Sieb des Eratosthenes bis 100.
@@ -19,8 +19,8 @@
   function zuf(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
   function wahl(L){ return L[Math.floor(Math.random() * L.length)]; }
   function minus(v){ return v < 0 ? "−" + (-v) : String(v); }
-  var TEILER = [2, 3, 4, 5, 6, 8, 9, 10, 11, 25];
-  var FARBE = { 2: "#d97706", 3: "#0284c7", 4: "#b45309", 5: "#059669", 6: "#7c3aed", 8: "#92400e", 9: "#0369a1", 10: "#047857", 11: "#be123c", 25: "#4d7c0f" };
+  var TEILER = [2, 3, 4, 5, 6, 7, 8, 9];
+  var FARBE = { 2: "#d97706", 3: "#0284c7", 4: "#b45309", 5: "#059669", 6: "#7c3aed", 7: "#be123c", 8: "#92400e", 9: "#0369a1", 10: "#047857", 11: "#be123c", 25: "#4d7c0f" };
 
   // ---------- Regeln anwenden ----------
   function teilbarText(a, d){ return t(a % d === 0 ? "istT" : "nichtT", { a: bdi(minus(a)), d: d }); }
@@ -45,6 +45,11 @@
       endeMark(1); var q6 = 0; for(i = 0; i < L; i++) q6 += Number(s[i]);
       z.push(t("durch", { d: 2 }) + " " + (n % 2 === 0 ? "✓" : "✗") + " (" + t("letzteZ", { z: s[L - 1] }) + ")");
       z.push(t("durch", { d: 3 }) + " " + (n % 3 === 0 ? "✓" : "✗") + " (" + t("qs") + " " + bdi(String(q6)) + ")");
+    } else if(d === 7){
+      // letzte Ziffer abtrennen, verdoppeln, vom Rest abziehen – bis die Zahl klein ist
+      endeMark(1); var w = n;
+      while(Math.abs(w) >= 70){ var r = Math.floor(Math.abs(w) / 10) * (w < 0 ? -1 : 1), b = Math.abs(w) % 10, neu = r - 2 * b; z.push(bdi(minus(w) + ": " + minus(r) + " − 2 · " + b + " = " + minus(neu))); w = neu; }
+      z.push(teilbarText(w, 7));
     } else if(d === 11){
       var a = 0, teile = [];
       for(i = L - 1, k = 0; i >= 0; i--, k++){ var v = Number(s[i]), plus = k % 2 === 0; a += plus ? v : -v; m[i] = plus ? "p" : "n"; teile.push((k === 0 ? "" : plus ? " + " : " − ") + v); }
@@ -59,6 +64,7 @@
     if(d === 8) return t("wEnde3", { d: d });
     if(d === 3 || d === 9) return t("wQS", { d: d });
     if(d === 6) return t("w6");
+    if(d === 7) return t("w7");
     return t("w11");
   }
 
@@ -72,7 +78,7 @@
     var ja = [], nein = [], h = "";
     TEILER.forEach(function(d){
       var A = anwenden(d, s); (A.ok ? ja : nein).push(d);
-      h += '<div class="regel ' + (A.ok ? "ja" : "nein") + '" style="--farbe:' + FARBE[d] + '"><div class="kopf"><span class="d">' + d + '</span><span class="urteil">' + (A.ok ? "✓ " : "✗ ") + t(A.ok ? "istT" : "nichtT", { a: bdi(s), d: d }) + "</span></div>" +
+      h += '<div class="regel ' + (A.ok ? "ja" : "nein") + '" data-d="' + d + '" style="--farbe:' + FARBE[d] + '"><div class="kopf"><span class="d">' + d + '</span><span class="urteil">' + (A.ok ? "✓ " : "✗ ") + t(A.ok ? "istT" : "nichtT", { a: bdi(s), d: d }) + "</span></div>" +
         '<p class="text">' + t("r" + d) + "</p>" + A.ziffern + A.z.map(function(x){ return '<p class="anw">' + x + "</p>"; }).join("") +
         '<p class="warum"><b>' + t("warumL") + "</b> " + warum(d) + "</p></div>";
     });
@@ -81,7 +87,7 @@
   }
   $("zahl").addEventListener("input", regeln);
   $("zufall").addEventListener("click", function(){
-    var n = wahl([zuf(100, 99999), zuf(10, 9999) * wahl([6, 8, 9, 11, 12, 25, 36]), zuf(1000, 999999)]);
+    var n = wahl([zuf(100, 99999), zuf(10, 9999) * wahl([6, 7, 8, 9, 12, 14, 36]), zuf(1000, 999999)]);
     $("zahl").value = String(n); regeln();
   });
 
@@ -165,7 +171,7 @@
     } else if(typ === "ziffer"){
       var dd, s, pos, gut;
       do {
-        dd = wahl([3, 9, 4, 11, 6]); var len = zuf(4, 5); s = String(zuf(1, 9)); for(var i = 1; i < len; i++) s += zuf(0, 9);
+        dd = wahl([3, 9, 4, 6]); var len = zuf(4, 5); s = String(zuf(1, 9)); for(var i = 1; i < len; i++) s += zuf(0, 9);
         if(dd === 4) pos = len - 2; else if(dd === 6){ pos = zuf(0, len - 2); if(Number(s[len - 1]) % 2) s = s.slice(0, -1) + "4"; } else pos = zuf(0, len - 1);
         gut = [];
         for(var z = pos === 0 ? 1 : 0; z <= 9; z++){ var tst = s.slice(0, pos) + z + s.slice(pos + 1); if(Number(tst) % dd === 0) gut.push(z); }
