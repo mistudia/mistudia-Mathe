@@ -3,7 +3,7 @@
 var WT = {
 de: {
   titel: "Wahrscheinlichkeit", tab_baum: "Baumdiagramm", tab_sim: "Simulation", tab_ueben: "Üben",
-  versuch: "Zufallsexperiment:", stufen: "Stufen:", rotN: "rote Kugeln:", blauN: "blaue Kugeln:", pTreffer: "P(Treffer) =",
+  versuch: "Zufallsexperiment:", stufen: "Stufen:", rotN: "rote Kugeln:", blauN: "blaue Kugeln:", gruenN: "grüne Kugeln:", gelbN: "gelbe Kugeln:", pTreffer: "P(Treffer) =",
   v_muenze: "Münze werfen", v_wuerfel: "Würfeln (Sechs oder keine Sechs)", v_urneMit: "Urne – mit Zurücklegen", v_urneOhne: "Urne – ohne Zurücklegen", v_rad: "Glücksrad (½ rot, ⅓ gelb, ⅙ blau)", v_eigen: "Eigenes: Treffer oder Niete",
   f_bruch: "Bruch", f_dezimal: "Dezimalzahl", f_prozent: "Prozent",
   hinweisKlick: "Tippe rechts auf die Pfade, die zu deinem Ereignis gehören – oder wähle unten ein Ereignis.",
@@ -20,11 +20,11 @@ de: {
   aufPfad: "Wie groß ist die Wahrscheinlichkeit für {p}?", aufEreig: "Wie groß ist die Wahrscheinlichkeit für „{e}“?",
   eingabe: "Antwort", eingabeH: "als Bruch, Dezimalzahl oder Prozent", pruefen: "Prüfen", weiter: "Nächste Aufgabe", richtig: "Richtig!", falsch: "Leider nicht. Richtig ist: {l}", punkte: "{p} von {n} richtig",
   kopf: "Kopf", kopfK: "K", zahl: "Zahl", zahlK: "Z", sechs: "Sechs", sechsK: "6", nicht6: "keine Sechs", nicht6K: "6̄",
-  rot: "rot", rotK: "R", blau: "blau", blauK: "B", gelb: "gelb", gelbK: "G", treffer: "Treffer", trefferK: "T", niete: "Niete", nieteK: "N"
+  rot: "rot", rotK: "R", blau: "blau", blauK: "B", gelb: "gelb", gelbK: "G", gruen: "grün", gruenK: "Gr", treffer: "Treffer", trefferK: "T", niete: "Niete", nieteK: "N"
 },
 en: {
   titel: "Probability", tab_baum: "Tree diagram", tab_sim: "Simulation", tab_ueben: "Practice",
-  versuch: "Random experiment:", stufen: "Stages:", rotN: "red balls:", blauN: "blue balls:", pTreffer: "P(success) =",
+  versuch: "Random experiment:", stufen: "Stages:", rotN: "red balls:", blauN: "blue balls:", gruenN: "green balls:", gelbN: "yellow balls:", pTreffer: "P(success) =",
   v_muenze: "Toss a coin", v_wuerfel: "Roll a die (six or not six)", v_urneMit: "Urn – with replacement", v_urneOhne: "Urn – without replacement", v_rad: "Spinner (½ red, ⅓ yellow, ⅙ blue)", v_eigen: "Own: success or failure",
   f_bruch: "Fraction", f_dezimal: "Decimal", f_prozent: "Percent",
   hinweisKlick: "Tap the paths on the right that belong to your event – or choose an event below.",
@@ -41,11 +41,11 @@ en: {
   aufPfad: "What is the probability of {p}?", aufEreig: "What is the probability of “{e}”?",
   eingabe: "Answer", eingabeH: "as a fraction, decimal or percent", pruefen: "Check", weiter: "Next task", richtig: "Correct!", falsch: "Not quite. The answer is: {l}", punkte: "{p} of {n} correct",
   kopf: "heads", kopfK: "H", zahl: "tails", zahlK: "T", sechs: "six", sechsK: "6", nicht6: "not six", nicht6K: "6̄",
-  rot: "red", rotK: "R", blau: "blue", blauK: "B", gelb: "yellow", gelbK: "Y", treffer: "success", trefferK: "S", niete: "failure", nieteK: "F"
+  rot: "red", rotK: "R", blau: "blue", blauK: "B", gelb: "yellow", gelbK: "Y", gruen: "green", gruenK: "G", treffer: "success", trefferK: "S", niete: "failure", nieteK: "F"
 },
 es: {
   titel: "Probabilidad", tab_baum: "Diagrama de árbol", tab_sim: "Simulación", tab_ueben: "Practicar",
-  versuch: "Experimento aleatorio:", stufen: "Etapas:", rotN: "bolas rojas:", blauN: "bolas azules:", pTreffer: "P(acierto) =",
+  versuch: "Experimento aleatorio:", stufen: "Etapas:", rotN: "bolas rojas:", blauN: "bolas azules:", gruenN: "bolas verdes:", gelbN: "bolas amarillas:", pTreffer: "P(acierto) =",
   v_muenze: "Lanzar una moneda", v_wuerfel: "Lanzar un dado (seis o no seis)", v_urneMit: "Urna – con reemplazo", v_urneOhne: "Urna – sin reemplazo", v_rad: "Ruleta (½ rojo, ⅓ amarillo, ⅙ azul)", v_eigen: "Propio: acierto o fallo",
   f_bruch: "Fracción", f_dezimal: "Decimal", f_prozent: "Porcentaje",
   hinweisKlick: "Toca a la derecha los caminos que pertenecen a tu suceso, o elige un suceso abajo.",
@@ -62,11 +62,11 @@ es: {
   aufPfad: "¿Cuál es la probabilidad de {p}?", aufEreig: "¿Cuál es la probabilidad de «{e}»?",
   eingabe: "Respuesta", eingabeH: "como fracción, decimal o porcentaje", pruefen: "Comprobar", weiter: "Siguiente ejercicio", richtig: "¡Correcto!", falsch: "No es correcto. La respuesta es: {l}", punkte: "{p} de {n} correctas",
   kopf: "cara", kopfK: "C", zahl: "cruz", zahlK: "X", sechs: "seis", sechsK: "6", nicht6: "no seis", nicht6K: "6̄",
-  rot: "rojo", rotK: "R", blau: "azul", blauK: "A", gelb: "amarillo", gelbK: "Am", treffer: "acierto", trefferK: "A", niete: "fallo", nieteK: "F"
+  rot: "rojo", rotK: "R", blau: "azul", blauK: "A", gelb: "amarillo", gelbK: "Am", gruen: "verde", gruenK: "V", treffer: "acierto", trefferK: "A", niete: "fallo", nieteK: "F"
 },
 zh: {
   titel: "概率", tab_baum: "树状图", tab_sim: "模拟", tab_ueben: "练习",
-  versuch: "随机试验：", stufen: "步数：", rotN: "红球个数：", blauN: "蓝球个数：", pTreffer: "P(成功) =",
+  versuch: "随机试验：", stufen: "步数：", rotN: "红球个数：", blauN: "蓝球个数：", gruenN: "绿球个数：", gelbN: "黄球个数：", pTreffer: "P(成功) =",
   v_muenze: "抛硬币", v_wuerfel: "掷骰子（6 或不是 6）", v_urneMit: "摸球——放回", v_urneOhne: "摸球——不放回", v_rad: "转盘（红 ½、黄 ⅓、蓝 ⅙）", v_eigen: "自定义：成功或失败",
   f_bruch: "分数", f_dezimal: "小数", f_prozent: "百分数",
   hinweisKlick: "点按右边属于你的事件的路径——或者在下面选择一个事件。",
@@ -83,11 +83,11 @@ zh: {
   aufPfad: "{p} 的概率是多少？", aufEreig: "“{e}”的概率是多少？",
   eingabe: "答案", eingabeH: "分数、小数或百分数", pruefen: "检查", weiter: "下一题", richtig: "正确！", falsch: "不对。正确答案是：{l}", punkte: "{n} 题中答对 {p} 题",
   kopf: "正面", kopfK: "正", zahl: "反面", zahlK: "反", sechs: "6 点", sechsK: "6", nicht6: "不是 6", nicht6K: "6̄",
-  rot: "红", rotK: "红", blau: "蓝", blauK: "蓝", gelb: "黄", gelbK: "黄", treffer: "成功", trefferK: "成", niete: "失败", nieteK: "败"
+  rot: "红", rotK: "红", blau: "蓝", blauK: "蓝", gelb: "黄", gelbK: "黄", gruen: "绿", gruenK: "绿", treffer: "成功", trefferK: "成", niete: "失败", nieteK: "败"
 },
 fr: {
   titel: "Probabilités", tab_baum: "Arbre", tab_sim: "Simulation", tab_ueben: "S’entraîner",
-  versuch: "Expérience aléatoire :", stufen: "Étapes :", rotN: "boules rouges :", blauN: "boules bleues :", pTreffer: "P(succès) =",
+  versuch: "Expérience aléatoire :", stufen: "Étapes :", rotN: "boules rouges :", blauN: "boules bleues :", gruenN: "boules vertes :", gelbN: "boules jaunes :", pTreffer: "P(succès) =",
   v_muenze: "Lancer une pièce", v_wuerfel: "Lancer un dé (six ou pas six)", v_urneMit: "Urne – avec remise", v_urneOhne: "Urne – sans remise", v_rad: "Roue (½ rouge, ⅓ jaune, ⅙ bleu)", v_eigen: "Ma propre expérience : succès ou échec",
   f_bruch: "Fraction", f_dezimal: "Décimal", f_prozent: "Pourcentage",
   hinweisKlick: "Touche à droite les chemins qui appartiennent à ton événement – ou choisis un événement ci-dessous.",
@@ -104,11 +104,11 @@ fr: {
   aufPfad: "Quelle est la probabilité de {p} ?", aufEreig: "Quelle est la probabilité de « {e} » ?",
   eingabe: "Réponse", eingabeH: "en fraction, nombre décimal ou pourcentage", pruefen: "Vérifier", weiter: "Exercice suivant", richtig: "Juste !", falsch: "Pas tout à fait. La bonne réponse est : {l}", punkte: "{p} sur {n} justes",
   kopf: "pile", kopfK: "P", zahl: "face", zahlK: "F", sechs: "six", sechsK: "6", nicht6: "pas six", nicht6K: "6̄",
-  rot: "rouge", rotK: "R", blau: "bleu", blauK: "B", gelb: "jaune", gelbK: "J", treffer: "succès", trefferK: "S", niete: "échec", nieteK: "E"
+  rot: "rouge", rotK: "R", blau: "bleu", blauK: "B", gelb: "jaune", gelbK: "J", gruen: "vert", gruenK: "V", treffer: "succès", trefferK: "S", niete: "échec", nieteK: "E"
 },
 ru: {
   titel: "Вероятность", tab_baum: "Дерево", tab_sim: "Моделирование", tab_ueben: "Тренировка",
-  versuch: "Случайный опыт:", stufen: "Шагов:", rotN: "красных шаров:", blauN: "синих шаров:", pTreffer: "P(успех) =",
+  versuch: "Случайный опыт:", stufen: "Шагов:", rotN: "красных шаров:", blauN: "синих шаров:", gruenN: "зелёных шаров:", gelbN: "жёлтых шаров:", pTreffer: "P(успех) =",
   v_muenze: "Бросить монету", v_wuerfel: "Бросить кубик (шестёрка или нет)", v_urneMit: "Урна – с возвращением", v_urneOhne: "Урна – без возвращения", v_rad: "Колесо (½ красный, ⅓ жёлтый, ⅙ синий)", v_eigen: "Свой опыт: успех или неудача",
   f_bruch: "Дробь", f_dezimal: "Десятичная", f_prozent: "Проценты",
   hinweisKlick: "Нажми справа на пути, которые относятся к твоему событию, – или выбери событие ниже.",
@@ -125,11 +125,11 @@ ru: {
   aufPfad: "Какова вероятность {p}?", aufEreig: "Какова вероятность события «{e}»?",
   eingabe: "Ответ", eingabeH: "дробью, десятичной дробью или в процентах", pruefen: "Проверить", weiter: "Следующее задание", richtig: "Верно!", falsch: "Неверно. Правильный ответ: {l}", punkte: "Верно {p} из {n}",
   kopf: "орёл", kopfK: "О", zahl: "решка", zahlK: "Р", sechs: "шестёрка", sechsK: "6", nicht6: "не шестёрка", nicht6K: "6̄",
-  rot: "красный", rotK: "К", blau: "синий", blauK: "С", gelb: "жёлтый", gelbK: "Ж", treffer: "успех", trefferK: "У", niete: "неудача", nieteK: "Н"
+  rot: "красный", rotK: "К", blau: "синий", blauK: "С", gelb: "жёлтый", gelbK: "Ж", gruen: "зелёный", gruenK: "З", treffer: "успех", trefferK: "У", niete: "неудача", nieteK: "Н"
 },
 ar: {
   titel: "الاحتمالات", tab_baum: "المخطط الشجري", tab_sim: "المحاكاة", tab_ueben: "تمرين",
-  versuch: "التجربة العشوائية:", stufen: "المراحل:", rotN: "كرات حمراء:", blauN: "كرات زرقاء:", pTreffer: "P(نجاح) =",
+  versuch: "التجربة العشوائية:", stufen: "المراحل:", rotN: "كرات حمراء:", blauN: "كرات زرقاء:", gruenN: "كرات خضراء:", gelbN: "كرات صفراء:", pTreffer: "P(نجاح) =",
   v_muenze: "رمي قطعة نقود", v_wuerfel: "رمي حجر نرد (ستة أو ليست ستة)", v_urneMit: "صندوق – مع الإرجاع", v_urneOhne: "صندوق – دون إرجاع", v_rad: "عجلة الحظ (½ أحمر، ⅓ أصفر، ⅙ أزرق)", v_eigen: "تجربة خاصة: نجاح أو إخفاق",
   f_bruch: "كسر", f_dezimal: "عدد عشري", f_prozent: "نسبة مئوية",
   hinweisKlick: "اضغط على اليمين على المسارات التي تنتمي إلى حادثتك – أو اختر حادثة في الأسفل.",
@@ -146,11 +146,11 @@ ar: {
   aufPfad: "ما احتمال {p}؟", aufEreig: "ما احتمال «{e}»؟",
   eingabe: "الإجابة", eingabeH: "كسرًا أو عددًا عشريًا أو نسبة مئوية", pruefen: "تحقّق", weiter: "التمرين التالي", richtig: "صحيح!", falsch: "ليس تمامًا. الإجابة الصحيحة: {l}", punkte: "{p} من {n} صحيحة",
   kopf: "صورة", kopfK: "ص", zahl: "كتابة", zahlK: "ك", sechs: "ستة", sechsK: "6", nicht6: "ليست ستة", nicht6K: "6̄",
-  rot: "أحمر", rotK: "ح", blau: "أزرق", blauK: "ز", gelb: "أصفر", gelbK: "ف", treffer: "نجاح", trefferK: "ن", niete: "إخفاق", nieteK: "خ"
+  rot: "أحمر", rotK: "ح", blau: "أزرق", blauK: "ز", gelb: "أصفر", gelbK: "ف", gruen: "أخضر", gruenK: "خ", treffer: "نجاح", trefferK: "ن", niete: "إخفاق", nieteK: "خ"
 },
 ja: {
   titel: "確率", tab_baum: "樹形図", tab_sim: "シミュレーション", tab_ueben: "練習",
-  versuch: "試行：", stufen: "回数：", rotN: "赤玉の数：", blauN: "青玉の数：", pTreffer: "P(当たり) =",
+  versuch: "試行：", stufen: "回数：", rotN: "赤玉の数：", blauN: "青玉の数：", gruenN: "緑玉の数：", gelbN: "黄玉の数：", pTreffer: "P(当たり) =",
   v_muenze: "硬貨を投げる", v_wuerfel: "さいころ（6 か 6 以外か）", v_urneMit: "袋から玉――もどす", v_urneOhne: "袋から玉――もどさない", v_rad: "ルーレット（赤 ½・黄 ⅓・青 ⅙）", v_eigen: "自分で：当たりかはずれ",
   f_bruch: "分数", f_dezimal: "小数", f_prozent: "百分率",
   hinweisKlick: "右側で、自分の事象にあてはまる枝をタップしよう。下から事象をえらんでもOK。",
@@ -167,11 +167,11 @@ ja: {
   aufPfad: "{p} となる確率は？", aufEreig: "「{e}」となる確率は？",
   eingabe: "答え", eingabeH: "分数・小数・百分率で", pruefen: "答え合わせ", weiter: "次の問題", richtig: "正解！", falsch: "ざんねん。正しい答えは：{l}", punkte: "{n} 問中 {p} 問正解",
   kopf: "表", kopfK: "表", zahl: "裏", zahlK: "裏", sechs: "6", sechsK: "6", nicht6: "6 以外", nicht6K: "6̄",
-  rot: "赤", rotK: "赤", blau: "青", blauK: "青", gelb: "黄", gelbK: "黄", treffer: "当たり", trefferK: "当", niete: "はずれ", nieteK: "外"
+  rot: "赤", rotK: "赤", blau: "青", blauK: "青", gelb: "黄", gelbK: "黄", gruen: "緑", gruenK: "緑", treffer: "当たり", trefferK: "当", niete: "はずれ", nieteK: "外"
 },
 pt: {
   titel: "Probabilidades", tab_baum: "Diagrama em árvore", tab_sim: "Simulação", tab_ueben: "Praticar",
-  versuch: "Experiência aleatória:", stufen: "Etapas:", rotN: "bolas vermelhas:", blauN: "bolas azuis:", pTreffer: "P(sucesso) =",
+  versuch: "Experiência aleatória:", stufen: "Etapas:", rotN: "bolas vermelhas:", blauN: "bolas azuis:", gruenN: "bolas verdes:", gelbN: "bolas amarelas:", pTreffer: "P(sucesso) =",
   v_muenze: "Lançar uma moeda", v_wuerfel: "Lançar um dado (seis ou não seis)", v_urneMit: "Urna – com reposição", v_urneOhne: "Urna – sem reposição", v_rad: "Roleta (½ vermelho, ⅓ amarelo, ⅙ azul)", v_eigen: "Própria: sucesso ou insucesso",
   f_bruch: "Fração", f_dezimal: "Decimal", f_prozent: "Percentagem",
   hinweisKlick: "Toca à direita nos caminhos que pertencem ao teu acontecimento – ou escolhe um acontecimento abaixo.",
@@ -188,7 +188,7 @@ pt: {
   aufPfad: "Qual é a probabilidade de {p}?", aufEreig: "Qual é a probabilidade de «{e}»?",
   eingabe: "Resposta", eingabeH: "em fração, decimal ou percentagem", pruefen: "Verificar", weiter: "Próximo exercício", richtig: "Certo!", falsch: "Não está certo. A resposta é: {l}", punkte: "{p} de {n} certas",
   kopf: "cara", kopfK: "Ca", zahl: "coroa", zahlK: "Co", sechs: "seis", sechsK: "6", nicht6: "não seis", nicht6K: "6̄",
-  rot: "vermelho", rotK: "V", blau: "azul", blauK: "A", gelb: "amarelo", gelbK: "Am", treffer: "sucesso", trefferK: "S", niete: "insucesso", nieteK: "I"
+  rot: "vermelho", rotK: "V", blau: "azul", blauK: "A", gelb: "amarelo", gelbK: "Am", gruen: "verde", gruenK: "Vd", treffer: "sucesso", trefferK: "S", niete: "insucesso", nieteK: "I"
 }
 };
 

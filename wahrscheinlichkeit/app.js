@@ -56,18 +56,22 @@
 
   // ---------- Experimente ----------
   // Ergebnis: { k: Schlüssel, farbe }; Name und Kürzel kommen aus den Texten (k, k + "K")
-  var FARBE = { kopf: "#2563eb", zahl: "#d97706", sechs: "#16a34a", nicht6: "#64748b", rot: "#dc2626", blau: "#2563eb", gelb: "#eab308", treffer: "#16a34a", niete: "#64748b", A: "#7c3aed", nA: "#94a3b8", B: "#0d9488", nB: "#64748b" };
+  var FARBE = { kopf: "#2563eb", zahl: "#d97706", sechs: "#16a34a", nicht6: "#64748b", rot: "#dc2626", blau: "#2563eb", gelb: "#eab308", gruen: "#16a34a", treffer: "#16a34a", niete: "#64748b", A: "#7c3aed", nA: "#94a3b8", B: "#0d9488", nB: "#64748b" };
   var VERSUCHE = ["muenze", "wuerfel", "urneMit", "urneOhne", "rad", "eigen"];
-  function experiment(art, stufen, r, b, pT){
-    return { art: art, stufen: stufen, r: r, b: b, pT: pT,
+  // Urne: bis zu 4 Farben (rot, blau, grün, gelb); g und y sind optional (0 = Farbe kommt nicht vor)
+  var URNE = ["rot", "blau", "gruen", "gelb"];
+  function experiment(art, stufen, r, b, pT, g, y){
+    g = g || 0; y = y || 0;
+    return { art: art, stufen: stufen, r: r, b: b, g: g, y: y, pT: pT,
       stufe: function(i, pfad){
         if(art === "muenze") return [{ k: "kopf", p: F(1, 2) }, { k: "zahl", p: F(1, 2) }];
         if(art === "wuerfel") return [{ k: "sechs", p: F(1, 6) }, { k: "nicht6", p: F(5, 6) }];
         if(art === "rad") return [{ k: "rot", p: F(1, 2) }, { k: "gelb", p: F(1, 3) }, { k: "blau", p: F(1, 6) }];
         if(art === "eigen") return [{ k: "treffer", p: pT }, { k: "niete", p: sub(F(1), pT) }].filter(function(o){ return o.p.n > 0; });
-        var rr = r, bb = b;
-        if(art === "urneOhne") pfad.forEach(function(o){ if(o.k === "rot") rr--; else bb--; });
-        var n = rr + bb; return [{ k: "rot", p: F(rr, n) }, { k: "blau", p: F(bb, n) }].filter(function(o){ return o.p.n > 0; });
+        var anz = { rot: r, blau: b, gruen: g, gelb: y };
+        if(art === "urneOhne") pfad.forEach(function(o){ anz[o.k]--; });
+        var n = anz.rot + anz.blau + anz.gruen + anz.gelb;
+        return URNE.filter(function(k){ return anz[k] > 0; }).map(function(k){ return { k: k, p: F(anz[k], n) }; });
       } };
   }
   // Baum aufbauen: Blätter mit Pfad und Pfadwahrscheinlichkeit
@@ -114,7 +118,8 @@
       n.kinder.forEach(function(c){
         var an = c.blatt != null ? !!aus[B.blaetter[c.blatt].key] : unterAn(c);
         svg.appendChild(el("line", { x1: n.x + (n === B.wurzel ? 4 : 14), y1: n.y, x2: c.x - 14, y2: c.y, "class": "b-kante" + (an ? " an" : "") }));
-        var mx = (n.x + c.x) / 2, my = (n.y + c.y) / 2;
+        // bei mehr als 2 Ästen die Beschriftung näher an das Kind rücken, damit sie sich am Knoten nicht überdecken
+        var q = n.kinder.length > 2 ? 0.68 : 0.5, mx = n.x + (c.x - n.x) * q, my = n.y + (c.y - n.y) * q;
         svg.appendChild(el("text", { x: mx, y: c.y > n.y + 1 ? my + 17 : my - 6, "class": "b-p", "text-anchor": "middle" }, (o.f || fmt)(c.p, o.format)));
         kanten(c);
       });
@@ -140,7 +145,7 @@
   // ---------- Ereignisse ----------
   function ereignisse(E){
     var erste = E.stufe(0, []).map(function(o){ return o.k; }), L = [];
-    var haupt = E.art === "muenze" ? ["kopf"] : E.art === "wuerfel" ? ["sechs"] : E.art === "eigen" ? ["treffer"] : E.art === "rad" ? ["rot", "gelb"] : ["rot", "blau"];
+    var haupt = E.art === "muenze" ? ["kopf"] : E.art === "wuerfel" ? ["sechs"] : E.art === "eigen" ? ["treffer"] : E.art === "rad" ? ["rot", "gelb"] : URNE.filter(function(k){ return { rot: E.r, blau: E.b, gruen: E.g, gelb: E.y }[k] > 0; });
     haupt.forEach(function(x){
       var name = t(x), anz = function(b){ return b.pfad.filter(function(o){ return o.k === x; }).length; };
       if(E.stufen > 1){
@@ -158,12 +163,12 @@
   // ---------- Zustand ----------
   var E = null, B = null, auswahl = {}, ereignis = null, EL = [];
   function lesen(){
-    var art = $("versuch").value, st = Number($("stufen").value), r = Number($("nRot").value), b = Number($("nBlau").value), pT = F(1, 4), fe = "";
+    var art = $("versuch").value, st = Number($("stufen").value), r = Number($("nRot").value), b = Number($("nBlau").value), g = Number($("nGruen").value), y = Number($("nGelb").value), pT = F(1, 4), fe = "";
     sicht($("urneBox"), art === "urneMit" || art === "urneOhne"); sicht($("eigenBox"), art === "eigen");
     if(art === "eigen"){ pT = liesBruch($("pTreffer").value); if(!pT){ fe = t("fehlerP"); pT = F(1, 4); } }
-    if(art === "urneOhne" && st > r + b) fe = t("fehlerUrne");
+    if(art === "urneOhne" && st > r + b + g + y) fe = t("fehlerUrne");
     $("fehler").textContent = fe;
-    E = experiment(art, st, r, b, pT); B = baumBauen(E); EL = ereignisse(E);
+    E = experiment(art, st, r, b, pT, g, y); B = baumBauen(E); EL = ereignisse(E);
     if(ereignis){ var neu = EL.filter(function(x){ return x.id === ereignis.id; })[0]; ereignis = neu || null; }
     if(ereignis) setzeEreignis(ereignis, true); else { var gueltig = {}; B.blaetter.forEach(function(bl){ if(auswahl[bl.key]) gueltig[bl.key] = 1; }); auswahl = gueltig; }
     sicht($("ohneHinweis"), art === "urneOhne" && st > 1);
@@ -546,7 +551,7 @@
   $("weiter").addEventListener("click", neueAufgabe);
 
   // ---------- Bedienung ----------
-  ["versuch", "stufen", "nRot", "nBlau"].forEach(function(id){ $(id).addEventListener("change", function(){ simReset(); lesen(); alles(true); }); });
+  ["versuch", "stufen", "nRot", "nBlau", "nGruen", "nGelb"].forEach(function(id){ $(id).addEventListener("change", function(){ simReset(); lesen(); alles(true); }); });
   $("pTreffer").addEventListener("input", function(){ simReset(); lesen(); alles(true); });
   $("format").querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ format = b.dataset.f; $("format").querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); alles(true); }); });
   var tab = "grund";
@@ -559,7 +564,8 @@
     alles(true);
   }
   document.querySelectorAll(".tabs button").forEach(function(b){ b.addEventListener("click", function(){ zeigeTab(b.dataset.tab); }); });
-  (function(){ var h = ""; for(var i = 1; i <= 9; i++) h += "<option>" + i + "</option>"; $("nRot").innerHTML = h; $("nBlau").innerHTML = h; $("nRot").value = "3"; $("nBlau").value = "2"; })();
+  (function(){ var h = ""; for(var i = 1; i <= 9; i++) h += "<option>" + i + "</option>"; $("nRot").innerHTML = h; $("nBlau").innerHTML = h; $("nRot").value = "3"; $("nBlau").value = "2";
+    h = ""; for(var j = 0; j <= 9; j++) h += "<option>" + j + "</option>"; $("nGruen").innerHTML = h; $("nGelb").innerHTML = h; $("nGruen").value = "0"; $("nGelb").value = "0"; })();
 
   // ---------- Texte (bei jedem Sprachwechsel alles neu beschriften) ----------
   function alles(nurRechnen){
@@ -569,7 +575,7 @@
       document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
       var v = $("versuch").value || "muenze";
       $("versuch").innerHTML = VERSUCHE.map(function(x){ return '<option value="' + x + '">' + t("v_" + x) + "</option>"; }).join(""); $("versuch").value = v;
-      $("tVersuch").textContent = t("versuch"); $("tStufen").textContent = t("stufen"); $("tRot").textContent = t("rotN"); $("tBlau").textContent = t("blauN"); $("tPTreffer").textContent = t("pTreffer");
+      $("tVersuch").textContent = t("versuch"); $("tStufen").textContent = t("stufen"); $("tRot").textContent = t("rotN"); $("tBlau").textContent = t("blauN"); $("tGruen").textContent = t("gruenN"); $("tGelb").textContent = t("gelbN"); $("tPTreffer").textContent = t("pTreffer");
       $("format").querySelectorAll("button").forEach(function(b){ b.textContent = t("f_" + b.dataset.f); });
       $("hinweisKlick").textContent = t("hinweisKlick"); $("ohneHinweis").textContent = t("ohneHinweis");
       var altId = ereignis && ereignis.id; lesen(); if(altId){ ereignis = EL.filter(function(x){ return x.id === altId; })[0] || null; if(ereignis) setzeEreignis(ereignis, true); }
