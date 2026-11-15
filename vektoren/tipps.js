@@ -1,0 +1,73 @@
+// Erklär-Blasen für die Vektor-Kachel (9 Sprachen) – nutzt MS_TIPP.auto aus /symbol-tipp.js.
+(function(){
+  "use strict";
+  var TX = {
+  de: { betrag: "|…| = Betrag (Länge) des Vektors: Wurzel aus der Summe der quadrierten Komponenten, z. B. |(3; 4)| = √(3² + 4²) = 5.", k: "k = Skalar (eine Zahl): k · a macht den Vektor k-mal so lang; bei negativem k zeigt er in die Gegenrichtung.",
+    skalar: "Skalarprodukt: Komponenten paarweise malnehmen und addieren. Ergebnis ist eine Zahl. Ist es 0, stehen die Vektoren senkrecht (orthogonal).", phi: "φ = Winkel zwischen den beiden Vektoren: cos φ = (a · b) : (|a| · |b|).",
+    AB: "AB = Verbindungsvektor von A nach B: „Spitze minus Fuß“, also B − A.", M: "M = Mittelpunkt der Strecke: ½ · (A + B), also der Durchschnitt der Koordinaten.", kreuz: "× = Kreuzprodukt (Vektorprodukt): ergibt einen Vektor, der auf beiden senkrecht steht. Seine Länge ist die Fläche des Parallelogramms.",
+    param: "Parameterform einer Geraden: Man startet beim Punkt p (Stützvektor) und geht t-mal in Richtung u (Richtungsvektor). Jeder Wert von t ergibt einen Punkt der Geraden.",
+    p: "p = Stützvektor von g: der Ortsvektor eines Punktes, durch den die Gerade geht.", u: "u = Richtungsvektor von g: gibt die Richtung der Geraden an.", q: "q = Stützvektor von h.", v: "v = Richtungsvektor von h.",
+    ts: "t und s = Parameter der beiden Geraden. Setzt man sie ein, erhält man den gemeinsamen Punkt.", S: "S = Schnittpunkt der beiden Geraden." },
+  en: { betrag: "|…| = magnitude (length) of the vector: square root of the sum of the squared components, e.g. |(3; 4)| = √(3² + 4²) = 5.", k: "k = scalar (a number): k · a makes the vector k times as long; for negative k it points the opposite way.",
+    skalar: "Dot product: multiply the components pairwise and add. The result is a number. If it is 0, the vectors are perpendicular (orthogonal).", phi: "φ = angle between the two vectors: cos φ = (a · b) : (|a| · |b|).",
+    AB: "AB = vector from A to B: “tip minus tail”, i.e. B − A.", M: "M = midpoint of the segment: ½ · (A + B), the average of the coordinates.", kreuz: "× = cross product: gives a vector perpendicular to both. Its length is the area of the parallelogram.",
+    param: "Parametric form of a line: start at point p (position vector) and go t times in direction u (direction vector). Every value of t gives a point on the line.",
+    p: "p = position vector of g: points to a point the line passes through.", u: "u = direction vector of g: gives the direction of the line.", q: "q = position vector of h.", v: "v = direction vector of h.",
+    ts: "t and s = parameters of the two lines. Substituting them gives the common point.", S: "S = point of intersection of the two lines." },
+  es: { betrag: "|…| = módulo (longitud) del vector: raíz de la suma de las componentes al cuadrado, p. ej. |(3; 4)| = √(3² + 4²) = 5.", k: "k = escalar (un número): k · a hace el vector k veces más largo; si k es negativo apunta al revés.",
+    skalar: "Producto escalar: multiplicar las componentes por parejas y sumar. El resultado es un número. Si es 0, los vectores son perpendiculares (ortogonales).", phi: "φ = ángulo entre los dos vectores: cos φ = (a · b) : (|a| · |b|).",
+    AB: "AB = vector de A a B: «punta menos origen», es decir B − A.", M: "M = punto medio del segmento: ½ · (A + B), la media de las coordenadas.", kreuz: "× = producto vectorial: da un vector perpendicular a ambos. Su longitud es el área del paralelogramo.",
+    param: "Ecuación paramétrica de la recta: se parte del punto p (vector de posición) y se avanza t veces en la dirección u (vector director). Cada valor de t da un punto de la recta.",
+    p: "p = vector de posición de g: lleva a un punto por el que pasa la recta.", u: "u = vector director de g: indica la dirección de la recta.", q: "q = vector de posición de h.", v: "v = vector director de h.",
+    ts: "t y s = parámetros de las dos rectas. Al sustituirlos se obtiene el punto común.", S: "S = punto de corte de las dos rectas." },
+  zh: { betrag: "|…| = 向量的模（长度）：各分量平方和的平方根，例如 |(3; 4)| = √(3² + 4²) = 5。", k: "k = 数（标量）：k · a 使向量变成 k 倍长；k 为负时方向相反。",
+    skalar: "数量积（点积）：对应分量相乘再相加，结果是一个数。为 0 时两向量垂直。", phi: "φ = 两向量的夹角：cos φ = (a · b) : (|a| · |b|)。",
+    AB: "AB = 从 A 到 B 的向量：“终点减起点”，即 B − A。", M: "M = 线段中点：½ · (A + B)，即坐标的平均值。", kreuz: "× = 向量积（叉积）：得到一个同时垂直于两者的向量，其长度等于平行四边形的面积。",
+    param: "直线的参数式：从点 p（定点向量）出发，沿方向 u（方向向量）走 t 倍。每个 t 对应直线上的一个点。",
+    p: "p = g 的定点向量：指向直线经过的一个点。", u: "u = g 的方向向量：表示直线的方向。", q: "q = h 的定点向量。", v: "v = h 的方向向量。",
+    ts: "t 和 s = 两条直线的参数。代入后得到公共点。", S: "S = 两直线的交点。" },
+  fr: { betrag: "|…| = norme (longueur) du vecteur : racine de la somme des carrés des coordonnées, p. ex. |(3; 4)| = √(3² + 4²) = 5.", k: "k = scalaire (un nombre) : k · a rend le vecteur k fois plus long ; si k < 0, il pointe dans l’autre sens.",
+    skalar: "Produit scalaire : multiplier les coordonnées deux à deux et additionner. Le résultat est un nombre. S’il vaut 0, les vecteurs sont orthogonaux.", phi: "φ = angle entre les deux vecteurs : cos φ = (a · b) : (|a| · |b|).",
+    AB: "AB = vecteur de A à B : « arrivée moins départ », donc B − A.", M: "M = milieu du segment : ½ · (A + B), la moyenne des coordonnées.", kreuz: "× = produit vectoriel : donne un vecteur orthogonal aux deux. Sa longueur est l’aire du parallélogramme.",
+    param: "Représentation paramétrique d’une droite : on part du point p et on avance t fois dans la direction u (vecteur directeur). Chaque valeur de t donne un point de la droite.",
+    p: "p = vecteur position d’un point de g.", u: "u = vecteur directeur de g : donne la direction de la droite.", q: "q = vecteur position d’un point de h.", v: "v = vecteur directeur de h.",
+    ts: "t et s = paramètres des deux droites. En les remplaçant, on obtient le point commun.", S: "S = point d’intersection des deux droites." },
+  ru: { betrag: "|…| = длина (модуль) вектора: корень из суммы квадратов координат, например |(3; 4)| = √(3² + 4²) = 5.", k: "k = скаляр (число): k · a делает вектор в k раз длиннее; при k < 0 он смотрит в обратную сторону.",
+    skalar: "Скалярное произведение: перемножить координаты попарно и сложить. Результат – число. Если оно 0, векторы перпендикулярны.", phi: "φ = угол между векторами: cos φ = (a · b) : (|a| · |b|).",
+    AB: "AB = вектор из A в B: «конец минус начало», т. е. B − A.", M: "M = середина отрезка: ½ · (A + B), среднее координат.", kreuz: "× = векторное произведение: даёт вектор, перпендикулярный обоим. Его длина равна площади параллелограмма.",
+    param: "Параметрическое уравнение прямой: начинаем в точке p и идём t раз в направлении u (направляющий вектор). Каждому t соответствует точка прямой.",
+    p: "p = радиус-вектор точки на прямой g.", u: "u = направляющий вектор g.", q: "q = радиус-вектор точки на прямой h.", v: "v = направляющий вектор h.",
+    ts: "t и s = параметры двух прямых. Подставив их, получаем общую точку.", S: "S = точка пересечения прямых." },
+  ar: { betrag: "|…| = طول المتجه: الجذر التربيعي لمجموع مربعات المركبات، مثل |(3; 4)| = √(3² + 4²) = 5.", k: "k = عدد قياسي: k · a يجعل المتجه أطول k مرة؛ إذا كان k سالبًا يتجه في الاتجاه المعاكس.",
+    skalar: "الضرب القياسي: نضرب المركبات المتقابلة ونجمع. الناتج عدد. إذا كان 0 فالمتجهان متعامدان.", phi: "φ = الزاوية بين المتجهين: cos φ = (a · b) : (|a| · |b|).",
+    AB: "AB = المتجه من A إلى B: «النهاية ناقص البداية» أي B − A.", M: "M = منتصف القطعة: ½ · (A + B)، أي متوسط الإحداثيات.", kreuz: "× = الضرب الاتجاهي: يعطي متجهًا عموديًا على كليهما، وطوله يساوي مساحة متوازي الأضلاع.",
+    param: "الصيغة الوسيطية للمستقيم: نبدأ من النقطة p ونسير t مرة في اتجاه u (متجه الاتجاه). كل قيمة لـ t تعطي نقطة على المستقيم.",
+    p: "p = متجه موضع نقطة على g.", u: "u = متجه اتجاه g.", q: "q = متجه موضع نقطة على h.", v: "v = متجه اتجاه h.",
+    ts: "t و s = وسيطا المستقيمين. بالتعويض نحصل على النقطة المشتركة.", S: "S = نقطة تقاطع المستقيمين." },
+  ja: { betrag: "|…| = ベクトルの大きさ（長さ）：成分の 2 乗の和の平方根。例：|(3; 4)| = √(3² + 4²) = 5。", k: "k = 実数（スカラー）：k · a はベクトルを k 倍の長さにする。k が負なら向きが逆になる。",
+    skalar: "内積：成分どうしをかけて足す。結果は数。0 なら 2 つのベクトルは垂直。", phi: "φ = 2 つのベクトルのなす角：cos φ = (a · b) : (|a| · |b|)。",
+    AB: "AB = A から B へのベクトル：「終点 − 始点」、つまり B − A。", M: "M = 線分の中点：½ · (A + B)、座標の平均。", kreuz: "× = 外積：両方に垂直なベクトルになる。その長さは平行四辺形の面積。",
+    param: "直線のベクトル方程式：点 p から出発して、方向 u（方向ベクトル）に t 倍進む。t の値ごとに直線上の点が 1 つ決まる。",
+    p: "p = g の位置ベクトル：直線が通る点を指す。", u: "u = g の方向ベクトル：直線の向き。", q: "q = h の位置ベクトル。", v: "v = h の方向ベクトル。",
+    ts: "t と s = 2 本の直線のパラメータ。代入すると共通の点が出る。", S: "S = 2 直線の交点。" },
+  pt: { betrag: "|…| = norma (comprimento) do vetor: raiz da soma dos quadrados das coordenadas, p. ex. |(3; 4)| = √(3² + 4²) = 5.", k: "k = escalar (um número): k · a deixa o vetor k vezes mais comprido; com k negativo aponta no sentido oposto.",
+    skalar: "Produto escalar: multiplicar as coordenadas aos pares e somar. O resultado é um número. Se for 0, os vetores são perpendiculares.", phi: "φ = ângulo entre os dois vetores: cos φ = (a · b) : (|a| · |b|).",
+    AB: "AB = vetor de A para B: «ponta menos origem», ou seja B − A.", M: "M = ponto médio do segmento: ½ · (A + B), a média das coordenadas.", kreuz: "× = produto vetorial: dá um vetor perpendicular aos dois. O seu comprimento é a área do paralelogramo.",
+    param: "Equação paramétrica da reta: parte-se do ponto p e anda-se t vezes na direção u (vetor diretor). Cada valor de t dá um ponto da reta.",
+    p: "p = vetor posição de um ponto de g.", u: "u = vetor diretor de g: dá a direção da reta.", q: "q = vetor posição de um ponto de h.", v: "v = vetor diretor de h.",
+    ts: "t e s = parâmetros das duas retas. Substituindo-os obtém-se o ponto comum.", S: "S = ponto de interseção das duas retas." }
+  };
+  if(!window.MS_TIPP) return;
+  var NB = "(?<![\\p{L}\\p{N}])", NA = "(?![\\p{L}\\p{N}])";
+  var R = "#zRech, #dErg, #dErg2, #gWeg, #gLage, #uLauf";
+  MS_TIPP.auto([
+    { sel: "#zRech, #dErg, #dErg2, #uLauf", re: /\|[^|\n]{1,14}\|/u, k: "betrag" },
+    { sel: "#kBox", re: new RegExp(NB + "(k)" + NA, "u"), k: "k" },
+    { sel: "#zRech", re: /a · b/, k: "skalar" }, { sel: "#dErg, #dErg2", re: /AB · AC/, k: "skalar" },
+    { sel: R, re: /φ/, k: "phi" }, { sel: "#dErg, #dErg2", re: /×/, k: "kreuz" },
+    { sel: "#dErg, #dErg2", re: new RegExp(NB + "(A[BC])" + NA, "u"), k: "AB" }, { sel: "#dErg, #dErg2", re: /(M) =/, k: "M" },
+    { sel: "#gText", re: /x = p \+ t · u/, k: "param" },
+    { sel: "#gEing", re: /(p) =/, k: "p" }, { sel: "#gEing", re: /(u) =/, k: "u" }, { sel: "#gEing", re: /(q) =/, k: "q" }, { sel: "#gEing", re: /(v) =/, k: "v" },
+    { sel: "#gWeg", re: new RegExp(NB + "([ts]) =", "u"), k: "ts" }, { sel: "#gLage", re: new RegExp(NB + "(S)\\(", "u"), k: "S" }
+  ], function(k){ var l = document.documentElement.lang; return (TX[l] && TX[l][k]) || TX.de[k]; }, "#zHinweis, #gEing");
+})();
