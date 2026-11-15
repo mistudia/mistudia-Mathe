@@ -408,6 +408,11 @@
       if(war){ beantwortet = false; anzahl--; if(gut) punkte--; if(Array.isArray(e)) e.forEach(function(v, i){ if($("uA" + i)) $("uA" + i).value = v; }); pruefe(e); }
     }
   }
+  // Alltagsbeispiel laden (aus alltag-daten.js): {fig, dreh} → Figuren, {funk, eigen} → Graph
+  window.MS_SYM = { laden: function(w){
+    if(w.fig){ zeigeTab("figuren"); $("figur").value = w.fig; $("dreh").value = w.dreh || 0; figuren(); $("figur").scrollIntoView({ behavior: "smooth", block: "start" }); }
+    else { zeigeTab("graph"); $("funk").value = w.funk; if(w.eigen) $("eigenF").value = w.eigen; graph(); $("funk").scrollIntoView({ behavior: "smooth", block: "start" }); }
+  } };
   window.MS_LANG = { apply: function(l){ if(SY[l]){ lang = l; alles(); } } };
   alles();
 })();
