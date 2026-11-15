@@ -34,6 +34,7 @@ var MS_ALLTAG = (function(){
     var h = '<div class="msa-karte" role="dialog" aria-modal="true"><div class="msa-kopf"><h2>' + esc(ui("titel")) + '</h2><button type="button" class="msa-zu" aria-label="' + esc(ui("zu")) + '">×</button></div><div class="msa-liste">';
     liste(B).forEach(function(e, i){
       h += '<div class="msa-bsp"><h3>' + esc(e[0]) + "</h3><p>" + text(e[1]) + "</p>";
+      var bf = bilder(B); if(bf && bf[i]){ try { h += '<div class="msa-bild">' + bf[i]() + "</div>"; } catch(x){} }
       if(e[2]) h += '<details><summary>' + esc(ui("loesung")) + "</summary><p>" + text(e[2]) + "</p></details>";
       if(B.laden && B.werte && B.werte[i] != null) h += '<button type="button" class="msa-los" data-i="' + i + '">' + esc(ui("probieren")) + "</button>";
       h += "</div>";
@@ -45,6 +46,9 @@ var MS_ALLTAG = (function(){
     ov.querySelectorAll(".msa-los").forEach(function(b){ b.addEventListener("click", function(){ var w = B.werte[+b.dataset.i]; schliessen(); B.laden(w); }); });
     ov.querySelector(".msa-zu").focus();
   }
+  // Zeichnungen aus /alltag-bilder.js (Schlüssel = B.bild oder Ordnername der Kachel)
+  function bilder(B){ var M = window.MS_ALLTAG_BILD; if(!M) return null; var k = B.bild || (location.pathname.split("/").filter(Boolean)[0] || ""); return M[k] || null; }
+  function bilderLaden(){ if(window.MS_ALLTAG_BILD || document.querySelector('script[src="/alltag-bilder.js"]')) return; var sc = document.createElement("script"); sc.src = "/alltag-bilder.js"; sc.onload = function(){ if(offen) zeigen(offen); }; document.head.appendChild(sc); }
   function schliessen(){ var o = document.querySelector(".msa-ov"); if(o) o.remove(); offen = null; }
   document.addEventListener("keydown", function(ev){ if(ev.key === "Escape") schliessen(); });
 
@@ -52,7 +56,7 @@ var MS_ALLTAG = (function(){
     var k = document.createElement("button"); k.type = "button"; k.className = "msa-knopf";
     k.addEventListener("click", function(){ zeigen(B); });
     B.nach.parentNode.insertBefore(k, B.nach.nextSibling);
-    B.knopf = k; boxen.push(B); k.textContent = ui("titel");
+    B.knopf = k; boxen.push(B); k.textContent = ui("titel"); bilderLaden();
     // Sprachwechsel der Kachel automatisch mitnehmen
     var A = window.MS_LANG;
     if(A && A.apply && !A._msa){ var alt = A.apply; A.apply = function(l){ var r = alt.apply(A, arguments); sprache(l); return r; }; A._msa = true; }
@@ -79,5 +83,5 @@ var MS_ALLTAG = (function(){
     ".msa-bsp details p{background:#f4f8ff;border-radius:8px;padding:6px 8px;font-size:15px}" +
     ".msa-los{margin-top:6px;font:700 14px system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:0;background:#1565c0;color:#ffffff;cursor:pointer}";
   document.head.appendChild(css);
-  return { einbauen: einbauen, sprache: sprache, schliessen: schliessen };
+  return { einbauen: einbauen, sprache: sprache, schliessen: schliessen, lang: function(){ return lang; } };
 })();
