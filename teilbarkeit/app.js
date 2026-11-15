@@ -63,7 +63,8 @@
   }
 
   // ---------- Reiter Regeln ----------
-  function liesZahl(v, max){ var s = String(v).replace(/[\s.,'’_]/g, "").replace(/^0+(?=\d)/, ""); if(!/^\d+$/.test(s) || s.length > max || Number(s) < 1) return null; return s; }
+  function liesZahl(v, max){ var dz = /^(en|zh|ja|ar)$/.test(lang) ? "." : ","; if(String(v).indexOf(dz) >= 0) return null; // Kommazahl → keine natürliche Zahl
+    var s = String(v).replace(/[\s.,'’_]/g, "").replace(/^0+(?=\d)/, ""); if(!/^\d+$/.test(s) || s.length > max || Number(s) < 1) return null; return s; }
   function regeln(){
     var s = liesZahl($("zahl").value, 12);
     $("fehler").textContent = s ? "" : t("fehler", { m: "999 999 999 999" });
