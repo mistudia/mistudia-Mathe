@@ -401,6 +401,11 @@
       if(war){ beantwortet = false; anzahl--; if(gut) punkte--; pruefe(auf.typ === "stamm" ? (gut ? auf.l : (gewaehlt ? gewaehlt.dataset.w : "x")) : (eing || "999999")); }
     }
   }
+  // Alltagsbeispiel laden (aus alltag-daten.js): {tab, f, a, b}
+  window.MS_INT = { laden: function(w){
+    $("fkt").value = "eigen"; $("eigen").value = w.f; $("a").value = String(w.a); $("b").value = String(w.b);
+    zeigeTab(w.tab); $("eingabe").scrollIntoView({ behavior: "smooth", block: "start" });
+  } };
   window.MS_LANG = { apply: function(l){ if(IT[l]){ lang = l; FK.setLang(l); alles(); } } };
   $("fkt").value = "x2"; alles();
 })();
