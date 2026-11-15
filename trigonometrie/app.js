@@ -343,7 +343,8 @@
   // ---------- Reiter ----------
   function zeigeTab(k){
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
-    ["kreis", "dreieck", "rechner", "ueben"].forEach(function(x){ $("s_" + x).hidden = x !== k; });
+    ["kreis", "dreieck", "fig", "rechner", "ueben"].forEach(function(x){ $("s_" + x).hidden = x !== k; });
+    if(k === "fig" && window.MS_TRIG_FIG) MS_TRIG_FIG.zeigen();
     if(k === "ueben" && !auf) neueAufgabe();
   }
   document.querySelectorAll(".tabs button").forEach(function(b){ b.addEventListener("click", function(){ zeigeTab(b.dataset.tab); }); });
@@ -373,6 +374,6 @@
     $("fall").value = w.fall; zeigeTab("rechner"); rechnerFelder();
     $("fall").scrollIntoView({ behavior: "smooth", block: "start" });
   } };
-  window.MS_LANG = { apply: function(l){ if(TG[l]){ lang = l; alles(); } } };
+  window.MS_LANG = { apply: function(l){ if(TG[l]){ lang = l; alles(); if(window.MS_TRIG_FIG) MS_TRIG_FIG.sprache(l); } } };
   alles();
 })();
