@@ -117,7 +117,7 @@
   <section id="s_uebersicht">
     <div class="karte">
       <h2 id="permH"></h2>
-      <p class="formelGross"><span class="f">P<sub>n</sub> = n! = n · (n − 1) · … · 2 · 1</span></p>
+      <p class="formelGross"><span class="f" id="permFormel">P<sub>n</sub> = n! = n · (n − 1) · … · 2 · 1</span></p>
       <p class="zeile" id="permT"></p>
       <div class="regler"><label><span>n =</span> <input type="range" id="pn" min="1" max="10" step="1" value="4"> <b id="pnW"></b></label></div>
       <p class="zeile" id="permBsp"></p>
@@ -134,7 +134,8 @@
         <label><span>n =</span> <input type="range" id="tn" min="1" max="12" step="1" value="5"> <b id="tnW"></b></label>
         <label><span>k =</span> <input type="range" id="tk" min="1" max="8" step="1" value="2"> <b id="tkW"></b></label>
       </div>
-      <p class="zeile muted" id="nkInfo"></p>
+      <p class="zeile" id="nkInfo"></p>
+      <p class="muted" id="tippHinweis" style="margin:2px 0 8px;font-size:14px"></p>
       <div class="tafel" id="tafel"></div>
       <p class="merke" id="erkl"></p>
     </div>
@@ -171,6 +172,8 @@
   <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
 </div>
 <script src="texte.js"></script>
+<script src="tipps.js"></script>
+<script src="/symbol-tipp.js"></script>
 <script src="app.js"></script>
 <script src="/home-button.js"></script>
 </body>

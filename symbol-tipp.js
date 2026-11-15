@@ -16,7 +16,7 @@
   };
   var css = document.createElement("style");
   css.textContent =
-    ".sym{border-bottom:2px dotted #1565c0;cursor:help;border-radius:2px;outline:none}" +
+    ".sym{display:inline-block;line-height:1.3;border-bottom:2px dotted #1565c0;cursor:help;border-radius:2px;outline:none}" +
     ".sym:hover,.sym:focus-visible,.sym.offen{background:#dbeafe}" +
     ".ms-tipp{position:fixed;z-index:9999;max-width:min(300px,calc(100vw - 16px));background:#1a2233;color:#ffffff;font:500 15px/1.45 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:8px 11px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.25);pointer-events:none;white-space:normal;text-align:start}" +
     ".ms-tipp[hidden]{display:none}";
@@ -43,6 +43,8 @@
   document.addEventListener("click", function(ev){
     var s = symVon(ev.target);
     if(!s){ if(offen) weg(); return; }
+    // in einem <label>: sonst „klickt“ der Browser danach noch das Eingabefeld an und die Blase geht gleich wieder zu
+    if(s.closest("label")) ev.preventDefault();
     if(offen === s && fest){ weg(); return; }
     zeige(s); fest = true;
   });

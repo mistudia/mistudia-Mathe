@@ -62,7 +62,7 @@
   function reglerBauen(){
     var box = $("regler"); box.innerHTML = "";
     REGLER[form].forEach(function(r){
-      var l = document.createElement("label"); l.innerHTML = "<span>" + r[0] + " =</span>";
+      var l = document.createElement("label"); l.innerHTML = "<span>" + (window.MS_TIPP ? MS_TIPP.s(r[0], t("tip_" + r[0])) : r[0]) + " =</span>";
       var inp = document.createElement("input"); inp.type = "range"; inp.min = r[1]; inp.max = r[2]; inp.step = r[3]; inp.value = P[r[0]]; inp.id = "r_" + r[0];
       var w = document.createElement("b"); w.id = "w_" + r[0];
       inp.addEventListener("input", function(){ P[r[0]] = Number(inp.value); if(r[0] === "a" && Math.abs(P.a) < 0.05){ P.a = 0.1; } param(); });
@@ -216,7 +216,7 @@
       document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
       document.title = "miStudia – " + t("titel"); $("titel").textContent = t("titel");
       document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
-      reglerBauen();
+      reglerBauen(); if($("tippHinweis")) $("tippHinweis").textContent = window.MS_TIPP ? MS_TIPP.hinweis(lang) : "";
       $("modell").innerHTML = Object.keys(MODELLE).map(function(k){ return '<option value="' + k + '">' + t("mo_" + k) + "</option>"; }).join(""); $("modell").value = mod;
       $("tModell").textContent = t("modellL");
       var alt = $("m_N0") ? [$("m_N0").value, $("m_w").value, $("m_dauer").value] : null; eingabenBauen(); if(alt){ $("m_N0").value = alt[0]; $("m_w").value = alt[1]; $("m_dauer").value = alt[2]; }

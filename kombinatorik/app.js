@@ -20,6 +20,11 @@
   // große Zahlen mit schmalem Leerzeichen gruppieren (ab 5 Stellen), in allen Sprachen gleich
   function gz(v){ var s = String(v); return s.length < 5 ? s : s.replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
 
+  // Erklär-Blasen (gemeinsam: /symbol-tipp.js)
+  function TT(h, txt){ return window.MS_TIPP ? MS_TIPP.s(h, txt) : h; }
+  function tp(h, key, w){ return TT(h, t(key, w)); }
+  var PROD3 = { pin: "tip_pin3", podest: "tip_podest3", lotto: "tip_bk3", eis: "tip_bk3", perm: "tip_perm3" };
+
   // ---------- Mathematik ----------
   function fak(n){ var r = 1; for(var i = 2; i <= n; i++) r *= i; return r; }
   function binko(n, k){ if(k < 0 || k > n) return 0; var r = 1; for(var i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); }
@@ -55,12 +60,15 @@
   }
   // ausführliche Rechnung: allgemeine Formel = eingesetzt = Produkt = Ergebnis
   function rechnung(fall, n, k){
-    var w = anzahl(fall, n, k), T = [ALLG[fall]];
+    var w = anzahl(fall, n, k), v = { n: n, k: k }, T = [tp(ALLG[fall], fall === "perm" ? "tip_fak" : "erk_" + fall)];
     if(fall === "pin"){ T.push(n + "<sup>" + k + "</sup>"); if(k > 1 && k <= 6) T.push(Array(k + 1).join(n + " · ").slice(0, -3)); }
     else if(fall === "podest"){ T.push(br(n + "!", (n - k) + "!")); if(k > 1) T.push(prod(n, n - k + 1)); }
     else if(fall === "lotto"){ T.push(bk(n, k)); if(k > 1) T.push(br(prod(n, n - k + 1), prod(k, 1))); }
     else if(fall === "eis"){ T.push(bk(n + k - 1, k)); if(k > 1) T.push(br(prod(n + k - 1, n), prod(k, 1))); }
     else { T.push(n + "!"); if(n > 1) T.push(prod(n, 1)); }
+    // eingesetzter Schritt und Produkt-Schritt bekommen eine Erklär-Blase
+    if(T.length > 1) T[1] = tp(T[1], fall === "perm" ? "tip_einPerm" : "tip_ein", v);
+    if(T.length > 2) T[2] = tp(T[2], PROD3[fall], v);
     T.push("<b>" + gz(w) + "</b>");
     return f(T.join(" = "));
   }
@@ -95,7 +103,7 @@
   function perm(){
     var n = Number($("pn").value); $("pnW").textContent = n;
     $("permBsp").textContent = t("permBsp", { n: n });
-    $("permWert").innerHTML = f(n + "! = " + (n > 1 ? prod(n, 1) + " = " : "") + "<b>" + gz(fak(n)) + "</b>");
+    $("permWert").innerHTML = f(tp(n + "!", "tip_fak") + " = " + (n > 1 ? prod(n, 1) + " = " : "") + "<b>" + gz(fak(n)) + "</b>");
     sicht($("permListeBox"), n <= 4);
     if(n <= 4) $("permAlle").innerHTML = aufzaehlen("ABCD".slice(0, n).split(""), n, true, false).map(function(e){ return "<span>" + e.join("") + "</span>"; }).join("");
   }
@@ -105,9 +113,9 @@
     jaNein($("w2"), wd, function(v){ wd = v; });
     var n = Number($("tn").value), k = Number($("tk").value), an = feldVon(rf, wd);
     $("tnW").textContent = n; $("tkW").textContent = k;
-    var h = '<div class="kopf ecke"></div><div class="kopf">' + t("mitR") + '</div><div class="kopf">' + t("ohneR") + "</div>";
+    var h = '<div class="kopf ecke"></div><div class="kopf">' + tp(esc(t("mitR")), "tip_mitR") + '</div><div class="kopf">' + tp(esc(t("ohneR")), "tip_ohneR") + "</div>";
     [true, false].forEach(function(w){
-      h += '<div class="kopf zkopf">' + t(w ? "mitW" : "ohneW") + "</div>";
+      h += '<div class="kopf zkopf">' + tp(esc(t(w ? "mitW" : "ohneW")), w ? "tip_mitW" : "tip_ohneW") + "</div>";
       [true, false].forEach(function(r){
         var fa = feldVon(r, w), zu = OHNE_W[fa] && k > n;
         h += '<button type="button" class="feld' + (fa === an ? " an" : "") + '" data-r="' + r + '" data-w="' + w + '">' +
@@ -119,6 +127,9 @@
     });
     $("tafel").innerHTML = h;
     $("tafel").querySelectorAll(".feld").forEach(function(b){ b.addEventListener("click", function(){ rf = b.dataset.r === "true"; wd = b.dataset.w === "true"; uebersicht(); }); });
+    var bkSym = t("buch")[3][0];
+    $("nkInfo").innerHTML = "<b>" + esc(t("legH")) + "</b> " + [tp("n = " + n, "tip_n", { n: n }), tp("k = " + k, "tip_k", { k: k }), tp("n!", "tip_fak"), tp(esc(bkSym), "tip_binko", { n: n, k: k, v: gz(binko(n, k)) }), tp("n<sup>k</sup>", "tip_pot")].map(f).join(" · ");
+    $("tippHinweis").textContent = window.MS_TIPP ? MS_TIPP.hinweis(lang) : "";
     $("erkl").innerHTML = "<b>" + esc(t("ex_" + an)) + ":</b> " + esc(t("erk_" + an));
   }
 
@@ -134,7 +145,7 @@
     var r = fall === "pin" || fall === "podest" || fall === "perm", w = fall === "pin" || fall === "eis";
     return esc(t("f1")) + " <b>" + t(r ? "ja" : "nein") + "</b> · " + esc(t("f2")) + " <b>" + t(w ? "ja" : "nein") + "</b>";
   }
-  function gegeben(fall, n, k){ return fall === "perm" ? "n = " + n : "n = " + n + ", k = " + k; }
+  function gegeben(fall, n, k){ return fall === "perm" ? tp("n = " + n, "tip_nPerm", { n: n }) : tp("n = " + n, "tip_n", { n: n }) + ", " + tp("k = " + k, "tip_k", { k: k }); }
   function beispiele(){
     var fall = $("bsp").value || "pin", B = BSP[fall], T = t("b_" + fall);
     $("bTitel").textContent = T[0];
@@ -216,7 +227,7 @@
     document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
     ["permH", "permT", "permListe", "tabH", "tabT", "f1", "f2", "buchH", "wahlL", "antwortL", "tipp"].forEach(function(id){ $(id).textContent = t(id); });
     $("pruefen").textContent = t("pruefen"); $("weiter").textContent = t("weiter");
-    $("nkInfo").textContent = t("nInfo") + " · " + t("kInfo");
+    $("permFormel").innerHTML = tp("P<sub>n</sub>", "tip_Pn") + " = " + tp("n!", "tip_fak") + " = n · (n − 1) · … · 2 · 1";
     $("buch").innerHTML = t("buch").map(function(z){ return '<tr><td><span class="f">' + esc(z[0]).replace("^k", "<sup>k</sup>") + "</span></td><td>" + esc(z[1]) + "</td></tr>"; }).join("");
     var bv = $("bsp").value || "pin";
     $("bsp").innerHTML = Object.keys(BSP).map(function(k){ return '<option value="' + k + '">' + esc(t("b_" + k)[0]) + "</option>"; }).join("");
