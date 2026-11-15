@@ -282,8 +282,10 @@ function yBereich(){
   return Math.ceil(m * 2) / 2;
 }
 var YM = 1.6;
-function sx(x){ return ML + (x - X0) / (X1 - X0) * (W - ML - MR); }
-function sy(y){ return MT + (YM - y) / (2 * YM) * (H - MT - MB); }
+// aktueller Ausschnitt (Grundausschnitt X0…X1, −YM…YM, verschiebbar/zoombar über graph-ablesen.js)
+var VX0 = X0, VX1 = X1, VY0 = -1.6, VY1 = 1.6;
+function sx(x){ return ML + (x - VX0) / (VX1 - VX0) * (W - ML - MR); }
+function sy(y){ return MT + (VY1 - y) / (VY1 - VY0) * (H - MT - MB); }
 function el(name, attrs, text){
   var e = document.createElementNS("http://www.w3.org/2000/svg", name);
   for(var k in attrs) e.setAttribute(k, attrs[k]);
@@ -293,7 +295,7 @@ function el(name, attrs, text){
 function kurve(q, farbe, breite, strich){
   var d = "", n = 500;
   for(var i = 0; i <= n; i++){
-    var x = X0 + (X1 - X0) * i / n, y = q.a * Math.sin(q.b * x + q.c) + q.d;
+    var x = VX0 + (VX1 - VX0) * i / n, y = q.a * Math.sin(q.b * x + q.c) + q.d;
     d += (i ? "L" : "M") + sx(x).toFixed(1) + " " + sy(y).toFixed(1);
   }
   var a = { d: d, fill: "none", stroke: farbe, "stroke-width": breite, "stroke-linejoin": "round" };
@@ -329,30 +331,39 @@ function zeichne(){
   W = schmal ? 460 : 800; H = schmal ? 400 : 460;
   svg.setAttribute("viewBox", "0 0 " + W + " " + H);
   svg.innerHTML = "";
+  var V = { x0: X0, x1: X1, y0: -YM, y1: YM };
+  if(window.MS_ABL && modus !== "ueben") V = MS_ABL.sicht(svg, V);
+  VX0 = V.x0; VX1 = V.x1; VY0 = V.y0; VY1 = V.y1;
+  var cpd = el("defs", {}), cp = el("clipPath", { id: "sinClip" }); cp.appendChild(el("rect", { x: ML, y: MT, width: W - ML - MR, height: H - MT - MB })); cpd.appendChild(cp); svg.appendChild(cpd);
   svg.setAttribute("aria-label", t("aria"));
-  // Gitter + Achsen
+  // Gitter + Achsen (passend zum aktuellen Ausschnitt)
+  var bx = VX1 - VX0;
   if(piModus){
-    for(var k = -2; k <= 4; k++){
-      var gx = sx(k * Math.PI / 2);
+    var st = Math.PI / 2 * Math.max(1, Math.pow(2, Math.ceil(Math.log(bx / (6.5 * Math.PI)) / Math.LN2)));
+    for(var k = Math.ceil(VX0 / st - 1e-9); k * st <= VX1 + 1e-9; k++){
+      var gx = sx(k * st);
       svg.appendChild(el("line", { x1: gx, y1: MT, x2: gx, y2: H - MB, stroke: "#dde3ec", "stroke-width": 1 }));
-      if(k) svg.appendChild(el("text", { x: gx, y: H - MB + 20, "font-size": 14, fill: "#333", "text-anchor": "middle" }, piLabel(k)));
+      if(k) svg.appendChild(el("text", { x: gx, y: H - MB + 20, "font-size": 14, fill: "#333", "text-anchor": "middle" }, piBruch(k * st) || zahl(k * st)));
     }
   } else {
-    for(var k2 = Math.ceil(X0); k2 <= Math.floor(X1); k2++){
-      var gx2 = sx(k2);
+    var sd = [1, 2, 5, 10, 20, 50, 100].filter(function(s){ return bx / s <= 14; })[0] || 100;
+    if(bx < 3) sd = 0.5;
+    for(var k2 = Math.ceil(VX0 / sd - 1e-9); k2 * sd <= VX1 + 1e-9; k2++){
+      var gx2 = sx(k2 * sd);
       svg.appendChild(el("line", { x1: gx2, y1: MT, x2: gx2, y2: H - MB, stroke: "#dde3ec", "stroke-width": 1 }));
-      if(k2) svg.appendChild(el("text", { x: gx2, y: H - MB + 20, "font-size": 14, fill: "#333", "text-anchor": "middle" }, zahl(k2)));
+      if(k2) svg.appendChild(el("text", { x: gx2, y: H - MB + 20, "font-size": 14, fill: "#333", "text-anchor": "middle" }, zahl(k2 * sd)));
     }
   }
-  var schritt = YM > 3 ? 1 : 0.5;
-  for(var y = -Math.floor(YM / schritt) * schritt; y <= YM + 1e-9; y += schritt){
+  var by = VY1 - VY0, schritt = [0.25, 0.5, 1, 2, 5, 10, 20].filter(function(s){ return by / s <= 14; })[0] || 20;
+  for(var y = Math.ceil(VY0 / schritt - 1e-9) * schritt; y <= VY1 + 1e-9; y += schritt){
     var gy = sy(y);
     svg.appendChild(el("line", { x1: ML, y1: gy, x2: W - MR, y2: gy, stroke: "#dde3ec", "stroke-width": 1 }));
-    if(Math.abs(y) > 1e-9) svg.appendChild(el("text", { x: ML - 6, y: gy + 5, "font-size": 13, fill: "#333", "text-anchor": "end" }, zahl(y, 1)));
+    if(Math.abs(y) > 1e-9) svg.appendChild(el("text", { x: ML - 6, y: gy + 5, "font-size": 13, fill: "#333", "text-anchor": "end" }, zahl(y, 2)));
   }
-  svg.appendChild(el("line", { x1: ML, y1: sy(0), x2: W - MR, y2: sy(0), stroke: "#555", "stroke-width": 1.5 }));
-  svg.appendChild(el("line", { x1: sx(0), y1: MT, x2: sx(0), y2: H - MB, stroke: "#555", "stroke-width": 1.5 }));
-  svg.appendChild(el("text", { x: sx(0) - 6, y: sy(0) + 16, "font-size": 13, fill: "#333", "text-anchor": "end" }, "0"));
+  if(VY0 <= 0 && VY1 >= 0) svg.appendChild(el("line", { x1: ML, y1: sy(0), x2: W - MR, y2: sy(0), stroke: "#555", "stroke-width": 1.5 }));
+  if(VX0 <= 0 && VX1 >= 0) svg.appendChild(el("line", { x1: sx(0), y1: MT, x2: sx(0), y2: H - MB, stroke: "#555", "stroke-width": 1.5 }));
+  if(VY0 <= 0 && VY1 >= 0 && VX0 <= 0 && VX1 >= 0) svg.appendChild(el("text", { x: sx(0) - 6, y: sy(0) + 16, "font-size": 13, fill: "#333", "text-anchor": "end" }, "0"));
+  var nGitter = svg.childNodes.length;
 
   if(modus === "bsp" && alleZeigen){
     ["f", "g", "h", "i", "j"].forEach(function(k){ svg.appendChild(kurve(BSP[k], BSP[k].col, k === "f" ? 3 : 2.5)); });
@@ -364,7 +375,7 @@ function zeichne(){
     schild(svg, sx(Math.PI / 2), sy(-0.15), "b = 2", "#00a651");
     pfeil(svg, sx(0) + 4, sy(-0.05), sx(Math.PI) - 4, sy(-0.05), "#00a651", true);
     svg.appendChild(el("line", { x1: sx(-1), y1: sy(0), x2: sx(-1), y2: H - MB, stroke: "#00a3e0", "stroke-width": 2.5, "stroke-dasharray": "3 4" }));
-    schild(svg, sx(-1), sy(-YM + 0.35), "x = −1", "#00a3e0");
+    schild(svg, sx(-1), sy(VY0 + 0.35), "x = −1", "#00a3e0");
     schild(svg, sx(-1.05), sy(0.55), "c = 1", "#00a3e0", "end");
     schild(svg, sx(0.2), sy(0.95), "d = " + zahl(0.5), "#e91ee0", "start");
   } else if(modus === "ueben" && UE.ziel){
@@ -383,37 +394,39 @@ function zeichne(){
     svg.appendChild(kurve(q, "#1a2b6b", 4));
     // Startpunkt der Schwingung (x = −c/b) und Periode
     var x0 = -q.c / q.b, p = 2 * Math.PI / q.b;
-    while(x0 < X0 + 0.05) x0 += p;
-    while(x0 > X0 + p) x0 -= p;
+    while(x0 < VX0 + 0.05) x0 += p;
+    while(x0 > VX0 + p) x0 -= p;
     if(Math.abs(q.c) > 1e-9){
       svg.appendChild(el("line", { x1: sx(-q.c / q.b), y1: MT, x2: sx(-q.c / q.b), y2: H - MB, stroke: "#00a3e0", "stroke-width": 2.5, "stroke-dasharray": "3 4" }));
       schild(svg, sx(-q.c / q.b), H - MB - 12, "x = " + xTxt(-q.c / q.b), "#0083b8");
     }
     var py = sy(q.d - Math.abs(q.a) - 0.25 * (YM > 2 ? 1 : 0.6));
-    if(x0 + p <= X1){
+    if(x0 + p <= VX1){
       pfeil(svg, sx(x0) + 2, py, sx(x0 + p) - 2, py, "#6f2da8", true);
       schild(svg, (sx(x0) + sx(x0 + p)) / 2, py + 16, "p = 2π / " + zahl(q.b) + (piModus && piBruch(p) ? " = " + piBruch(p) : "") + " ≈ " + zahl(p), "#6f2da8");
     }
     // Amplitude am ersten sichtbaren Hochpunkt (bzw. Tiefpunkt bei a < 0)
     if(Math.abs(q.a) > 1e-9){
       var xm = (Math.PI / 2 - q.c) / q.b;
-      while(xm < X0 + 0.3) xm += p;
-      while(xm - p > X0 + 0.3) xm -= p;
-      if(xm < X1 - 0.3){
+      while(xm < VX0 + 0.3) xm += p;
+      while(xm - p > VX0 + 0.3) xm -= p;
+      if(xm < VX1 - 0.3){
         pfeil(svg, sx(xm), sy(q.d), sx(xm), sy(q.d + q.a) + (q.a > 0 ? 3 : -3), "#f0a500");
         schild(svg, sx(xm) + 10, sy(q.d + q.a / 2), "a = " + zahl(q.a), "#c48a00", "start");
       }
     }
     // Legende
-    schild(svg, W - MR - 6, MT + 14, "f(x) = sin(x)", "#d04848", "end");
+    schild(svg, W - MR - 50, MT + 14, "f(x) = sin(x)", "#d04848", "end");
   }
+  // Kurven und Hilfslinien auf die Zeichenfläche beschneiden (wichtig nach dem Verschieben)
+  Array.prototype.slice.call(svg.childNodes, nGitter).forEach(function(e){ if(e.tagName === "path" || e.tagName === "line") e.setAttribute("clip-path", "url(#sinClip)"); });
   // Werte ablesen + Wertetabelle (/graph-ablesen.js) – nicht im Übungsmodus
   if(window.MS_ABL){
     if(modus === "ueben") MS_ABL.aus(svg);
     else {
       var sk = function(q){ return function(x){ return q.a * Math.sin(q.b * x + q.c) + q.d; }; };
       var ks = modus === "bsp" && alleZeigen ? ["f", "g", "h", "i", "j"].map(function(k){ return { f: sk(BSP[k]), farbe: BSP[k].col, name: k + "(x)" }; }) : [{ f: sk(P), farbe: "#1a2b6b", name: "f(x)" }];
-      MS_ABL.an(svg, { x0: X0, x1: X1, y0: -YM, y1: YM, L: ML, R: W - MR, T: MT, B: H - MB, kurven: ks });
+      MS_ABL.an(svg, { x0: VX0, x1: VX1, y0: VY0, y1: VY1, L: ML, R: W - MR, T: MT, B: H - MB, kurven: ks, neu: zeichne });
     }
   }
   live();

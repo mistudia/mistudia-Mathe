@@ -80,12 +80,14 @@
     var lo = ys[Math.floor(ys.length * 0.02)], hi = ys[Math.ceil(ys.length * 0.98) - 1];
     lo = Math.min(lo, 0); hi = Math.max(hi, 0); if(hi - lo < 1e-9){ hi += 1; lo -= 1; }
     var pad = (hi - lo) * 0.1; lo -= pad; hi += pad;
+    // Verschieben/Zoomen (graph-ablesen.js): Grundausschnitt → aktueller Ausschnitt
+    if(o.abl && window.MS_ABL){ var sv0 = MS_ABL.sicht(svg, { x0: x0, x1: x1, y0: lo, y1: hi }); x0 = sv0.x0; x1 = sv0.x1; lo = sv0.y0; hi = sv0.y1; }
     var X = function(x){ return GL + (x - x0) / (x1 - x0) * (GR - GL); }, Y = function(y){ return GB - (y - lo) / (hi - lo) * (GB - GT); };
     svg._X = X; svg._inv = function(px){ return x0 + (px - GL) / (GR - GL) * (x1 - x0); }; svg._xr = o.xr;
     var sx = schritt(x1 - x0), sy = schritt(hi - lo), v;
     for(v = Math.ceil(x0 / sx) * sx; v <= x1; v += sx){ svg.appendChild(el("line", { x1: X(v), y1: GT, x2: X(v), y2: GB, "class": "g-gitter" })); if(Math.abs(v) > sx / 2) svg.appendChild(el("text", { x: X(v), y: Math.min(GB - 4, Math.max(GT + 12, Y(0) + 16)), "class": "g-zahl", "text-anchor": "middle" }, z(v, 2))); }
     for(v = Math.ceil(lo / sy) * sy; v <= hi; v += sy){ svg.appendChild(el("line", { x1: GL, y1: Y(v), x2: GR, y2: Y(v), "class": "g-gitter" })); if(Math.abs(v) > sy / 2) svg.appendChild(el("text", { x: Math.min(GR - 30, Math.max(GL + 2, X(0) - 6)), y: Y(v) + 4, "class": "g-zahl", "text-anchor": X(0) - 6 < GL + 2 ? "start" : "end" }, z(v, 2))); }
-    svg.appendChild(el("line", { x1: GL, y1: Y(0), x2: GR, y2: Y(0), "class": "g-achse" }));
+    if(lo <= 0 && hi >= 0) svg.appendChild(el("line", { x1: GL, y1: Y(0), x2: GR, y2: Y(0), "class": "g-achse" }));
     if(x0 <= 0 && x1 >= 0) svg.appendChild(el("line", { x1: X(0), y1: GT, x2: X(0), y2: GB, "class": "g-achse" }));
     var cl = function(y){ return Math.max(-2000, Math.min(2400, Y(y))); };
     (o.rects || []).forEach(function(r){ var y1 = cl(r.h), y0 = Y(0); svg.appendChild(el("rect", { x: X(r.x0), y: Math.min(y0, y1), width: Math.max(0.5, X(r.x1) - X(r.x0)), height: Math.abs(y1 - y0), "class": r.h >= 0 ? "g-pos" : "g-neg", "stroke-width": o.rects.length > 60 ? 0 : 1 })); });
@@ -107,7 +109,10 @@
     (o.punkte || []).forEach(function(p){ svg.appendChild(el("circle", { cx: X(p.x), cy: cl(p.y), r: 5, "class": "g-null" })); });
     (o.namen || []).forEach(function(n){ svg.appendChild(el("text", { x: X(n.x), y: Math.max(GT + 14, Math.min(GB - 6, cl(n.y) + 5)), "class": "g-name", "text-anchor": "middle", fill: n.farbe || "#1a2233" }, n.text)); });
     // Werte ablesen + Wertetabelle (/graph-ablesen.js), nur bei Erkunden-Graphen (o.abl)
-    if(window.MS_ABL){ if(o.abl) MS_ABL.an(svg, { x0: x0, x1: x1, y0: lo, y1: hi, L: GL, R: GR, T: GT, B: GB,
+    // Inhalt auf die Zeichenfläche beschneiden (nach dem Verschieben)
+    if(!svg.querySelector("#" + svg.id + "Clip")){ var cp = el("clipPath", { id: svg.id + "Clip" }); cp.appendChild(el("rect", { x: GL, y: GT, width: GR - GL, height: GB - GT })); svg.insertBefore(cp, svg.firstChild); }
+    svg.querySelectorAll("rect.g-pos, rect.g-neg, polygon, path, line.g-grenze, circle.g-griff, circle.g-null").forEach(function(e){ e.setAttribute("clip-path", "url(#" + svg.id + "Clip)"); });
+    if(window.MS_ABL){ if(o.abl) MS_ABL.an(svg, { x0: x0, x1: x1, y0: lo, y1: hi, L: GL, R: GR, T: GT, B: GB, neu: function(){ zeichne(svg, o); },
       kurven: (o.kurven || []).map(function(k, i){ return o.abl[i] ? { f: function(x){ return imDef(k.fn, x) ? k.fn[k.F ? "F" : "f"](x) : NaN; }, el: k._el, name: o.abl[i] } : null; }) }); else MS_ABL.aus(svg); }
   }
   function xBereich(a, b){

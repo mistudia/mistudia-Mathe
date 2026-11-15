@@ -29,6 +29,7 @@
 
   // ---------- Graph ----------
   function plot(sv, o){
+    var o0 = o; if(o.abl && window.MS_ABL) o = MS_ABL.sicht(sv, o); // Verschieben/Zoomen (graph-ablesen.js)
     leer(sv); var W = o.W || 420, H = o.H || 420, L = 34, R = W - 10, T = 10, B = H - 26;
     sv.setAttribute("viewBox", "0 0 " + W + " " + H);
     var X = function(x){ return L + (x - o.x0) / (o.x1 - o.x0) * (R - L); }, Y = function(y){ return B - (y - o.y0) / (o.y1 - o.y0) * (B - T); };
@@ -55,7 +56,7 @@
     });
     (o.punkte || []).forEach(function(p){ if(p[1] >= o.y0 && p[1] <= o.y1 && p[0] >= o.x0 && p[0] <= o.x1){ sv.appendChild(el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 6, "class": "punkt" })); if(p[2]) sv.appendChild(el("text", { x: X(p[0]) + 8, y: Y(p[1]) - 8, "class": "treppeT", style: "fill:#1d4ed8" }, p[2])); } });
     // Werte ablesen + Wertetabelle (/graph-ablesen.js), nur bei Erkunden-Graphen (o.abl)
-    if(window.MS_ABL){ if(o.abl) MS_ABL.an(sv, { x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, L: L, R: R, T: T, B: B, xName: o.abl.x || "x",
+    if(window.MS_ABL){ if(o.abl) MS_ABL.an(sv, { x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, L: L, R: R, T: T, B: B, xName: o.abl.x || "x", neu: function(){ plot(sv, o0); },
       kurven: (o.kurven || []).map(function(k, i){ return o.abl.namen[i] ? { f: k.f, el: k._el, name: o.abl.namen[i] } : null; }) }); else MS_ABL.aus(sv); }
   }
 

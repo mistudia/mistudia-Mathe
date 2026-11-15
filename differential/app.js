@@ -41,6 +41,7 @@
   // ---------- Graph ----------
   function schritt(r){ var s = Math.pow(10, Math.floor(Math.log10(r / 6))), n = r / 6 / s; return s * (n < 1.5 ? 1 : n < 3.5 ? 2 : n < 7.5 ? 5 : 10); }
   function plot(sv, o){
+    var o0 = o; if(o.abl && window.MS_ABL) o = MS_ABL.sicht(sv, o); // Verschieben/Zoomen (graph-ablesen.js)
     leer(sv);
     var W = (sv.clientWidth || (sv.parentNode && sv.parentNode.clientWidth) || 640) < 520 ? 420 : 640, H = o.H || 360;
     sv.setAttribute("viewBox", "0 0 " + W + " " + H);
@@ -67,10 +68,10 @@
     });
     (o.linien || []).forEach(function(l){ g.appendChild(el("line", { x1: X(l.x1), y1: Y(l.y1), x2: X(l.x2), y2: Y(l.y2), "class": l.cls })); });
     (o.polys || []).forEach(function(p){ g.appendChild(el("polyline", { points: p.pts.map(function(q){ return X(q[0]).toFixed(1) + "," + Y(q[1]).toFixed(1); }).join(" "), "class": p.cls })); });
-    (o.punkte || []).forEach(function(p){ if(p.y < o.y0 - 1e-9 || p.y > o.y1 + 1e-9) return; sv.appendChild(el("circle", { cx: X(p.x), cy: Y(p.y), r: p.r || 5, "class": p.cls || "pt" })); if(p.txt) sv.appendChild(el("text", { x: X(p.x) + (p.dx || 8), y: Y(p.y) + (p.dy || -8), "class": "lab" + (p.tcls ? " " + p.tcls : "") }, p.txt)); });
-    (o.texte || []).forEach(function(p){ sv.appendChild(el("text", { x: X(p.x), y: Y(p.y), "class": "lab " + (p.cls || ""), "text-anchor": p.anker || "middle" }, p.txt)); });
+    (o.punkte || []).forEach(function(p){ if(p.y < o.y0 - 1e-9 || p.y > o.y1 + 1e-9 || p.x < o.x0 - 1e-9 || p.x > o.x1 + 1e-9) return; sv.appendChild(el("circle", { cx: X(p.x), cy: Y(p.y), r: p.r || 5, "class": p.cls || "pt" })); if(p.txt) sv.appendChild(el("text", { x: X(p.x) + (p.dx || 8), y: Y(p.y) + (p.dy || -8), "class": "lab" + (p.tcls ? " " + p.tcls : "") }, p.txt)); });
+    (o.texte || []).forEach(function(p){ if(p.x < o.x0 || p.x > o.x1 || p.y < o.y0 || p.y > o.y1) return; sv.appendChild(el("text", { x: X(p.x), y: Y(p.y), "class": "lab " + (p.cls || ""), "text-anchor": p.anker || "middle" }, p.txt)); });
     // Werte ablesen + Wertetabelle (/graph-ablesen.js), nur bei Erkunden-Graphen (o.abl)
-    if(window.MS_ABL){ if(o.abl) MS_ABL.an(sv, { x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, L: L, R: R, T: T, B: B, xName: o.abl.x || "x",
+    if(window.MS_ABL){ if(o.abl) MS_ABL.an(sv, { x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, L: L, R: R, T: T, B: B, xName: o.abl.x || "x", neu: function(){ plot(sv, o0); },
       kurven: (o.kurven || []).map(function(k, i){ return o.abl.namen[i] ? { f: function(x){ return (k.von != null && x < k.von) || (k.bis != null && x > k.bis) ? NaN : k.f(x); }, el: k._el, name: o.abl.namen[i] } : null; }) }); else MS_ABL.aus(sv); }
     return { X: X, Y: Y };
   }

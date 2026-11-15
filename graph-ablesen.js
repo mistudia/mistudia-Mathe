@@ -15,15 +15,15 @@ var MS_ABL = (function(){
   "use strict";
   var NS = "http://www.w3.org/2000/svg";
   var TX = {
-    de: { titel: "Wertetabelle", hinweis: "Eigene x-Werte eingeben – die Funktionswerte werden sofort berechnet. Werte ablesen: mit der Maus über den Graphen fahren oder auf den Graphen tippen.", neu: "+ Zeile", auto: "Werte aus dem Bild", punkte: "Punkte im Graph zeigen", ziel: "Punkt im Graph markieren", weg: "Zeile löschen", x: "x-Wert eingeben" },
-    en: { titel: "Table of values", hinweis: "Type your own x-values – the function values are calculated at once. Read off values: hover with the mouse or tap the graph.", neu: "+ Row", auto: "Values from the picture", punkte: "Show points in the graph", ziel: "Mark point in the graph", weg: "Delete row", x: "Enter x-value" },
-    es: { titel: "Tabla de valores", hinweis: "Escribe tus propios valores de x: los valores de la función se calculan al instante. Leer valores: pasa el ratón o toca la gráfica.", neu: "+ Fila", auto: "Valores de la imagen", punkte: "Mostrar puntos en la gráfica", ziel: "Marcar el punto en la gráfica", weg: "Borrar fila", x: "Escribe un valor de x" },
-    zh: { titel: "数值表", hinweis: "输入你自己的 x 值，函数值会立即算出。读取数值：用鼠标悬停或点按图像。", neu: "+ 行", auto: "取图中的值", punkte: "在图像中显示点", ziel: "在图像中标出该点", weg: "删除此行", x: "输入 x 值" },
-    fr: { titel: "Tableau de valeurs", hinweis: "Saisis tes propres valeurs de x : les valeurs de la fonction sont calculées aussitôt. Lire des valeurs : survole avec la souris ou touche la courbe.", neu: "+ Ligne", auto: "Valeurs de l’image", punkte: "Afficher les points sur la courbe", ziel: "Marquer le point sur la courbe", weg: "Supprimer la ligne", x: "Saisir une valeur de x" },
-    ru: { titel: "Таблица значений", hinweis: "Вводи свои значения x — значения функции считаются сразу. Чтобы прочитать значения, наведи мышь или коснись графика.", neu: "+ Строка", auto: "Значения с рисунка", punkte: "Показать точки на графике", ziel: "Отметить точку на графике", weg: "Удалить строку", x: "Введи значение x" },
-    ar: { titel: "جدول القيم", hinweis: "اكتب قيم x الخاصة بك – تُحسب قيم الدالة فورًا. لقراءة القيم: مرّر الفأرة أو المس المنحنى.", neu: "+ صف", auto: "قيم من الرسم", punkte: "إظهار النقاط على المنحنى", ziel: "تحديد النقطة على المنحنى", weg: "حذف الصف", x: "أدخل قيمة x" },
-    ja: { titel: "値の表", hinweis: "自分で x の値を入力すると、関数の値がすぐに計算されます。値を読むには、マウスを重ねるかグラフをタップします。", neu: "+ 行", auto: "図から値を入れる", punkte: "グラフに点を表示", ziel: "グラフに点を示す", weg: "行を削除", x: "x の値を入力" },
-    pt: { titel: "Tabela de valores", hinweis: "Digite seus próprios valores de x – os valores da função são calculados na hora. Ler valores: passe o mouse ou toque no gráfico.", neu: "+ Linha", auto: "Valores da imagem", punkte: "Mostrar pontos no gráfico", ziel: "Marcar o ponto no gráfico", weg: "Excluir linha", x: "Digite um valor de x" }
+    de: { rein: "Vergrößern", raus: "Verkleinern", fit: "Ganzen Graphen zeigen", titel: "Wertetabelle", hinweis: "Eigene x-Werte eingeben – die Funktionswerte werden sofort berechnet. Werte ablesen: mit der Maus über den Graphen fahren oder auf den Graphen tippen.", neu: "+ Zeile", auto: "Werte aus dem Bild", punkte: "Punkte im Graph zeigen", ziel: "Punkt im Graph markieren", weg: "Zeile löschen", x: "x-Wert eingeben" },
+    en: { rein: "Zoom in", raus: "Zoom out", fit: "Show whole graph", titel: "Table of values", hinweis: "Type your own x-values – the function values are calculated at once. Read off values: hover with the mouse or tap the graph.", neu: "+ Row", auto: "Values from the picture", punkte: "Show points in the graph", ziel: "Mark point in the graph", weg: "Delete row", x: "Enter x-value" },
+    es: { rein: "Acercar", raus: "Alejar", fit: "Ver toda la gráfica", titel: "Tabla de valores", hinweis: "Escribe tus propios valores de x: los valores de la función se calculan al instante. Leer valores: pasa el ratón o toca la gráfica.", neu: "+ Fila", auto: "Valores de la imagen", punkte: "Mostrar puntos en la gráfica", ziel: "Marcar el punto en la gráfica", weg: "Borrar fila", x: "Escribe un valor de x" },
+    zh: { rein: "放大", raus: "缩小", fit: "显示整个图像", titel: "数值表", hinweis: "输入你自己的 x 值，函数值会立即算出。读取数值：用鼠标悬停或点按图像。", neu: "+ 行", auto: "取图中的值", punkte: "在图像中显示点", ziel: "在图像中标出该点", weg: "删除此行", x: "输入 x 值" },
+    fr: { rein: "Agrandir", raus: "Réduire", fit: "Afficher toute la courbe", titel: "Tableau de valeurs", hinweis: "Saisis tes propres valeurs de x : les valeurs de la fonction sont calculées aussitôt. Lire des valeurs : survole avec la souris ou touche la courbe.", neu: "+ Ligne", auto: "Valeurs de l’image", punkte: "Afficher les points sur la courbe", ziel: "Marquer le point sur la courbe", weg: "Supprimer la ligne", x: "Saisir une valeur de x" },
+    ru: { rein: "Увеличить", raus: "Уменьшить", fit: "Показать весь график", titel: "Таблица значений", hinweis: "Вводи свои значения x — значения функции считаются сразу. Чтобы прочитать значения, наведи мышь или коснись графика.", neu: "+ Строка", auto: "Значения с рисунка", punkte: "Показать точки на графике", ziel: "Отметить точку на графике", weg: "Удалить строку", x: "Введи значение x" },
+    ar: { rein: "تكبير", raus: "تصغير", fit: "عرض المنحنى كاملًا", titel: "جدول القيم", hinweis: "اكتب قيم x الخاصة بك – تُحسب قيم الدالة فورًا. لقراءة القيم: مرّر الفأرة أو المس المنحنى.", neu: "+ صف", auto: "قيم من الرسم", punkte: "إظهار النقاط على المنحنى", ziel: "تحديد النقطة على المنحنى", weg: "حذف الصف", x: "أدخل قيمة x" },
+    ja: { rein: "拡大", raus: "縮小", fit: "グラフ全体を表示", titel: "値の表", hinweis: "自分で x の値を入力すると、関数の値がすぐに計算されます。値を読むには、マウスを重ねるかグラフをタップします。", neu: "+ 行", auto: "図から値を入れる", punkte: "グラフに点を表示", ziel: "グラフに点を示す", weg: "行を削除", x: "x の値を入力" },
+    pt: { rein: "Aproximar", raus: "Afastar", fit: "Mostrar o gráfico todo", titel: "Tabela de valores", hinweis: "Digite seus próprios valores de x – os valores da função são calculados na hora. Ler valores: passe o mouse ou toque no gráfico.", neu: "+ Linha", auto: "Valores da imagem", punkte: "Mostrar pontos no gráfico", ziel: "Marcar o ponto no gráfico", weg: "Excluir linha", x: "Digite um valor de x" }
   };
   var lang = "de"; try { lang = localStorage.getItem("msMathLang") || document.documentElement.lang || "de"; } catch(e){}
   if(!TX[lang]) lang = "de";
@@ -52,22 +52,110 @@ var MS_ABL = (function(){
   // ---------- Zustand je Graph ----------
   function zustand(svg){
     if(svg._abl) return svg._abl;
-    var Z = svg._abl = { svg: svg, o: null, pin: null, hover: null, down: null, xs: [], det: null, g: null };
-    svg.addEventListener("pointerdown", function(e){ Z.down = (e.defaultPrevented || !e.isPrimary) ? null : { x: e.clientX, y: e.clientY, id: e.pointerId }; });
+    var Z = svg._abl = { svg: svg, o: null, pin: null, hover: null, down: null, xs: [], det: null, g: null,
+      T: { s: 1, dx: 0, dy: 0 }, orig: null, neu: null, ptr: {}, zieht: false, pinch: null, knopf: null };
+    // Zoomen/Verschieben: am Handy nur waagerechtes Wischen und Zwei-Finger-Zoom, senkrecht scrollt die Seite
+    svg.style.touchAction = "pan-y";
+    svg.addEventListener("pointerdown", function(e){
+      var k = e.target && e.target.closest ? e.target.closest("[data-msabl]") : null;
+      if(k){ Z.knopf = k.getAttribute("data-msabl"); e.preventDefault(); return; }
+      if(e.defaultPrevented || !Z.o){ Z.down = null; return; }
+      Z.ptr[e.pointerId] = { x: e.clientX, y: e.clientY };
+      var ids = Object.keys(Z.ptr);
+      if(ids.length === 1){ Z.down = { x: e.clientX, y: e.clientY, id: e.pointerId, v: aktSicht(Z) }; Z.zieht = false; }
+      else if(ids.length === 2 && Z.neu){ var a = Z.ptr[ids[0]], c = Z.ptr[ids[1]]; Z.pinch = { d: Math.hypot(a.x - c.x, a.y - c.y) || 1, v: aktSicht(Z), m: punktXY(Z, (a.x + c.x) / 2, (a.y + c.y) / 2) }; Z.down = null; }
+      try { svg.setPointerCapture(e.pointerId); } catch(x){}
+    });
     svg.addEventListener("pointermove", function(e){
-      if(Z.down && Math.hypot(e.clientX - Z.down.x, e.clientY - Z.down.y) > 6) Z.down = null;
+      if(Z.ptr[e.pointerId]) Z.ptr[e.pointerId] = { x: e.clientX, y: e.clientY };
+      var ids = Object.keys(Z.ptr);
+      if(Z.pinch && ids.length >= 2){
+        var a = Z.ptr[ids[0]], c = Z.ptr[ids[1]], f = Z.pinch.d / (Math.hypot(a.x - c.x, a.y - c.y) || 1);
+        zoomUm(Z, Z.pinch.v, Z.pinch.m, f); e.preventDefault(); return;
+      }
+      if(Z.down && Z.down.id === e.pointerId){
+        if(!Z.zieht && Math.hypot(e.clientX - Z.down.x, e.clientY - Z.down.y) > 6) Z.zieht = !!Z.neu;
+        if(Z.zieht){ schieben(Z, e); e.preventDefault(); }
+        if(Z.hover){ Z.hover = null; zeichneAbl(Z); }
+        return;
+      }
       if(e.pointerType === "mouse" && !e.buttons){ Z.hover = punkt(Z, e); zeichneAbl(Z); }
       else if(Z.hover){ Z.hover = null; zeichneAbl(Z); }
     });
     svg.addEventListener("pointerleave", function(e){ if(Z.hover){ Z.hover = null; zeichneAbl(Z); } });
-    svg.addEventListener("pointerup", function(e){
-      var d = Z.down; Z.down = null;
-      if(!d || d.id !== e.pointerId || e.defaultPrevented || !Z.o) return;
+    function ende(e){
+      if(Z.knopf){ var k = Z.knopf; Z.knopf = null; if(e.type === "pointerup") knopf(Z, k); return; }
+      var d = Z.down, warZug = Z.zieht; delete Z.ptr[e.pointerId];
+      if(Object.keys(Z.ptr).length < 2) Z.pinch = null;
+      if(d && d.id === e.pointerId){ Z.down = null; Z.zieht = false; }
+      if(!d || d.id !== e.pointerId || warZug || e.type !== "pointerup" || e.defaultPrevented || !Z.o) return;
       tippen(Z, punkt(Z, e));
-    });
-    svg.addEventListener("pointercancel", function(){ Z.down = null; });
+    }
+    svg.addEventListener("pointerup", ende);
+    svg.addEventListener("pointercancel", ende);
+    svg.addEventListener("wheel", function(e){
+      if(!Z.o || !Z.neu) return;
+      e.preventDefault();
+      zoomUm(Z, aktSicht(Z), punkt(Z, e), e.deltaY < 0 ? 1 / 1.2 : 1.2);
+    }, { passive: false });
     alle.push(Z);
     return Z;
+  }
+  // ---------- Ausschnitt (Verschieben/Zoomen) ----------
+  // T beschreibt den Ausschnitt relativ zum Grundausschnitt der Kachel: s = Zoomfaktor, dx/dy = Verschiebung in Grundbreiten.
+  function aktSicht(Z){ var o = Z.o; return { x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1 }; }
+  function setzeSicht(Z, v){
+    var G = Z.orig; if(!G) return;
+    var gw = G.x1 - G.x0, gh = G.y1 - G.y0, s = (v.x1 - v.x0) / gw;
+    if(s < 0.02 || s > 60) return;
+    Z.T = { s: s, dx: ((v.x0 + v.x1) / 2 - (G.x0 + G.x1) / 2) / gw, dy: ((v.y0 + v.y1) / 2 - (G.y0 + G.y1) / 2) / gh };
+    neuZeichnen(Z);
+  }
+  var geplant = null;
+  function neuZeichnen(Z){ if(geplant) return; geplant = (window.requestAnimationFrame || setTimeout)(function(){ geplant = null; if(Z.neu) try { Z.neu(); } catch(x){ if(window.console) console.error(x); } }); }
+  function schieben(Z, e){
+    var o = Z.o, v = Z.down.v, m = Z.svg.getScreenCTM(); if(!m) return;
+    var dxv = (e.clientX - Z.down.x) / m.a, dyv = (e.clientY - Z.down.y) / m.d;
+    var dxw = dxv / (o.R - o.L) * (v.x1 - v.x0), dyw = dyv / (o.B - o.T) * (v.y1 - v.y0);
+    setzeSicht(Z, { x0: v.x0 - dxw, x1: v.x1 - dxw, y0: v.y0 + dyw, y1: v.y1 + dyw });
+  }
+  function punktXY(Z, cx, cy){ var m = Z.svg.getScreenCTM(); if(!m) return null; var p = Z.svg.createSVGPoint(); p.x = cx; p.y = cy; p = p.matrixTransform(m.inverse()); return { px: p.x, py: p.y }; }
+  function zoomUm(Z, v, p, f){
+    var o = Z.o; if(!p) p = { px: (o.L + o.R) / 2, py: (o.T + o.B) / 2 };
+    var fx = klemm((p.px - o.L) / (o.R - o.L), 0, 1), fy = klemm((o.B - p.py) / (o.B - o.T), 0, 1);
+    var wx = v.x0 + fx * (v.x1 - v.x0), wy = v.y0 + fy * (v.y1 - v.y0), nw = (v.x1 - v.x0) * f, nh = (v.y1 - v.y0) * f;
+    setzeSicht(Z, { x0: wx - fx * nw, x1: wx - fx * nw + nw, y0: wy - fy * nh, y1: wy - fy * nh + nh });
+  }
+  function knopf(Z, k){
+    if(k === "rein") zoomUm(Z, aktSicht(Z), null, 1 / 1.4);
+    else if(k === "raus") zoomUm(Z, aktSicht(Z), null, 1.4);
+    else { Z.T = { s: 1, dx: 0, dy: 0 }; neuZeichnen(Z); }
+  }
+  // von der Kachel VOR dem Zeichnen aufgerufen: Grundausschnitt → aktueller Ausschnitt
+  function sicht(svg, o){
+    if(!svg) return o;
+    var Z = zustand(svg); Z.orig = { x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1 };
+    var T = Z.T; if(T.s === 1 && !T.dx && !T.dy) return o;
+    var gw = o.x1 - o.x0, gh = o.y1 - o.y0, cx = (o.x0 + o.x1) / 2 + T.dx * gw, cy = (o.y0 + o.y1) / 2 + T.dy * gh, nw = gw * T.s, nh = gh * T.s;
+    var r = {}; for(var k in o) r[k] = o[k];
+    r.x0 = cx - nw / 2; r.x1 = cx + nw / 2; r.y0 = cy - nh / 2; r.y1 = cy + nh / 2;
+    if(T.s !== 1){ delete r.sx; delete r.sy; }
+    return r;
+  }
+  function knoepfe(Z){
+    if(Z.kg && Z.kg.parentNode) Z.kg.parentNode.removeChild(Z.kg);
+    Z.kg = null; var o = Z.o; if(!o || !Z.neu) return;
+    var vb = Z.svg.viewBox && Z.svg.viewBox.baseVal, bw = Z.svg.getBoundingClientRect().width;
+    var m = vb && vb.width && bw ? klemm(vb.width / bw, 1, 2.2) : 1, gr = 30 * m, ab = 6 * m;
+    var g = E("g", { "class": "msabl-knoepfe" }), x = o.R - gr - ab;
+    [["rein", "+"], ["raus", "−"], ["fit", "⤢"]].forEach(function(b, i){
+      var y = o.T + ab + i * (gr + ab), k = E("g", { "data-msabl": b[0], style: "cursor:pointer" });
+      k.appendChild(E("title", {}, tx(b[0])));
+      k.appendChild(E("rect", { x: x, y: y, width: gr, height: gr, rx: 7 * m, fill: "#ffffff", "fill-opacity": 0.93, stroke: "#b0b0b8", "stroke-width": 1.5 * m }));
+      k.appendChild(E("text", { x: x + gr / 2, y: y + gr / 2 + 6 * m, "text-anchor": "middle", "font-size": 18 * m, "font-weight": 700, "font-family": "system-ui, sans-serif", fill: "#1a2233", style: "font-style:normal" }, b[1]));
+      g.appendChild(k);
+    });
+    Z.svg.appendChild(g); Z.kg = g;
   }
   function punkt(Z, e){ // Bildschirm → viewBox-Koordinaten
     var m = Z.svg.getScreenCTM(); if(!m) return null;
@@ -229,13 +317,13 @@ var MS_ABL = (function(){
       if(!farbe && k.el){ try { farbe = getComputedStyle(k.el).stroke; } catch(e){} }
       return { f: k.f, farbe: farbe && farbe !== "none" ? farbe : "#1a2233", name: k.name };
     });
-    Z.o = o;
+    Z.o = o; Z.neu = typeof o.neu === "function" ? o.neu : null;
     if(o.tabelle !== false && !Z.det) tabelleBauen(Z);
     if(Z.det) Z.det.hidden = o.tabelle === false;
-    neu(Z); zeichneAbl(Z);
+    neu(Z); zeichneAbl(Z); knoepfe(Z);
   }
-  function aus(svg){ if(svg && svg._abl){ var Z = svg._abl; Z.o = null; Z.pin = null; Z.hover = null; if(Z.g && Z.g.parentNode) Z.g.parentNode.removeChild(Z.g); if(Z.det) Z.det.hidden = true; } }
-  function sprache(l){ if(TX[l]) lang = l; alle.forEach(function(Z){ if(Z.o){ texte(Z); neu(Z); zeichneAbl(Z); } }); }
+  function aus(svg){ if(svg && svg._abl){ var Z = svg._abl; Z.o = null; Z.pin = null; Z.hover = null; Z.neu = null; if(Z.g && Z.g.parentNode) Z.g.parentNode.removeChild(Z.g); if(Z.kg && Z.kg.parentNode) Z.kg.parentNode.removeChild(Z.kg); if(Z.det) Z.det.hidden = true; } }
+  function sprache(l){ if(TX[l]) lang = l; alle.forEach(function(Z){ if(Z.o){ texte(Z); neu(Z); zeichneAbl(Z); knoepfe(Z); } }); }
   // Sprachwechsel der Kachel automatisch mitnehmen
   (function haken(){
     var A = window.MS_LANG;
@@ -263,5 +351,5 @@ var MS_ABL = (function(){
     ".msabl-knoepfe button{font:700 14px system-ui,sans-serif;padding:7px 12px;border-radius:10px;border:2px solid #1565c0;background:#ffffff;color:#1565c0;cursor:pointer;margin:0;box-shadow:none}" +
     ".msabl-knoepfe label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#1a2233;font-size:14px}";
   document.head.appendChild(css);
-  return { an: an, aus: aus, sprache: sprache };
+  return { an: an, aus: aus, sprache: sprache, sicht: sicht };
 })();
