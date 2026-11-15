@@ -56,6 +56,7 @@
 <script src="/funktionen/alltag-bilder.js"></script>
 <script src="/funktionen/alltag.js"></script>
 <script src="/funktionen/seite.js"></script>
+<script src="/formel.js"></script>
 <script src="/funktionen/loesweg.js"></script>
 <script src="/symbol-tipp.js"></script>
 <script src="/funktionen/tipps.js"></script>
@@ -201,9 +202,14 @@
     h += FS.karte(t("ySchn"), FS.fleck(C.Y) + f(FK.punkt(t("lblY"), "0", FK.btxt(c))));
     // Diskriminante & abc-Formel
     var D = Bz.sub(Bz.mul(b, b), Bz.mul(B(4), Bz.mul(a, c))), Dv = Bz.num(D);
-    var dh = f("D = b² " + FK.MINUS + " 4ac = " + kB(b) + "² " + FK.MINUS + " 4 · " + kA(a) + " · " + kC(c) + " = " + FK.btxt(D)) + "<br><b>" + t(Dv > 0 ? "d2" : Dv === 0 ? "d1" : "d0") + "</b>";
-    if(Dv >= 0){
-      dh += "<br>" + FB.wort("mitternacht", t("abc")) + ": " + f("x<sub>1,2</sub> = (" + FK.MINUS + "b ± √D) / (2a) = (" + FK.MINUS + kB(b) + " ± √" + klammer(D) + ") / (2 · " + kA(a) + ")");
+    var dh, MF = window.MS_F;
+    if(MF){
+      var LA = FS.ein("a", CA), LB = FS.ein("b", CB), LC = FS.ein("c", CC);
+      dh = MF.zeilen([["D", "=", LB + "² " + FK.MINUS + " 4 · " + LA + " · " + LC], ["", "=", kB(b) + "² " + FK.MINUS + " 4 · " + kA(a) + " · " + kC(c)], ["", "=", FK.btxt(D)]]) + "<b>" + t(Dv > 0 ? "d2" : Dv === 0 ? "d1" : "d0") + "</b>";
+      if(Dv >= 0) dh += "<br>" + FB.wort("mitternacht", t("abc")) + ":" + MF.zeilen([["x<sub>1,2</sub>", "=", MF.bruch(FK.MINUS + LB + " ± " + MF.wurzel("D"), "2 · " + LA)], ["", "=", MF.bruch(FK.MINUS + kB(b) + " ± " + MF.wurzel(klammer(D)), "2 · " + kA(a))]]);
+    } else {
+      dh = f("D = b² " + FK.MINUS + " 4ac = " + kB(b) + "² " + FK.MINUS + " 4 · " + kA(a) + " · " + kC(c) + " = " + FK.btxt(D)) + "<br><b>" + t(Dv > 0 ? "d2" : Dv === 0 ? "d1" : "d0") + "</b>";
+      if(Dv >= 0) dh += "<br>" + FB.wort("mitternacht", t("abc")) + ": " + f("x<sub>1,2</sub> = (" + FK.MINUS + "b ± √D) / (2a) = (" + FK.MINUS + kB(b) + " ± √" + klammer(D) + ") / (2 · " + kA(a) + ")");
     }
     h += FS.karte(t("diskr"), dh);
     h += FS.karte(t("nst"), A.nst.length ? "<ul>" + A.nst.map(function(z, i){

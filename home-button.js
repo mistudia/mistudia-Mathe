@@ -73,3 +73,9 @@
   if(window.MS_VERSCHIEBEN || document.querySelector('script[src="/verschieben.js"]')) return;
   var s = document.createElement("script"); s.src = "/verschieben.js"; document.head.appendChild(s);
 })();
+
+// ---------- Rechenwege Zeile für Zeile, Brüche, Wurzeln (/formel.js) ----------
+(function(){
+  if(window.MS_F || document.querySelector('script[src="/formel.js"]')) return;
+  var s = document.createElement("script"); s.src = "/formel.js"; document.head.appendChild(s);
+})();

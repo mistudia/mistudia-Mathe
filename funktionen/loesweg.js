@@ -57,10 +57,22 @@ var FL = (function(){
         info.irr = true; return [];
       }
       var D = Bz.sub(Bz.mul(Bk, Bk), Bz.mul(B(4), Bz.mul(A, C)));
+      var nenner = Bz.mul(B(2), A);
+      if(window.MS_F){
+        var wd0 = D.n >= 0 ? quadrat(D) : null, mb = Bz.neg(Bk), o = { v: v, a: bt(A), b: bt(Bk), c: bt(C), an: Bz.num(A), bn: Bz.num(Bk), cn: Bz.num(C),
+          mbTxt: bt(mb), nen: kl(nenner), D: bt(D), Dn: Bz.num(D), txt: { keine: tx("dneg") } };
+        if(D.n >= 0){
+          if(wd0){ var e1 = Bz.div(Bz.add(mb, wd0), nenner), e2 = Bz.div(Bz.sub(mb, wd0), nenner); o.wD = bt(wd0); o.wExakt = true; o.x1 = bt(e1); o.x2 = bt(e2); o.x1Exakt = o.x2Exakt = true; }
+          else { var sw = Math.sqrt(Bz.num(D)), mn = Bz.num(mb), nn = Bz.num(nenner); o.wD = FK.zahl(sw, 4); o.wExakt = false; o.x1 = FK.zahl((mn + sw) / nn); o.x2 = FK.zahl((mn - sw) / nn); }
+        }
+        Z.push({ h: tx("mnf"), mnf: o });
+        if(D.n < 0) return [];
+        if(wd0) return uniq([Bz.div(Bz.add(mb, wd0), nenner), Bz.div(Bz.sub(mb, wd0), nenner)]);
+        info.irr = true; return [];
+      }
       Z.push({ h: tx("mnf"), f: "a = " + bt(A) + ",  b = " + bt(Bk) + ",  c = " + bt(C) });
       Z.push({ h: "", f: "D = b² − 4ac = " + kl(Bk) + "² − 4 · " + kl(A) + " · " + kl(C) + " = " + bt(D) });
       if(D.n < 0){ Z.push({ h: "", f: tx("dneg") }); return []; }
-      var nenner = Bz.mul(B(2), A);
       if(D.n === 0){ var x0 = Bz.div(Bz.neg(Bk), nenner); Z.push({ h: tx("d0"), f: v + " = −b : (2a) = " + bt(Bz.neg(Bk)) + " : " + kl(nenner) + " = " + bt(x0) }); return [x0]; }
       var wd = quadrat(D);
       var kopf = v + "₁,₂ = (−b ± √D) : (2a) = (" + bt(Bz.neg(Bk)) + " ± √" + bt(D) + ") : " + kl(nenner);
@@ -117,7 +129,10 @@ var FL = (function(){
   }
   function html(p, links){
     var f = window.FS ? FS.f : function(s){ return '<span class="f" dir="ltr">' + s + "</span>"; };
-    return weg(p, links).map(function(z){ return (z.h ? '<div class="lw-h">' + z.h + "</div>" : "") + '<div class="lw-f">' + f(z.f) + "</div>"; }).join("");
+    return weg(p, links).map(function(z){
+      var inhalt = z.mnf ? MS_F.mnf(z.mnf) : window.MS_F ? MS_F.kette(z.f) : f(z.f);
+      return (z.h ? '<div class="lw-h">' + z.h + "</div>" : "") + '<div class="lw-f">' + inhalt + "</div>";
+    }).join("");
   }
   var css = document.createElement("style");
   css.textContent = ".lw-h{font-size:14px;color:#4f5b6e;margin-top:6px}.lw-f{margin:2px 0}";

@@ -6,23 +6,23 @@
   "use strict";
   var QF = {
   de: { titel: "Flugbahnen vergleichen", intro: "Drei Golfschläge. x ist die waagerechte Entfernung vom Abschlag in m, y die Höhe des Balls in m. Berechne für jeden Schlag die Flugweite und die größte Höhe (auf eine Stelle gerundet).", weite: "Flugweite", hoehe: "größte Höhe", amWeitesten: "Welcher Schlag fliegt am weitesten?", amHoechsten: "Welcher Schlag fliegt am höchsten?", neu: "Neue Schläge", pruefen: "Prüfen", richtig: "Richtig!", falsch: "Noch nicht.", weg: "Lösungsweg", schlag: "Schlag", tipp: "Tipp: Die Flugweite ist die positive Nullstelle (y = 0), die größte Höhe ist der y-Wert des Scheitelpunkts.", ax: "Weite in m", ay: "Höhe in m", huegel: "Abschlag {c} m über dem Boden",
-    L: { scheitel: "Scheitelpunkt: x = −b : (2a)", hoehe: "Höhe am Scheitelpunkt:", null: "Landepunkt: y = 0", aus: "x ausklammern:", abc: "Mitternachtsformel:" } },
+    L: { scheitel: "Scheitelpunkt: x-Wert mit der Formel", hoehe: "Höhe am Scheitelpunkt: x einsetzen", null: "Landepunkt: Der Ball ist wieder am Boden, also y = 0", aus: "x ausklammern", produkt: "Ein Produkt ist 0, wenn ein Faktor 0 ist", allg: "Mitternachtsformel (allgemein)", einsetzen: "Werte einsetzen und ausrechnen", loes: "Die beiden Lösungen", positiv: "Die Flugweite ist die positive Lösung:" }, nochmal: "Noch nicht – vergleiche die Werte und versuch es noch einmal.", richtigIst: "Richtig ist {x}.", vergleich: "Vergleich:" },
   en: { titel: "Comparing flight paths", intro: "Three golf shots. x is the horizontal distance from the tee in m, y the height of the ball in m. Work out the distance and the greatest height of each shot (rounded to one decimal).", weite: "distance", hoehe: "greatest height", amWeitesten: "Which shot goes the farthest?", amHoechsten: "Which shot goes the highest?", neu: "New shots", pruefen: "Check", richtig: "Correct!", falsch: "Not yet.", weg: "Solution steps", schlag: "Shot", tipp: "Hint: the distance is the positive zero (y = 0); the greatest height is the y-value of the vertex.", ax: "distance in m", ay: "height in m", huegel: "tee {c} m above the ground",
-    L: { scheitel: "Vertex: x = −b : (2a)", hoehe: "Height at the vertex:", null: "Landing point: y = 0", aus: "Factor out x:", abc: "Quadratic formula:" } },
+    L: { scheitel: "Vertex: x-value with the formula", hoehe: "Height at the vertex: substitute x", null: "Landing point: the ball is back on the ground, so y = 0", aus: "Factor out x", produkt: "A product is 0 if one factor is 0", allg: "Quadratic formula (general form)", einsetzen: "Substitute the values and work it out", loes: "The two solutions", positiv: "The distance is the positive solution:" }, nochmal: "Not yet – compare the values and try again.", richtigIst: "The right answer is {x}.", vergleich: "Comparison:" },
   es: { titel: "Comparar trayectorias", intro: "Tres golpes de golf. x es la distancia horizontal desde el punto de salida en m, y la altura de la pelota en m. Calcula el alcance y la altura máxima de cada golpe (redondeado a un decimal).", weite: "alcance", hoehe: "altura máxima", amWeitesten: "¿Qué golpe llega más lejos?", amHoechsten: "¿Qué golpe sube más alto?", neu: "Nuevos golpes", pruefen: "Comprobar", richtig: "¡Correcto!", falsch: "Todavía no.", weg: "Solución paso a paso", schlag: "Golpe", tipp: "Pista: el alcance es el cero positivo (y = 0); la altura máxima es la coordenada y del vértice.", ax: "distancia en m", ay: "altura en m", huegel: "salida a {c} m sobre el suelo",
-    L: { scheitel: "Vértice: x = −b : (2a)", hoehe: "Altura en el vértice:", null: "Punto de caída: y = 0", aus: "Sacar x factor común:", abc: "Fórmula general:" } },
+    L: { scheitel: "Vértice: valor de x con la fórmula", hoehe: "Altura en el vértice: sustituir x", null: "Punto de caída: la pelota vuelve al suelo, o sea y = 0", aus: "Sacar x factor común", produkt: "Un producto es 0 si un factor es 0", allg: "Fórmula general", einsetzen: "Sustituir los valores y calcular", loes: "Las dos soluciones", positiv: "El alcance es la solución positiva:" }, nochmal: "Todavía no: compara los valores e inténtalo otra vez.", richtigIst: "La respuesta correcta es {x}.", vergleich: "Comparación:" },
   zh: { titel: "比较飞行轨迹", intro: "三次高尔夫击球。x 是离发球点的水平距离（m），y 是球的高度（m）。求每次击球的飞行距离和最大高度（保留一位小数）。", weite: "飞行距离", hoehe: "最大高度", amWeitesten: "哪一球飞得最远？", amHoechsten: "哪一球飞得最高？", neu: "换一组击球", pruefen: "检查", richtig: "正确！", falsch: "还不对。", weg: "解题步骤", schlag: "击球", tipp: "提示：飞行距离是正的零点（y = 0），最大高度是顶点的 y 值。", ax: "距离 m", ay: "高度 m", huegel: "发球点离地 {c} m",
-    L: { scheitel: "顶点：x = −b : (2a)", hoehe: "顶点处的高度：", null: "落点：y = 0", aus: "提取 x：", abc: "求根公式：" } },
+    L: { scheitel: "顶点：用公式求 x", hoehe: "顶点处的高度：代入 x", null: "落点：球回到地面，即 y = 0", aus: "提取 x", produkt: "乘积为 0，则至少一个因式为 0", allg: "求根公式（一般形式）", einsetzen: "代入数值并计算", loes: "两个解", positiv: "飞行距离是正的解：" }, nochmal: "还不对——比较一下数值，再试一次。", richtigIst: "正确答案是 {x}。", vergleich: "比较：" },
   fr: { titel: "Comparer des trajectoires", intro: "Trois coups de golf. x est la distance horizontale depuis le départ en m, y la hauteur de la balle en m. Calcule la portée et la hauteur maximale de chaque coup (arrondies au dixième).", weite: "portée", hoehe: "hauteur maximale", amWeitesten: "Quel coup va le plus loin ?", amHoechsten: "Quel coup monte le plus haut ?", neu: "Nouveaux coups", pruefen: "Vérifier", richtig: "Juste !", falsch: "Pas encore.", weg: "Solution détaillée", schlag: "Coup", tipp: "Indice : la portée est la racine positive (y = 0) ; la hauteur maximale est l’ordonnée du sommet.", ax: "distance en m", ay: "hauteur en m", huegel: "départ à {c} m au-dessus du sol",
-    L: { scheitel: "Sommet : x = −b : (2a)", hoehe: "Hauteur au sommet :", null: "Point d’arrivée : y = 0", aus: "Factoriser par x :", abc: "Formule du discriminant :" } },
+    L: { scheitel: "Sommet : abscisse avec la formule", hoehe: "Hauteur au sommet : remplacer x", null: "Point d’arrivée : la balle retouche le sol, donc y = 0", aus: "Mettre x en facteur", produkt: "Un produit est nul si un facteur est nul", allg: "Formule du discriminant (forme générale)", einsetzen: "Remplacer par les valeurs et calculer", loes: "Les deux solutions", positiv: "La portée est la solution positive :" }, nochmal: "Pas encore – compare les valeurs et réessaie.", richtigIst: "La bonne réponse est {x}.", vergleich: "Comparaison :" },
   ru: { titel: "Сравнение траекторий", intro: "Три удара в гольфе. x — расстояние по горизонтали от точки удара в м, y — высота мяча в м. Найди дальность и наибольшую высоту каждого удара (с точностью до десятых).", weite: "дальность", hoehe: "наибольшая высота", amWeitesten: "Какой удар летит дальше всех?", amHoechsten: "Какой удар летит выше всех?", neu: "Новые удары", pruefen: "Проверить", richtig: "Верно!", falsch: "Пока нет.", weg: "Решение по шагам", schlag: "Удар", tipp: "Подсказка: дальность — положительный нуль (y = 0), наибольшая высота — y вершины.", ax: "расстояние, м", ay: "высота, м", huegel: "удар с высоты {c} м",
-    L: { scheitel: "Вершина: x = −b : (2a)", hoehe: "Высота в вершине:", null: "Точка падения: y = 0", aus: "Вынести x за скобки:", abc: "Формула корней:" } },
+    L: { scheitel: "Вершина: x по формуле", hoehe: "Высота в вершине: подставить x", null: "Точка падения: мяч снова на земле, значит y = 0", aus: "Вынести x за скобки", produkt: "Произведение равно 0, если один из множителей равен 0", allg: "Формула корней (общий вид)", einsetzen: "Подставить значения и вычислить", loes: "Два решения", positiv: "Дальность — положительное решение:" }, nochmal: "Пока нет – сравни значения и попробуй ещё раз.", richtigIst: "Правильный ответ: {x}.", vergleich: "Сравнение:" },
   ar: { titel: "مقارنة مسارات الطيران", intro: "ثلاث ضربات غولف. x المسافة الأفقية من نقطة الضرب بالمتر، وy ارتفاع الكرة بالمتر. احسب مدى كل ضربة وأقصى ارتفاع لها (مقرّبًا لمنزلة عشرية واحدة).", weite: "المدى", hoehe: "أقصى ارتفاع", amWeitesten: "أي ضربة تطير أبعد؟", amHoechsten: "أي ضربة تطير أعلى؟", neu: "ضربات جديدة", pruefen: "تحقّق", richtig: "صحيح!", falsch: "ليس بعد.", weg: "خطوات الحل", schlag: "الضربة", tipp: "تلميح: المدى هو الصفر الموجب (y = 0)، وأقصى ارتفاع هو قيمة y لرأس القطع.", ax: "المسافة بالمتر", ay: "الارتفاع بالمتر", huegel: "نقطة الضرب على ارتفاع {c} م",
-    L: { scheitel: "الرأس: x = −b : (2a)", hoehe: "الارتفاع عند الرأس:", null: "نقطة السقوط: y = 0", aus: "إخراج x عاملًا مشتركًا:", abc: "القانون العام:" } },
+    L: { scheitel: "الرأس: قيمة x بالقانون", hoehe: "الارتفاع عند الرأس: نعوّض x", null: "نقطة السقوط: الكرة على الأرض من جديد، أي y = 0", aus: "إخراج x عاملًا مشتركًا", produkt: "حاصل الضرب يساوي 0 إذا كان أحد العوامل 0", allg: "القانون العام (الصيغة العامة)", einsetzen: "نعوّض القيم ونحسب", loes: "الحلان", positiv: "المدى هو الحل الموجب:" }, nochmal: "ليس بعد – قارن القيم وحاول مرة أخرى.", richtigIst: "الإجابة الصحيحة {x}.", vergleich: "مقارنة:" },
   ja: { titel: "飛ぶ道すじを比べる", intro: "ゴルフの3つのショット。x はティーからの水平距離（m）、y はボールの高さ（m）です。それぞれの飛距離と最高の高さを求めよう（小数第1位まで）。", weite: "飛距離", hoehe: "最高の高さ", amWeitesten: "いちばん遠くまで飛ぶのはどれ？", amHoechsten: "いちばん高く上がるのはどれ？", neu: "新しいショット", pruefen: "確かめる", richtig: "正解！", falsch: "まだです。", weg: "解き方", schlag: "ショット", tipp: "ヒント：飛距離は正の解（y = 0）、最高の高さは頂点の y 座標。", ax: "距離 m", ay: "高さ m", huegel: "ティーは地面から {c} m",
-    L: { scheitel: "頂点：x = −b ÷ (2a)", hoehe: "頂点の高さ：", null: "落ちる点：y = 0", aus: "x でくくる：", abc: "解の公式：" } },
+    L: { scheitel: "頂点：公式で x を求める", hoehe: "頂点の高さ：x を代入", null: "落ちる点：ボールが地面にもどるので y = 0", aus: "x でくくる", produkt: "かけ算が 0 なら、どれかの因数が 0", allg: "解の公式（一般の形）", einsetzen: "値を代入して計算", loes: "2つの解", positiv: "飛距離は正の解：" }, nochmal: "まだです。値を比べて、もう一度。", richtigIst: "正解は {x} です。", vergleich: "比べると：" },
   pt: { titel: "Comparar trajetórias", intro: "Três tacadas de golfe. x é a distância horizontal desde o tee em m, y a altura da bola em m. Calcule o alcance e a altura máxima de cada tacada (arredondados a uma casa).", weite: "alcance", hoehe: "altura máxima", amWeitesten: "Qual tacada vai mais longe?", amHoechsten: "Qual tacada sobe mais alto?", neu: "Novas tacadas", pruefen: "Verificar", richtig: "Certo!", falsch: "Ainda não.", weg: "Solução passo a passo", schlag: "Tacada", tipp: "Dica: o alcance é a raiz positiva (y = 0); a altura máxima é o y do vértice.", ax: "distância em m", ay: "altura em m", huegel: "tee a {c} m do chão",
-    L: { scheitel: "Vértice: x = −b : (2a)", hoehe: "Altura no vértice:", null: "Ponto de queda: y = 0", aus: "Colocar x em evidência:", abc: "Fórmula de Bhaskara:" } }
+    L: { scheitel: "Vértice: valor de x pela fórmula", hoehe: "Altura no vértice: substituir x", null: "Ponto de queda: a bola volta ao chão, então y = 0", aus: "Colocar x em evidência", produkt: "Um produto é 0 se um fator for 0", allg: "Fórmula de Bhaskara (forma geral)", einsetzen: "Substituir os valores e calcular", loes: "As duas soluções", positiv: "O alcance é a solução positiva:" }, nochmal: "Ainda não – compare os valores e tente de novo.", richtigIst: "A resposta certa é {x}.", vergleich: "Comparação:" }
   };
   var lang = "de"; try { lang = localStorage.getItem("msMathLang") || "de"; } catch(e){}
   if(!QF[lang]) lang = "de";
@@ -52,14 +52,43 @@
     } while(tries < 50 && (Math.abs(L[0].W - L[1].W) < 8 || Math.abs(L[1].W - L[2].W) < 8 || Math.abs(L[0].W - L[2].W) < 8 || Math.abs(L[0].H - L[1].H) < 4 || Math.abs(L[1].H - L[2].H) < 4 || Math.abs(L[0].H - L[2].H) < 4));
     schlaege = L; zust = {};
   }
-  function formel(s){ return "y = " + zk(s.a).replace("−", "−") + "x² + " + zk(s.b) + "x" + (s.c ? " + " + zk(s.c) : ""); }
-  function wegWeite(s){
-    var w = [];
-    if(!s.c) w.push([S().L.null, "0 = " + zk(s.a) + "x² + " + zk(s.b) + "x"], [S().L.aus, "0 = x · (" + zk(s.a) + "x + " + zk(s.b) + ")  →  x = 0 " + "∨ x = −" + zk(s.b) + " : (" + zk(s.a) + ") = " + z(s.W) + " m"]);
-    else { var D = s.b * s.b - 4 * s.a * s.c; w.push([S().L.null, "0 = " + zk(s.a) + "x² + " + zk(s.b) + "x + " + zk(s.c)], [S().L.abc, "x = (−" + zk(s.b) + " ± √(" + zk(s.b) + "² − 4 · (" + zk(s.a) + ") · " + zk(s.c) + ")) : (2 · (" + zk(s.a) + "))"], ["", "√" + z(D, 4) + " ≈ " + z(Math.sqrt(D), 4) + "  →  x ≈ " + z(s.W) + " m"]); }
-    return w;
+  function formel(s, farbig){
+    var C = window.MS_F && farbig ? MS_F.c : function(k, h){ return h; };
+    return "y = " + C("a", zk(s.a)) + "x² + " + C("b", zk(s.b)) + "x" + (s.c ? " + " + C("c", zk(s.c)) : "");
   }
-  function wegHoehe(s){ return [[S().L.scheitel, "x = −" + zk(s.b) + " : (2 · (" + zk(s.a) + ")) = " + z(s.xs) + " m"], [S().L.hoehe, "y = " + zk(s.a) + " · " + z(s.xs) + "² + " + zk(s.b) + " · " + z(s.xs) + (s.c ? " + " + zk(s.c) : "") + " ≈ " + z(s.H) + " m"]]; }
+  function H(t){ return ['<span class="msf-h">' + esc(t) + "</span>"]; }
+  function kl(v){ return v < 0 ? "(" + zk(v) + ")" : zk(v); }
+  function wegWeite(s){
+    var F = MS_F, Ls = S().L, R = [];
+    R.push(H(Ls.null)); R.push(["0", "=", formel(s, true).slice(4)]);
+    if(!s.c){
+      R.push(H(Ls.aus)); R.push(["0", "=", "x · (" + F.c("a", zk(s.a)) + "x + " + F.c("b", zk(s.b)) + ")"]);
+      R.push(H(Ls.produkt)); R.push(["x<sub>1</sub>", "=", "0"]);
+      R.push([F.c("a", zk(s.a)) + "x + " + F.c("b", zk(s.b)), "=", "0"]);
+      R.push([F.c("a", zk(s.a)) + "x", "=", "−" + F.c("b", zk(s.b))]);
+      R.push(["x<sub>2</sub>", "=", F.bruch("−" + F.c("b", zk(s.b)), F.c("a", kl(s.a)))]);
+      R.push(["", "=", z(s.W) + " m"]);
+      return F.zeilen(R);
+    }
+    var D = s.b * s.b - 4 * s.a * s.c, w = Math.sqrt(D), x1 = (-s.b + w) / (2 * s.a), x2 = (-s.b - w) / (2 * s.a);
+    var blk = F.zeilen(R) + F.mnf({ v: "x", a: zk(s.a), b: zk(s.b), c: zk(s.c), an: s.a, bn: s.b, cn: s.c,
+      mbTxt: "−" + zk(s.b), nen: kl(2 * s.a), D: z(D, 4), Dn: D, wD: z(w, 4), wExakt: false, x1: z(x1) , x2: z(x2),
+      txt: { allg: esc(Ls.allg), einsetzen: esc(Ls.einsetzen), loes: esc(Ls.loes) } });
+    return blk + F.zeilen([H(Ls.positiv), ["x", "≈", z(s.W) + " m"]]);
+  }
+  function wegHoehe(s){
+    var F = MS_F, Ls = S().L, R = [];
+    R.push(H(Ls.scheitel));
+    R.push(["x<sub>S</sub>", "=", F.bruch("−" + F.c("b", "b"), "2 · " + F.c("a", "a"))]);
+    R.push(["", "=", F.bruch("−" + F.c("b", zk(s.b)), "2 · " + F.c("a", kl(s.a)))]);
+    R.push(["", "=", F.bruch("−" + zk(s.b), kl(2 * s.a))]);
+    R.push(["", "=", z(s.xs, 2) + " m"]);
+    R.push(H(Ls.hoehe));
+    R.push(["y<sub>S</sub>", "=", F.c("a", zk(s.a)) + " · " + z(s.xs, 2) + "² + " + F.c("b", zk(s.b)) + " · " + z(s.xs, 2) + (s.c ? " + " + F.c("c", zk(s.c)) : "")]);
+    R.push(["", "=", z(s.a * s.xs * s.xs, 2) + " + " + z(s.b * s.xs, 2) + (s.c ? " + " + zk(s.c) : "")]);
+    R.push(["", "≈", z(s.H) + " m"]);
+    return F.zeilen(R);
+  }
   function lies(s){ s = String(s).trim().replace(/[\sm]/g, "").replace(",", "."); return /^\d*\.?\d+$/.test(s) ? +s : NaN; }
   function stimmt(e, w){ return isFinite(e) && Math.abs(e - w) <= 0.51; }
 
@@ -93,21 +122,27 @@
     if(!schlaege.length) neu();
     var s = S(), h = "<h2>" + esc(s.titel) + '</h2><p class="zeile qf-intro">' + esc(s.intro) + "</p>" + svg() + '<div class="qf-grid">';
     schlaege.forEach(function(sl, i){
-      h += '<div class="qf-schlag" style="border-color:' + FARBE[i] + '"><h3 style="color:' + FARBE[i] + '">' + esc(s.schlag) + " " + NAME[i] + ')</h3><p class="qf-f"><bdi dir="ltr">' + esc(formel(sl)) + "</bdi></p>" + (sl.c ? '<p class="qf-klein">' + esc(s.huegel.replace("{c}", sl.c)) + "</p>" : "");
+      h += '<div class="qf-schlag" style="border-color:' + FARBE[i] + '"><h3 style="color:' + FARBE[i] + '">' + esc(s.schlag) + " " + NAME[i] + ')</h3><p class="qf-f"><bdi dir="ltr">' + formel(sl, true) + "</bdi></p>" + (sl.c ? '<p class="qf-klein">' + esc(s.huegel.replace("{c}", sl.c)) + "</p>" : "");
       [["w", s.weite, sl.W, wegWeite(sl)], ["h", s.hoehe, sl.H, wegHoehe(sl)]].forEach(function(q){
         var id = q[0] + i, zz = zust[id] || {};
         h += '<div class="qf-ein"><label>' + esc(q[1]) + ' =</label> <input class="qf-inp" data-id="' + id + '" inputmode="decimal" autocomplete="off" value="' + esc(zz.e || "") + '"> m <button type="button" class="qf-pr" data-id="' + id + '">' + esc(s.pruefen) + "</button>" +
           ' <span class="qf-m ' + (zz.ok === true ? "gut" : zz.ok === false ? "schlecht" : "") + '">' + (zz.ok === true ? "✓" : zz.ok === false ? "✗" : "") + "</span></div>" +
-          (zz.ok != null ? '<details class="qf-weg"' + (zz.ok === false ? " open" : "") + "><summary>" + esc(s.weg) + '</summary><ol class="qf-lauf">' + q[3].map(function(w){ return "<li>" + (w[0] ? '<span class="qf-l">' + esc(w[0]) + "</span><br>" : "") + '<bdi dir="ltr">' + esc(w[1]) + "</bdi></li>"; }).join("") + "</ol></details>" : "");
+          (zz.ok != null ? '<details class="qf-weg"' + (zz.ok === false ? " open" : "") + "><summary>" + esc(s.weg) + '</summary><div class="qf-lw">' + q[3] + "</div></details>" : "");
       });
       h += "</div>";
     });
     h += "</div>";
     [["weit", s.amWeitesten, "W"], ["hoch", s.amHoechsten, "H"]].forEach(function(q){
       var beste = 0; schlaege.forEach(function(sl, i){ if(sl[q[2]] > schlaege[beste][q[2]]) beste = i; });
-      var gew = zust[q[0]];
-      h += '<div class="qf-frage"><b>' + esc(q[1]) + '</b> <span class="qf-knoepfe">' + NAME.map(function(n, i){ var cls = gew != null ? (i === beste ? "richtig" : i === gew ? "falsch" : "") : ""; return '<button type="button" data-q="' + q[0] + '" data-i="' + i + '" class="' + cls + '" style="--f:' + FARBE[i] + '">' + n + ")</button>"; }).join("") + "</span>" +
-        (gew != null ? ' <span class="qf-m ' + (gew === beste ? "gut" : "schlecht") + '">' + esc(gew === beste ? s.richtig : s.falsch) + "</span>" : "") + "</div>";
+      var Z = zust[q[0]] || { falsch: [], ok: false }, zeig = Z.ok || Z.falsch.length >= 2;
+      h += '<div class="qf-frage"><b>' + esc(q[1]) + '</b> <span class="qf-knoepfe">' + NAME.map(function(n, i){
+        var cls = (zeig && i === beste) ? "richtig" : Z.falsch.indexOf(i) >= 0 ? "falsch" : "";
+        return '<button type="button" data-q="' + q[0] + '" data-i="' + i + '" class="' + cls + '" style="--f:' + FARBE[i] + '"' + (zeig ? " disabled" : "") + ">" + n + ")" + (zeig && i === beste ? " ✓" : "") + "</button>"; }).join("") + "</span>";
+      if(Z.ok) h += ' <span class="qf-m gut">' + esc(s.richtig) + "</span>";
+      else if(Z.falsch.length === 1) h += ' <span class="qf-m schlecht">' + esc(s.nochmal) + "</span>";
+      else if(zeig) h += ' <span class="qf-m schlecht">' + esc(s.richtigIst.replace("{x}", NAME[beste] + ")")) + "</span>";
+      if(zeig) h += '<div class="qf-vgl">' + esc(s.vergleich) + " " + schlaege.map(function(sl, i){ return '<b style="color:' + FARBE[i] + '">' + NAME[i] + ")</b> " + z(sl[q[2]]) + " m"; }).join(" · ") + "</div>";
+      h += "</div>";
     });
     h += '<p class="qf-tipp">' + esc(s.tipp) + '</p><p><button type="button" class="knopf hell" id="qfNeu">↻ ' + esc(s.neu) + "</button></p>";
     box.innerHTML = h;
@@ -123,7 +158,10 @@
       inp.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); pruefe(inp.dataset.id); } });
       inp.addEventListener("input", function(){ zust[inp.dataset.id] = { e: inp.value }; });
     });
-    box.querySelectorAll(".qf-knoepfe button").forEach(function(b){ b.addEventListener("click", function(){ if(zust[b.dataset.q] != null) return; zust[b.dataset.q] = +b.dataset.i; zeigen(); }); });
+    box.querySelectorAll(".qf-knoepfe button").forEach(function(b){ b.addEventListener("click", function(){
+      var q = b.dataset.q, i = +b.dataset.i, Z = zust[q] || (zust[q] = { falsch: [], ok: false }); if(Z.ok || Z.falsch.length >= 2) return;
+      var beste = 0, k = q === "weit" ? "W" : "H"; schlaege.forEach(function(sl, j){ if(sl[k] > schlaege[beste][k]) beste = j; });
+      if(i === beste) Z.ok = true; else if(Z.falsch.indexOf(i) < 0) Z.falsch.push(i); zeigen(); }); });
   }
   var css = document.createElement("style");
   css.textContent =
@@ -138,9 +176,10 @@
     ".qf-inp{width:84px;font:18px system-ui,sans-serif;padding:4px 6px;border:2px solid #b0b0b8;border-radius:8px;text-align:center;color:#1a2233;background:#ffffff}" +
     ".qf-pr{font:700 14px system-ui,sans-serif;padding:6px 10px;border-radius:9px;border:0;background:#1565c0;color:#ffffff;cursor:pointer}" +
     ".qf-m{font-weight:800;font-size:16px}.qf-m.gut{color:#15803d}.qf-m.schlecht{color:#b91c1c}" +
+    ".qf-lw{margin:6px 0;font-size:15px}.qf-vgl{flex-basis:100%;font-size:14.5px;color:#1a2233}.qf-knoepfe button[disabled]{cursor:default}" +
     ".qf-weg summary{cursor:pointer;font-weight:700;color:#1565c0;font-size:14px}.qf-lauf{font-size:15px;line-height:1.5;padding-inline-start:20px;margin:4px 0}.qf-l{color:#4f5b6e;font-size:13px}" +
     ".qf-frage{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0;font-size:16px}" +
-    ".qf-knoepfe button{font:800 16px system-ui,sans-serif;width:48px;height:38px;border-radius:10px;border:2px solid var(--f);background:#ffffff;color:var(--f);cursor:pointer;margin:0 3px}" +
+    ".qf-knoepfe button{font:800 16px system-ui,sans-serif;min-width:48px;padding:0 10px;white-space:nowrap;height:38px;border-radius:10px;border:2px solid var(--f);background:#ffffff;color:var(--f);cursor:pointer;margin:0 3px}" +
     ".qf-knoepfe button.richtig{background:#dcfce7;border-color:#15803d;color:#15803d}.qf-knoepfe button.falsch{background:#fee2e2;border-color:#b91c1c;color:#b91c1c}" +
     ".qf-tipp{font-size:14.5px;color:#4f5b6e;background:#fff8e1;border-inline-start:4px solid #f59e0b;padding:6px 10px;border-radius:8px}";
   document.head.appendChild(css);

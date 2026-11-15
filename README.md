@@ -52,3 +52,5 @@ Erklär-Blasen: `/symbol-tipp.js` (gemeinsam, MS_TIPP.s/hinweis) – benutzt von
 Rechenwege: `funktionen/loesweg.js` (FL.weg/FL.html) zeigt, wie man Polynom = 0 löst (umstellen, x ausklammern, Wurzel ziehen, Mitternachtsformel, Substitution z = x², Lösung raten + Polynomdivision, sonst Näherung) – in den Rechenwegen von polynom/rational und in allen Übungen (funktionen/ueben.js: jeder Schritt hat nach dem Lösen einen Rechenweg).
 
 Zeichnungen zu den Alltagsbeispielen der Funktions-Kacheln: `funktionen/alltag-bilder.js` (FA_BILD[app][i], SVG ohne Sprachtexte; bei Achterbahn, Wurf, Brücke usw. ist die echte Funktion Teil des Bildes) – eingebunden in linear, quadratisch, polynom, rational, sinus, waage.
+
+Rechenwege: `/formel.js` (gemeinsam, MS_F, über home-button.js überall geladen) – Brüche mit Bruchstrich, lange Wurzeln, Farben für a/b/c, `MS_F.zeilen` (Gleichungen Zeile für Zeile am = ausgerichtet), `MS_F.mnf` (Mitternachtsformel allgemein → eingesetzt → x₁, x₂). Zusätzlich setzt es Rechenweg-Zeilen (ol.lauf/weg/schritte, .rechnung, .loesung, .lw-f …) mit mehreren =, ≈, → automatisch untereinander.
