@@ -11,11 +11,11 @@
 // ============================================================
 var MS_F = (function(){
   "use strict";
-  var FARBE = { a: "#2563eb", b: "#c2410c", c: "#0f766e", d: "#7c3aed" };
+  var FARBE = { a: "#1e88e5", b: "#ff7a00", c: "#00b84a", d: "#b14cf0" };
   function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function bruch(z, n){ return '<span class="msf-br"><span>' + z + "</span><span>" + n + "</span></span>"; }
   function wurzel(x){ return '<span class="msf-w"><span class="msf-wz">√</span><span class="msf-wi">' + x + "</span></span>"; }
-  function c(k, h){ return '<span class="msf-' + k + '" style="color:' + (FARBE[k] || "inherit") + '">' + h + "</span>"; }
+  function c(k, h){ return '<span class="msf-f msf-' + k + '" style="color:' + (FARBE[k] || "inherit") + '">' + h + "</span>"; }
   function zeilen(rows){
     var h = '<div class="msf-blk" dir="ltr">';
     rows.forEach(function(r){
@@ -179,8 +179,9 @@ var MS_F = (function(){
       "font-family:'Cambria Math',Cambria,'Times New Roman',serif;font-size:1.08em;line-height:1.35;margin:.2em 0;overflow-x:auto;max-width:100%;font-variant-numeric:tabular-nums}" +
     ".msf-l{grid-column:1;text-align:right;white-space:nowrap}.msf-r{grid-column:2;text-align:center;white-space:nowrap}.msf-rr{grid-column:3;white-space:nowrap}" +
     ".msf-voll{grid-column:1 / -1;white-space:normal;text-align:start}.msf-h{font-family:system-ui,sans-serif;font-size:.82em;color:#4f5b6e}" +
-    ".msf-br{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .15em;line-height:1.3}" +
-    ".msf-br>span{padding:0 .25em;white-space:nowrap}.msf-br>span+span{border-top:1.6px solid currentColor}" +
+    ".msf-br{display:inline-flex;flex-direction:column;align-items:stretch;vertical-align:middle;margin:0 .15em;line-height:1.3}" +
+    ".msf-br>span{padding:0 .3em;white-space:nowrap;text-align:center}.msf-br>span+span{border-top:1.8px solid #1a2233}" +
+    ".msf-f{font-weight:700}" +
     ".msf-w{display:inline-flex;align-items:stretch;white-space:nowrap;vertical-align:middle}.msf-wz{font-size:1.2em;line-height:1;margin-right:-.06em;align-self:center}" +
     ".msf-wi{border-top:1.6px solid currentColor;padding:2px .15em 0;margin-top:.12em;line-height:1.25}";
   document.head.appendChild(css);
