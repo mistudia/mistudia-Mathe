@@ -725,12 +725,24 @@
       if (erste) erste.focus();
     });
     ['eigenA', 'eigenB'].forEach(id => document.getElementById(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('eigenOk').click(); }));
+    // Alltagsbeispiel als eigene Aufgabe laden (aus alltag-daten.js): {art, a, b}
+    window.MS_SCHRIFT = { laden: function(w) {
+      art = w.art; stufe = 'eigene';
+      document.querySelectorAll('.art').forEach(b => b.classList.toggle('aktiv', b.dataset.art === art));
+      document.querySelectorAll('.stufe').forEach(b => b.classList.toggle('aktiv', b.dataset.stufe === 'eigene'));
+      document.getElementById('eigenA').value = String(w.a); document.getElementById('eigenB').value = String(w.b);
+      eigeneZahlen = { a: String(w.a), b: String(w.b) };
+      neueAufgaben();
+      document.getElementById('eigenBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } };
     aufgabeLoeschen();
     pinyinVerhalten();
     punkteVerhalten();
     neueAufgaben();
   </script>
 <script src="msm-i18n.js"></script>
+<script src="/alltag.js"></script>
+<script src="alltag-daten.js"></script>
 <script src="/home-button.js"></script>
 </body>
 </html>
