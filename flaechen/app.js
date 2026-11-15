@@ -305,6 +305,7 @@
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
     TABS.forEach(function(x){ sicht($("s_" + x), x === k); });
     if(k === "ueben" && !auf) neueAufgabe();
+    if(k === "zus" && window.MS_FL_ZUS2) MS_FL_ZUS2.zeigen();
     alles(true);
   }
   document.querySelectorAll(".tabs button").forEach(function(b){ b.addEventListener("click", function(){ zeigeTab(b.dataset.tab); }); });
@@ -329,6 +330,6 @@
     paramsBauen(); zeigeTab("figur");
     $("figur").scrollIntoView({ behavior: "smooth", block: "start" });
   } };
-  window.MS_LANG = { apply: function(l){ if(FL[l]){ lang = l; alles(); } } };
+  window.MS_LANG = { apply: function(l){ if(FL[l]){ lang = l; alles(); if(window.MS_FL_ZUS2) MS_FL_ZUS2.sprache(l); } } };
   alles();
 })();
