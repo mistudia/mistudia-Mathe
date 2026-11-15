@@ -380,6 +380,10 @@
   }
   window.MS_LANG = { apply: function(l){ if(TT[l]){ lang = l; alles(); } } };
   // Testzugang für automatische Prüfungen
+  window.MS_TERM_LADEN = function(w){ // Alltagsbeispiel (alltag-daten.js): {tab, term}
+    var id = { einfach: "term", mult: "term2", klammer: "term3" }[w.tab];
+    $(id).value = w.term; zeigeTab(w.tab); $(id).scrollIntoView({ behavior: "smooth", block: "center" });
+  };
   window.MS_TERM = { parse: parse, expand: expand, ptxt: ptxt, vereinfacht: vereinfacht, ausklammern: ausklammern, faktorTxt: faktorTxt };
   alles();
 })();
