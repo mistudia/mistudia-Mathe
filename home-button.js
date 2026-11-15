@@ -38,26 +38,23 @@
 })();
 
 // ---------- Stufen auf Schiebereglern markieren (alle Unter-Apps) ----------
-// Jeder Regler mit festen Stufen bekommt eine <datalist> mit seinen Stufen – der Browser
-// zeichnet daraus die Striche unter der Spur. Bei sehr vielen Stufen wird nur jede k-te
-// markiert (höchstens etwa 25 Striche); step="any" bleibt stufenlos.
+// Regler mit wenigen festen Stufen (höchstens 25) bekommen eine <datalist> mit allen Stufen –
+// der Browser zeichnet daraus Striche unter der Spur. Regler mit vielen Stufen fühlen sich
+// stufenlos an und bleiben ohne Striche (eine Liste nur mit jedem k-ten Wert würde den Regler
+// in Chrome auf diese Werte einrasten lassen).
 (function(){
   "use strict";
-  var KS = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000], nr = 0;
+  var nr = 0;
   function markiere(r){
     var min = parseFloat(r.min), max = parseFloat(r.max), st = r.step === "any" ? NaN : parseFloat(r.step || "1");
     if(!isFinite(min)) min = 0; if(!isFinite(max)) max = 100;
     var sig = min + "|" + max + "|" + r.step; if(r._msStufen === sig) return; r._msStufen = sig;
     var N = st > 0 ? Math.round((max - min) / st) : 0, dl = r._msListe;
-    // ohne step-Attribut und mit sehr feiner Teilung (z. B. 0–100 für eine Animation) gilt der Regler als stufenlos
-    var stufenlos = !r.hasAttribute("step") && N >= 50;
-    if(stufenlos || !(N >= 1) || N > 5000 || Math.abs(N * st - (max - min)) > st * 1e-6){ if(dl) dl.innerHTML = ""; return; }
-    var k = 0; for(var i = 0; i < KS.length; i++){ if(Math.ceil(N / KS[i]) <= 25){ k = KS[i]; break; } } if(!k) k = Math.ceil(N / 25);
-    if(!dl){ dl = document.createElement("datalist"); dl.id = "msStufen" + (++nr); document.body.appendChild(dl); r._msListe = dl; r.setAttribute("list", dl.id); }
-    // Striche bei „runden“ Werten (Vielfache von k Stufen) plus Anfang und Ende
-    var d = (String(st).split(".")[1] || "").length + 2, w = k * st, h = '<option value="' + min + '"></option>';
-    for(var v = Math.ceil((min - 1e-9) / w) * w; v <= max + 1e-9; v += w){ var vv = Number(v.toFixed(d)); if(vv > min + 1e-9 && vv < max - 1e-9) h += '<option value="' + vv + '"></option>'; }
-    h += '<option value="' + max + '"></option>';
+    if(!(N >= 1) || N > 25 || Math.abs(N * st - (max - min)) > st * 1e-6){ if(dl){ r.removeAttribute("list"); dl.innerHTML = ""; } return; }
+    if(!dl){ dl = document.createElement("datalist"); dl.id = "msStufen" + (++nr); document.body.appendChild(dl); r._msListe = dl; }
+    r.setAttribute("list", dl.id);
+    var d = (String(st).split(".")[1] || "").length + 2, h = "";
+    for(var j = 0; j <= N; j++) h += '<option value="' + Number((min + j * st).toFixed(d)) + '"></option>';
     dl.innerHTML = h;
   }
   function alle(w){ (w || document).querySelectorAll('input[type="range"]').forEach(markiere); }
