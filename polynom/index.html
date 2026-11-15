@@ -52,6 +52,7 @@
 <script src="/funktionen/lexikon.js"></script>
 <script src="/funktionen/alltag.js"></script>
 <script src="/funktionen/seite.js"></script>
+<script src="/funktionen/loesweg.js"></script>
 <script src="/symbol-tipp.js"></script>
 <script src="/funktionen/tipps.js"></script>
 <script>
@@ -168,6 +169,7 @@
       var zus = z.m > 1 ? ' <span class="klein-text">(' + t("fachN", { n: z.m }) + (z.m % 2 === 0 ? ", " + FB.wort("beruehren", t("beruehrt")) : "") + ")</span>" : "";
       return "<li>" + FS.fleck(C.N) + f(FK.punkt(t("lblN") + (A.nst.length > 1 ? "₁₂₃₄₅₆"[i] : ""), FK.xtxt(z), "0")) + zus + "</li>";
     }).join("") + "</ul>" : t("noNst");
+    if(n >= 1) nh += FS.rechenweg([["rwNst", FL.html(p, "f(x)")]]).replace(/<div class="klein-text">[^<]*<\/div><\/details>$/, "</details>");
     h += FS.karte(t("nst"), nh);
     if(n >= 1) h += FS.karte(t("abl"), f("f′(x) = " + FK.ptxt(A.a1)) + "<br>" + f("f″(x) = " + FK.ptxt(A.a2)) + (n >= 3 ? "<br>" + f("f‴(x) = " + FK.ptxt(FK.ableitung(A.a2))) : "") + '<div class="klein-text">' + t("ablHinweis") + "</div>");
     if(n >= 2){
@@ -178,7 +180,7 @@
           var a2v = FK.wertN(A.a2, e.z.x), vz = Math.abs(a2v) < 1e-9 ? "= 0" : a2v < 0 ? "< 0" : "> 0";
           var farbe = e.art === "H" ? C.H : C.T;
           var rw = FS.rechenweg([
-            ["rwExt1", f("f′(x) = " + FK.ptxt(A.a1) + " = 0") + " ⇒ " + f(FS.xListe(FK.nullstellen(A.a1)))],
+            ["rwExt1", FL.html(A.a1, "f′(x)")],
             ["rwExt2", FS.einsetzen(A.a2, e.z, farbe, "f″") + " " + f(vz) + " ⇒ <b>" + t(e.art === "H" ? "hp" : "tp") + "</b>"],
             ["rwY", FS.einsetzen(p, e.z, farbe, "f") + "<br>⇒ <b>" + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + "</b>"]
           ]);
@@ -196,7 +198,7 @@
       wh += A.wp.length ? "<ul>" + A.wp.map(function(w){
         var a3v = FK.wertN(a3, w.z.x), farbe = w.sattel ? C.S : C.W;
         var rw = FS.rechenweg([
-          ["rwWp1", f("f″(x) = " + FK.ptxt(A.a2) + " = 0") + " ⇒ " + f(FS.xListe(FK.nullstellen(A.a2)))],
+          ["rwWp1", FL.html(A.a2, "f″(x)")],
           ["rwWp2", FS.einsetzen(a3, w.z, farbe, "f‴") + " " + f(Math.abs(a3v) < 1e-9 ? "= 0" : "≠ 0") + (Math.abs(a3v) < 1e-9 ? '<div class="klein-text">' + t("rwSp") + "</div>" : "")],
           ["rwY", FS.einsetzen(p, w.z, farbe, "f") + "<br>⇒ <b>" + f(FS.vollPunkt(t(w.sattel ? "lblS" : "lblW"), w.z, w.y)) + "</b>"]
         ]);

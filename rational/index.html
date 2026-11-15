@@ -60,6 +60,7 @@
 <script src="/funktionen/lexikon.js"></script>
 <script src="/funktionen/alltag.js"></script>
 <script src="/funktionen/seite.js"></script>
+<script src="/funktionen/loesweg.js"></script>
 <script src="/symbol-tipp.js"></script>
 <script src="/funktionen/tipps.js"></script>
 <script src="/funktionen/rational.js"></script>
@@ -192,7 +193,7 @@
         var vz = Math.abs(e.f2) < 1e-9 ? "= 0" : e.f2 < 0 ? "< 0" : "> 0";
         var farbe = e.art === "H" ? C.H : C.T;
         var rw = FS.rechenweg([
-          ["rwExt1", f("f′(x) = 0 ⇔ " + FK.ptxt(A.P) + " = 0") + " ⇒ " + f(FS.xListe(FK.nullstellen(A.P).filter(function(z){ return A.inD(z.x); })))],
+          ["rwExt1", f("f′(x) = 0 ⇔ " + FK.ptxt(A.P) + " = 0") + FL.html(A.P, false) + " ⇒ " + f(FS.xListe(FK.nullstellen(A.P).filter(function(z){ return A.inD(z.x); })))],
           ["rwExt2", f("f″(" + FK.xtxt(e.z) + ") " + (e.f2ex ? "= " + e.f2ex + " " : "") + vz) + " ⇒ <b>" + t(e.art === "H" ? "hp" : "tp") + "</b>"],
           ["rwY", FS.einsetzenBruch(A.Zr, A.Nr, e.z, farbe) + "<br>⇒ <b>" + f(FS.vollPunkt(t(e.art === "H" ? "lblH" : "lblT"), e.z, e.y)) + "</b>"]
         ]);

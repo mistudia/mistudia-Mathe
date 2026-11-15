@@ -46,3 +46,5 @@ Gemeinsame Bilder (Elefant, Logos) liegen einmal unter `img/` statt in jedem Ord
 Weitere Dateien: `manifest.webmanifest`, `sw.js` (Start ohne Netz), `icons/`, `privacy.html`, `.nojekyll` (für `.well-known/` bei GitHub Pages).
 
 Erklär-Blasen: `/symbol-tipp.js` (gemeinsam, MS_TIPP.s/hinweis) – benutzt von kombinatorik, binomial, normalverteilung, exponential und über `funktionen/tipps.js` (Zeichen in den Analyse-Karten und Parameter-Buchstaben) von linear, quadratisch, polynom, rational. `MS_TIPP.auto(regeln, text, hinweisNach)` packt Zeichen in Textknoten automatisch ein (logarithmus, integral, vektoren, trigonometrie).
+
+Rechenwege: `funktionen/loesweg.js` (FL.weg/FL.html) zeigt, wie man Polynom = 0 löst (umstellen, x ausklammern, Wurzel ziehen, Mitternachtsformel, Substitution z = x², Lösung raten + Polynomdivision, sonst Näherung) – in den Rechenwegen von polynom/rational und in allen Übungen (funktionen/ueben.js: jeder Schritt hat nach dem Lösen einen Rechenweg).

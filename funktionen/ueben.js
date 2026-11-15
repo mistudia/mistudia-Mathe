@@ -22,6 +22,20 @@ var FU = (function(){
     rs = rs.slice().sort(function(a, b){ return (a === 0 ? -99 : a) - (b === 0 ? -99 : b); });
     return rs.map(function(r){ return r === 0 ? "x" : "(x " + (r > 0 ? M + " " + r : "+ " + (-r)) + ")"; }).join("");
   }
+  // ---------- Rechenwege (werden nach dem Lösen eines Schritts gezeigt) ----------
+  function bt(b){ return FK.btxt(b); }
+  function kl(b){ return b.n < 0 ? "(" + bt(b) + ")" : bt(b); }
+  function zeilen(L){ return L.map(function(z){ return '<div class="lw-f">' + f(z) + "</div>"; }).join(""); }
+  function lw(p, links){ return window.FL ? FL.html(p, links) : zeilen([(links ? links + " = " : "") + FK.ptxt(p) + " = 0"]); }
+  // Potenzregel Summand für Summand: 3x² → 6x
+  function ablWeg(p, name){
+    var L = [];
+    for(var i = p.length - 1; i >= 0; i--){ if(Bz.null(p[i])) continue; var term = FK.trim(new Array(i).fill(B(0)).concat([p[i]]));
+      L.push(FK.ptxt(term) + " → " + (i === 0 ? "0" : FK.ptxt(FK.ableitung(term)))); }
+    L.push(name + " = " + FK.ptxt(FK.ableitung(p)));
+    return zeilen(L);
+  }
+  function einsetzenWeg(p, x, name){ return zeilen([name + "(" + bt(x) + ") = " + bt(FK.wertB(p, x))]); }
   var BRUECHE = [B(1, 2), B(-1, 2), B(3, 2), B(-3, 2), B(1, 3), B(-2, 3)];
 
   // ---------- Aufgaben ----------
@@ -31,9 +45,9 @@ var FU = (function(){
         var m = Math.random() < 0.7 ? B(wahl([-3, -2, -1, 1, 2, 3, 4])) : wahl(BRUECHE), b = B(zuf(-6, 6));
         var p = FK.trim([b, m]);
         return { text: "f(x) = " + FK.ptxt(p), eingabe: eingabeTxt(p), schritte: [
-          { art: "zahl", q: "qM", h: "hM", soll: m },
-          { art: "zahl", q: "qB", h: "hB", soll: b },
-          { art: "zahlen", q: "qNst", h: "hNstLin", soll: [Bz.div(Bz.neg(b), m)] } ] };
+          { art: "zahl", q: "qM", h: "hM", soll: m, weg: function(){ return zeilen(["f(x) = m · x + b", "f(x) = " + FK.ptxt(p) + "  ⇒  m = " + bt(m)]); } },
+          { art: "zahl", q: "qB", h: "hB", soll: b, weg: function(){ return zeilen(["f(0) = " + kl(m) + " · 0 + " + kl(b) + " = " + bt(b)]); } },
+          { art: "zahlen", q: "qNst", h: "hNstLin", soll: [Bz.div(Bz.neg(b), m)], weg: function(){ return lw(p, "f(x)"); } } ] };
       }
       var m2 = Math.random() < 0.6 ? B(wahl([-3, -2, -1, 1, 2, 3])) : wahl(BRUECHE);
       var x1 = zuf(-4, 3), d = wahl([1, 2, 3, 4]); if(m2.d > 1) d = m2.d * wahl([1, 2]);
@@ -41,9 +55,9 @@ var FU = (function(){
       var b2 = Bz.sub(B(y1), Bz.mul(m2, B(x1))), p2 = FK.trim([b2, m2]);
       var P1 = FK.punkt("P₁", FK.zahl(x1, 0), FK.zahl(y1, 0)), P2 = FK.punkt("P₂", FK.zahl(x2, 0), FK.btxt(y2));
       return { text: t("aufg2P", { p1: P1, p2: P2 }), eingabe: eingabeTxt(p2), schritte: [
-        { art: "zahl", q: "qM", h: "h2Pm", soll: m2 },
-        { art: "zahl", q: "qBb", h: "h2Pb", soll: b2 },
-        { art: "zahlen", q: "qNst", h: "hNstLin", soll: [Bz.div(Bz.neg(b2), m2)] } ] };
+        { art: "zahl", q: "qM", h: "h2Pm", soll: m2, weg: function(){ return zeilen(["m = (y₂ − y₁) : (x₂ − x₁)", "m = (" + bt(y2) + " − " + kl(B(y1)) + ") : (" + (x2) + " − " + kl(B(x1)) + ") = " + bt(Bz.sub(y2, B(y1))) + " : " + d + " = " + bt(m2)]); } },
+        { art: "zahl", q: "qBb", h: "h2Pb", soll: b2, weg: function(){ return zeilen(["y₁ = m · x₁ + b  ⇒  b = y₁ − m · x₁", "b = " + y1 + " − " + kl(m2) + " · " + kl(B(x1)) + " = " + bt(b2)]); } },
+        { art: "zahlen", q: "qNst", h: "hNstLin", soll: [Bz.div(Bz.neg(b2), m2)], weg: function(){ return lw(p2, "f(x)"); } } ] };
     },
     quadratisch: function(){
       var a = wahl([B(1), B(-1), B(2), B(-2), B(1, 2), B(-1, 2)]), p;
@@ -57,31 +71,31 @@ var FU = (function(){
       var A = FK.analyse(p), xs = Bz.div(Bz.neg(p[1]), Bz.mul(B(2), p[2])), ys = FK.wertB(p, xs);
       var D = Bz.sub(Bz.mul(p[1], p[1]), Bz.mul(B(4), Bz.mul(p[2], p[0])));
       return { text: "f(x) = " + FK.ptxt(p), eingabe: eingabeTxt(p), schritte: [
-        { art: "wahl", q: "qOeff", h: "hOeff", optionen: ["uOben", "uUnten"], soll: Bz.num(a) > 0 ? "uOben" : "uUnten" },
-        { art: "punkt", q: "qS", h: "hS", soll: [xs, ys] },
-        { art: "zahl", q: "qD", h: "hD", soll: D },
-        { art: "zahlen", q: "qNst", h: "hNstQ", soll: A.nst.map(function(z){ return z.b; }) },
-        { art: "zahl", q: "qY", h: "hY", soll: p[0] } ] };
+        { art: "wahl", q: "qOeff", h: "hOeff", optionen: ["uOben", "uUnten"], soll: Bz.num(a) > 0 ? "uOben" : "uUnten", weg: function(){ return zeilen(["a = " + bt(p[2]) + (Bz.num(p[2]) > 0 ? " > 0" : " < 0")]); } },
+        { art: "punkt", q: "qS", h: "hS", soll: [xs, ys], weg: function(){ return zeilen(["x<sub>S</sub> = −b : (2a) = " + bt(Bz.neg(p[1])) + " : " + kl(Bz.mul(B(2), p[2])) + " = " + bt(xs), "y<sub>S</sub> = f(" + bt(xs) + ") = " + bt(ys)]); } },
+        { art: "zahl", q: "qD", h: "hD", soll: D, weg: function(){ return zeilen(["D = b² − 4ac = " + kl(p[1]) + "² − 4 · " + kl(p[2]) + " · " + kl(p[0]) + " = " + bt(D)]); } },
+        { art: "zahlen", q: "qNst", h: "hNstQ", soll: A.nst.map(function(z){ return z.b; }), weg: function(){ return lw(p, "f(x)"); } },
+        { art: "zahl", q: "qY", h: "hY", soll: p[0], weg: function(){ return zeilen(["f(0) = c = " + bt(p[0])]); } } ] };
     },
     polynom: function(){
       if(Math.random() < 0.3){
         var rs = mischen([-4, -3, -2, -1, 0, 1, 2, 3, 4]).slice(0, 3).sort(function(u, v){ return u - v; }), k = wahl([1, -1]);
         var p0 = poly([k]); rs.forEach(function(r){ p0 = FK.pmul(p0, lin(1, r)); });
         return { text: "f(x) = " + (k < 0 ? M : "") + faktTxt(rs), eingabe: eingabeTxt(p0), schritte: [
-          { art: "zahlen", q: "qNst", h: "hNstP", soll: rs.map(function(r){ return B(r); }) },
-          { art: "zahl", q: "qY", h: "hY", soll: p0[0] } ] };
+          { art: "zahlen", q: "qNst", h: "hNstP", soll: rs.map(function(r){ return B(r); }), weg: function(){ return (window.FL ? '<div class="lw-h">' + FL.tx("null_") + "</div>" : "") + zeilen(rs.map(function(r){ return (r === 0 ? "x" : faktTxt([r]).slice(1, -1)) + " = 0  ⇒  x = " + bt(B(r)); })); } },
+          { art: "zahl", q: "qY", h: "hY", soll: p0[0], weg: function(){ return einsetzenWeg(p0, B(0), "f"); } } ] };
       }
       var u = zuf(-3, 2), v = zuf(u + 1, 3), kk = wahl([1, -1]), c = zuf(-5, 5);
       var p = poly([c, 6 * u * v * kk, -3 * (u + v) * kk, 2 * kk]);
       var A = FK.analyse(p), H = A.ext.filter(function(e){ return e.art === "H"; })[0], T = A.ext.filter(function(e){ return e.art === "T"; })[0], W = A.wp[0];
       var pk = function(e){ return [e.z.b, FK.wertB(p, e.z.b)]; };
       return { text: "f(x) = " + FK.ptxt(p), eingabe: eingabeTxt(p), schritte: [
-        { art: "poly", q: "qA1", h: "hA1", soll: A.a1 },
-        { art: "poly", q: "qA2", h: "hA2", soll: A.a2 },
-        { art: "zahlen", q: "qKand", h: "hKand", soll: [B(u), B(v)] },
-        { art: "punkt", q: "qH", h: "hH", soll: pk(H) },
-        { art: "punkt", q: "qT", h: "hT", soll: pk(T) },
-        { art: "punkt", q: "qW", h: "hW", soll: pk(W) } ] };
+        { art: "poly", q: "qA1", h: "hA1", soll: A.a1, weg: function(){ return ablWeg(p, "f′(x)"); } },
+        { art: "poly", q: "qA2", h: "hA2", soll: A.a2, weg: function(){ return ablWeg(A.a1, "f″(x)"); } },
+        { art: "zahlen", q: "qKand", h: "hKand", soll: [B(u), B(v)], weg: function(){ return lw(A.a1, "f′(x)"); } },
+        { art: "punkt", q: "qH", h: "hH", soll: pk(H), weg: function(){ var x = H.z.b; return zeilen(["f″(" + bt(x) + ") = " + bt(FK.wertB(A.a2, x)) + " < 0  ⇒  H", "f(" + bt(x) + ") = " + bt(FK.wertB(p, x)), "H" + FK.punkt("", bt(x), bt(FK.wertB(p, x)))]); } },
+        { art: "punkt", q: "qT", h: "hT", soll: pk(T), weg: function(){ var x = T.z.b; return zeilen(["f″(" + bt(x) + ") = " + bt(FK.wertB(A.a2, x)) + " > 0  ⇒  T", "f(" + bt(x) + ") = " + bt(FK.wertB(p, x)), "T" + FK.punkt("", bt(x), bt(FK.wertB(p, x)))]); } },
+        { art: "punkt", q: "qW", h: "hW", soll: pk(W), weg: function(){ var x = W.z.b; return lw(A.a2, "f″(x)") + zeilen(["f(" + bt(x) + ") = " + bt(FK.wertB(p, x)), "W" + FK.punkt("", bt(x), bt(FK.wertB(p, x)))]); } } ] };
     },
     rational: function(){
       var v = zuf(1, 4), z, n, tx;
@@ -103,11 +117,15 @@ var FU = (function(){
                        : v === 2 ? faktTxt([q[0], q[1]]) + " / (" + faktTxt([q[0], q[2]]) + ")"
                        : klammerP(z) + " / " + klammerP(n));
       return { text: tx, eingabe: klammerP(z).replace(/−/g, "-") + "/" + klammerP(n).replace(/−/g, "-"), schritte: [
-        { art: "zahlen", q: "qLuecken", h: "hLuecken", soll: A.luecken.map(function(l){ return l.b; }) },
-        { art: "zahlen", q: "qPole", h: "hPole", soll: A.pole.map(function(p){ return p.z.b; }) },
-        { art: "zahlen", q: "qHebbar", h: "hHebbar", soll: A.hebbar.map(function(h){ return h.z.b; }) },
-        { art: "zahlen", q: "qNst", h: "hNstR", soll: A.nst.map(function(s){ return s.b; }) },
-        { art: "poly", q: "qAsym", h: "hAsym", soll: A.asym.q, praefix: "y =" } ] };
+        { art: "zahlen", q: "qLuecken", h: "hLuecken", soll: A.luecken.map(function(l){ return l.b; }), weg: function(){ return lw(n); } },
+        { art: "zahlen", q: "qPole", h: "hPole", soll: A.pole.map(function(p){ return p.z.b; }), weg: function(){ return zaehlerAnLuecken(); } },
+        { art: "zahlen", q: "qHebbar", h: "hHebbar", soll: A.hebbar.map(function(h){ return h.z.b; }), weg: function(){ return zaehlerAnLuecken(); } },
+        { art: "zahlen", q: "qNst", h: "hNstR", soll: A.nst.map(function(s){ return s.b; }), weg: function(){ return lw(z) + zeilen([A.nst.length ? "x = " + A.nst.map(function(s){ return bt(s.b); }).join("; ") + "   (" + FK.ptxt(n) + " ≠ 0)" : "–"]); } },
+        { art: "poly", q: "qAsym", h: "hAsym", soll: A.asym.q, praefix: "y =", weg: function(){
+            if(FK.grad(z) < FK.grad(n)) return zeilen(["y = 0"]);
+            var r = FK.padd(z, FK.pneg(FK.pmul(A.asym.q, n)));
+            return zeilen(["(" + FK.ptxt(z) + ") : (" + FK.ptxt(n) + ") = " + FK.ptxt(A.asym.q) + (FK.grad(FK.trim(r)) >= 0 && !(FK.trim(r).length === 1 && Bz.null(FK.trim(r)[0])) ? " + " + klammerP(r) + " / (" + FK.ptxt(n) + ")" : ""), "y = " + FK.ptxt(A.asym.q)]); } } ] };
+      function zaehlerAnLuecken(){ return zeilen(A.luecken.map(function(l){ var w = FK.wertB(z, l.b); return "Z(" + bt(l.b) + ") = " + bt(w) + (Bz.null(w) ? " = 0" : " ≠ 0"); })); }
     }
   };
 
@@ -180,6 +198,7 @@ var FU = (function(){
       if(z.meldung) h += '<div class="u-meldung ' + (z.ok ? "gut" : "schlecht") + '">' + t(z.meldung) + "</div>";
       if(z.tipp && !z.fertig) h += '<div class="u-tipp">💡 ' + mt(t(st.h)) + "</div>";
       if(z.gezeigt) h += '<div class="u-loesung">' + t("uLoesung") + " " + f(loesungTxt(st)) + "</div>";
+      if(z.fertig && st.weg){ var wg = ""; try { wg = st.weg(); } catch(e){ wg = ""; } if(wg) h += '<details class="rw u-rw"' + (z.gezeigt ? " open" : "") + "><summary>" + t("rwT") + "</summary><div>" + wg + "</div></details>"; }
       h += "</section>";
     });
     if(ak >= a.schritte.length){
