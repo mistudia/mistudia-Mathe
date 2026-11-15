@@ -254,6 +254,12 @@
     if(tab === "regeln") regeln(); else if(tab === "teiler"){ teiler(); sieb(); }
     if(!nurRechnen && auf){ var war = beantwortet, e = letzteEingabe, gut = $("meldung").classList.contains("gut"); zeige(); if(war){ beantwortet = false; anzahl--; if(gut) punkte--; if($("uAntwort")) $("uAntwort").value = e; pruefe(e); } }
   }
+  // Alltagsbeispiel laden (aus alltag-daten.js): {tab: "regeln"|"teiler", n}
+  window.MS_TEIL = { laden: function(w){
+    var id = w.tab === "teiler" ? "zahl2" : "zahl"; zeigeTab(w.tab); $(id).value = String(w.n);
+    if(w.tab === "teiler") teiler(); else regeln();
+    $(id).scrollIntoView({ behavior: "smooth", block: "center" });
+  } };
   window.MS_LANG = { apply: function(l){ if(TB[l]){ lang = l; alles(); } } };
   alles();
 })();
