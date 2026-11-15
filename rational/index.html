@@ -11,6 +11,10 @@
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="stylesheet" href="/home-button.css">
 <link rel="stylesheet" href="/funktionen/kern.css">
+<style>
+.r-regler-box { margin: 4px 0 12px; }
+.r-regler-box summary { cursor: pointer; font-weight: 700; color: var(--blue); font-size: 16px; padding: 6px 0; }
+</style>
 </head>
 <body>
 <div class="app">
@@ -33,6 +37,15 @@
     <div class="graph-box">
       <div class="graph-wrap"><svg id="graph" role="img"></svg><div class="zoom" id="zoom"></div></div>
       <div class="legende"><label><input type="checkbox" id="zeigeAbl"> <span id="tAbl"></span></label></div>
+  <details class="r-regler-box" id="rReglerBox">
+    <summary id="rReglerT"></summary>
+    <p class="regler-hinweis" id="rReglerH"></p>
+    <div class="regler" id="rRegler" dir="ltr">
+      <div class="regel"><label for="ra"><span><span class="m" style="color:#2563eb">a</span> <span id="tra"></span></span><output id="ora"></output></label><div class="zeile"><input type="range" id="ra" min="-5" max="5" step="0.5" value="2"></div></div>
+      <div class="regel"><label for="rb"><span><span class="m" style="color:#b91c1c">b</span> <span id="trb"></span></span><output id="orb"></output></label><div class="zeile"><input type="range" id="rb" min="-5" max="5" step="0.5" value="1"></div></div>
+      <div class="regel"><label for="rc"><span><span class="m" style="color:#ea580c">c</span> <span id="trc"></span></span><output id="orc"></output></label><div class="zeile"><input type="range" id="rc" min="-4" max="4" step="0.5" value="1"></div></div>
+    </div>
+  </details>
       <p class="tipp" id="tipp"></p>
     </div>
     <div class="analyse" id="analyse"></div>
@@ -193,7 +206,35 @@
     h += '<div class="klein-text" style="text-align:center">' + t("note") + "</div>";
     box.innerHTML = h;
   }
-  FS.sprache(function(){ texte(); graph.zeichne(); });
+  // ---------- Parameter-Regler: f(x) = a/(x − b) + c ----------
+  var RT = {
+    de: ["Mit Schiebereglern: f(x) = a/(x − b) + c", "Ziehe an den Reglern – Graph, Asymptoten und Rechnung ändern sich sofort. b verschiebt die Polstelle (senkrechte Asymptote x = b), c verschiebt die waagerechte Asymptote y = c, a streckt den Graphen und spiegelt ihn, wenn a negativ ist.", "Streckung", "Polstelle", "waagerechte Asymptote"],
+    en: ["With sliders: f(x) = a/(x − b) + c", "Move the sliders – graph, asymptotes and analysis change at once. b moves the pole (vertical asymptote x = b), c moves the horizontal asymptote y = c, a stretches the graph and reflects it when a is negative.", "stretch", "pole", "horizontal asymptote"],
+    es: ["Con controles: f(x) = a/(x − b) + c", "Mueve los controles: la gráfica, las asíntotas y el análisis cambian al instante. b desplaza el polo (asíntota vertical x = b), c desplaza la asíntota horizontal y = c, a estira la gráfica y la refleja si a es negativo.", "dilatación", "polo", "asíntota horizontal"],
+    zh: ["用滑块：f(x) = a/(x − b) + c", "拖动滑块——图像、渐近线和分析会立刻改变。b 移动极点（竖直渐近线 x = b），c 移动水平渐近线 y = c，a 拉伸图像，a 为负时图像翻转。", "伸缩", "极点", "水平渐近线"],
+    fr: ["Avec curseurs : f(x) = a/(x − b) + c", "Bouge les curseurs : la courbe, les asymptotes et l’étude changent tout de suite. b déplace le pôle (asymptote verticale x = b), c déplace l’asymptote horizontale y = c, a étire la courbe et la retourne si a est négatif.", "dilatation", "pôle", "asymptote horizontale"],
+    ru: ["С ползунками: f(x) = a/(x − b) + c", "Двигай ползунки – график, асимптоты и исследование сразу меняются. b сдвигает полюс (вертикальная асимптота x = b), c сдвигает горизонтальную асимптоту y = c, a растягивает график и отражает его при отрицательном a.", "растяжение", "полюс", "горизонтальная асимптота"],
+    ar: ["بالمؤشرات: f(x) = a/(x − b) + c", "حرّك المؤشرات – يتغير المنحنى والخطوط المقاربة والتحليل فورًا. b يزيح القطب (الخط المقارب الرأسي x = b)، و c يزيح الخط المقارب الأفقي y = c، و a يمدّ المنحنى ويعكسه إذا كان سالبًا.", "تمديد", "قطب", "خط مقارب أفقي"],
+    ja: ["スライダーで：f(x) = a/(x − b) + c", "スライダーを動かすと、グラフ・漸近線・分析がすぐに変わる。b は極（たての漸近線 x = b）を動かし、c は横の漸近線 y = c を動かし、a はグラフをのばし、a が負なら反転させる。", "のび", "極", "横の漸近線"],
+    pt: ["Com controles: f(x) = a/(x − b) + c", "Mova os controles – o gráfico, as assíntotas e a análise mudam na hora. b desloca o polo (assíntota vertical x = b), c desloca a assíntota horizontal y = c, a estica o gráfico e o reflete se a for negativo.", "dilatação", "polo", "assíntota horizontal"]
+  };
+  function rt(i){ return (RT[FK.getLang()] || RT.de)[i]; }
+  function rz(v){ var s = String(v); return /^(en|zh|ja|ar)$/.test(FK.getLang()) ? s : s.replace(".", ","); }
+  function reglerText(){
+    document.getElementById("rReglerT").textContent = rt(0); document.getElementById("rReglerH").textContent = rt(1);
+    document.getElementById("tra").textContent = rt(2); document.getElementById("trb").textContent = rt(3); document.getElementById("trc").textContent = rt(4);
+    ["ra", "rb", "rc"].forEach(function(id){ document.getElementById("o" + id).textContent = rz(Number(document.getElementById(id).value)).replace("-", M); });
+  }
+  function ausReglern(){
+    var a = Number(document.getElementById("ra").value), b = Number(document.getElementById("rb").value), c = Number(document.getElementById("rc").value);
+    if(a === 0){ a = 0.5; document.getElementById("ra").value = 0.5; }
+    var s = rz(a) + (b === 0 ? "/x" : "/(x" + (b > 0 ? " - " + rz(b) : " + " + rz(-b)) + ")") + (c === 0 ? "" : c > 0 ? " + " + rz(c) : " - " + rz(-c));
+    document.getElementById("eingabe").value = s; reglerText(); rechne();
+  }
+  ["ra", "rb", "rc"].forEach(function(id){ document.getElementById(id).addEventListener("input", ausReglern); });
+  document.getElementById("rReglerBox").addEventListener("toggle", function(){ if(document.getElementById("rReglerBox").open) ausReglern(); });
+  reglerText();
+  FS.sprache(function(){ texte(); reglerText(); graph.zeichne(); });
   FS.eingabeHilfe({ text: function(s){ var r = FR.parse(s); return "f(x) = " + bruch(r.z, r.n); },
     zeilen: [["(x^2 - 1)/(x - 2)", "hBruchF"], ["1/(x^2 - 4)", "hHoch"], ["3x/(x^2 + 1)", "hMal"], ["(0,5x + 1)/(x - 1)", "hDez"], ["(x - 1)(x + 2)/(x + 3)", "hKlammer"]] });
   FA.einbauen("rational", document.getElementById("form"), function(e){
