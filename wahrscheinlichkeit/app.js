@@ -558,7 +558,8 @@
   function zeigeTab(k){
     tab = k;
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
-    ["grund", "begr", "baum", "vier", "sim", "ueben"].forEach(function(x){ sicht($("s_" + x), x === k); });
+    ["grund", "begr", "baum", "vergl", "vier", "sim", "ueben"].forEach(function(x){ sicht($("s_" + x), x === k); });
+    if(k === "vergl" && window.MS_WK_VGL) MS_WK_VGL.zeigen();
     sicht($("eingabe"), k === "baum" || k === "sim");
     if(k === "ueben" && !auf) neueAufgabe();
     alles(true);
@@ -591,7 +592,7 @@
       if(war){ beantwortet = false; anzahl--; if(gut) punkte--; pruefe(eing || "-1"); }
     }
   }
-  window.MS_LANG = { apply: function(l){ if(WT[l]){ lang = l; alles(); } } };
+  window.MS_LANG = { apply: function(l){ if(WT[l]){ lang = l; alles(); if(window.MS_WK_VGL) MS_WK_VGL.sprache(l); } } };
   $("versuch").innerHTML = '<option value="muenze">muenze</option>';
   sicht($("eingabe"), false); gSetzeEv("gerade");
   alles();

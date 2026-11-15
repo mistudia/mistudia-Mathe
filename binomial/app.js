@@ -54,12 +54,18 @@
     var ok = isFinite(a) && isFinite(b); a = Math.max(0, a); b = Math.min(n, b);
     var S = 0; if(ok) for(var i = a; i <= b; i++) S += P[i];
     var ktxt = art === "gleich" ? "P(X = " + a + ")" : art === "hoechstens" ? "P(X ≤ " + b + ")" : art === "mindestens" ? "P(X ≥ " + a + ")" : "P(" + a + " ≤ X ≤ " + b + ")";
-    var gz = genau(S, 4) && !(S > 0 && S < 5e-5); $("ergebnis").innerHTML = ok ? bdi(ktxt + " " + (gz ? "=" : "≈") + " " + zahl(S, 4) + " " + (gz ? "=" : "≈") + " " + proz(S)) : "";
+    // Erklär-Blasen für die Zeichen
+    var bspK = $("bsp").value || "eigen", V = { n: n, p: pTxt(p), k: a, a: a, b: b, tr: t("tr_" + bspK), q: zahl(1 - p, 4), bk: ok ? binko(n, a) : "" };
+    var TT = window.MS_TIPP ? MS_TIPP.s : function(h){ return h; };
+    function tp(h, key, w){ return TT(h, t(key, w || V)); }
+    var vk = art === "hoechstens" ? { n: n, k: b, tr: V.tr } : V;
+    var ktxtT = tp(ktxt, "tipP_" + art, vk);
+    var gz = genau(S, 4) && !(S > 0 && S < 5e-5); $("ergebnis").innerHTML = ok ? bdi(ktxtT + " " + (gz ? "=" : "≈") + " " + zahl(S, 4) + " " + (gz ? "=" : "≈") + " " + proz(S)) : "";
     // Rechenweg
     var W = [];
     if(ok && art === "gleich" && a >= 0 && a <= n){
-      W.push(t("bernoulli") + " " + bdi("P(X = k) = " + t("binkoSym") + " · p<sup>k</sup> · (1 − p)<sup>n − k</sup>"));
-      W.push(bdi("P(X = " + a + ") = " + binko(n, a) + " · " + zahl(p, 4) + "<sup>" + a + "</sup> · " + zahl(1 - p, 4) + "<sup>" + (n - a) + "</sup> " + (genau(P[a], 4) ? "=" : "≈") + " " + zahl(P[a], 4)));
+      W.push(t("bernoulli") + " " + bdi(tp("P(X = k)", "tipP_gleich", { n: "n", k: "k", tr: V.tr }) + " = " + tp(t("binkoSym"), "tip_binko") + " · " + tp("p<sup>k</sup>", "tip_pk") + " · " + tp("(1 − p)<sup>n − k</sup>", "tip_q")));
+      W.push(bdi(tp("P(X = " + a + ")", "tipP_gleich") + " = " + tp(String(binko(n, a)), "tip_binko") + " · " + tp(zahl(p, 4) + "<sup>" + a + "</sup>", "tip_pk") + " · " + tp(zahl(1 - p, 4) + "<sup>" + (n - a) + "</sup>", "tip_q") + " " + (genau(P[a], 4) ? "=" : "≈") + " " + zahl(P[a], 4)));
       W.push(t("binkoInfo", { n: n, k: a, b: binko(n, a) }));
     } else if(ok && art === "mindestens" && a >= 1){
       W.push(t("gegen") + " " + bdi("P(X ≥ " + a + ") = 1 − P(X ≤ " + (a - 1) + ") = 1 − " + zahl(1 - S, 4) + " " + (genau(S, 4) ? "=" : "≈") + " " + zahl(S, 4)));
@@ -68,7 +74,14 @@
     }
     $("weg").innerHTML = W.map(function(s){ return "<li>" + s + "</li>"; }).join("");
     var mu = n * p, sg = Math.sqrt(n * p * (1 - p));
-    $("kenn").innerHTML = t("kenn", { mu: bdi("μ = n · p = " + n + " · " + zahl(p, 4) + " " + (genau(mu, 2) ? "=" : "≈") + " " + zahl(mu, 2)), s: bdi("σ = √(n · p · (1 − p)) ≈ " + zahl(sg, 2)) });
+    V.mu = zahl(mu, 2); V.s = zahl(sg, 2);
+    $("kenn").innerHTML = t("kenn", { mu: bdi(tp("μ", "tip_mu") + " = n · p = " + n + " · " + zahl(p, 4) + " " + (genau(mu, 2) ? "=" : "≈") + " " + zahl(mu, 2)), s: bdi(tp("σ", "tip_sigma") + " = √(n · p · (1 − p)) ≈ " + zahl(sg, 2)) });
+    // Legende: alle Zeichen dieser Seite mit Erklärung
+    var leg = [tp("n = " + n, "tip_n"), tp("p = " + pTxt(p), "tip_p")];
+    if(art === "zwischen") leg.push(tp("a = " + a, "tip_a"), tp("b = " + b, "tip_b")); else leg.push(tp("k = " + (art === "hoechstens" ? b : a), "tip_k", vk));
+    leg.push(tp("X", "tip_X"), tp("μ " + (genau(mu, 2) ? "=" : "≈") + " " + V.mu, "tip_mu"), tp("σ " + (genau(sg, 2) ? "=" : "≈") + " " + V.s, "tip_sigma"));
+    $("legende").innerHTML = "<b>" + t("legH") + "</b> " + leg.map(bdi).join(" · ");
+    $("tippHinweis").textContent = window.MS_TIPP ? MS_TIPP.hinweis(lang) : "";
     histogramm($("hSvg"), P, ok ? a : -1, ok ? b : -2, mu, sg);
     $("vMerke").textContent = t("vMerke");
   }

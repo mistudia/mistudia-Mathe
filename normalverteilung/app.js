@@ -57,13 +57,25 @@
     if(!ok){ ["ergebnis", "weg"].forEach(function(id){ $(id).innerHTML = ""; }); leer($("nSvg")); return; }
     var za = (a - mu) / s, zb = (b - mu) / s, P = Phi(zb) - Phi(za), E = einheit();
     var ktxt = art === "hoechstens" ? "P(X ≤ " + zahl(b, 2) + ")" : art === "mindestens" ? "P(X ≥ " + zahl(a, 2) + ")" : "P(" + zahl(a, 2) + " ≤ X ≤ " + zahl(b, 2) + ")";
-    $("ergebnis").innerHTML = bdi(ktxt + " ≈ " + zahl(P, 4) + " ≈ " + proz(P));
+    // Erklär-Blasen für die Zeichen
+    var TT = window.MS_TIPP ? MS_TIPP.s : function(h){ return h; };
+    var V = { g: t("g_" + ($("bsp").value || "eigen")), mu: zahl(mu, 2), s: zahl(s, 2), a: zahl(a, 2), b: zahl(b, 2) };
+    function tp(h, key, w){ return TT(h, t(key, w || V)); }
+    function zt(z){ return tp(zahl(z, 3), "tip_zwert", { z: zahl(z, 2) }); }
+    function ph(z){ return tp("Φ(" + zahl(z, 2) + ")", "tip_Phi", { z: zahl(z, 2), phi: zahl(Phi(z), 4) }); }
+    var ktxtT = tp(ktxt, "tipP_" + art);
+    $("ergebnis").innerHTML = bdi(ktxtT + " ≈ " + zahl(P, 4) + " ≈ " + proz(P));
     var W = [];
-    W.push(t("standard") + " " + bdi("z = (x − μ) : σ"));
-    if(art !== "mindestens") W.push(bdi("z<sub>b</sub> = (" + zahl(b, 2) + " − " + zahl(mu, 2) + ") : " + zahl(s, 2) + " ≈ " + zahl(zb, 3) + " → Φ(" + zahl(zb, 2) + ") ≈ " + zahl(Phi(zb), 4)));
-    if(art !== "hoechstens") W.push(bdi("z<sub>a</sub> = (" + zahl(a, 2) + " − " + zahl(mu, 2) + ") : " + zahl(s, 2) + " ≈ " + zahl(za, 3) + " → Φ(" + zahl(za, 2) + ") ≈ " + zahl(Phi(za), 4)));
-    W.push(bdi(art === "hoechstens" ? ktxt + " = Φ(z<sub>b</sub>) ≈ " + zahl(P, 4) : art === "mindestens" ? ktxt + " = 1 − Φ(z<sub>a</sub>) ≈ " + zahl(P, 4) : ktxt + " = Φ(z<sub>b</sub>) − Φ(z<sub>a</sub>) ≈ " + zahl(P, 4)));
+    W.push(t("standard") + " " + bdi(tp("z", "tip_z") + " = (" + tp("x", "tip_x") + " − " + tp("μ", "tip_mu") + ") : " + tp("σ", "tip_sigma")));
+    if(art !== "mindestens") W.push(bdi(tp("z<sub>b</sub>", "tip_z") + " = (" + tp(zahl(b, 2), "tip_b") + " − " + tp(zahl(mu, 2), "tip_mu") + ") : " + tp(zahl(s, 2), "tip_sigma") + " ≈ " + zt(zb) + " → " + ph(zb) + " ≈ " + zahl(Phi(zb), 4)));
+    if(art !== "hoechstens") W.push(bdi(tp("z<sub>a</sub>", "tip_z") + " = (" + tp(zahl(a, 2), "tip_a") + " − " + tp(zahl(mu, 2), "tip_mu") + ") : " + tp(zahl(s, 2), "tip_sigma") + " ≈ " + zt(za) + " → " + ph(za) + " ≈ " + zahl(Phi(za), 4)));
+    W.push(bdi(art === "hoechstens" ? ktxtT + " = Φ(z<sub>b</sub>) ≈ " + zahl(P, 4) : art === "mindestens" ? ktxtT + " = 1 − Φ(z<sub>a</sub>) ≈ " + zahl(P, 4) : ktxtT + " = Φ(z<sub>b</sub>) − Φ(z<sub>a</sub>) ≈ " + zahl(P, 4)));
     $("weg").innerHTML = W.map(function(x){ return "<li>" + x + "</li>"; }).join("");
+    var leg = [tp("X", "tip_X"), tp("μ = " + V.mu, "tip_mu"), tp("σ = " + V.s, "tip_sigma")];
+    if(art !== "hoechstens") leg.push(tp("a = " + V.a, "tip_a")); if(art !== "mindestens") leg.push(tp("b = " + V.b, "tip_b"));
+    leg.push(tp("z", "tip_z"), tp("Φ", "tip_Phi", { z: "z", phi: "…" }));
+    $("legende").innerHTML = "<b>" + t("legH") + "</b> " + leg.map(bdi).join(" · ");
+    $("tippHinweis").textContent = window.MS_TIPP ? MS_TIPP.hinweis(lang) : "";
     kurve($("nSvg"), mu, s, a, b, E);
     $("nMerke").textContent = t("nMerke");
   }
