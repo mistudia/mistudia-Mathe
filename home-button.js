@@ -67,3 +67,9 @@
   document.addEventListener("input", function(e){ if(e.target && e.target.type === "range") markiere(e.target); }, true);
   document.addEventListener("pointerdown", function(e){ if(e.target && e.target.type === "range") markiere(e.target); }, true);
 })();
+
+// ---------- Popups mit der Maus verschieben (/verschieben.js) ----------
+(function(){
+  if(window.MS_VERSCHIEBEN || document.querySelector('script[src="/verschieben.js"]')) return;
+  var s = document.createElement("script"); s.src = "/verschieben.js"; document.head.appendChild(s);
+})();
