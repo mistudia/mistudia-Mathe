@@ -295,13 +295,16 @@ function setLang(l){
 
 /* ---------- Monome: {c, x, y} ---------- */
 function rnd(n){return Math.floor(Math.random()*n)}
-function mul(m,n){return {c:m.c*n.c,x:m.x+n.x,y:m.y+n.y}}
-function skal(m,f){return {c:m.c*f,x:m.x,y:m.y}}
+// Koeffizienten dürfen Kommazahlen sein (eigene Aufgaben) – Rundung gegen Gleitkomma-Reste
+function rk(z){return Math.round(z*1e9)/1e9}
+function mul(m,n){return {c:rk(m.c*n.c),x:m.x+n.x,y:m.y+n.y}}
+function skal(m,f){return {c:rk(m.c*f),x:m.x,y:m.y}}
+function zahlStr(a){const s=String(a);return /^(en|zh|ja|ar)$/.test(lang)?s:s.replace(".",",")}
 function pot(v,e){return e===0?"":e===1?v:v+"^"+e}
 function fmt(m){
   if(m.c===0)return "0";
   const a=Math.abs(m.c), vars=pot("x",m.x)+pot("y",m.y);
-  const z=(a===1&&vars!=="")?"":String(a);
+  const z=(a===1&&vars!=="")?"":zahlStr(a);
   return (m.c<0?"-":"")+z+vars;
 }
 function mitVz(m){return (m.c<0?" − ":" + ")+fmt(skal(m,m.c<0?-1:1))}
@@ -336,7 +339,7 @@ function setzeAufgabe(typ,a,b,eigen){
   if(typ==="quadMinus"){A.s1=-1;A.s2=-1}
   A.el=[a, skal(b,A.s1), a, skal(b,A.s2)];      // die vier Klammer-Elemente
   A.p=paare.map(p=>mul(A.el[p[0]],A.el[p[1]])); // vier Zwischenergebnisse
-  A.summe=[A.p[0], {c:A.p[1].c+A.p[2].c, x:A.p[1].x, y:A.p[1].y}, A.p[3]].filter(m=>m.c!==0);
+  A.summe=[A.p[0], {c:rk(A.p[1].c+A.p[2].c), x:A.p[1].x, y:A.p[1].y}, A.p[3]].filter(m=>m.c!==0);
   zeigeFormel();
   zeichneTerm();
   baueSchritte();
@@ -550,9 +553,10 @@ function terme(t){
   const s=norm(t).replace(/-/g,"+-").replace(/^\+/,"");
   return s.split("+").filter(x=>x!=="").map(x=>{
     // Faktoren sortieren, damit x^2y = yx^2
-    const m=x.match(/^(-?)([0-9]*)(.*)$/);
+    const m=x.match(/^(-?)([0-9]*(?:[.,][0-9]+)?)(.*)$/);
     const vars=(m[3].match(/[a-z](\^[0-9]+)?/g)||[]).sort().join("");
-    return (m[1]||"")+(m[2]===""||m[2]==="1"&&vars!==""?"":m[2])+vars;
+    const c=m[2]===""?"":String(Number(m[2].replace(",",".")));
+    return (m[1]||"")+(c===""||c==="1"&&vars!==""?"":c)+vars;
   }).sort();
 }
 function gleich(a,b){const A1=terme(a),B1=terme(b);return A1.length===B1.length&&A1.every((v,i)=>v===B1[i])}
