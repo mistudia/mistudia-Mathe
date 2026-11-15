@@ -469,6 +469,7 @@ Object.assign(WT.pt, {
 
 // ---------- Grundlagen (Laplace) ----------
 Object.assign(WT.de, {
+  tab_begr: "Begriffe", gZeichen: "Zeichen: <b>Ω</b> (Omega) = Ergebnisraum, alle möglichen Ergebnisse · <b>E</b> = Ereignis, die gewählten Ergebnisse · <b>Ē</b> (E quer) = Gegenereignis · <b>|E|</b> = Anzahl der Ergebnisse in E · <b>P</b> = Wahrscheinlichkeit (engl. probability) · { } = Menge. Alle Zeichen und Fachbegriffe stehen im Reiter „Begriffe“.",
   tab_grund: "Grundlagen", gx_wuerfel: "ein Würfel", gx_zwei: "zwei Würfel", gx_muenze3: "drei Münzen", gx_karten: "Kartenspiel (32 Karten)",
   gt_wuerfel: "Ein Würfel wird einmal geworfen.", gt_zwei: "Zwei Würfel werden geworfen (erster | zweiter). In der Tabelle steht die Augensumme.", gt_muenze3: "Drei Münzen werden geworfen (K = Kopf, Z = Zahl).", gt_karten: "Aus einem Skatblatt mit 32 Karten wird eine Karte gezogen.",
   gEvL: "Ereignis E wählen – oder Ergebnisse antippen:",
@@ -481,6 +482,7 @@ Object.assign(WT.de, {
   aufLap: "Wie groß ist die Wahrscheinlichkeit für „{e}“?", lapWeg: "{k} günstige von {n} möglichen Ergebnissen:"
 });
 Object.assign(WT.en, {
+  tab_begr: "Glossary", gZeichen: "Symbols: <b>Ω</b> (omega) = sample space, all possible outcomes · <b>E</b> = event, the chosen outcomes · <b>Ē</b> (E bar) = complementary event · <b>|E|</b> = number of outcomes in E · <b>P</b> = probability · { } = set. All symbols and terms are explained in the “Glossary” tab.",
   tab_grund: "Basics", gx_wuerfel: "one die", gx_zwei: "two dice", gx_muenze3: "three coins", gx_karten: "card game (32 cards)",
   gt_wuerfel: "A die is rolled once.", gt_zwei: "Two dice are rolled (first | second). The table shows the total.", gt_muenze3: "Three coins are tossed (H = heads, T = tails).", gt_karten: "One card is drawn from a pack of 32 cards (7 to ace).",
   gEvL: "Choose an event E – or tap outcomes:",
@@ -493,6 +495,7 @@ Object.assign(WT.en, {
   aufLap: "What is the probability of “{e}”?", lapWeg: "{k} favourable out of {n} possible outcomes:"
 });
 Object.assign(WT.es, {
+  tab_begr: "Glosario", gZeichen: "Símbolos: <b>Ω</b> (omega) = espacio muestral, todos los resultados posibles · <b>E</b> = suceso, los resultados elegidos · <b>Ē</b> (E barra) = suceso contrario · <b>|E|</b> = número de resultados de E · <b>P</b> = probabilidad · { } = conjunto. Todos los símbolos y términos están en la pestaña «Glosario».",
   tab_grund: "Conceptos básicos", gx_wuerfel: "un dado", gx_zwei: "dos dados", gx_muenze3: "tres monedas", gx_karten: "baraja (32 cartas)",
   gt_wuerfel: "Se lanza un dado una vez.", gt_zwei: "Se lanzan dos dados (primero | segundo). La tabla muestra la suma.", gt_muenze3: "Se lanzan tres monedas (C = cara, X = cruz).", gt_karten: "Se saca una carta de una baraja de 32 cartas (del 7 al as).",
   gEvL: "Elige un suceso E, o toca resultados:",
@@ -505,6 +508,7 @@ Object.assign(WT.es, {
   aufLap: "¿Cuál es la probabilidad de «{e}»?", lapWeg: "{k} casos favorables de {n} posibles:"
 });
 Object.assign(WT.zh, {
+  tab_begr: "术语", gZeichen: "符号：<b>Ω</b>（omega）= 样本空间，所有可能结果 · <b>E</b> = 事件，选中的结果 · <b>Ē</b>（E 拔）= 对立事件 · <b>|E|</b> = E 中结果的个数 · <b>P</b> = 概率（probability）· { } = 集合。所有符号和术语见“术语”页。",
   tab_grund: "基础", gx_wuerfel: "一颗骰子", gx_zwei: "两颗骰子", gx_muenze3: "三枚硬币", gx_karten: "纸牌（32 张）",
   gt_wuerfel: "掷一颗骰子一次。", gt_zwei: "掷两颗骰子（第一颗 | 第二颗）。表中是点数和。", gt_muenze3: "掷三枚硬币（正 = 正面，反 = 反面）。", gt_karten: "从 32 张牌（7 到 A）中抽一张。",
   gEvL: "选择事件 E——或点击结果：",
@@ -517,6 +521,7 @@ Object.assign(WT.zh, {
   aufLap: "“{e}”的概率是多少？", lapWeg: "{n} 个可能结果中有 {k} 个有利："
 });
 Object.assign(WT.fr, {
+  tab_begr: "Lexique", gZeichen: "Symboles : <b>Ω</b> (oméga) = univers, toutes les issues possibles · <b>E</b> = événement, les issues choisies · <b>Ē</b> (E barre) = événement contraire · <b>|E|</b> = nombre d’issues de E · <b>P</b> = probabilité · { } = ensemble. Tous les symboles et termes sont dans l’onglet « Lexique ».",
   tab_grund: "Bases", gx_wuerfel: "un dé", gx_zwei: "deux dés", gx_muenze3: "trois pièces", gx_karten: "jeu de 32 cartes",
   gt_wuerfel: "On lance un dé une fois.", gt_zwei: "On lance deux dés (premier | second). Le tableau donne la somme.", gt_muenze3: "On lance trois pièces (P = pile, F = face).", gt_karten: "On tire une carte d’un jeu de 32 cartes (du 7 à l’as).",
   gEvL: "Choisis un événement E – ou touche des issues :",
@@ -529,6 +534,7 @@ Object.assign(WT.fr, {
   aufLap: "Quelle est la probabilité de « {e} » ?", lapWeg: "{k} issues favorables sur {n} possibles :"
 });
 Object.assign(WT.ru, {
+  tab_begr: "Термины", gZeichen: "Знаки: <b>Ω</b> (омега) = пространство исходов, все возможные исходы · <b>E</b> = событие, выбранные исходы · <b>Ē</b> (E с чертой) = противоположное событие · <b>|E|</b> = число исходов в E · <b>P</b> = вероятность (англ. probability) · { } = множество. Все знаки и термины – на вкладке «Термины».",
   tab_grund: "Основы", gx_wuerfel: "один кубик", gx_zwei: "два кубика", gx_muenze3: "три монеты", gx_karten: "колода из 32 карт",
   gt_wuerfel: "Кубик бросают один раз.", gt_zwei: "Бросают два кубика (первый | второй). В таблице – сумма очков.", gt_muenze3: "Бросают три монеты (О = орёл, Р = решка).", gt_karten: "Из колоды в 32 карты (от 7 до туза) вынимают одну карту.",
   gEvL: "Выбери событие E – или нажимай на исходы:",
@@ -541,6 +547,7 @@ Object.assign(WT.ru, {
   aufLap: "Какова вероятность события «{e}»?", lapWeg: "{k} благоприятных из {n} возможных:"
 });
 Object.assign(WT.ar, {
+  tab_begr: "المصطلحات", gZeichen: "الرموز: <b>Ω</b> (أوميغا) = فضاء العينة، كل النتائج الممكنة · <b>E</b> = الحدث، النتائج المختارة · <b>Ē</b> (E بشرطة) = الحدث المتمم · <b>|E|</b> = عدد النتائج في E · <b>P</b> = الاحتمال (probability) · { } = مجموعة. كل الرموز والمصطلحات في تبويب «المصطلحات».",
   tab_grund: "الأساسيات", gx_wuerfel: "حجر نرد واحد", gx_zwei: "حجرا نرد", gx_muenze3: "ثلاث قطع نقود", gx_karten: "أوراق لعب (32 ورقة)",
   gt_wuerfel: "يُرمى حجر نرد مرة واحدة.", gt_zwei: "يُرمى حجرا نرد (الأول | الثاني). في الجدول مجموع النقاط.", gt_muenze3: "تُرمى ثلاث قطع نقود (ص = صورة، ك = كتابة).", gt_karten: "تُسحب ورقة واحدة من 32 ورقة (من 7 إلى الآس).",
   gEvL: "اختر حدثًا E – أو اضغط على النتائج:",
@@ -553,6 +560,7 @@ Object.assign(WT.ar, {
   aufLap: "ما احتمال «{e}»؟", lapWeg: "{k} حالات مواتية من {n} حالة ممكنة:"
 });
 Object.assign(WT.ja, {
+  tab_begr: "用語", gZeichen: "記号：<b>Ω</b>（オメガ）= 標本空間、起こりうるすべての結果 · <b>E</b> = 事象、選んだ結果 · <b>Ē</b>（E バー）= 余事象 · <b>|E|</b> = E に含まれる結果の数 · <b>P</b> = 確率（probability）· { } = 集合。記号と用語はすべて「用語」タブにあります。",
   tab_grund: "基本", gx_wuerfel: "さいころ 1 個", gx_zwei: "さいころ 2 個", gx_muenze3: "硬貨 3 枚", gx_karten: "トランプ（32 枚）",
   gt_wuerfel: "さいころを 1 回投げる。", gt_zwei: "さいころを 2 個投げる（1 個目 | 2 個目）。表は目の和。", gt_muenze3: "硬貨を 3 枚投げる（表・裏）。", gt_karten: "7〜A の 32 枚のトランプから 1 枚引く。",
   gEvL: "事象 E を選ぼう――または結果をタップ：",
@@ -565,6 +573,7 @@ Object.assign(WT.ja, {
   aufLap: "「{e}」の確率は？", lapWeg: "{n} 通りのうち {k} 通り："
 });
 Object.assign(WT.pt, {
+  tab_begr: "Glossário", gZeichen: "Símbolos: <b>Ω</b> (ómega) = espaço amostral, todos os resultados possíveis · <b>E</b> = acontecimento, os resultados escolhidos · <b>Ē</b> (E barra) = acontecimento contrário · <b>|E|</b> = número de resultados em E · <b>P</b> = probabilidade · { } = conjunto. Todos os símbolos e termos estão no separador «Glossário».",
   tab_grund: "Noções básicas", gx_wuerfel: "um dado", gx_zwei: "dois dados", gx_muenze3: "três moedas", gx_karten: "baralho de 32 cartas",
   gt_wuerfel: "Lança-se um dado uma vez.", gt_zwei: "Lançam-se dois dados (primeiro | segundo). A tabela mostra a soma.", gt_muenze3: "Lançam-se três moedas (F = face, C = coroa).", gt_karten: "Tira-se uma carta de um baralho de 32 cartas (do 7 ao ás).",
   gEvL: "Escolhe um acontecimento E – ou toca nos resultados:",

@@ -3,7 +3,8 @@
      wahrscheinlichkeit/index.html – Wahrscheinlichkeit & Baumdiagramme (miStudia Mathe)
      Baumdiagramme (Münze, Würfel, Urne mit/ohne Zurücklegen, Glücksrad, eigenes
      Experiment), Pfad- und Summenregel, Gegenereignis, Vierfeldertafel und
-     bedingte Wahrscheinlichkeit (mit umgekehrtem Baum), Simulation, Üben.
+     bedingte Wahrscheinlichkeit (mit umgekehrtem Baum), Simulation, Üben,
+     Reiter „Begriffe“: alle Zeichen und Fachbegriffe mit Beispielen (begriffe.js).
      Logik: app.js, Texte: texte.js (9 Sprachen), Sprache aus dem Startmenü.
      ============================================================ -->
 <html lang="de">
@@ -143,6 +144,21 @@
   .gErg.an { background: #fef3c7; border-color: #d97706; box-shadow: 0 0 0 2px #f59e0b; }
   .gTab { border-collapse: collapse; } .gTab th { font-size: 26px; padding: 2px 4px; color: var(--text); } .gTab td { padding: 2px; } .gTab .gErg { min-width: 40px; font-size: 16px; }
   @media (max-width: 600px) { .gTab th { font-size: 20px; } .gTab .gErg { min-width: 34px; padding: 5px 4px; font-size: 14px; } }
+  .gMengen { font-size: 17px; line-height: 1.5; margin: 6px 0; }
+  .gMengen div { margin: 2px 0; overflow-wrap: anywhere; }
+  .gMengen .anz { color: var(--muted); white-space: nowrap; }
+  /* Begriffe */
+  #bSuche { width: 100%; max-width: 420px; font: 17px system-ui, sans-serif; padding: 8px 12px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; margin: 4px 0 6px; }
+  #bSuche:focus { outline: none; border-color: var(--blue); }
+  .bGruppe { color: var(--blue); font-size: 19px; margin: 16px 0 8px; }
+  .bGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 10px; }
+  .bKarte { border: 1px solid #c9dcf2; border-radius: 12px; padding: 10px 12px; background: #fbfdff; min-width: 0; }
+  .bKopf { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 4px; }
+  .bSym { font: 800 22px system-ui, sans-serif; color: var(--blue); background: #e3eefc; border-radius: 8px; padding: 0 8px; white-space: nowrap; }
+  .bName { font-weight: 800; font-size: 17px; color: var(--text); }
+  .bText { margin: 0 0 6px; font-size: 15.5px; line-height: 1.45; color: var(--text); }
+  .bBsp { margin: 0; font-size: 15px; line-height: 1.45; color: var(--muted); border-inline-start: 3px solid #f59e0b; padding-inline-start: 8px; }
+  .bBsp b { color: #b45309; }
   .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
   @media (max-width: 600px) {
     body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
@@ -158,6 +174,7 @@
   <h1 id="titel">Wahrscheinlichkeit</h1>
   <div class="tabs" role="tablist">
     <button type="button" role="tab" data-tab="grund" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="begr" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="baum" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="vier" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="sim" aria-selected="false"></button>
@@ -189,9 +206,18 @@
       <p class="zeile"><b id="gEvText"></b></p>
       <div class="wahl" id="gEvents" style="margin-bottom:10px"></div>
       <div class="gOmega" id="gOmega"></div>
-      <p class="zeile" id="gErgebnis"></p>
+      <div class="gMengen" id="gErgebnis"></div>
       <p class="ergebnisZ" id="gP"></p>
       <p class="merke" id="gMerke"></p>
+      <p class="muted" id="gZeichen"></p>
+    </div>
+  </section>
+
+  <section id="s_begr" hidden>
+    <div class="karte">
+      <p class="zeile" id="bIntro"></p>
+      <input type="search" id="bSuche" autocomplete="off">
+      <div id="bListe"></div>
     </div>
   </section>
 
@@ -279,6 +305,7 @@
   <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
 </div>
 <script src="texte.js"></script>
+<script src="begriffe.js"></script>
 <script src="app.js"></script>
 <script src="/home-button.js"></script>
 </body>

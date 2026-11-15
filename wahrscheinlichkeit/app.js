@@ -242,10 +242,28 @@
     $("gOmega").innerHTML = h;
     $("gOmega").querySelectorAll(".gErg").forEach(function(b){ b.addEventListener("click", function(){ var id = b.dataset.id; if(gWahl[id]) delete gWahl[id]; else gWahl[id] = 1; gEv = null; grund(); }); });
     var P = F(k, n), Q = F(n - k, n);
-    $("gErgebnis").innerHTML = bdi("|Ω| = " + n + ", |E| = " + k);
+    var el = function(o){ return gExp === "zwei" ? "(" + o.a + "|" + o.b + ")" : gExp === "wuerfel" ? String(o.w) : gText(gExp, o); };
+    var menge = function(L){ if(!L.length) return "{ } = ∅"; var s = L.length <= 12 ? L.map(el) : L.slice(0, 4).map(el).concat(["…"], L.slice(-2).map(el)); return "{" + s.join(", ") + "}"; };
+    var EL2 = O.filter(function(o){ return gWahl[o.id]; }), NL = O.filter(function(o){ return !gWahl[o.id]; });
+    $("gErgebnis").innerHTML = [["Ω", O, n], ["E", EL2, k], ["Ē", NL, n - k]].map(function(r){ return "<div>" + bdi("<b>" + r[0] + "</b> = " + menge(r[1])) + ' <span class="anz">' + bdi("|" + r[0] + "| = " + r[2]) + "</span></div>"; }).join("");
     $("gP").innerHTML = (bdi("P(E) = |E| : |Ω| = " + k + "/" + n + (P.d !== n ? " = " + fmt(P, "bruch") : "") + " = " + fmt(P, "dezimal") + " = " + fmt(P, "prozent")) + "<br>" + bdi("P(Ē) = 1 − P(E) = " + fmt(Q, "bruch") + " = " + fmt(Q, "prozent"))).replace(/= ≈/g, "≈");
-    $("gText").textContent = t("gt_" + gExp); $("gEvText").textContent = t("gEvL"); $("gMerke").innerHTML = t("gMerke"); $("tGExp").textContent = t("versuch");
+    $("gText").textContent = t("gt_" + gExp); $("gEvText").textContent = t("gEvL"); $("gMerke").innerHTML = t("gMerke"); $("gZeichen").innerHTML = t("gZeichen"); $("tGExp").textContent = t("versuch");
   }
+  // ---------- Begriffe (Daten in begriffe.js) ----------
+  function begriffe(){
+    var B = WB[lang] || WB.de, q = $("bSuche").value.trim().toLowerCase(), h = "", treffer = 0;
+    var formel = function(s){ return s.replace(/ %/g, "\u00a0%").replace(/\$([^$]+)\$/g, function(m, f){ return bdi(f); }); };
+    B.gruppen.forEach(function(g){
+      var E = g[1].filter(function(e){ return !q || (e[0] + " " + e[1] + " " + e[2] + " " + e[3]).replace(/<[^>]+>/g, "").toLowerCase().indexOf(q) >= 0; });
+      if(!E.length) return; treffer += E.length;
+      h += '<h2 class="bGruppe">' + g[0] + '</h2><div class="bGrid">' + E.map(function(e){
+        return '<div class="bKarte"><div class="bKopf">' + (e[0] ? '<span class="bSym">' + bdi(e[0]) + "</span>" : "") + '<span class="bName">' + e[1] + '</span></div><p class="bText">' + formel(e[2]) + '</p><p class="bBsp"><b>' + B.bsp + "</b> " + formel(e[3]) + "</p></div>";
+      }).join("") + "</div>";
+    });
+    $("bListe").innerHTML = treffer ? h : '<p class="muted">' + B.nichts + "</p>";
+    $("bIntro").textContent = B.intro; $("bSuche").placeholder = B.suche; $("bSuche").setAttribute("aria-label", B.suche);
+  }
+  $("bSuche").addEventListener("input", begriffe);
   $("gExp").addEventListener("change", function(){ gExp = $("gExp").value; gSetzeEv(Object.keys(GEXP[gExp].ev)[0]); });
   // Laplace-Aufgabe für den Üben-Reiter
   function neueLaplace(){
@@ -533,7 +551,7 @@
   function zeigeTab(k){
     tab = k;
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
-    ["grund", "baum", "vier", "sim", "ueben"].forEach(function(x){ sicht($("s_" + x), x === k); });
+    ["grund", "begr", "baum", "vier", "sim", "ueben"].forEach(function(x){ sicht($("s_" + x), x === k); });
     sicht($("eingabe"), k === "baum" || k === "sim");
     if(k === "ueben" && !auf) neueAufgabe();
     alles(true);
@@ -555,7 +573,7 @@
       var altId = ereignis && ereignis.id; lesen(); if(altId){ ereignis = EL.filter(function(x){ return x.id === altId; })[0] || null; if(ereignis) setzeEreignis(ereignis, true); }
     }
     if(!nurRechnen){ vierTexte(); $("gExp").innerHTML = Object.keys(GEXP).map(function(x){ return '<option value="' + x + '">' + t("gx_" + x) + "</option>"; }).join(""); $("gExp").value = gExp; }
-    if(tab === "grund") grund(); else if(tab === "baum") baum(); else if(tab === "sim") simZeigen(); else if(tab === "vier") vier();
+    if(tab === "grund") grund(); else if(tab === "begr") begriffe(); else if(tab === "baum") baum(); else if(tab === "sim") simZeigen(); else if(tab === "vier") vier();
     if(!nurRechnen && auf){
       var war = beantwortet, eing = $("uAntwort") ? $("uAntwort").value : null, gut = $("meldung").classList.contains("gut");
       if(auf.typ === "vier" || auf.typ === "lap"){ /* Auftrag wird in zeige() neu beschriftet */ }
