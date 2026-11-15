@@ -207,11 +207,11 @@
 
   // ---------- Rechner ----------
   var FAELLE = { ac: ["al", "c"], aa: ["al", "a"], ab: ["al", "b"], xy: ["a", "b"], xc: ["a", "c"], yc: ["b", "c"] };
-  var WERTE = { al: 35, a: 4, b: 6, c: 8 };
+  var WERTE = { al: 35, a: 4, b: 6, c: 8 }, REINH = "cm";
   var NAME = { al: "α", a: "a", b: "b", c: "c" };
   // liefert {a, b, c, al, be, schritte[]} oder {fehler}
-  function loese(fall, v){
-    var a, b, c, al, S = [], cm = " cm", sn = function(x){ return "sin " + z(x, 1) + "°"; }, cs = function(x){ return "cos " + z(x, 1) + "°"; }, tn = function(x){ return "tan " + z(x, 1) + "°"; };
+  function loese(fall, v, E){
+    var a, b, c, al, S = [], cm = " " + (E || "cm"), sn = function(x){ return "sin " + z(x, 1) + "°"; }, cs = function(x){ return "cos " + z(x, 1) + "°"; }, tn = function(x){ return "tan " + z(x, 1) + "°"; };
     if(fall.charAt(0) === "a" && fall !== "xy"){ al = v.al; if(!(al > 0 && al < 90)) return { fehler: "fehlerWinkel" }; }
     if(fall === "ac"){ c = v.c; a = c * Math.sin(al * GRAD); b = c * Math.cos(al * GRAD);
       S.push("a = c · sin α = " + z(c) + " · " + sn(al) + " ≈ " + z(a) + cm); S.push("b = c · cos α = " + z(c) + " · " + cs(al) + " ≈ " + z(b) + cm); }
@@ -237,14 +237,14 @@
   }
   function rechnerFelder(){
     var f = FAELLE[$("fall").value];
-    $("eingaben").innerHTML = f.map(function(k){ return "<label>" + NAME[k] + ' = <input class="zahl" id="rIn_' + k + '" inputmode="decimal" value="' + z(WERTE[k], 2) + '"> ' + (k === "al" ? "°" : "cm") + "</label>"; }).join("");
+    $("eingaben").innerHTML = f.map(function(k){ return "<label>" + NAME[k] + ' = <input class="zahl" id="rIn_' + k + '" inputmode="decimal" value="' + z(WERTE[k], 2) + '"> ' + (k === "al" ? "°" : REINH) + "</label>"; }).join("");
     f.forEach(function(k){ $("rIn_" + k).addEventListener("input", function(){ var v = lies(this.value); if(isFinite(v)) WERTE[k] = v; rechner(); }); });
     rechner();
   }
   function rechner(){
     var f = $("fall").value, v = {};
     FAELLE[f].forEach(function(k){ v[k] = lies($("rIn_" + k).value); });
-    var L = loese(f, v);
+    var L = loese(f, v, REINH);
     if(L.fehler){ $("rFehler").textContent = t(L.fehler); $("rLauf").innerHTML = ""; leer($("rDreieck")); return; }
     $("rFehler").textContent = "";
     $("rLauf").innerHTML = L.schritte.map(function(s){ return "<li>" + bdi(s) + "</li>"; }).join("");
@@ -367,6 +367,12 @@
       if(war){ beantwortet = false; anzahl--; if(gut) punkte--; pruefe(auf.typ === "begriff" ? (gut ? auf.l : "x") : (eing != null && eing !== "" ? eing : "999999")); }
     }
   }
+  // Alltagsbeispiel in den Rechner laden (aus alltag-daten.js)
+  window.MS_TRIG = { laden: function(w){
+    REINH = w.einheit; for(var k in w.v) WERTE[k] = w.v[k];
+    $("fall").value = w.fall; zeigeTab("rechner"); rechnerFelder();
+    $("fall").scrollIntoView({ behavior: "smooth", block: "start" });
+  } };
   window.MS_LANG = { apply: function(l){ if(TG[l]){ lang = l; alles(); } } };
   alles();
 })();
