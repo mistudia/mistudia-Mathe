@@ -136,6 +136,7 @@
   #vFrage { max-width: 100%; font-size: 17px; }
   #vRechnung { font-size: 20px; line-height: 1.6; }
   @media (max-width: 600px) { table.vt { font-size: 16px; } table.vt th, table.vt td { padding: 6px 6px; } }
+  .vR { width: 150px; max-width: 50vw; accent-color: var(--blue); }
   /* Grundlagen */
   .gOmega { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; direction: ltr; overflow-x: auto; }
   .gErg { font: 700 18px system-ui, sans-serif; min-width: 44px; padding: 6px 8px; border-radius: 10px; border: 2px solid var(--line); background: #ffffff; color: var(--text); cursor: pointer; }
@@ -239,9 +240,9 @@
       <div class="reihe"><label><span id="tVPreset"></span> <select id="vPreset"></select></label></div>
       <p class="zeile" id="vKontext"></p>
       <div class="reihe">
-        <label><bdi dir="ltr">P(A) =</bdi> <input class="zahl" id="vPA" inputmode="text" autocomplete="off" style="width:110px"></label>
-        <label><bdi dir="ltr">P(B | A) =</bdi> <input class="zahl" id="vPBA" inputmode="text" autocomplete="off" style="width:110px"></label>
-        <label><bdi dir="ltr">P(B | Ā) =</bdi> <input class="zahl" id="vPBnA" inputmode="text" autocomplete="off" style="width:110px"></label>
+        <label><bdi dir="ltr">P(A) =</bdi> <input class="zahl" id="vPA" inputmode="text" autocomplete="off" style="width:110px"> <input type="range" class="vR" id="vPAR" min="1" max="99" step="1" aria-label="vPA"></label>
+        <label><bdi dir="ltr">P(B | A) =</bdi> <input class="zahl" id="vPBA" inputmode="text" autocomplete="off" style="width:110px"> <input type="range" class="vR" id="vPBAR" min="1" max="99" step="1" aria-label="vPBA"></label>
+        <label><bdi dir="ltr">P(B | Ā) =</bdi> <input class="zahl" id="vPBnA" inputmode="text" autocomplete="off" style="width:110px"> <input type="range" class="vR" id="vPBnAR" min="1" max="99" step="1" aria-label="vPBnA"></label>
       </div>
       <p class="muted" id="vLegende"></p>
       <div class="reihe">

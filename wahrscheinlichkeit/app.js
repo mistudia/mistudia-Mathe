@@ -319,6 +319,7 @@
     var pa = vLies($("vPA").value), pba = vLies($("vPBA").value), pbna = vLies($("vPBnA").value);
     if(!pa || !pba || !pbna){ $("vFehler").textContent = t("vFehler"); return null; }
     $("vFehler").textContent = "";
+    [["vPAR", pa], ["vPBAR", pba], ["vPBnAR", pbna]].forEach(function(x){ $(x[0]).value = Math.round(num(x[1]) * 100); });
     var eins = F(1), na = sub(eins, pa);
     var M = [[mulK(pa, pba), mulK(pa, sub(eins, pba)), pa], [mulK(na, pbna), mulK(na, sub(eins, pbna)), na], [null, null, eins]];
     M[2][0] = addL(M[0][0], M[1][0]); M[2][1] = addL(M[0][1], M[1][1]);
@@ -386,6 +387,7 @@
   }
   $("vPreset").addEventListener("change", function(){ vSetzePreset($("vPreset").value); vierTexte(); vier(); });
   ["vPA", "vPBA", "vPBnA"].forEach(function(id){ $(id).addEventListener("input", vier); });
+  ["vPA", "vPBA", "vPBnA"].forEach(function(id){ $(id + "R").addEventListener("input", function(){ $(id).value = $(id + "R").value + " %"; vier(); }); });
   $("vN").addEventListener("change", vier);
   $("vFrage").addEventListener("change", function(){ vFrage = $("vFrage").value; vier(); });
   $("vFormat").querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ vFormat = b.dataset.f; $("vFormat").querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); vier(); }); });
