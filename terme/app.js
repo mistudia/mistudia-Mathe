@@ -148,6 +148,7 @@
   function fehlerText(e){ return t("err_" + (typeof e === "string" ? e : "zeichen")); }
 
   // ---------- Reiter Vereinfachen ----------
+  var probeW = {}, probeSig = null;
   function vereinfachen(){
     var L = [], ast;
     try { ast = parse($("term").value); } catch(e){ $("fehler").textContent = fehlerText(e); ["schritte", "ergebnis", "probe"].forEach(function(id){ $(id).innerHTML = ""; }); return; }
@@ -183,7 +184,14 @@
     $("ergebnis").innerHTML = bdi(esc(render(ast)) + " = " + ptxt(erg));
     // Probe
     var V = astVars(ast), w = {}, werte = [2, 3, -1, 5, 4];
-    V.forEach(function(v, i){ w[v] = werte[i % werte.length]; });
+    V.forEach(function(v, i){ w[v] = probeW[v] != null ? probeW[v] : werte[i % werte.length]; probeW[v] = w[v]; });
+    // Regler für die eingesetzten Werte (nur neu bauen, wenn sich die Variablen ändern – sonst ginge das Ziehen verloren)
+    var sig = V.join(",");
+    sicht($("probeRegler"), V.length > 0); $("probeReglerT").textContent = t("probeRegler");
+    if(sig !== probeSig){ probeSig = sig;
+      $("probeRegel").innerHTML = V.map(function(v){ return '<label>' + esc(v) + ' = <input type="range" min="-5" max="5" step="1" value="' + w[v] + '" data-v="' + esc(v) + '"> <b>' + zahl(w[v]) + "</b></label>"; }).join("");
+      $("probeRegel").querySelectorAll("input").forEach(function(r){ r.addEventListener("input", function(){ probeW[r.dataset.v] = Number(r.value); r.nextElementSibling.textContent = zahl(Number(r.value)); vereinfachen(); }); });
+    }
     var a = auswerten(ast, w), b = auswerten({ t: "sum", items: [] }, w), pe = 0;
     Object.keys(erg).forEach(function(k){ var m = kparse(k), x = erg[k].n / erg[k].d; for(var v in m) x *= Math.pow(w[v], m[v]); pe += x; }); void b;
     $("probe").innerHTML = V.length ? t("probe", { w: bdi(Object.keys(w).map(function(v){ return v + " = " + zahl(w[v]); }).join(", ")), a: bdi(zahl(a)), b: bdi(zahl(pe)) }) : "";
