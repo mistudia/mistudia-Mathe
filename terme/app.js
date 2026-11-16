@@ -402,7 +402,7 @@
       document.title = "miStudia – " + t("titel"); $("titel").textContent = t("titel");
       document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = b.dataset.tab === "grund" ? MS_GRUND.t("tab", lang) : t("tab_" + b.dataset.tab); });
       // Grundlagen-Karten (gemeinsam mit „Negative Zahlen“, /grundlagen.js) in der aktuellen Sprache
-      if(window.MS_GRUND) MS_GRUND.karten($("grundBox"), ["minus", "verteilen", "sorten", "potenz", "kuerzen"], lang);
+      if(window.MS_GRUND) MS_GRUND.karten($("grundBox"), ["minus", "verteilen", "sorten", "fallen", "potenz", "kuerzen"], lang);
       $("tTerm").textContent = t("termL"); $("tTerm2").textContent = t("termL2"); $("tTerm3").textContent = t("termL3"); $("hinweis").textContent = t("hinweis");
       beispiele($("bsp1"), $("term"), ["3a + 5b − a + 2b + 4", "4x − 7 + 2x + 9 − x", "2a · 3b + 5ab − ab", "3x² + 2x − x² + 4x", "5(2a − 3) − 2(a − 4)", "−(x − 3) + 4x", "7x − (3x + 2)", "4 + (2x − 5) − (x − 1)", "8a − (−2a + 5)", "−2(3a − b) + 4(a + 2b)", "3(x + 2) − (x − 4) + 2(5 − x)"], vereinfachen);
       beispiele($("bsp2"), $("term2"), ["3(2x − 5)", "−4a(a + 2b)", "(a + 2)(a + 5)", "(2x + 3)(x − 4)", "(x − 3)²", "(a + b)(c − d)"], ausmult);

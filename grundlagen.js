@@ -13,6 +13,7 @@ var MS_GRUND = (function(){
   "use strict";
   var T = {
 de: {
+  f_t: "Vorsicht, Verwechslungsgefahr!", f_txt: "Setze eine Zahl ein – dann sieht man sofort, ob zwei Terme gleich sind oder nicht.", f_w1: "Mehrmals plus wird zu mal:", f_w2: "Mehrmals mal wird zur Hochzahl:", f_tuete: "Jede Tüte enthält a Punkte. 5a + 3 sind 5 Tüten und 3 einzelne Punkte.", f_m1: "3x = x + x + x (dreimal x addiert), aber x³ = x · x · x (dreimal x malgenommen). Das sind verschiedene Terme!", f_m2: "5a + 3 lässt sich nicht zusammenfassen: a und eine reine Zahl sind verschiedene Sorten. 5a + 3 ist weder 8 noch 8a. Nur gleiche Sorten darf man addieren: 5a + 3a = 8a.", f_zufall: "Hier zufällig gleich – probiere eine andere Zahl!",
   tab: "Grundlagen", intro: "Die wichtigsten Regeln zum Anschauen – mit Bildern statt nur mit Formeln.",
   m_t: "Minus heißt: das Gegenteil dazurechnen",
   m_txt: "Grün ist 1 € Guthaben (+1), rot ist 1 € Schulden (−1). Ein grüner und ein roter Euro heben sich auf – sie werden durchgestrichen.",
@@ -36,6 +37,7 @@ de: {
   k_err: "Bitte oben und unten nur eine Zahl mal Variablen eingeben, z. B. 6x³y² und 3x²y.", k_nochmal: "Nochmal zeigen"
 },
 en: {
+  f_t: "Careful – easy to mix up!", f_txt: "Put in a number – then you see straight away whether two expressions are equal or not.", f_w1: "Adding several times becomes multiplying:", f_w2: "Multiplying several times becomes a power:", f_tuete: "Each bag holds a dots. 5a + 3 is 5 bags and 3 single dots.", f_m1: "3x = x + x + x (x added three times), but x³ = x · x · x (x multiplied three times). These are different expressions!", f_m2: "5a + 3 cannot be combined: a and a plain number are different kinds. 5a + 3 is neither 8 nor 8a. Only like terms may be added: 5a + 3a = 8a.", f_zufall: "Equal here just by chance – try another number!",
   tab: "Basics", intro: "The most important rules to look at – with pictures, not just formulas.",
   m_t: "Minus means: add the opposite",
   m_txt: "Green is €1 credit (+1), red is €1 debt (−1). One green and one red euro cancel each other out – they get crossed out.",
@@ -59,6 +61,7 @@ en: {
   k_err: "Please enter only a number times variables on top and at the bottom, e.g. 6x³y² and 3x²y.", k_nochmal: "Show again"
 },
 es: {
+  f_t: "¡Cuidado, fácil de confundir!", f_txt: "Sustituye un número y verás enseguida si dos expresiones son iguales o no.", f_w1: "Sumar varias veces se convierte en multiplicar:", f_w2: "Multiplicar varias veces se convierte en potencia:", f_tuete: "Cada bolsa contiene a puntos. 5a + 3 son 5 bolsas y 3 puntos sueltos.", f_m1: "3x = x + x + x (x sumado tres veces), pero x³ = x · x · x (x multiplicado tres veces). ¡Son expresiones distintas!", f_m2: "5a + 3 no se puede reducir: a y un número solo son clases distintas. 5a + 3 no es 8 ni 8a. Solo se suman términos semejantes: 5a + 3a = 8a.", f_zufall: "Aquí son iguales por casualidad: ¡prueba otro número!",
   tab: "Lo básico", intro: "Las reglas más importantes para mirar – con imágenes y no solo con fórmulas.",
   m_t: "Restar significa: sumar lo contrario",
   m_txt: "Verde es 1 € a favor (+1), rojo es 1 € de deuda (−1). Un euro verde y uno rojo se anulan: se tachan.",
@@ -82,6 +85,7 @@ es: {
   k_err: "Escribe arriba y abajo solo un número por variables, p. ej. 6x³y² y 3x²y.", k_nochmal: "Mostrar otra vez"
 },
 zh: {
+  f_t: "注意，容易混淆！", f_txt: "代入一个数，马上就能看出两个式子是否相等。", f_w1: "连加几次变成乘法：", f_w2: "连乘几次变成幂：", f_tuete: "每个袋子里有 a 个点。5a + 3 就是 5 个袋子加 3 个单独的点。", f_m1: "3x = x + x + x（x 加三次），而 x³ = x · x · x（x 乘三次）。这是不同的式子！", f_m2: "5a + 3 不能合并：a 和单独的数是不同的类。5a + 3 既不是 8，也不是 8a。只有同类项才能相加：5a + 3a = 8a。", f_zufall: "这里只是碰巧相等——换一个数试试！",
   tab: "基础", intro: "最重要的规则，用图来看，而不只是公式。",
   m_t: "减法就是：加上相反数",
   m_txt: "绿色表示 1 欧元存款（+1），红色表示 1 欧元欠款（−1）。一个绿色和一个红色互相抵消，被划掉。",
@@ -105,6 +109,7 @@ zh: {
   k_err: "上下请只输入一个数乘字母，例如 6x³y² 和 3x²y。", k_nochmal: "再看一次"
 },
 fr: {
+  f_t: "Attention, facile à confondre !", f_txt: "Remplace par un nombre : on voit tout de suite si deux expressions sont égales ou non.", f_w1: "Additionner plusieurs fois devient multiplier :", f_w2: "Multiplier plusieurs fois devient une puissance :", f_tuete: "Chaque sac contient a points. 5a + 3, ce sont 5 sacs et 3 points seuls.", f_m1: "3x = x + x + x (x additionné trois fois), mais x³ = x · x · x (x multiplié trois fois). Ce sont des expressions différentes !", f_m2: "5a + 3 ne se réduit pas : a et un nombre seul sont des sortes différentes. 5a + 3 n’est ni 8 ni 8a. On n’additionne que des termes semblables : 5a + 3a = 8a.", f_zufall: "Égal ici par hasard – essaie un autre nombre !",
   tab: "Les bases", intro: "Les règles les plus importantes à regarder – avec des images, pas seulement des formules.",
   m_t: "Moins veut dire : ajouter l’opposé",
   m_txt: "Vert = 1 € d’avoir (+1), rouge = 1 € de dette (−1). Un euro vert et un euro rouge s’annulent : on les barre.",
@@ -128,6 +133,7 @@ fr: {
   k_err: "En haut et en bas, écris seulement un nombre fois des lettres, p. ex. 6x³y² et 3x²y.", k_nochmal: "Revoir"
 },
 ru: {
+  f_t: "Осторожно, легко перепутать!", f_txt: "Подставь число – и сразу видно, равны два выражения или нет.", f_w1: "Несколько раз плюс – это умножение:", f_w2: "Несколько раз умножить – это степень:", f_tuete: "В каждом мешке a точек. 5a + 3 – это 5 мешков и 3 отдельные точки.", f_m1: "3x = x + x + x (x сложили три раза), а x³ = x · x · x (x умножили три раза). Это разные выражения!", f_m2: "5a + 3 нельзя упростить: a и просто число – разные сорта. 5a + 3 – это не 8 и не 8a. Складывать можно только подобные: 5a + 3a = 8a.", f_zufall: "Здесь равны случайно – попробуй другое число!",
   tab: "Основы", intro: "Самые важные правила наглядно – с картинками, а не только формулами.",
   m_t: "Минус значит: прибавить противоположное",
   m_txt: "Зелёный – 1 € на счёте (+1), красный – 1 € долга (−1). Один зелёный и один красный взаимно уничтожаются – их зачёркивают.",
@@ -151,6 +157,7 @@ ru: {
   k_err: "Сверху и снизу введи только число, умноженное на переменные, например 6x³y² и 3x²y.", k_nochmal: "Показать ещё раз"
 },
 ar: {
+  f_t: "انتبه، من السهل الخلط!", f_txt: "عوّض بعدد – فترى فورًا هل الحدّان متساويان أم لا.", f_w1: "الجمع عدة مرات يصبح ضربًا:", f_w2: "الضرب عدة مرات يصبح قوة:", f_tuete: "في كل كيس a نقاط. 5a + 3 تعني 5 أكياس و3 نقاط منفردة.", f_m1: "3x = x + x + x (جمع x ثلاث مرات)، أما x³ = x · x · x (ضرب x ثلاث مرات). هذان حدّان مختلفان!", f_m2: "لا يمكن تبسيط 5a + 3: فـ a والعدد وحده نوعان مختلفان. 5a + 3 ليس 8 وليس 8a. لا يُجمع إلا المتشابه: 5a + 3a = 8a.", f_zufall: "متساويان هنا بالصدفة – جرّب عددًا آخر!",
   tab: "الأساسيات", intro: "أهم القواعد للمشاهدة – بالصور وليس بالصيغ فقط.",
   m_t: "الطرح يعني: إضافة العكس",
   m_txt: "الأخضر 1 € رصيد (+1)، والأحمر 1 € دين (−1). يلغي يورو أخضر ويورو أحمر بعضهما – فيُشطبان.",
@@ -174,6 +181,7 @@ ar: {
   k_err: "أدخل في الأعلى والأسفل عددًا مضروبًا في متغيرات فقط، مثل 6x³y² و3x²y.", k_nochmal: "أعد العرض"
 },
 ja: {
+  f_t: "注意！まちがえやすいところ", f_txt: "数を代入してみると、2 つの式が等しいかどうかすぐにわかります。", f_w1: "同じ数を何回もたす → かけ算：", f_w2: "同じ数を何回もかける → 累乗：", f_tuete: "ふくろ 1 つに a 個の点。5a + 3 は、ふくろ 5 つと点 3 個。", f_m1: "3x = x + x + x（x を 3 回たす）、でも x³ = x · x · x（x を 3 回かける）。ちがう式です！", f_m2: "5a + 3 はまとめられません：a と数だけの項はちがう種類。5a + 3 は 8 でも 8a でもありません。たせるのは同類項だけ：5a + 3a = 8a。", f_zufall: "ここではたまたま同じ。別の数でためしてみよう！",
   tab: "きほん", intro: "いちばん大事なきまりを、式だけでなく図で見てみよう。",
   m_t: "ひき算は「反対の数をたす」こと",
   m_txt: "緑は 1 ユーロの残高（+1）、赤は 1 ユーロの借金（−1）。緑と赤が 1 つずつで打ち消し合い、線で消されます。",
@@ -197,6 +205,7 @@ ja: {
   k_err: "上と下には「数 × 文字」だけを入れてください。例：6x³y² と 3x²y。", k_nochmal: "もう一度見る"
 },
 pt: {
+  f_t: "Cuidado, fácil de confundir!", f_txt: "Substitua por um número – aí dá para ver na hora se duas expressões são iguais ou não.", f_w1: "Somar várias vezes vira multiplicar:", f_w2: "Multiplicar várias vezes vira potência:", f_tuete: "Cada saquinho tem a pontos. 5a + 3 são 5 saquinhos e 3 pontos soltos.", f_m1: "3x = x + x + x (x somado três vezes), mas x³ = x · x · x (x multiplicado três vezes). São expressões diferentes!", f_m2: "5a + 3 não se simplifica: a e um número sozinho são tipos diferentes. 5a + 3 não é 8 nem 8a. Só se somam termos semelhantes: 5a + 3a = 8a.", f_zufall: "Aqui são iguais por acaso – tente outro número!",
   tab: "O básico", intro: "As regras mais importantes para ver – com imagens, não só com fórmulas.",
   m_t: "Menos quer dizer: somar o oposto",
   m_txt: "Verde é 1 € de saldo (+1), vermelho é 1 € de dívida (−1). Um euro verde e um vermelho se anulam – são riscados.",
@@ -268,11 +277,20 @@ pt: {
     ".gl-kz input{width:150px;font:20px system-ui,sans-serif;padding:5px 8px;border:2px solid #b0b0b8;border-radius:10px;direction:ltr;text-align:center;color:#1a2233;background:#ffffff}" +
     ".gl-bsp{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;direction:ltr}.gl-bsp button{font:600 15px system-ui,sans-serif;padding:5px 10px;border-radius:999px;border:2px solid #b0b0b8;background:#ffffff;color:#1a2233;cursor:pointer}" +
     ".gl-fehler{color:#b91c1c;font-weight:700}" +
-    ".gl-ergebnis{font:800 22px system-ui,sans-serif;color:#1565c0}";
+    ".gl-ergebnis{font:800 22px system-ui,sans-serif;color:#1565c0}" +
+    ".gl-drei{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}@media (max-width:760px){.gl-drei{grid-template-columns:1fr}}" +
+    ".gl-feld{border:2px solid #c9dcf2;border-radius:12px;padding:8px 10px;background:#fbfdff;min-width:0}.gl-feld .gl-f{font-size:18px;margin:2px 0}" +
+    ".gl-bild{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end;margin:6px 0;direction:ltr;min-height:30px}" +
+    ".gl-gr{display:inline-flex;flex-wrap:wrap;gap:3px;padding:4px;border:2px solid #2563eb;border-radius:8px;background:#eff6ff;max-width:100%}" +
+    ".gl-sch{display:inline-grid;gap:2px;padding:3px;border:2px solid #7c3aed;border-radius:6px;background:#f5f3ff}.gl-q{width:9px;height:9px;background:#7c3aed;border-radius:2px}" +
+    ".gl-tuete{display:inline-flex;flex-wrap:wrap;gap:2px;width:34px;padding:4px 3px 3px;border:2px solid #d97706;border-radius:4px 4px 10px 10px;background:#fef3c7;justify-content:center;position:relative}" +
+    ".gl-tuete::before{content:'a';position:absolute;top:-11px;left:50%;transform:translateX(-50%);font:800 11px system-ui,sans-serif;color:#92400e;background:#ffffff;padding:0 2px;border-radius:4px}" +
+    ".gl-pt{width:8px;height:8px;border-radius:50%;background:#2563eb;flex:none}.gl-pt.o{background:#16a34a;width:12px;height:12px}" +
+    ".gl-ja{color:#15803d;font-weight:800}.gl-nein{color:#b91c1c;font-weight:800}.gl-hinweis{color:#b45309;font-weight:700;margin:4px 0}";
   document.head.appendChild(css);
 
   // Zustand der Regler (bleibt beim Sprachwechsel erhalten)
-  var Z = { ma: 5, mb: 3, mop: "-", vk: 2, va: 3, vb: 4, sBsp: null, kz: "x³y²", kn: "x²y" };
+  var Z = { fx: 2, fa: 2, ma: 5, mb: 3, mop: "-", vk: 2, va: 3, vb: 4, sBsp: null, kz: "x³y²", kn: "x²y" };
   var FARBE = { x: "gl-c0", y: "gl-c1", a: "gl-c2", b: "gl-c3", z: "gl-c4", m: "gl-c2", n: "gl-c3" };
   function vfarbe(v){ return FARBE[v] || "gl-c4"; }
 
@@ -450,7 +468,49 @@ pt: {
     kuerzenRechnen(box);
   }
 
+  // ---------- Karte: Verwechslungsgefahr (3x ≠ x³, 5a + 3 ≠ 8 ≠ 8a) mit eingesetzten Zahlen ----------
+  function fallenHtml(){
+    return '<div class="gl-karte" id="glFall"><h2>' + esc(t("f_t")) + '</h2><p class="gl-p">' + tx("f_txt") + "</p>" +
+      '<div class="gl-regler"><label>x = <input type="range" min="1" max="5" step="1" id="glFx"> <b id="glFxW"></b></label></div>' +
+      '<div class="gl-zwei"><div class="gl-feld"><p class="gl-p">' + esc(t("f_w1")) + '</p><p class="gl-f" id="glF1"></p><div class="gl-bild" id="glF1b"></div></div>' +
+      '<div class="gl-feld"><p class="gl-p">' + esc(t("f_w2")) + '</p><p class="gl-f" id="glF2"></p><div class="gl-bild" id="glF2b"></div></div></div>' +
+      '<p class="gl-f" id="glF12" style="text-align:center"></p><p class="gl-hinweis" id="glF12z"></p><p class="gl-merk">' + tx("f_m1") + "</p>" +
+      '<div class="gl-regler" style="margin-top:14px"><label>a = <input type="range" min="1" max="5" step="1" id="glFa"> <b id="glFaW"></b></label></div><p class="gl-p">' + tx("f_tuete") + "</p>" +
+      '<div class="gl-drei"><div class="gl-feld"><p class="gl-f" id="glF3"></p><div class="gl-bild" id="glF3b"></div></div><div class="gl-feld"><p class="gl-f" id="glF4"></p><div class="gl-bild" id="glF4b"></div></div><div class="gl-feld"><p class="gl-f" id="glF5"></p><div class="gl-bild" id="glF5b"></div></div></div>' +
+      '<p class="gl-f" id="glF345" style="text-align:center"></p><p class="gl-hinweis" id="glF345z"></p><p class="gl-merk">' + tx("f_m2") + "</p></div>";
+  }
+  function wdh(n, f){ var s = ""; for(var i = 0; i < n; i++) s += f(i); return s; }
+  function vgl(p, q){ return p === q ? '<span class="gl-ja">=</span>' : '<span class="gl-nein">≠</span>'; }
+  function fallenRechnen(box){
+    var x = Z.fx, a = Z.fa;
+    box.querySelector("#glFxW").textContent = x; box.querySelector("#glFaW").textContent = a;
+    var s1 = 3 * x, s2 = x * x * x;
+    box.querySelector("#glF1").innerHTML = bdi("3x = x + x + x<br>= " + x + " + " + x + " + " + x + " = <b>" + s1 + "</b>");
+    box.querySelector("#glF2").innerHTML = bdi("x³ = x · x · x<br>= " + x + " · " + x + " · " + x + " = <b>" + s2 + "</b>");
+    // Bild: 3 Gruppen mit je x Punkten | x Schichten mit je x · x Kästchen
+    box.querySelector("#glF1b").innerHTML = wdh(3, function(){ return '<span class="gl-gr">' + wdh(x, function(){ return '<span class="gl-pt"></span>'; }) + "</span>"; });
+    box.querySelector("#glF2b").innerHTML = wdh(x, function(){ return '<span class="gl-sch" style="grid-template-columns:repeat(' + x + ',9px)">' + wdh(x * x, function(){ return '<span class="gl-q"></span>'; }) + "</span>"; });
+    box.querySelector("#glF12").innerHTML = bdi("3x " + vgl(s1, s2) + " x³ &nbsp; (" + s1 + " " + vgl(s1, s2) + " " + s2 + ")");
+    box.querySelector("#glF12z").textContent = s1 === s2 ? t("f_zufall") : "";
+    var r3 = 5 * a + 3, r4 = 8, r5 = 8 * a;
+    box.querySelector("#glF3").innerHTML = bdi("5a + 3<br>= 5 · " + a + " + 3 = <b>" + r3 + "</b>");
+    box.querySelector("#glF4").innerHTML = bdi("5 + 3<br>= <b>8</b>");
+    box.querySelector("#glF5").innerHTML = bdi("5a + 3a = 8a<br>= 8 · " + a + " = <b>" + r5 + "</b>");
+    function tuete(){ return '<span class="gl-tuete">' + wdh(a, function(){ return '<span class="gl-pt"></span>'; }) + "</span>"; }
+    function einz(){ return '<span class="gl-pt o"></span>'; }
+    box.querySelector("#glF3b").innerHTML = wdh(5, tuete) + wdh(3, einz);
+    box.querySelector("#glF4b").innerHTML = wdh(8, einz);
+    box.querySelector("#glF5b").innerHTML = wdh(8, tuete);
+    box.querySelector("#glF345").innerHTML = bdi("5a + 3 " + vgl(r3, r4) + " 8 &nbsp; (" + r3 + " " + vgl(r3, r4) + " 8)") + " &nbsp;&nbsp; " + bdi("5a + 3 " + vgl(r3, r5) + " 8a &nbsp; (" + r3 + " " + vgl(r3, r5) + " " + r5 + ")");
+    box.querySelector("#glF345z").textContent = (r3 === r4 || r3 === r5) ? t("f_zufall") : "";
+  }
+  function fallenBinden(box){
+    [["glFx", "fx"], ["glFa", "fa"]].forEach(function(p){ var e = box.querySelector("#" + p[0]); e.value = Z[p[1]]; e.addEventListener("input", function(){ Z[p[1]] = +e.value; fallenRechnen(box); }); });
+    fallenRechnen(box);
+  }
+
   var KARTEN = {
+    fallen: [fallenHtml, fallenBinden],
     minus: [minusHtml, minusBinden], verteilen: [verteilenHtml, verteilenBinden], sorten: [sortenHtml, sortenBinden],
     potenz: [potenzHtml, null], kuerzen: [kuerzenHtml, kuerzenBinden]
   };
