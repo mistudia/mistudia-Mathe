@@ -48,9 +48,9 @@
     var erg = { W: "W = " + Z(W), G: "G = " + Z(G), P: "p = " + Z(p) + " %", E: t("neuL") + " " + Z(neu), S: t("neuL") + " " + Z(neu) }[pModus];
     $("pErgebnis").innerHTML = bdi(erg);
     var F = [], D = [], K = [];
-    if(pModus === "W"){ F = ["W = G · p : 100", "W = " + Z(G) + " · " + Z(p) + " : 100 = " + Z(W)]; D = ["100 % ≙ " + Z(G), "1 % ≙ " + Z(G / 100), Z(p) + " % ≙ " + Z(W)]; K = [Z(p) + " % = " + Z(q), "W = " + Z(q) + " · " + Z(G) + " = " + Z(W)]; }
-    else if(pModus === "G"){ F = ["G = W · 100 : p", "G = " + Z(W) + " · 100 : " + Z(p) + " = " + Z(G)]; D = [Z(p) + " % ≙ " + Z(W), "1 % ≙ " + Z(W / p), "100 % ≙ " + Z(G)]; K = [Z(p) + " % = " + Z(q), "G = " + Z(W) + " : " + Z(q) + " = " + Z(G)]; }
-    else if(pModus === "P"){ F = ["p = W : G · 100", "p = " + Z(W) + " : " + Z(G) + " · 100 = " + Z(p)]; D = [Z(G) + " ≙ 100 %", "1 ≙ " + Z(100 / G) + " %", Z(W) + " ≙ " + Z(p) + " %"]; K = [Z(W) + " : " + Z(G) + " = " + Z(q), Z(q) + " = " + Z(p) + " %"]; }
+    if(pModus === "W"){ F = ["W = G · p : 100", "W = " + Z(G) + " · " + Z(p) + " : 100 = " + Z(G * p) + " : 100 = " + Z(W)]; D = ["100 % ≙ " + Z(G), "1 % ≙ " + Z(G / 100), Z(p) + " % ≙ " + Z(W)]; K = [Z(p) + " % = " + Z(q), "W = " + Z(q) + " · " + Z(G) + " = " + Z(W)]; }
+    else if(pModus === "G"){ F = ["G = W · 100 : p", "G = " + Z(W) + " · 100 : " + Z(p) + " = " + Z(W * 100) + " : " + Z(p) + " = " + Z(G)]; D = [Z(p) + " % ≙ " + Z(W), "1 % ≙ " + Z(W / p), "100 % ≙ " + Z(G)]; K = [Z(p) + " % = " + Z(q), "G = " + Z(W) + " : " + Z(q) + " = " + Z(G)]; }
+    else if(pModus === "P"){ F = ["p = W : G · 100", "p = " + Z(W) + " : " + Z(G) + " · 100 = " + Z(W / G) + " · 100 = " + Z(p)]; D = [Z(G) + " ≙ 100 %", "1 ≙ " + Z(100 / G) + " %", Z(W) + " ≙ " + Z(p) + " %"]; K = [Z(W) + " : " + Z(G) + " = " + Z(q), Z(q) + " = " + Z(p) + " %"]; }
     else { var s = pModus === "E" ? "+" : "−", pp = pModus === "E" ? 100 + p : 100 - p;
       F = [t("neuK") + " = G · (100 " + s + " p) : 100", t("neuK") + " = " + Z(G) + " · " + Z(pp) + " : 100 = " + Z(neu)];
       D = ["100 % ≙ " + Z(G), "1 % ≙ " + Z(G / 100), Z(pp) + " % ≙ " + Z(neu)];
@@ -196,11 +196,11 @@
     var ok = Math.abs(v - A.l) <= tol;
     letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var g = function(x){ return A.geld ? geld(x) : zahl(x, 2); }, lt = A.typ === "P" ? zahl(A.l, 2) + " %" : g(A.l), L = [];
-    if(A.typ === "W") L.push(bdi("W = G · p : 100 = " + zahl(A.G) + " · " + zahl(A.p) + " : 100 = " + zahl(A.l)));
-    else if(A.typ === "G") L.push(bdi("G = W · 100 : p = " + zahl(A.W) + " · 100 : " + zahl(A.p) + " = " + zahl(A.l)));
-    else if(A.typ === "P") L.push(bdi("p = W : G · 100 = " + zahl(A.W) + " : " + zahl(A.G) + " · 100 = " + zahl(A.l) + " %"));
+    if(A.typ === "W") L.push(bdi("W = G · p : 100 = " + zahl(A.G) + " · " + zahl(A.p) + " : 100 = " + zahl(A.G * A.p) + " : 100 = " + zahl(A.l)));
+    else if(A.typ === "G") L.push(bdi("G = W · 100 : p = " + zahl(A.W) + " · 100 : " + zahl(A.p) + " = " + zahl(A.W * 100) + " : " + zahl(A.p) + " = " + zahl(A.l)));
+    else if(A.typ === "P") L.push(bdi("p = W : G · 100 = " + zahl(A.W) + " : " + zahl(A.G) + " · 100 = " + zahl(A.W / A.G, 4) + " · 100 = " + zahl(A.l) + " %"));
     else if(A.typ === "E" || A.typ === "S"){ var pp = A.typ === "E" ? 100 + A.p : 100 - A.p; L.push(bdi("q = " + zahl(pp / 100) + " (" + zahl(pp) + " %)")); L.push(bdi(geld(A.G) + " · " + zahl(pp / 100) + " = " + geld(A.l))); }
-    else if(A.typ === "zz"){ var q = 1 + A.p / 100; L.push(bdi("K<sub>" + A.n + "</sub> = K<sub>0</sub> · q<sup>n</sup> = " + geld(A.K) + " · " + zahl(q, 4) + hoch(A.n) + " = " + geld(A.l))); }
+    else if(A.typ === "zz"){ var q = 1 + A.p / 100; L.push(bdi("K<sub>" + A.n + "</sub> = K<sub>0</sub> · q<sup>n</sup> = " + geld(A.K) + " · " + zahl(q, 4) + hoch(A.n) + " = " + geld(A.K) + " · " + zahl(Math.pow(q, A.n), 6) + " = " + geld(A.l))); }
     else { var e2 = A.typ === "zM" ? "m" : A.typ === "zT" ? "d" : "j"; L.push(t("jahresZ") + " " + bdi(geld(A.K) + " · " + zahl(A.p) + " : 100 = " + geld(A.K * A.p / 100))); if(e2 !== "j") L.push(bdi("Z = " + geld(A.K * A.p / 100) + " · " + bruchZeit(A.n, e2) + " = " + geld(A.l))); }
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);

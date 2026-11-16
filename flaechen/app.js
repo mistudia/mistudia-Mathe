@@ -49,7 +49,16 @@
   }
   function seitenDreieck(P){ return [P.g, hyp(P.g - P.v, P.h), hyp(P.v, P.h)]; }
   function seitenTrapez(P){ return [P.a, hyp(P.v + P.c - P.a, P.h), P.c, hyp(P.v, P.h)]; }
-  function berechne(typ, P){ // {A, u, fA: [Formel, eingesetzt], fu}
+  function zwischen(typ, P, R){ // weitere Rechenschritte zwischen „eingesetzt“ und Ergebnis
+    var E = einheit, z = function(v){ return zahl(v) + " " + E; }, zA = [], zu = [];
+    if(typ === "trapez"){ zA.push(z(P.a + P.c) + " : 2 · " + z(P.h)); zA.push(z((P.a + P.c) / 2) + " · " + z(P.h)); }
+    if(typ === "dreieck" || typ === "raute" || typ === "drachen"){ var x = typ === "dreieck" ? P.g * P.h : P.e * P.f; zA.push(zahl(x) + " " + E + "² : 2"); }
+    if(typ === "kreis"){ zA.push("π · " + zahl(P.r * P.r) + " " + E + "²"); zu.push(zahl(2 * P.r) + " · π " + E); }
+    if(typ === "rechteck" || typ === "parallelogramm") zu.push("2 · " + z(P.a + P.b));
+    R.zA = zA; R.zu = zu; return R;
+  }
+  function berechne(typ, P){ return zwischen(typ, P, berechne0(typ, P)); }
+  function berechne0(typ, P){ // {A, u, fA: [Formel, eingesetzt], fu}
     var E = einheit, E2 = einheit + "²", z = function(v){ return zahl(v) + " " + E; };
     if(typ === "quadrat") return { A: P.a * P.a, u: 4 * P.a, fA: ["A = a · a", z(P.a) + " · " + z(P.a)], fu: ["u = 4 · a", "4 · " + z(P.a)] };
     if(typ === "rechteck") return { A: P.a * P.b, u: 2 * (P.a + P.b), fA: ["A = a · b", z(P.a) + " · " + z(P.b)], fu: ["u = 2 · (a + b)", "2 · (" + z(P.a) + " + " + z(P.b) + ")"] };
@@ -191,8 +200,8 @@
     var w = Number($("warum").value);
     zeichnen($("figSvg"), typ, P, { warum: w });
     var R = berechne(typ, P), E = einheit;
-    var h = "<b>" + t("flaecheL") + "</b><br>" + R.fA[0] + "<br>A = " + R.fA[1] + "<br>A " + (genau(R.A) ? "=" : "≈") + " " + zahl(R.A) + " " + E + "²";
-    h += "<br><br><b>" + t("umfangL") + "</b><br>" + R.fu[0] + "<br>u = " + R.fu[1] + "<br>u " + (genau(R.u) ? "=" : "≈") + " " + zahl(R.u) + " " + E;
+    var h = "<b>" + t("flaecheL") + "</b><br>" + R.fA[0] + "<br>A = " + R.fA[1] + R.zA.map(function(x){ return "<br>A = " + x; }).join("") + "<br>A " + (genau(R.A) ? "=" : "≈") + " " + zahl(R.A) + " " + E + "²";
+    h += "<br><br><b>" + t("umfangL") + "</b><br>" + R.fu[0] + "<br>u = " + R.fu[1] + R.zu.map(function(x){ return "<br>u = " + x; }).join("") + "<br>u " + (genau(R.u) ? "=" : "≈") + " " + zahl(R.u) + " " + E;
     if(R.seiten) h += '<br><br><span class="muted">' + t("seitenL") + " " + R.seiten.map(function(x){ return zg(x) + " " + E; }).join(", ") + "</span>";
     $("rechnung").innerHTML = h;
     $("hWarum").textContent = t("warumL"); $("warumText").textContent = warumText(typ, P, w);
@@ -289,8 +298,8 @@
     var A = auf, tol = Math.max(0.011, Math.abs(A.l) * 0.006), ok = Math.abs(v - A.l) <= tol;
     letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var einh = (A.art === "A" || (A.art === "L" && A.frage === "A")) ? " cm²" : " cm", lt = zg(A.l) + einh, L = [];
-    if(A.art === "A") L.push(bdi(A.R.fA[0] + " = " + A.R.fA[1] + " " + (genau(A.l) ? "=" : "≈") + " " + zahl(A.l) + einh));
-    else if(A.art === "u") L.push(bdi(A.R.fu[0] + " = " + A.R.fu[1] + " " + (genau(A.l) ? "=" : "≈") + " " + zahl(A.l) + einh));
+    if(A.art === "A") L.push(bdi(A.R.fA[0] + " = " + A.R.fA[1] + (A.R.zA || []).map(function(x){ return " = " + x; }).join("") + " " + (genau(A.l) ? "=" : "≈") + " " + zahl(A.l) + einh));
+    else if(A.art === "u") L.push(bdi(A.R.fu[0] + " = " + A.R.fu[1] + (A.R.zu || []).map(function(x){ return " = " + x; }).join("") + " " + (genau(A.l) ? "=" : "≈") + " " + zahl(A.l) + einh));
     else if(A.art === "rueck") L.push(bdi(A.w === "R" ? "b = A : a = " + A.A + " : " + A.a + " = " + A.b + " cm" : A.w === "Q" ? "a = √A = √" + A.A + " = " + A.a + " cm" : "r = u : (2 · π) = " + zahl(A.u) + " : (2 · π) ≈ " + A.r + " cm"));
     else L.push(bdi(A.frage === "A" ? "A = a · b − c · d = " + A.P.a + " · " + A.P.b + " − " + A.P.c + " · " + A.P.d + " = " + A.l + " cm²" : "u = 2 · (a + b) = 2 · (" + A.P.a + " + " + A.P.b + ") = " + A.l + " cm"));
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });

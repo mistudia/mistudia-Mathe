@@ -190,9 +190,9 @@
     else {
       var v = lies(e); if(!isFinite(v)) return;
       ok = Math.abs(v - A2.l) <= Math.max(0.011, A2.l * 0.003); lt = zg(A2.l);
-      if(A2.typ === "hyp" || A2.typ === "bild") L.push(bdi("c = √(" + zahl(A2.a) + "² + " + zahl(A2.b) + "²) = √" + zahl(A2.a * A2.a + A2.b * A2.b) + " " + (genau(A2.l) ? "=" : "≈") + " " + zahl(A2.l)));
-      else if(A2.typ === "kat" || A2.typ === "leiter") L.push(bdi((A2.typ === "kat" ? "a" : "h") + " = √(" + zahl(A2.c) + "² − " + zahl(A2.b) + "²) = √" + zahl(A2.c * A2.c - A2.b * A2.b) + " " + (genau(A2.l) ? "=" : "≈") + " " + zahl(A2.l)));
-      else { var dx = A2.Q[0] - A2.P[0], dy = A2.Q[1] - A2.P[1]; L.push(t("abstandWeg", { x: bdi(zahl(Math.abs(dx))), y: bdi(zahl(Math.abs(dy))) })); L.push(bdi("d = √(" + zahl(Math.abs(dx)) + "² + " + zahl(Math.abs(dy)) + "²) = √" + (dx * dx + dy * dy) + " " + (genau(A2.l) ? "=" : "≈") + " " + zahl(A2.l))); }
+      if(A2.typ === "hyp" || A2.typ === "bild") L.push(bdi("c = √(" + zahl(A2.a) + "² + " + zahl(A2.b) + "²) = √(" + zahl(A2.a * A2.a) + " + " + zahl(A2.b * A2.b) + ") = √" + zahl(A2.a * A2.a + A2.b * A2.b) + " " + (genau(A2.l) ? "=" : "≈") + " " + zahl(A2.l)));
+      else if(A2.typ === "kat" || A2.typ === "leiter") L.push(bdi((A2.typ === "kat" ? "a" : "h") + " = √(" + zahl(A2.c) + "² − " + zahl(A2.b) + "²) = √(" + zahl(A2.c * A2.c) + " − " + zahl(A2.b * A2.b) + ") = √" + zahl(A2.c * A2.c - A2.b * A2.b) + " " + (genau(A2.l) ? "=" : "≈") + " " + zahl(A2.l)));
+      else { var dx = A2.Q[0] - A2.P[0], dy = A2.Q[1] - A2.P[1]; L.push(t("abstandWeg", { x: bdi(zahl(Math.abs(dx))), y: bdi(zahl(Math.abs(dy))) })); L.push(bdi("d = √(" + zahl(Math.abs(dx)) + "² + " + zahl(Math.abs(dy)) + "²) = √(" + (dx * dx) + " + " + (dy * dy) + ") = √" + (dx * dx + dy * dy) + " " + (genau(A2.l) ? "=" : "≈") + " " + zahl(A2.l))); }
     }
     letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });

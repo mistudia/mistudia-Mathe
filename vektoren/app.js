@@ -23,6 +23,13 @@
   function wahl(L){ return L[Math.floor(Math.random() * L.length)]; }
   function komma(){ return !(lang === "en" || lang === "zh" || lang === "ja" || lang === "ar"); }
   function zahl(v, d){ if(d == null) d = 2; var r = Math.round(v * Math.pow(10, d)) / Math.pow(10, d); if(Object.is(r, -0)) r = 0; var s = String(Math.abs(r)); if(s.indexOf("e") >= 0) s = Math.abs(r).toFixed(d); if(komma()) s = s.replace(".", ","); return (r < 0 ? "−" : "") + s; }
+  function kz(x){ return x < 0 ? "(" + zahl(x) + ")" : zahl(x); }
+  function sumZ(L){ return L.map(function(x, i){ return i ? (x < 0 ? " − " + zahl(-x) : " + " + zahl(x)) : zahl(x); }).join(""); }
+  // Skalarprodukt ausführlich: (−3) · (−3) + (−2) · 11 = 9 − 22 = −13
+  function skTxt(a, b){ var P = a.map(function(x, i){ return x * b[i]; }), r = P.reduce(function(s, x){ return s + x; }, 0);
+    return a.map(function(x, i){ return kz(x) + " · " + kz(b[i]); }).join(" + ") + (a.length > 1 ? " = " + sumZ(P) : "") + " = " + zahl(r); }
+  // Betrag ausführlich: √((−1)² + 4²) = √(1 + 16) = √17
+  function btTxt(v){ var Q = v.map(function(x){ return x * x; }); return "√(" + v.map(function(x){ return kz(x) + "²"; }).join(" + ") + ") = √(" + Q.map(zahl).join(" + ") + ") = √" + zahl(Q.reduce(function(s, x){ return s + x; }, 0)); }
   function genau(v, d){ d = d == null ? 2 : d; return Math.abs(v * Math.pow(10, d) - Math.round(v * Math.pow(10, d))) < 1e-7; }
   function gl(v, d){ return genau(v, d) ? "=" : "≈"; }
   function zg(v, d){ return (genau(v, d) ? "" : "≈ ") + zahl(v, d); }
@@ -80,7 +87,7 @@
       var w1 = wa, w2 = wb; if(((w2 - w1) + 4 * Math.PI) % (2 * Math.PI) > Math.PI){ var tmp = w1; w1 = w2; w2 = tmp; }
       var p1 = [r * Math.cos(w1), r * Math.sin(w1)], p2 = [r * Math.cos(w2), r * Math.sin(w2)];
       if(len(a) > 0 && len(b) > 0) sv.appendChild(el("path", { d: "M" + X(0) + " " + Y(0) + " L" + X(p1[0]) + " " + Y(p1[1]) + " A" + r * S2 + " " + r * S2 + " 0 0 0 " + X(p2[0]) + " " + Y(p2[1]) + " Z", "class": "bogen" }));
-      L.push(t("skalarL") + " " + bdi("a · b = " + zahl(a[0]) + " · " + zahl(b[0]) + " + " + zahl(a[1]) + " · " + zahl(b[1]) + " = " + zahl(sp)));
+      L.push(t("skalarL") + " " + bdi("a · b = " + skTxt(a, b)));
       L.push(bdi("|a| " + gl(len(a)) + " " + zahl(len(a)) + ", |b| " + gl(len(b)) + " " + zahl(len(b))));
       L.push(t("winkelL") + " " + bdi("cos φ = " + zahl(sp) + " : (" + zahl(len(a)) + " · " + zahl(len(b)) + ") " + gl(sp / (len(a) * len(b)), 4) + " " + zahl(sp / (len(a) * len(b)), 4) + " → φ " + gl(w, 1) + " " + zahl(w, 1) + "°"));
       L.push(t(Math.abs(sp) < 1e-9 ? "orthoJa" : sp > 0 ? "spitz" : "stumpf"));
@@ -139,9 +146,9 @@
     var pM = P(M); $("dSvg").appendChild(el("circle", { cx: pM[0], cy: pM[1], r: 4, fill: FE })); $("dSvg").appendChild(el("text", { x: pM[0] - 20, y: pM[1] + 4, "class": "vlab", fill: FE }, "M"));
     function karte(h, s){ return "<div><h3>" + h + "</h3>" + s + "</div>"; }
     $("dErg").innerHTML = karte(t("h_vek"), "AB = B − A = " + vk(AB) + "<br>AC = C − A = " + vk(AC)) +
-      karte(t("h_laenge"), "|AB| = √(" + AB.map(function(x){ return zahl(x) + "²"; }).join(" + ") + ") " + gl(len(AB)) + " " + zahl(len(AB)) + "<br>|AC| " + gl(len(AC)) + " " + zahl(len(AC)));
+      karte(t("h_laenge"), "|AB| = " + btTxt(AB) + " " + gl(len(AB)) + " " + zahl(len(AB)) + "<br>|AC| " + gl(len(AC)) + " " + zahl(len(AC)));
     $("dErg2").innerHTML = karte(t("h_mitte"), "M = ½ · (A + B) = " + vk(M)) +
-      karte(t("h_skalar"), "AB · AC = " + AB.map(function(x, i){ return zahl(x) + " · " + zahl(AC[i]); }).join(" + ") + " = " + zahl(sp) + "<br>" + t(Math.abs(sp) < 1e-9 ? "orthoJa" : "orthoNein")) +
+      karte(t("h_skalar"), "AB · AC = " + skTxt(AB, AC) + "<br>" + t(Math.abs(sp) < 1e-9 ? "orthoJa" : "orthoNein")) +
       karte(t("h_winkel"), isFinite(w) ? "cos α = " + zahl(sp) + " : (" + zahl(len(AB)) + " · " + zahl(len(AC)) + ") → α " + gl(w, 1) + " " + zahl(w, 1) + "°" : "–") +
       karte(t("h_kreuz"), "AB × AC = " + vk(kr) + "<br>" + t("flaecheP") + " |AB × AC| " + gl(len(kr)) + " " + zahl(len(kr)) + "<br>" + t("flaecheD") + " " + gl(len(kr) / 2) + " " + zahl(len(kr) / 2) + (nullV(kr) ? "<br>" + t("kollinear") : ""));
   }
@@ -236,7 +243,7 @@
   function pruefe(e){
     if(beantwortet) return;
     var A = auf, ok, lt, L = [];
-    if(A.typ === "ortho"){ ok = e === A.l; lt = t(A.l ? "ja" : "nein"); L.push(bdi("a · b = " + A.a.map(function(x, i){ return zahl(x) + " · " + zahl(A.b[i]); }).join(" + ") + " = " + dot(A.a, A.b)) + " " + t(A.l ? "orthoJa" : "orthoNein")); }
+    if(A.typ === "ortho"){ ok = e === A.l; lt = t(A.l ? "ja" : "nein"); L.push(bdi("a · b = " + skTxt(A.a, A.b)) + " " + t(A.l ? "orthoJa" : "orthoNein")); }
     else if(A.typ === "lage"){ ok = e === A.l; lt = t("lageK_" + A.l); var Lg = lageBerechnen(A.p, A.u, A.q, A.v); L.push(t("w_richt") + " " + t(nullV(kreuz(A.u, A.v)) ? "w_vielfach" : "w_keinVielfach")); if(Lg.S) L.push(bdi("t = " + zahl(Lg.t) + ", s = " + zahl(Lg.s) + " → S" + pk(Lg.S))); else if(Lg.art === "wind") L.push(t("w_probe", { c: Lg.k + 1 }) + " " + t("w_probeNein")); else L.push(t("w_punkt") + " " + t(Lg.art === "ident" ? "w_punktJa" : "w_punktNein")); }
     else {
       var v = e.map(lies); if(!v.every(isFinite)) return;
@@ -244,9 +251,9 @@
       ok = v.every(function(x, i){ return Math.abs(x - ziel[i]) <= tol; });
       lt = Array.isArray(A.l) ? bdi(vk(A.l)) : bdi(zg(A.l, A.typ === "winkel" ? 1 : 2) + (A.typ === "winkel" ? "°" : ""));
       if(A.typ === "ab") L.push(bdi("PQ = Q − P = " + vk(A.Q) + " − " + vk(A.P) + " = " + vk(A.l)));
-      else if(A.typ === "betrag") L.push(bdi("|v| = √(" + A.v.map(function(x){ return zahl(x) + "²"; }).join(" + ") + ") = √" + dot(A.v, A.v) + " = " + zahl(A.l)));
-      else if(A.typ === "skalar") L.push(bdi("a · b = " + A.a.map(function(x, i){ return zahl(x) + " · " + zahl(A.b[i]); }).join(" + ") + " = " + zahl(A.l)));
-      else if(A.typ === "winkel") L.push(bdi("cos α = " + zahl(dot(A.a, A.b)) + " : (" + zahl(len(A.a)) + " · " + zahl(len(A.b)) + ") → α ≈ " + zahl(A.l, 1) + "°"));
+      else if(A.typ === "betrag") L.push(bdi("|v| = " + btTxt(A.v) + " " + (Math.abs(A.l * 100 - Math.round(A.l * 100)) < 1e-9 ? "=" : "≈") + " " + zahl(A.l)));
+      else if(A.typ === "skalar") L.push(bdi("a · b = " + skTxt(A.a, A.b)));
+      else if(A.typ === "winkel") L.push(bdi("a · b = " + skTxt(A.a, A.b)) + "<br>" + bdi("|a| = " + btTxt(A.a) + " ≈ " + zahl(len(A.a))) + "<br>" + bdi("|b| = " + btTxt(A.b) + " ≈ " + zahl(len(A.b))) + "<br>" + bdi("cos α = " + zahl(dot(A.a, A.b)) + " : (" + zahl(len(A.a)) + " · " + zahl(len(A.b)) + ") ≈ " + zahl(dot(A.a, A.b) / (len(A.a) * len(A.b)), 4) + " → α ≈ " + zahl(A.l, 1) + "°"));
       else if(A.typ === "mitte") L.push(bdi("M = ½ · (P + Q) = " + vk(A.l)));
       else { var a = A.a, b = A.b, z0 = function(x){ return x < 0 ? "(" + zahl(x) + ")" : zahl(x); };
         var zeilen = [z0(a[1]) + "·" + z0(b[2]) + " − " + z0(a[2]) + "·" + z0(b[1]), z0(a[2]) + "·" + z0(b[0]) + " − " + z0(a[0]) + "·" + z0(b[2]), z0(a[0]) + "·" + z0(b[1]) + " − " + z0(a[1]) + "·" + z0(b[0])];

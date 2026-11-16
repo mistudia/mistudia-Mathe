@@ -71,6 +71,10 @@
       W.push(t("gegen") + " " + bdi("P(X ≥ " + a + ") = 1 − P(X ≤ " + (a - 1) + ") = 1 − " + zahl(1 - S, 4) + " " + (genau(S, 4) ? "=" : "≈") + " " + zahl(S, 4)));
     } else if(ok){
       W.push(t("summe") + " " + bdi(ktxt + " = " + (b - a <= 4 ? range(a, b).map(function(i){ return "P(X = " + i + ")"; }).join(" + ") : "P(X = " + a + ") + … + P(X = " + b + ")")));
+      if(b - a <= 12){
+        range(a, b).forEach(function(i){ W.push(bdi("P(X = " + i + ") = " + binko(n, i) + " · " + zahl(p, 4) + "<sup>" + i + "</sup> · " + zahl(1 - p, 4) + "<sup>" + (n - i) + "</sup> ≈ " + zahl(P[i], 4))); });
+        W.push(bdi(ktxt + " ≈ " + range(a, b).map(function(i){ return zahl(P[i], 4); }).join(" + ") + " ≈ " + zahl(S, 4)));
+      }
     }
     $("weg").innerHTML = W.map(function(s){ return "<li>" + s + "</li>"; }).join("");
     var mu = n * p, sg = Math.sqrt(n * p * (1 - p));
@@ -167,8 +171,13 @@
     var A = auf, tol = A.typ === "mu" || A.typ === "wieoft" ? 1e-9 : A.typ === "sigma" ? 0.011 : 0.0011;
     var ok = Math.abs(v - A.l) <= tol, L = [];
     var lt = A.typ === "mu" || A.typ === "wieoft" ? zahl(A.l, 2) : A.typ === "sigma" ? zg(A.l, 2) : zg(A.l, 4) + " (" + proz(A.l) + ")";
-    if(A.typ === "gleich") L.push(bdi("P(X = " + A.k + ") = " + binko(A.n, A.k) + " · " + zahl(A.p, 4) + "<sup>" + A.k + "</sup> · " + zahl(1 - A.p, 4) + "<sup>" + (A.n - A.k) + "</sup> ≈ " + zahl(A.l, 4)));
-    else if(A.typ === "hoechstens") L.push(bdi("P(X ≤ " + A.k + ") = P(X = 0) + … + P(X = " + A.k + ") ≈ " + zahl(A.l, 4)));
+    if(A.typ === "gleich") L.push(bdi("P(X = " + A.k + ") = " + binko(A.n, A.k) + " · " + zahl(A.p, 4) + "<sup>" + A.k + "</sup> · " + zahl(1 - A.p, 4) + "<sup>" + (A.n - A.k) + "</sup> ≈ " + binko(A.n, A.k) + " · " + zahl(Math.pow(A.p, A.k), 6) + " · " + zahl(Math.pow(1 - A.p, A.n - A.k), 6) + " ≈ " + zahl(A.l, 4)));
+    else if(A.typ === "hoechstens"){
+      L.push(bdi("P(X ≤ " + A.k + ") = " + (A.k <= 4 ? range(0, A.k).map(function(i){ return "P(X = " + i + ")"; }).join(" + ") : "P(X = 0) + P(X = 1) + … + P(X = " + A.k + ")")));
+      var Wk = range(0, A.k).map(function(i){ return binko(A.n, i) * Math.pow(A.p, i) * Math.pow(1 - A.p, A.n - i); });
+      range(0, A.k).forEach(function(i){ L.push(bdi("P(X = " + i + ") = " + binko(A.n, i) + " · " + zahl(A.p, 4) + "<sup>" + i + "</sup> · " + zahl(1 - A.p, 4) + "<sup>" + (A.n - i) + "</sup> ≈ " + zahl(Wk[i], 4))); });
+      L.push(bdi("P(X ≤ " + A.k + ") ≈ " + Wk.map(function(x){ return zahl(x, 4); }).join(" + ") + " ≈ " + zahl(A.l, 4)));
+    }
     else if(A.typ === "mind1") L.push(t("gegen") + " " + bdi("P(X ≥ 1) = 1 − P(X = 0) = 1 − " + zahl(1 - A.p, 4) + "<sup>" + A.n + "</sup> ≈ " + zahl(A.l, 4)));
     else if(A.typ === "mu") L.push(bdi("μ = n · p = " + A.n + " · " + zahl(A.p, 2) + " = " + zahl(A.l, 2)));
     else if(A.typ === "sigma") L.push(bdi("σ = √(" + A.n + " · " + zahl(A.p, 2) + " · " + zahl(1 - A.p, 2) + ") = √" + zahl(A.n * A.p * (1 - A.p), 2) + " ≈ " + zahl(A.l, 2)));

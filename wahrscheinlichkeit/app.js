@@ -180,7 +180,23 @@
   }
   function klick(key){ if(auswahl[key]) delete auswahl[key]; else auswahl[key] = 1; ereignis = null; simReset(); baum(); }
   function gewaehlt(){ return B.blaetter.filter(function(b){ return auswahl[b.key]; }); }
-  function pfadZeile(b){ return bdi("P" + pfadText(b.pfad) + " = " + b.ps.map(function(p){ return fmt(p, "bruch"); }).join(" · ") + " = " + fmt(b.p)); }
+  // Produkt Schritt für Schritt: 5/8 · 4/7 = 20/56 = 5/14
+  function produktTxt(ps, ergebnis, f2){
+    var zn = 1, nn = 1; ps.forEach(function(p){ zn *= p.n; nn *= p.d; });
+    var s = ps.map(function(p){ return fmt(p, "bruch"); }).join(" · ");
+    if(ps.length > 1 && !(zn === ergebnis.n && nn === ergebnis.d) && nn !== 1) s += " = " + zn + "/" + nn;
+    return s + " = " + fmt(ergebnis, f2);
+  }
+  // Summe Schritt für Schritt mit gemeinsamem Nenner: 1/4 + 1/6 = 3/12 + 2/12 = 5/12
+  function summeTxt(L, ergebnis){
+    var g = function(a, b){ while(b){ var x = a % b; a = b; b = x; } return a; }, kgv = L.reduce(function(k, p){ return k / g(k, p.d) * p.d; }, 1);
+    var s = L.map(function(p){ return fmt(p, "bruch"); }).join(" + ");
+    if(L.some(function(p){ return p.d !== kgv; })) s += " = " + L.map(function(p){ return (p.n * kgv / p.d) + "/" + kgv; }).join(" + ");
+    var zs = L.reduce(function(a, p){ return a + p.n * kgv / p.d; }, 0);
+    if(!(zs === ergebnis.n && kgv === ergebnis.d)) s += " = " + zs + "/" + kgv;
+    return s + " = " + fmt(ergebnis, "bruch");
+  }
+  function pfadZeile(b){ return bdi("P" + pfadText(b.pfad) + " = " + produktTxt(b.ps, b.p)); }
   function summe(L){ return L.reduce(function(s, b){ return add(s, b.p); }, F(0)); }
 
   // Ereignis-Knöpfe (im Baum-Reiter mit „Auswahl löschen“, in der Simulation ohne)
@@ -542,8 +558,8 @@
     var lt = fmt(auf.l, "bruch") + " ≈ " + zahl(num(auf.l) * 100, 2) + " %";
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     var sv = $("uBaum"); sicht(sv, true); zeichneBaum(sv, auf.B, { stufen: auf.X.stufen, auswahl: auf.aus });
-    var G = auf.B.blaetter.filter(function(b){ return auf.aus[b.key]; }), L = G.map(function(b){ return bdi("P" + pfadText(b.pfad) + " = " + b.ps.map(function(p){ return fmt(p, "bruch"); }).join(" · ") + " = " + fmt(b.p, "bruch")); });
-    if(G.length > 1) L.push(t("summenregel") + " " + bdi(G.map(function(b){ return fmt(b.p, "bruch"); }).join(" + ") + " = " + fmt(auf.l, "bruch")));
+    var G = auf.B.blaetter.filter(function(b){ return auf.aus[b.key]; }), L = G.map(function(b){ return bdi("P" + pfadText(b.pfad) + " = " + produktTxt(b.ps, b.p, "bruch")); });
+    if(G.length > 1) L.push(t("summenregel") + " " + bdi(summeTxt(G.map(function(b){ return b.p; }), auf.l)));
     if(auf.ev && auf.ev.gegen){ var SG = summe(auf.B.blaetter.filter(auf.ev.gegen.test)); L.push(t("gegenL", { g: auf.ev.gegen.txt }) + " " + bdi("1 − " + fmt(SG, "bruch") + " = " + fmt(auf.l, "bruch"))); }
     $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);
     $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });

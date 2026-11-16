@@ -214,22 +214,22 @@
     var a, b, c, al, S = [], cm = " " + (E || "cm"), sn = function(x){ return "sin " + z(x, 1) + "°"; }, cs = function(x){ return "cos " + z(x, 1) + "°"; }, tn = function(x){ return "tan " + z(x, 1) + "°"; };
     if(fall.charAt(0) === "a" && fall !== "xy"){ al = v.al; if(!(al > 0 && al < 90)) return { fehler: "fehlerWinkel" }; }
     if(fall === "ac"){ c = v.c; a = c * Math.sin(al * GRAD); b = c * Math.cos(al * GRAD);
-      S.push("a = c · sin α = " + z(c) + " · " + sn(al) + " ≈ " + z(a) + cm); S.push("b = c · cos α = " + z(c) + " · " + cs(al) + " ≈ " + z(b) + cm); }
+      S.push("a = c · sin α = " + z(c) + " · " + sn(al) + " ≈ " + z(c) + " · " + z(Math.sin(al * GRAD), 4) + " ≈ " + z(a) + cm); S.push("b = c · cos α = " + z(c) + " · " + cs(al) + " ≈ " + z(c) + " · " + z(Math.cos(al * GRAD), 4) + " ≈ " + z(b) + cm); }
     if(fall === "aa"){ a = v.a; c = a / Math.sin(al * GRAD); b = a / Math.tan(al * GRAD);
-      S.push("c = a : sin α = " + z(a) + " : " + sn(al) + " ≈ " + z(c) + cm); S.push("b = a : tan α = " + z(a) + " : " + tn(al) + " ≈ " + z(b) + cm); }
+      S.push("c = a : sin α = " + z(a) + " : " + sn(al) + " ≈ " + z(a) + " : " + z(Math.sin(al * GRAD), 4) + " ≈ " + z(c) + cm); S.push("b = a : tan α = " + z(a) + " : " + tn(al) + " ≈ " + z(a) + " : " + z(Math.tan(al * GRAD), 4) + " ≈ " + z(b) + cm); }
     if(fall === "ab"){ b = v.b; c = b / Math.cos(al * GRAD); a = b * Math.tan(al * GRAD);
-      S.push("c = b : cos α = " + z(b) + " : " + cs(al) + " ≈ " + z(c) + cm); S.push("a = b · tan α = " + z(b) + " · " + tn(al) + " ≈ " + z(a) + cm); }
+      S.push("c = b : cos α = " + z(b) + " : " + cs(al) + " ≈ " + z(b) + " : " + z(Math.cos(al * GRAD), 4) + " ≈ " + z(c) + cm); S.push("a = b · tan α = " + z(b) + " · " + tn(al) + " ≈ " + z(b) + " · " + z(Math.tan(al * GRAD), 4) + " ≈ " + z(a) + cm); }
     if(fall === "xy"){ a = v.a; b = v.b; if(!(a > 0 && b > 0)) return { fehler: "fehlerEing" };
       c = Math.hypot(a, b); al = Math.atan(a / b) / GRAD;
-      S.push(t("pyth2") + ": c = √(a² + b²) = √(" + z(a) + "² + " + z(b) + "²) ≈ " + z(c) + cm);
+      S.push(t("pyth2") + ": c = √(a² + b²) = √(" + z(a) + "² + " + z(b) + "²) = √(" + z(a * a) + " + " + z(b * b) + ") = √" + z(a * a + b * b) + " ≈ " + z(c) + cm);
       S.push("tan α = a : b = " + z(a) + " : " + z(b) + " ≈ " + z(a / b, 3) + " ⇒ α = tan⁻¹(" + z(a / b, 3) + ") ≈ " + z(al, 1) + "°"); }
     if(fall === "xc"){ a = v.a; c = v.c; if(!(a > 0 && c > 0)) return { fehler: "fehlerEing" }; if(a >= c) return { fehler: "fehlerHyp" };
       b = Math.sqrt(c * c - a * a); al = Math.asin(a / c) / GRAD;
-      S.push(t("pyth2") + ": b = √(c² − a²) = √(" + z(c) + "² − " + z(a) + "²) ≈ " + z(b) + cm);
+      S.push(t("pyth2") + ": b = √(c² − a²) = √(" + z(c) + "² − " + z(a) + "²) = √(" + z(c * c) + " − " + z(a * a) + ") = √" + z(c * c - a * a) + " ≈ " + z(b) + cm);
       S.push("sin α = a : c = " + z(a) + " : " + z(c) + " ≈ " + z(a / c, 3) + " ⇒ α = sin⁻¹(" + z(a / c, 3) + ") ≈ " + z(al, 1) + "°"); }
     if(fall === "yc"){ b = v.b; c = v.c; if(!(b > 0 && c > 0)) return { fehler: "fehlerEing" }; if(b >= c) return { fehler: "fehlerHyp" };
       a = Math.sqrt(c * c - b * b); al = Math.acos(b / c) / GRAD;
-      S.push(t("pyth2") + ": a = √(c² − b²) = √(" + z(c) + "² − " + z(b) + "²) ≈ " + z(a) + cm);
+      S.push(t("pyth2") + ": a = √(c² − b²) = √(" + z(c) + "² − " + z(b) + "²) = √(" + z(c * c) + " − " + z(b * b) + ") = √" + z(c * c - b * b) + " ≈ " + z(a) + cm);
       S.push("cos α = b : c = " + z(b) + " : " + z(c) + " ≈ " + z(b / c, 3) + " ⇒ α = cos⁻¹(" + z(b / c, 3) + ") ≈ " + z(al, 1) + "°"); }
     if(!(a > 0 && b > 0 && c > 0)) return { fehler: "fehlerEing" };
     S.push("β = 90° − α = 90° − " + z(al, 1) + "° = " + z(90 - al, 1) + "°");

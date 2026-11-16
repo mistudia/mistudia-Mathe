@@ -190,11 +190,11 @@
     else {
       var v = lies(e); if(!isFinite(v)) return;
       ok = Math.abs(v - A.l) <= Math.max(0.011, Math.abs(A.l) * 0.003); lt = zg(A.l, 4);
-      if(A.typ === "wert") L.push(bdi("f(" + zahl(A.x) + ") = " + (A.a === 1 ? "" : zahl(A.a) + " · ") + zahl(A.b) + "<sup>" + zahl(A.x) + "</sup> = " + zahl(A.l, 4)));
+      if(A.typ === "wert") L.push(bdi("f(" + zahl(A.x) + ") = " + (A.a === 1 ? "" : zahl(A.a) + " · ") + zahl(A.b) + "<sup>" + zahl(A.x) + "</sup> = " + (A.a === 1 ? "" : zahl(A.a) + " · " + zahl(Math.pow(A.b, A.x), 4) + " = ") + zahl(A.l, 4)));
       else if(A.typ === "faktor") L.push(bdi("q = 1 " + (A.p > 0 ? "+ " : "− ") + zahl(Math.abs(A.p) / 100) + " = " + zahl(A.l)));
       else if(A.typ === "zweiP"){ L.push(bdi("a = " + zahl(A.a)) + " " + t("ausP0")); L.push(bdi(zahl(A.a) + " · b<sup>" + A.x + "</sup> = " + zahl(A.y) + " → b<sup>" + A.x + "</sup> = " + zahl(A.y / A.a) + " → b = " + zahl(A.b))); }
-      else if(A.typ === "halb") L.push(bdi(A.t + " : " + A.T + " = " + A.n) + " " + t("halbN", { n: A.n }) + " " + bdi(A.N0 + " · 0,5".replace(",", komma() ? "," : ".") + "<sup>" + A.n + "</sup> = " + zahl(A.l) + " g"));
-      else if(A.typ === "verdopp") L.push(bdi(A.t + " : " + A.T + " = " + A.n) + " " + t("verdN", { n: A.n }) + " " + bdi(A.N0 + " · 2<sup>" + A.n + "</sup> = " + zahl(A.l)));
+      else if(A.typ === "halb") L.push(bdi(A.t + " : " + A.T + " = " + A.n) + " " + t("halbN", { n: A.n }) + " " + bdi(A.N0 + " · 0,5".replace(",", komma() ? "," : ".") + "<sup>" + A.n + "</sup> = " + A.N0 + " · " + zahl(Math.pow(0.5, A.n), 6) + " = " + zahl(A.l) + " g"));
+      else if(A.typ === "verdopp") L.push(bdi(A.t + " : " + A.T + " = " + A.n) + " " + t("verdN", { n: A.n }) + " " + bdi(A.N0 + " · 2<sup>" + A.n + "</sup> = " + A.N0 + " · " + Math.pow(2, A.n) + " = " + zahl(A.l)));
       else L.push(t("ablesenWeg", { a: bdi(zahl(A.a)), y: bdi(zahl(A.a * A.b)), b: bdi(zahl(A.b)) }));
     }
     letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
