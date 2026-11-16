@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     graphen/index.html – Funktionsgleichungen aus Graphen ablesen (miStudia Mathe)
+     Geraden, Parabeln und Polynome (Grad 3–5) in einem Koordinatensystem, Gleichungen bestimmen.
+     Logik: app.js (Rechnen mit /funktionen/kern.js), Texte: texte.js (9 Sprachen).
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Graphen ablesen</title>
+<!-- SEO -->
+<meta name="description" content="Funktionsgleichungen von Geraden, Parabeln und Polynomen 3.–5. Grades bestimmen – Klasse 8–11. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<link rel="alternate" hreflang="de" href="https://math.mistudia.com/graphen/?lang=de">
+<link rel="alternate" hreflang="en" href="https://math.mistudia.com/graphen/?lang=en">
+<link rel="alternate" hreflang="es" href="https://math.mistudia.com/graphen/?lang=es">
+<link rel="alternate" hreflang="zh" href="https://math.mistudia.com/graphen/?lang=zh">
+<link rel="alternate" hreflang="fr" href="https://math.mistudia.com/graphen/?lang=fr">
+<link rel="alternate" hreflang="ru" href="https://math.mistudia.com/graphen/?lang=ru">
+<link rel="alternate" hreflang="ar" href="https://math.mistudia.com/graphen/?lang=ar">
+<link rel="alternate" hreflang="ja" href="https://math.mistudia.com/graphen/?lang=ja">
+<link rel="alternate" hreflang="pt" href="https://math.mistudia.com/graphen/?lang=pt">
+<link rel="alternate" hreflang="x-default" href="https://math.mistudia.com/graphen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="miStudia Mathe">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Graphen ablesen – miStudia Mathe">
+<meta property="og:description" content="Funktionsgleichungen von Geraden, Parabeln und Polynomen 3.–5. Grades bestimmen – Klasse 8–11. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<meta property="og:url" content="https://math.mistudia.com/graphen/">
+<meta property="og:image" content="https://math.mistudia.com/img/beispiele/funktionsgleichung-aus-graph-ablesen.webp">
+<meta name="twitter:card" content="summary_large_image">
+<script>var MS_SEO = {"de":["Graphen ablesen – miStudia Mathe","Funktionsgleichungen von Geraden, Parabeln und Polynomen 3.–5. Grades bestimmen – Klasse 8–11. Kostenlos üben mit miStudia, in 9 Sprachen."],"en":["Reading Graphs – miStudia Mathe","Find equations of lines, parabolas and polynomials of degree 3–5 – Grade 8–11. Free practice with miStudia, in 9 languages."],"es":["Leer gráficas – miStudia Mathe","Hallar ecuaciones de rectas, parábolas y polinomios de grado 3–5 – Curso 8–11. Practica gratis con miStudia, en 9 idiomas."],"zh":["由图像求解析式 – miStudia Mathe","求直线、抛物线和 3–5 次多项式的解析式 – 8–11年级. 用 miStudia 免费练习，支持 9 种语言。"],"fr":["Lire des courbes – miStudia Mathe","Trouver les équations de droites, paraboles et polynômes de degré 3 à 5 – 4e–1re. S’entraîner gratuitement avec miStudia, en 9 langues."],"ru":["Уравнение по графику – miStudia Mathe","Уравнения прямых, парабол и многочленов 3–5 степени – 8–11 класс. Бесплатные упражнения с miStudia на 9 языках."],"ar":["قراءة المنحنيات – miStudia Mathe","إيجاد معادلات المستقيمات والقطوع المكافئة وكثيرات الحدود من الدرجة 3–5 – الصف 8–11. تدرّب مجانًا مع miStudia بتسع لغات."],"ja":["グラフから式 – miStudia Mathe","直線・放物線・3〜5 次式の式を求める – 中2〜高2. miStudia で無料練習（9か国語）。"],"pt":["Ler gráficos – miStudia Mathe","Equações de retas, parábolas e polinômios de grau 3 a 5 – 8º ano–2º EM. Pratique grátis com o miStudia, em 9 idiomas."]};</script>
+<script src="/sprache-url.js"></script>
+<!-- /SEO -->
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 19px; margin: 4px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  .reihe label { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; max-width: 100%; }
+  input.zahl { width: 180px; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; font-variant-numeric: tabular-nums; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .knopf:disabled { opacity: 0.5; cursor: default; }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; margin: 8px 0; }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .fehler { color: var(--schlecht); font-weight: 700; }
+  .wahl { display: inline-flex; background: #e3eefc; border-radius: 12px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+  .wahl button { font: 700 15px system-ui, sans-serif; padding: 7px 12px; border: 0; border-radius: 9px; background: transparent; color: var(--blue); cursor: pointer; }
+  .wahl button[aria-pressed="true"] { background: var(--blue); color: #ffffff; }
+  select { font: 18px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; max-width: 100%; }
+  .zwei { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+  @media (max-width: 760px) { .zwei { grid-template-columns: 1fr; } }
+  svg.bild { width: 100%; height: auto; display: block; user-select: none; -webkit-user-select: none; }
+  #raster, #uRaster { touch-action: none; cursor: pointer; max-width: 520px; }
+  #koSvg { touch-action: none; max-width: 520px; }
+  #figSvg { max-width: 420px; margin: 0 auto; }
+  .farben { display: inline-flex; gap: 6px; }
+  .farben button { width: 34px; height: 34px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 0 2px var(--line); cursor: pointer; padding: 0; }
+  .farben button[aria-pressed="true"] { box-shadow: 0 0 0 3px #1a2233; }
+  .zelle { stroke: #c7d2e0; stroke-width: 1; fill: #ffffff; }
+  .achse { stroke: #dc2626; stroke-width: 3.5; stroke-dasharray: 10 7; fill: none; }
+  .zentrum { fill: #dc2626; stroke: #ffffff; stroke-width: 2; }
+  .fig { fill: #c7d2fe; stroke: #3730a3; stroke-width: 4; stroke-linejoin: round; }
+  .figL { fill: none; stroke: #3730a3; stroke-width: 20; stroke-linecap: round; stroke-linejoin: round; }
+  .kopie { fill: rgba(249,115,22,0.30); stroke: #ea580c; stroke-width: 3; stroke-dasharray: 6 4; }
+  .kopieL { fill: none; stroke: rgba(234,88,12,0.55); stroke-width: 12; stroke-linecap: round; }
+  .kopie.deckt, .kopieL.deckt { stroke: #16a34a; } .kopie.deckt { fill: rgba(22,163,74,0.25); }
+  .info { font-size: 18px; line-height: 1.7; }
+  .info b { color: var(--blue); }
+  input[type=range] { width: 100%; max-width: 420px; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  .eing { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 14px; margin: 10px 0 8px; }
+  .eing label { font-weight: 700; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .eing input.zahl { width: 110px; font-size: 20px; }
+  .einh { font-weight: 600; color: var(--muted); }
+  .einhWahl { font-weight: 700; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  .oben { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; margin: 6px 0 10px; }
+  .intro { text-align: center; color: var(--muted); margin: 0 0 8px; }
+  svg.ga { width: 100%; height: auto; display: block; max-width: 560px; margin: 0 auto; max-height: 72vh; max-height: 72dvh; direction: ltr; }
+  .ax { font: 11px system-ui, sans-serif; fill: #4f5b6e; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; }
+  .ax.achse { font: italic 700 15px "Cambria Math", Cambria, serif; fill: #1a2233; }
+  .gname { font: italic 700 22px "Cambria Math", Cambria, serif; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 5px; }
+  .mk { font: 700 13px system-ui, sans-serif; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+  .gkarte { border: 2px solid; border-inline-start-width: 6px; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; background: #fbfdff; }
+  .gzeile { display: flex; gap: 8px; align-items: center; }
+  .gl { font: italic 700 22px "Cambria Math", Cambria, serif; white-space: nowrap; }
+  .gzeile input { flex: 1; min-width: 0; font: 20px "Cambria Math", Cambria, serif; padding: 7px 10px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; }
+  .gzeile input:focus { outline: none; border-color: var(--blue); }
+  .gknoepfe { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .hinweis { font-size: 15px; color: var(--muted); margin: 6px 0 0; line-height: 1.45; }
+  .weg { margin-top: 6px; font-size: 17px; line-height: 1.5; }
+  .weg .wh { font-size: 14px; color: var(--muted); margin-top: 6px; }
+  .f { font-family: "Cambria Math", Cambria, "Times New Roman", serif; font-size: 18px; unicode-bidi: isolate; }
+  .hilfeZ { font-size: 13px; color: var(--muted); margin: 0 0 10px; direction: ltr; text-align: start; }
+  .punkte { font-weight: 700; color: var(--muted); }
+  .so { margin-top: 14px; } .so h2 { margin-bottom: 6px; }
+  .so p { margin: 6px 0; line-height: 1.5; }
+  .haupt2 { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 820px) { .haupt2 { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .wahl button { font-size: 14px; padding: 6px 9px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Graphen ablesen</h1>
+  <p class="intro" id="intro"></p>
+  <div class="oben"><div class="wahl" id="art"></div><button type="button" class="knopf" id="neu"></button><span class="punkte" id="punkte"></span></div>
+  <div class="haupt2">
+    <div class="karte"><svg id="gSvg" class="ga" viewBox="0 0 500 500" role="img"></svg></div>
+    <div><p class="hilfeZ" id="hilfe"></p><div id="karten"></div></div>
+  </div>
+  <div class="karte so"><h2 id="soT"></h2><p class="merke" id="soLin"></p><p class="merke" id="soPar"></p><p class="merke" id="soPol"></p></div>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="/funktionen/texte.js"></script>
+<script src="/funktionen/kern.js"></script>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/alltag.js"></script>
+<script src="alltag-daten.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>

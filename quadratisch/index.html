@@ -81,6 +81,7 @@
 <script src="/funktionen/seite.js"></script>
 <script src="/formel.js"></script>
 <script src="/funktionen/loesweg.js"></script>
+<script src="/funktionen/ergaenzung.js"></script>
 <script src="/symbol-tipp.js"></script>
 <script src="/funktionen/tipps.js"></script>
 <script>
@@ -215,6 +216,8 @@
     }
     dar += '<div class="abc-zeile">' + f(FS.ein("a = " + FK.btxt(a), CA) + ",  " + FS.ein("b = " + FK.btxt(b), CB) + ",  " + FS.ein("c = " + FK.btxt(c), CC)) + "</div>";
     h += FS.karte(t("formen"), dar);
+    // Quadratische Ergänzung Schritt für Schritt (Normalform → Scheitelpunktform)
+    if(window.FE) h += FS.karte(FE.t("titel"), FE.html(p, true));
     // Öffnung
     var an = Math.abs(Bz.num(a));
     h += FS.karte(t("form"), "<ul><li>" + t(Bz.num(a) > 0 ? "oeffO" : "oeffU") + "</li><li>" + t(an > 1 ? "gestreckt" : an < 1 ? "gestaucht" : "normalpar") + "</li></ul>");

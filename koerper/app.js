@@ -40,27 +40,27 @@
   // Fläche: { p: Eckpunkte, loch: Lochrand | null, o: Bezugspunkt im Körper, f: Farbe, g: glatte Gruppe, inv: Normale zum Bezugspunkt hin (Lochwände) }
   var N = 48, gid = 0;
   function kreis(r, y){ var L = []; for(var i = 0; i < N; i++){ var w = 2 * Math.PI * i / N; L.push([r * Math.cos(w), y, -r * Math.sin(w)]); } return L; }
-  function quader(F, b, f, ohne, lochO, lochU){
+  function quader(F, b, f, ohne, lochO, lochU, inv){
     var x0 = b[0], x1 = b[1], y0 = b[2], y1 = b[3], z0 = b[4], z1 = b[5], o = [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2]; ohne = ohne || "";
     var S = { unten: [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]], oben: [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]],
       vorne: [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], hinten: [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0]],
       links: [[x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0]], rechts: [[x1, y0, z0], [x1, y0, z1], [x1, y1, z1], [x1, y1, z0]] };
-    for(var s in S) if(ohne.indexOf(s) < 0) F.push({ p: S[s], o: o, f: f, loch: s === "oben" ? lochO : s === "unten" ? lochU : null });
+    for(var s in S) if(ohne.indexOf(s) < 0) F.push({ p: S[s], o: o, f: f, inv: inv, loch: s === "oben" ? lochO : s === "unten" ? lochU : null });
   }
   function zylinder(F, r, y0, y1, f, opt){
     opt = opt || {}; var A = kreis(r, y0), B = kreis(r, y1), g = "g" + (++gid), o = [0, (y0 + y1) / 2, 0];
     for(var i = 0; i < N; i++){ var j = (i + 1) % N; F.push({ p: [A[i], A[j], B[j], B[i]], o: o, f: f, g: g, inv: opt.inv }); }
-    if(opt.unten !== false) F.push({ p: A, o: o, f: f }); if(opt.oben !== false) F.push({ p: B, o: o, f: f });
+    if(opt.unten !== false) F.push({ p: A, o: o, f: f, inv: opt.inv }); if(opt.oben !== false) F.push({ p: B, o: o, f: f, inv: opt.inv });
   }
   function kegel(F, r, y0, ys, f, opt){
     opt = opt || {}; var A = kreis(r, y0), S = [0, ys, 0], g = "g" + (++gid), o = [0, y0 + (ys - y0) / 4, 0];
     for(var i = 0; i < N; i++) F.push({ p: [A[i], A[(i + 1) % N], S], o: o, f: f, g: g, inv: opt.inv });
-    if(opt.boden !== false) F.push({ p: A, o: o, f: f });
+    if(opt.boden !== false) F.push({ p: A, o: o, f: f, loch: opt.loch || null });
   }
   function pyramide(F, a, y0, ys, f, opt){
     opt = opt || {}; var h = a / 2, C = [[-h, y0, -h], [h, y0, -h], [h, y0, h], [-h, y0, h]], S = [0, ys, 0], o = [0, y0 + (ys - y0) / 4, 0];
     for(var i = 0; i < 4; i++) F.push({ p: [C[i], C[(i + 1) % 4], S], o: o, f: f, inv: opt.inv });
-    if(opt.boden !== false) F.push({ p: C, o: o, f: f });
+    if(opt.boden !== false) F.push({ p: C, o: o, f: f, loch: opt.loch || null });
   }
   function halbkugel(F, r, y0, f, opt){
     opt = opt || {}; var M = 16, s = opt.unten ? -1 : 1, g = opt.g || "g" + (++gid), o = [0, y0 + s * r * 0.3, 0], R = [];
@@ -69,6 +69,12 @@
     for(j = 0; j < M; j++) for(var i = 0; i < N; i++){ var k = (i + 1) % N;
       F.push({ p: j + 1 < M ? [R[j][i], R[j][k], R[j + 1][k], R[j + 1][i]] : [R[j][i], R[j][k], top], o: o, f: f, g: g }); }
     if(opt.boden !== false) F.push({ p: R[0], o: o, f: f });
+  }
+  function halbzylinder(F, r, cx, cy, z0, z1, f){ // liegend, Achse längs z, Wölbung nach +x
+    var n = N / 2, A = [], B = [], g = "g" + (++gid), o = [cx + r * 0.4, cy, (z0 + z1) / 2];
+    for(var i = 0; i <= n; i++){ var w = -Math.PI / 2 + Math.PI * i / n; A.push([cx + r * Math.cos(w), cy + r * Math.sin(w), z1]); B.push([cx + r * Math.cos(w), cy + r * Math.sin(w), z0]); }
+    for(i = 0; i < n; i++) F.push({ p: [A[i], A[i + 1], B[i + 1], B[i]], o: o, f: f, g: g });
+    F.push({ p: A, o: o, f: f }); F.push({ p: B, o: o, f: f });
   }
   function prisma(F, g, hd, L, y0, f, opt){
     opt = opt || {}; var T = function(z){ return [[-g / 2, y0, z], [g / 2, y0, z], [0, y0 + hd, z]]; }, A = T(L / 2), B = T(-L / 2), o = [0, y0 + hd / 3, 0];
@@ -266,6 +272,20 @@
         return { py: P.zeilen, v: { n: [t("k_quader"), t("k_prisma")], t: [T("a · b · h₁", z(a) + " · " + z(b) + " · " + z(d.h1), a * b * d.h1), T("½ · b · d · a", "½ · " + z(b) + " · " + z(d.d) + " · " + z(a), b * d.d * a / 2)] },
           o: { n: [t("f_boden"), t("f_waende"), t("f_giebel"), t("f_dach")], t: [T("a · b", z(a) + " · " + z(b), a * b), T("2 · (a + b) · h₁", "2 · (" + z(a) + " + " + z(b) + ") · " + z(d.h1), 2 * (a + b) * d.h1), T("2 · ½ · b · d", "2 · ½ · " + z(b) + " · " + z(d.d), b * d.d), T("2 · a · s", "2 · " + z(a) + " · " + z(s), 2 * a * s)] },
           weg: [nm("f_deckel", "k_quader"), nm("f_boden", "k_prisma")] }; } },
+    dpyr: { add: true, ein: [["a", "e_a", 6, 2, 10], ["h1", "e_h1", 4, 2, 10], ["h2", "e_h2", 7, 2, 12]],
+      netz: function(d, F){ pyramide(F, d.a, 0, d.h1, 0, { boden: false }); pyramide(F, d.a, 0, -d.h2, 1, { boden: false }); },
+      lab: function(d){ var x = d.a / 2; return [lab([-x, 0, x], [x, 0, x], "a = " + z(d.a)), lab([0, 0, 0], [0, d.h1, 0], "h₁ = " + z(d.h1), "h", "h"), lab([0, 0, 0], [0, -d.h2, 0], "h₂ = " + z(d.h2), "h", "h")]; },
+      rechne: function(d){ var a = d.a, P1 = pyWurzel("h_s1", d.h1, a / 2, "h₁", "(a : 2)"), P2 = pyWurzel("h_s2", d.h2, a / 2, "h₂", "(a : 2)");
+        return { py: P1.zeilen.concat(P2.zeilen), v: { n: [t("k_pyramide") + " 1", t("k_pyramide") + " 2"], t: [T("⅓ · a² · h₁", "⅓ · " + q(a) + " · " + z(d.h1), a * a * d.h1 / 3), T("⅓ · a² · h₂", "⅓ · " + q(a) + " · " + z(d.h2), a * a * d.h2 / 3)] },
+          o: { n: [t("f_sOben"), t("f_sUnten")], t: [T("4 · ½ · a · h_s1", "4 · ½ · " + z(a) + " · " + z(P1.v), 2 * a * P1.v), T("4 · ½ · a · h_s2", "4 · ½ · " + z(a) + " · " + z(P2.v), 2 * a * P2.v)] },
+          weg: [nm("f_grund", "k_pyramide") + " 1", nm("f_grund", "k_pyramide") + " 2"] }; } },
+    qhz: { add: true, ein: [["a", "e_l", 20, 6, 20], ["b", "e_b", 9, 3, 10], ["h", "e_h", 18, 4, 12]],
+      netz: function(d, F){ var x = d.b / 2, L = d.a / 2; quader(F, [-x, x, 0, d.h, -L, L], 0, "rechts"); halbzylinder(F, d.h / 2, x, d.h / 2, -L, L, 1); },
+      lab: function(d){ var x = d.b / 2, L = d.a / 2; return [lab([-x, 0, L], [x, 0, L], "b = " + z(d.b)), lab([-x, 0, L], [-x, d.h, L], "h = " + z(d.h)), lab([-x, d.h, L], [-x, d.h, -L], "a = " + z(d.a)), lab([x, d.h / 2, L], [x + d.h / 2, d.h / 2, L], "r = h : 2", "r", "d")]; },
+      rechne: function(d){ var a = d.a, b = d.b, h = d.h, r = h / 2, pi = Math.PI;
+        return { v: { n: [t("k_quader"), t("k_halbzyl")], t: [T("a · b · h", z(a) + " · " + z(b) + " · " + z(h), a * b * h), T("½ · π · (h : 2)² · a", "½ · π · " + q(r) + " · " + z(a), pi * r * r * a / 2)] },
+          o: { n: [t("f_aussen"), t("f_halbkreis"), t("f_mantel")], t: [T("2 · b · h + 2 · a · b + a · h", "2 · " + z(b) + " · " + z(h) + " + 2 · " + z(a) + " · " + z(b) + " + " + z(a) + " · " + z(h), 2 * b * h + 2 * a * b + a * h), T("π · (h : 2)²", "π · " + q(r), pi * r * r), T("π · (h : 2) · a", "π · " + z(r) + " · " + z(a), pi * r * a)] },
+          weg: [nm("f_klebe", "k_quader"), nm("f_klebe", "k_halbzyl")] }; } },
     wpyr: { sub: true, ein: [["a", "e_a", 6, 3, 10], ["t", "e_t", 4, 2, 10]], passt: function(d){ return d.t <= d.a; },
       netz: function(d, F){ var x = d.a / 2; quader(F, [-x, x, 0, d.a, -x, x], 0, "oben"); pyramide(F, d.a, d.a, d.a - d.t, 2, { boden: false, inv: true }); },
       lab: function(d){ var x = d.a / 2; return [lab([-x, 0, x], [x, 0, x], "a = " + z(d.a)), lab([0, d.a, 0], [0, d.a - d.t, 0], "t = " + z(d.t), "h", "h"), lab([0, d.a, x], [0, d.a - d.t, 0], "h_s", "s", "s")]; },
@@ -284,9 +304,21 @@
       lab: function(d){ var x = d.a / 2; return [lab([-x, 0, x], [x, 0, x], "a = " + z(d.a)), lab([0, d.a, 0], [d.r, d.a, 0], "r = " + z(d.r), "r", "d"), lab([0, d.a, 0], [0, d.a - d.t, 0], "t = " + z(d.t), "h", "h"), lab([0, d.a, d.r], [0, d.a - d.t, 0], "s", "s", "s")]; },
       rechne: function(d){ var a = d.a, r = d.r, pi = Math.PI, P = pyWurzel("s", r, d.t, "r", "t"), s = P.v;
         return { py: P.zeilen, v: { n: [t("k_wuerfel"), t("k_kegel")], t: [T("a³", k3(a), a * a * a), T("⅓ · π · r² · t", "⅓ · π · " + q(r) + " · " + z(d.t), pi * r * r * d.t / 3, true)] },
-          o: { n: [t("f_aussen"), t("f_oeffnung"), t("f_mantel")], t: [T("6 · a²", "6 · " + q(a), 6 * a * a), T("π · r²", "π · " + q(r), pi * r * r, true), T("π · r · s", "π · " + z(r) + " · " + z(s), pi * r * s)] } }; } }
+          o: { n: [t("f_aussen"), t("f_oeffnung"), t("f_mantel")], t: [T("6 · a²", "6 · " + q(a), 6 * a * a), T("π · r²", "π · " + q(r), pi * r * r, true), T("π · r · s", "π · " + z(r) + " · " + z(s), pi * r * s)] } }; } },
+    kwue: { sub: true, ein: [["r", "e_r", 6, 3, 8], ["h", "e_h", 10, 6, 12], ["k", "e_k", 3, 1, 4]], passt: function(d){ return d.k / Math.SQRT2 < d.r * (1 - d.k / d.h); },
+      netz: function(d, F){ var x = d.k / 2; kegel(F, d.r, 0, d.h, 0, { loch: [[-x, 0, -x], [x, 0, -x], [x, 0, x], [-x, 0, x]] }); quader(F, [-x, x, 0, d.k, -x, x], 2, "unten", null, null, true); },
+      lab: function(d){ var x = d.k / 2; return [lab([0, 0, 0], [d.r, 0, 0], "r = " + z(d.r), "r", "d"), lab([0, d.k, 0], [0, d.h, 0], "h = " + z(d.h), "h", "h"), lab([0, 0, d.r], [0, d.h, 0], "s", "s", "s"), lab([-x, 0, x], [x, 0, x], "k = " + z(d.k))]; },
+      rechne: function(d){ var r = d.r, k = d.k, pi = Math.PI, P = pyWurzel("s", r, d.h, "r", "h"), s = P.v;
+        return { py: P.zeilen, v: { n: [t("k_kegel"), t("k_wuerfel")], t: [T("⅓ · π · r² · h", "⅓ · π · " + q(r) + " · " + z(d.h), pi * r * r * d.h / 3), T("k³", k3(k), k * k * k, true)] },
+          o: { n: [t("f_grund"), t("f_oeffnung"), t("f_mantel"), t("f_innen")], t: [T("π · r²", "π · " + q(r), pi * r * r), T("k²", q(k), k * k, true), T("π · r · s", "π · " + z(r) + " · " + z(s), pi * r * s), T("5 · k²", "5 · " + q(k), 5 * k * k)] } }; } },
+    pzyl: { sub: true, ein: [["a", "e_a", 11, 6, 12], ["h", "e_h", 9, 6, 12], ["r", "e_rl", 3, 1, 3], ["t", "e_t", 2, 1, 4]], passt: function(d){ return d.t < d.h && d.r < d.a / 2 * (1 - d.t / d.h); },
+      netz: function(d, F){ pyramide(F, d.a, d.h, 0, 0, { loch: kreis(d.r, d.h) }); zylinder(F, d.r, d.h - d.t, d.h, 2, { oben: false, inv: true }); },
+      lab: function(d){ var x = d.a / 2; return [lab([x, d.h, x], [x, d.h, -x], "a = " + z(d.a)), lab([0, 0, 0], [0, d.h - d.t, 0], "h = " + z(d.h), "h", "h"), lab([d.r, d.h, 0], [d.r, d.h - d.t, 0], "t = " + z(d.t), "h", "h"), lab([0, d.h, 0], [-d.r, d.h, 0], "r = " + z(d.r), "r", "d"), lab([0, d.h, x], [0, 0, 0], "h_s", "s", "s")]; },
+      rechne: function(d){ var a = d.a, r = d.r, pi = Math.PI, P = pyWurzel("h_s", d.h, a / 2, "h", "(a : 2)"), hs = P.v;
+        return { py: P.zeilen, v: { n: [t("k_pyramide"), t("k_zylinder")], t: [T("⅓ · a² · h", "⅓ · " + q(a) + " · " + z(d.h), a * a * d.h / 3), T("π · r² · t", "π · " + q(r) + " · " + z(d.t), pi * r * r * d.t, true)] },
+          o: { n: [t("f_grund"), t("f_oeffnung"), t("f_seiten"), t("f_loch"), t("f_lochboden")], t: [T("a²", q(a), a * a), T("π · r²", "π · " + q(r), pi * r * r, true), T("4 · ½ · a · h_s", "4 · ½ · " + z(a) + " · " + z(hs), 2 * a * hs), T("2 · π · r · t", "2 · π · " + z(r) + " · " + z(d.t), 2 * pi * r * d.t), T("π · r²", "π · " + q(r), pi * r * r)] } }; } }
   };
-  var GRUND = ["wuerfel", "quader", "prisma", "zylinder", "pyramide", "kegel", "kugel", "halbkugel"], ZUS = ["silo", "haus", "rakete", "eis", "dach", "wpyr", "wzyl", "wkeg"];
+  var GRUND = ["wuerfel", "quader", "prisma", "zylinder", "pyramide", "kegel", "kugel", "halbkugel"], ZUS = ["silo", "haus", "rakete", "eis", "dach", "dpyr", "qhz", "wpyr", "wzyl", "wkeg", "kwue", "pzyl"];
   function name(k){ return t(GRUND.indexOf(k) >= 0 ? "k_" + k : "z_" + k); }
 
   // Rechenweg-Zeilen für V oder O: Namen, Formel, Zahlen, Teilergebnisse, Ergebnis

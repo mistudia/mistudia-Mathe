@@ -12,18 +12,18 @@ const { chromium } = require("playwright");
 const fs = require("fs"), path = require("path");
 const BASIS = "http://localhost:8771", ZIEL = path.join(__dirname, "..", "img", "beispiele");
 const FA_KACHELN = ["linear", "quadratisch", "polynom", "rational", "sinus", "waage"];
-const MSA_KACHELN = ["binome", "flaechen", "groessen", "integral", "logarithmus", "prozent", "schriftlich", "symmetrie", "teilbarkeit", "terme", "trigonometrie", "vektoren", "brueche", "dreisatz", "einmaleins", "zinsen", "binomial", "dreieck", "exponential", "kombinatorik", "normalverteilung", "pythagoras", "winkel", "koerper"];
+const MSA_KACHELN = ["binome", "flaechen", "groessen", "integral", "logarithmus", "prozent", "schriftlich", "symmetrie", "teilbarkeit", "terme", "trigonometrie", "vektoren", "brueche", "dreisatz", "einmaleins", "zinsen", "binomial", "dreieck", "exponential", "kombinatorik", "normalverteilung", "pythagoras", "winkel", "koerper", "graphen", "schnittpunkte"];
 // Koordinatensystem-Grundansichten: Kachel → [Selektor, Reiter zum Anklicken]
 const GRAPH = { linear: ["#graph"], quadratisch: ["#graph"], polynom: ["#graph"], rational: ["#graph"], sinus: ["#graph"],
   exponential: ["#gSvg"], logarithmus: ["#gSvg", '[data-tab="funktion"]'], integral: ["#gR"], differential: ["#aSvg"],
-  trigonometrie: ["#kreis"], vektoren: ["#vSvg"], pythagoras: ["#pySvg"], koerper: ["#gSvg"], winkel: ["#messSvg", '[data-tab="mess"]'],
+  trigonometrie: ["#kreis"], vektoren: ["#vSvg"], pythagoras: ["#pySvg"], koerper: ["#gSvg"], graphen: ["#gSvg"], schnittpunkte: ["#rSvg"], winkel: ["#messSvg", '[data-tab="mess"]'],
   wahrscheinlichkeit: ["#baum", '[data-tab="baum"]'], binomial: ["#hSvg"], normalverteilung: ["#nSvg"] };
 // sprechende Dateinamen für die Grundansichten (wichtig für die Bildersuche)
 const NAMEN = { linear: "lineare-funktion-gerade-koordinatensystem", quadratisch: "quadratische-funktion-parabel-koordinatensystem",
   polynom: "polynomfunktion-kurvendiskussion-graph", rational: "gebrochen-rationale-funktion-asymptote-graph", sinus: "sinusfunktion-amplitude-periode-graph",
   exponential: "exponentialfunktion-wachstum-graph", logarithmus: "logarithmusfunktion-graph", integral: "integral-flaeche-unter-kurve-rechtecke",
   differential: "sekante-tangente-ableitung-graph", trigonometrie: "einheitskreis-sinus-kosinus", vektoren: "vektoren-addieren-koordinatensystem",
-  pythagoras: "satz-des-pythagoras-quadrate", koerper: "zylinder-volumen-oberflaeche-3d", winkel: "winkelmesser-winkel-messen", wahrscheinlichkeit: "baumdiagramm-muenzwurf" };
+  pythagoras: "satz-des-pythagoras-quadrate", koerper: "zylinder-volumen-oberflaeche-3d", graphen: "funktionsgleichung-aus-graph-ablesen", schnittpunkte: "schnittpunkte-parabel-gerade", winkel: "winkelmesser-winkel-messen", wahrscheinlichkeit: "baumdiagramm-muenzwurf" };
 function slug(s){
   return s.toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
     .normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);

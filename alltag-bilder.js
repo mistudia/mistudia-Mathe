@@ -39,6 +39,11 @@ var MS_ALLTAG_BILD = (function(){
   function zyl(cx, y, rx, ry, h, f, s){ // stehender Zylinder: Deckel-Ellipse bei y, Höhe h
     return p("M" + (cx - rx) + " " + y + " L" + (cx - rx) + " " + (y + h) + " A" + rx + " " + ry + " 0 0 0 " + (cx + rx) + " " + (y + h) + " L" + (cx + rx) + " " + y + " Z", f, s) + '<ellipse cx="' + cx + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="' + f + '" stroke="' + s + '" stroke-width="2" style="filter:brightness(1.12)"/>';
   }
+  function kurve(x, y, w, h, fn, a, b, ya, yb, col, ww){ // nur die Kurve, im selben Koordinatenrahmen wie graph()
+    var d = "", n = 80; for(var i = 0; i <= n; i++){ var xx = a + (b - a) * i / n, yy = fn(xx); if(yy < ya - (yb - ya) * 0.05 || yy > yb + (yb - ya) * 0.05) continue; d += (d ? "L" : "M") + (x + w * i / n).toFixed(1) + " " + (y + h - h * (yy - ya) / (yb - ya)).toFixed(1); }
+    return p(d, "none", col || "#2563eb", ww || 3);
+  }
+  function gp(x, y, w, h, a, b, ya, yb, px, py){ return [x + w * (px - a) / (b - a), y + h - h * (py - ya) / (yb - ya)]; }
   // ---- Helfer für die neuen Kacheln (Brüche, Dreisatz, … Winkel) ----
   function stueck(cx, cy, rr, a0, a1, f, s){ // Kreisausschnitt, Winkel in Grad (0° = oben, im Uhrzeigersinn)
     var A = function(a){ var w = (a - 90) * Math.PI / 180; return (cx + rr * Math.cos(w)).toFixed(1) + " " + (cy + rr * Math.sin(w)).toFixed(1); };
@@ -215,6 +220,18 @@ var MS_ALLTAG_BILD = (function(){
       function(){ return svg(himmel() + r(60, 20, 160, 90, "#1f2937", null, ' rx="4"') + r(66, 26, 148, 78, "#93c5fd") + l(66, 104, 214, 26, "#dc2626", 2.5) + r(130, 110, 20, 10, "#475569") + r(110, 120, 60, 6, "#475569") + tm(140, 140, "80 cm", "#1f2937", 12) + t(226, 70, "45 cm", ' style="fill:#1f2937"') + tm(150, 60, "d", "#dc2626", 15)); },
       function(){ return svg(r(0, 0, W, H, "#bbf7d0") + p("M40 125 H280 V20", "none", "#a8a29e", 10) + l(40, 125, 280, 20, "#dc2626", 3, ST) + rwb(280, 125, -1, 0, 0, -1, 16, "#1f2937") + tm(160, 145, "80 m", "#1f2937", 13) + t(288, 75, "60 m", ' style="fill:#1f2937"') + tm(150, 60, "100 m", "#dc2626", 14) + figur(60, 118, 0.5, "#1e3a8a")); },
       function(){ return svg(himmel() + boden(125) + p("M40 125 L280 125 L280 95 Z", "#cbd5e1", "#475569") + rwb(280, 125, -1, 0, 0, -1, 12, "#1f2937") + tm(160, 100, "4 m", "#1f2937", 13) + t(286, 115, "0,5 m", ' style="fill:#1f2937"') + tm(160, 145, "?", "#dc2626", 15) + c(90, 108, 10, "none", "#1f2937") + c(115, 106, 10, "none", "#1f2937")); }
+    ],
+    graphen: [
+      function(){ var q = gp(20, 15, 190, 115, 0, 120, 0, 18, 100, 15), q0 = gp(20, 15, 190, 115, 0, 120, 0, 18, 0, 5); return svg(himmel() + graph(20, 15, 190, 115, function(x){ return 0.1 * x + 5; }, 0, 120, 0, 18, "#2563eb") + c(q0[0], q0[1], 5, "#dc2626") + c(q[0], q[1], 5, "#dc2626") + t(q0[0] + 6, q0[1] - 6, "5 €", ' style="fill:#dc2626"') + t(q[0] - 30, q[1] - 10, "15 €", ' style="fill:#dc2626"') + tm(115, 145, "0 … 120 min", null, 11) + telefon(250, 40)); },
+      function(){ return svg(himmel() + r(0, 118, W, 32, "#93c5fd") + p("M60 118 Q160 -2 260 118", "none", "#78716c", 10) + r(40, 112, 240, 8, "#57534e") + l(160, 58, 160, 118, "#dc2626", 2, ST) + t(166, 92, "8 m", ' style="fill:#dc2626"') + tm(160, 140, "40 m", "#1e3a8a", 13) + c(160, 58, 4, "#dc2626")); },
+      function(){ return svg(himmel() + boden(130) + figur(40, 128, 0.9, "#2563eb") + p("M50 92 Q120 -20 210 128", "none", "#ea580c", 2.5, ST) + c(50, 92, 7, "#f97316", "#9a3412") + c(110, 40, 4, "#dc2626") + t(116, 36, "5 m", ' style="fill:#dc2626"') + t(58, 104, "2 m", ' style="fill:#1f2937"') + tm(80, 145, "3 m", "#1f2937", 12)); },
+      function(){ return svg(himmel() + graph(20, 15, 190, 120, function(x){ return x * (x - 4) * (x - 4); }, 0, 5, -1, 10, "#9333ea") + tm(270, 55, "x·(x − 4)²", "#7e22ce", 14) + tm(270, 90, "(2 | 8)", "#dc2626", 14)); }
+    ],
+    schnittpunkte: [
+      function(){ var S = gp(20, 15, 200, 115, 0, 160, 0, 26, 100, 15); return svg(himmel() + graph(20, 15, 200, 115, function(x){ return 0.05 * x + 10; }, 0, 160, 0, 26, "#2563eb") + kurve(20, 15, 200, 115, function(x){ return 0.15 * x; }, 0, 160, 0, 26, "#ea580c") + c(S[0], S[1], 5, "#9333ea") + tm(270, 50, "A", "#2563eb", 16) + tm(270, 80, "B", "#ea580c", 16) + tm(S[0], S[1] - 10, "?", "#9333ea", 14)); },
+      function(){ var S = gp(20, 10, 220, 120, 0, 20, 0, 12, 15, 7.5); return svg(himmel() + p("M20 130 L" + gp(20, 10, 220, 120, 0, 20, 0, 12, 20, 10).join(" ") + " L240 130 Z", "#bbf7d0", "#15803d") + kurve(20, 10, 220, 120, function(x){ return -0.1 * x * x + 2 * x; }, 0, 20, 0, 12, "#ea580c", 2.5) + c(28, 126, 6, "#f97316", "#9a3412") + c(S[0], S[1], 5, "#9333ea") + tm(S[0] + 6, S[1] - 12, "?", "#9333ea", 14)); },
+      function(){ var o = function(fn){ return kurve(40, 15, 240, 115, fn, 0, 6, 0, 5, "#0ea5e9", 4); }; return svg(himmel() + r(30, 128, 260, 10, "#94a3b8") + o(function(x){ return -x * x + 4 * x; }) + kurve(40, 15, 240, 115, function(x){ return -x * x + 8 * x - 12; }, 0, 6, 0, 5, "#2563eb", 4) + c(160, gp(40, 15, 240, 115, 0, 6, 0, 5, 3, 3)[1], 6, "#9333ea") + tm(160, 30, "?", "#9333ea", 15)); },
+      function(){ return svg(himmel() + r(0, 125, W, 25, "#93c5fd") + p("M60 125 Q160 5 260 125", "none", "#78716c", 9) + r(40, 72, 240, 7, "#475569") + c(119, 75, 5, "#9333ea") + c(201, 75, 5, "#9333ea") + l(119, 90, 201, 90, "#dc2626", 2, ST) + tm(160, 104, "? m", "#dc2626", 13) + t(270, 70, "6 m", ' style="fill:#1f2937"')); }
     ],
     koerper: [
       function(){ return svg(himmel() + boden(132) + zyl(110, 30, 42, 12, 96, "#ef4444", "#7f1d1d") + r(68, 60, 84, 34, "#fde68a") + tm(110, 82, "COLA", "#b91c1c", 13) + l(110, 30, 152, 30, "#7c3aed", 2.5) + c(110, 30, 3, "#7c3aed") + tm(131, 13, "r = 4 cm", "#7c3aed", 12) + l(172, 30, 172, 126, "#dc2626", 2, ST) + t(180, 82, "h = 11 cm", ' style="fill:#dc2626"') + tm(255, 50, "V = π · r² · h", "#1f2937", 14)); },

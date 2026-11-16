@@ -72,7 +72,7 @@ var FU = (function(){
       var D = Bz.sub(Bz.mul(p[1], p[1]), Bz.mul(B(4), Bz.mul(p[2], p[0])));
       return { text: "f(x) = " + FK.ptxt(p), eingabe: eingabeTxt(p), schritte: [
         { art: "wahl", q: "qOeff", h: "hOeff", optionen: ["uOben", "uUnten"], soll: Bz.num(a) > 0 ? "uOben" : "uUnten", weg: function(){ return zeilen(["a = " + bt(p[2]) + (Bz.num(p[2]) > 0 ? " > 0" : " < 0")]); } },
-        { art: "punkt", q: "qS", h: "hS", soll: [xs, ys], weg: function(){ return zeilen(["x<sub>S</sub> = −b : (2a) = " + bt(Bz.neg(p[1])) + " : " + kl(Bz.mul(B(2), p[2])) + " = " + bt(xs), "y<sub>S</sub> = f(" + bt(xs) + ") = " + bt(ys)]); } },
+        { art: "punkt", q: "qS", h: "hS", soll: [xs, ys], weg: function(){ return zeilen(["x<sub>S</sub> = −b : (2a) = " + bt(Bz.neg(p[1])) + " : " + kl(Bz.mul(B(2), p[2])) + " = " + bt(xs), "y<sub>S</sub> = f(" + bt(xs) + ") = " + bt(ys)]) + (window.FE && !Bz.null(p[1] || B(0)) ? '<div class="lw-h">' + FE.t("oder") + "</div>" + FE.html(p, false) : ""); } },
         { art: "zahl", q: "qD", h: "hD", soll: D, weg: function(){ return zeilen(["D = b² − 4ac = " + kl(p[1]) + "² − 4 · " + kl(p[2]) + " · " + kl(p[0]) + " = " + bt(D)]); } },
         { art: "zahlen", q: "qNst", h: "hNstQ", soll: A.nst.map(function(z){ return z.b; }), weg: function(){ return lw(p, "f(x)"); } },
         { art: "zahl", q: "qY", h: "hY", soll: p[0], weg: function(){ return zeilen(["f(0) = c = " + bt(p[0])]); } } ] };
