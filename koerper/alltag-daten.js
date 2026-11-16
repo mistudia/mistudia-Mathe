@@ -73,6 +73,6 @@ pt: [
   ["Vela", "Uma vela é um cilindro com r = 2,5 cm e h = 15 cm. Quanta cera ela tem?", "$V = π · r² · h$\n$V = π · 2,5² · 15$\n$V ≈ 294,52 cm³$"]
 ]
 }, werte: [
-  { k: "zylinder", d: { r: 4, h: 11 } }, { k: "eis", d: { r: 3, h: 10 } }, { k: "prisma", d: { g: 2, hd: 1.5, h: 3 } },
-  { k: "silo", d: { r: 3, h1: 10 } }, { k: "dach", d: { a: 10, b: 8, h1: 6, d: 3 } }, { k: "zylinder", d: { r: 2.5, h: 15 } }
+  { k: "zylinder", d: { r: 4, h: 11 } }, { k: "eis", d: { r: 3, h: 10 } }, { k: "prisma", d: { g: 2, hd: 1.5, h: 3 }, e: "m" },
+  { k: "silo", d: { r: 3, h1: 10 }, e: "m" }, { k: "dach", d: { a: 10, b: 8, h1: 6, d: 3 }, e: "m" }, { k: "zylinder", d: { r: 2.5, h: 15 } }
 ], laden: function(w){ if(window.KO_LADEN) KO_LADEN(w); } });

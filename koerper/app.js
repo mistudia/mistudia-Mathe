@@ -107,7 +107,7 @@
       });
     });
     for(var k in E){ var e = E[k]; e.glatt = e.f.length === 2 && !!F[e.f[0]].g && F[e.f[0]].g === F[e.f[1]].g; }
-    this.F = F; this.E = E; this.L = L || []; this.c = c; this.R = R || 1; this.zeichne();
+    this.y0 = y0; this.y1 = y1; this.F = F; this.E = E; this.L = L || []; this.c = c; this.R = R || 1; this.zeichne();
   };
   Szene.prototype.zeichne = function(){
     var S = this, sv = S.sv; leer(sv); sv.setAttribute("viewBox", "0 0 " + W + " " + H); if(!S.F.length) return;
@@ -118,6 +118,15 @@
     function kante(e, versteckt){ var a = P(e.a), b = P(e.b); sv.appendChild(el("line", { x1: a[0].toFixed(1), y1: a[1].toFixed(1), x2: b[0].toFixed(1), y2: b[1].toFixed(1), "class": versteckt ? "kv" : "ks" })); }
     var LV = norm([-0.35, 0.75, 0.6]);
     var vorn = S.F.map(function(f){ var r = rot(f.n); f.licht = Math.max(0, dot(r, LV)); f.tief = P(f.m)[2]; return r[2] > 1e-6; });
+    // Rand eines Lochs: sichtbar, wenn die Außenfläche vorne liegt – oder wenn man durch die Öffnung (oben/unten) hineinschaut
+    var siehtOben = rot([0, 1, 0])[2] > 1e-6, siehtUnten = rot([0, -1, 0])[2] > 1e-6;
+    function sichtbar(e){
+      var aussen = e.f.filter(function(j){ return !S.F[j].inv; }), innen = e.f.filter(function(j){ return S.F[j].inv; });
+      if(!aussen.length || !innen.length) return e.f.some(function(j){ return vorn[j]; });
+      if(aussen.some(function(j){ return vorn[j]; })) return true;
+      var oben = Math.abs(e.a[1] - S.y1) < 1e-6 && Math.abs(e.b[1] - S.y1) < 1e-6, unten = Math.abs(e.a[1] - S.y0) < 1e-6 && Math.abs(e.b[1] - S.y0) < 1e-6;
+      return innen.some(function(j){ return vorn[j]; }) && ((oben && siehtOben) || (unten && siehtUnten));
+    }
     var ord = []; S.F.forEach(function(f, i){ if(vorn[i]) ord.push(i); });
     ord.sort(function(a, b){ return S.F[a].tief - S.F[b].tief; });
     ord.forEach(function(i){
@@ -126,11 +135,11 @@
       var a = { d: pfad(f.p) + (f.loch ? pfad(f.loch) : ""), fill: col, "fill-rule": "evenodd" };
       if(f.g){ a.stroke = col; a["stroke-width"] = 0.9; a["stroke-linejoin"] = "round"; }
       sv.appendChild(el("path", a));
-      f.k.forEach(function(kk){ var e = S.E[kk]; if(!e.glatt || e.f.some(function(j){ return !vorn[j]; })) kante(e, false); });
+      f.k.forEach(function(kk){ var e = S.E[kk]; if(e.glatt ? e.f.some(function(j){ return !vorn[j]; }) : sichtbar(e)) kante(e, false); });
     });
     // verdeckte Kanten zu Linienzügen verbinden, damit die Strichelung auch bei Kreisen durchläuft
     var VK = [], AN = {};
-    for(var kk in S.E){ var e = S.E[kk]; if(!e.glatt && !e.f.some(function(j){ return vorn[j]; })){ var ka = schluessel(e.a), kb = schluessel(e.b), x = { a: e.a, b: e.b, ka: ka, kb: kb, weg: false }; VK.push(x); (AN[ka] = AN[ka] || []).push(x); (AN[kb] = AN[kb] || []).push(x); } }
+    for(var kk in S.E){ var e = S.E[kk]; if(!e.glatt && !sichtbar(e)){ var ka = schluessel(e.a), kb = schluessel(e.b), x = { a: e.a, b: e.b, ka: ka, kb: kb, weg: false }; VK.push(x); (AN[ka] = AN[ka] || []).push(x); (AN[kb] = AN[kb] || []).push(x); } }
     VK.forEach(function(x){
       if(x.weg) return; x.weg = true; var zug = [x.a, x.b], ende = [x.ka, x.kb];
       [1, 0].forEach(function(seite){
@@ -279,18 +288,19 @@
     Z.push({ txt: bdi(sym + " " + rel(sum) + " " + zahl(sum) + " " + einh), end: true });
     return { Z: Z, wert: sum };
   }
-  function wegHtml(k, R, nur){
+  function wegHtml(k, R, nur, e){
+    e = e || "cm";
     var h = "";
     if(R.py && (nur !== "v")){ h += '<p class="muted">' + t("pyth") + "</p>" + R.py.map(function(s){ return "<p>" + bdi(s) + "</p>"; }).join(""); }
     function block(sym, X, einh, titel){ var Y = zeilen(sym, X, einh); h += "<h3>" + titel + "</h3>"; Y.Z.forEach(function(L){ h += '<p class="' + (L.end ? "ende" : L.name ? "namen" : "") + '">' + L.txt + "</p>"; }); }
-    if(nur !== "o") block("V", R.v, "cm³", t("vol"));
-    if(nur !== "v"){ block("O", R.o, "cm²", t("ofl")); if(R.weg) h += '<p class="muted">' + esc(t("weg", { f: R.weg.join(", ") })) + "</p>"; }
+    if(nur !== "o") block("V", R.v, e + "³", t("vol"));
+    if(nur !== "v"){ block("O", R.o, e + "²", t("ofl")); if(R.weg) h += '<p class="muted">' + esc(t("weg", { f: R.weg.join(", ") })) + "</p>"; }
     return h;
   }
   function werte(k, roh){ var d = {}, ok = true; KOERPER[k].ein.forEach(function(e){ var v = lies(roh[e[0]]); if(!(v > 0)) ok = false; d[e[0]] = v; }); return ok ? d : null; }
 
   // ---------- Reiter Grundkörper / Zusammengesetzt ----------
-  var ROH = {}, ART = { grund: "zylinder", zus: "silo" }, SZ = {};
+  var ROH = {}, ART = { grund: "zylinder", zus: "silo" }, SZ = {}, EINH = { g: "cm", z: "cm" }, EINHEITEN = ["mm", "cm", "dm", "m"];
   function roh(k){ if(!ROH[k]){ ROH[k] = {}; KOERPER[k].ein.forEach(function(e){ ROH[k][e[0]] = String(e[2]); }); } return ROH[k]; }
   function wahlKnoepfe(p){
     var box = $(p + "Wahl"), L = p === "g" ? GRUND : ZUS, art = ART[p === "g" ? "grund" : "zus"]; box.innerHTML = "";
@@ -303,9 +313,13 @@
       var l = document.createElement("label"), s = document.createElement("span"), i = document.createElement("input");
       s.textContent = t(e[1]) + " ="; i.className = "zahl"; i.setAttribute("inputmode", "decimal"); i.setAttribute("autocomplete", "off"); i.value = komma() ? R[e[0]].replace(".", ",") : R[e[0]].replace(",", ".");
       i.addEventListener("input", function(){ R[e[0]] = i.value; rechne(p, false); });
-      var u = document.createElement("span"); u.className = "einh"; u.textContent = "cm";
+      var u = document.createElement("span"); u.className = "einh"; u.textContent = EINH[p];
       l.appendChild(s); l.appendChild(i); l.appendChild(u); box.appendChild(l);
     });
+    var l2 = document.createElement("div"), s2 = document.createElement("span"), w = document.createElement("div"); s2.textContent = t("einheit"); w.className = "wahl"; l2.className = "einhWahl";
+    EINHEITEN.forEach(function(x){ var b = document.createElement("button"); b.type = "button"; b.textContent = x; b.setAttribute("aria-pressed", x === EINH[p] ? "true" : "false");
+      b.addEventListener("click", function(){ EINH[p] = x; felder(p); rechne(p, false); $(p + "Masse").textContent = t("masse", { e: x }); }); w.appendChild(b); });
+    l2.appendChild(s2); l2.appendChild(w); box.appendChild(l2);
   }
   function rechne(p, neuBild){
     var k = ART[p === "g" ? "grund" : "zus"], K = KOERPER[k], d = werte(k, roh(k)), fe = "";
@@ -314,7 +328,7 @@
     if(!SZ[p]) SZ[p] = new Szene($(p + "Svg"));
     if(fe){ $(p + "Rechnung").innerHTML = ""; SZ[p].F = []; SZ[p].zeichne(); return; }
     var F = []; K.netz(d, F); SZ[p].setze(F, K.lab(d));
-    $(p + "Rechnung").innerHTML = wegHtml(k, K.rechne(d));
+    $(p + "Rechnung").innerHTML = wegHtml(k, K.rechne(d), null, EINH[p]);
     $(p + "Merke").textContent = t(p === "g" ? "merkeGrund" : K.sub ? "merkeSub" : "merkeAdd");
   }
 
@@ -338,7 +352,7 @@
     var h = document.createElement("span"); h.className = "muted"; h.textContent = t("runden");
     Z.appendChild(inp); Z.appendChild(ein); Z.appendChild(pb); Z.appendChild(h);
     $("meldung").textContent = ""; $("meldung").className = "meldung"; $("uLauf").innerHTML = ""; sicht($("uLauf"), false);
-    $("uMasse").textContent = t("masse"); $("uDrehen").textContent = t("drehen");
+    $("uMasse").textContent = t("masse", { e: "cm" }); $("uDrehen").textContent = t("drehen");
     $("weiter").textContent = t("weiterA"); $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });
   }
   function abschluss(ok){
@@ -369,7 +383,7 @@
     document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
     document.title = "miStudia – " + t("titel"); $("titel").textContent = t("titel");
     document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
-    ["g", "z"].forEach(function(p){ wahlKnoepfe(p); felder(p); $(p + "Drehen").textContent = t("drehen"); $(p + "Masse").textContent = t("masse"); });
+    ["g", "z"].forEach(function(p){ wahlKnoepfe(p); felder(p); $(p + "Drehen").textContent = t("drehen"); $(p + "Masse").textContent = t("masse", { e: EINH[p] }); });
     if(tab === "grund") rechne("g", true); else if(tab === "zus") rechne("z", true);
     if(auf){ var war = fertig, e = letzte, gut = $("meldung").classList.contains("gut"), vs = versuche; zeige();
       if(war){ $("uAntwort").value = e; abschluss(gut); } else if(vs && e != null){ $("uAntwort").value = e; var m = $("meldung"); m.className = "meldung schlecht"; m.textContent = t("nochmal"); } }
@@ -378,6 +392,7 @@
   window.KO_LADEN = function(w){
     if(!KOERPER[w.k]) return; var g = GRUND.indexOf(w.k) >= 0, p = g ? "g" : "z"; ART[g ? "grund" : "zus"] = w.k; ROH[w.k] = {};
     for(var x in w.d) ROH[w.k][x] = String(w.d[x]);
+    EINH[p] = w.e || "cm"; $(p + "Masse").textContent = t("masse", { e: EINH[p] });
     wahlKnoepfe(p); felder(p); zeigeTab(g ? "grund" : "zus"); window.scrollTo(0, 0);
   };
   window.MS_LANG = { apply: function(l){ if(KO[l]){ lang = l; alles(); } } };

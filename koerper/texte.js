@@ -15,7 +15,7 @@ de: {
   merkeGrund: "Prismen und Zylinder: V = G · h. Spitze Körper (Pyramide, Kegel): V = ⅓ · G · h.",
   fehler: "Bitte positive Zahlen eintragen.", fehlerPasst: "Das Loch passt so nicht in den Würfel.",
   u_vol: "Berechne das Volumen des Körpers.", u_ofl: "Berechne den Oberflächeninhalt des Körpers.", runden: "auf 2 Nachkommastellen",
-  pruefen: "Prüfen", weiterA: "Nächste Aufgabe", punkte: "{p} von {n} richtig", richtig: "Richtig!", nochmal: "Noch nicht richtig – versuch es noch einmal.", falsch: "Leider nicht. Richtig ist: {l}", masse: "Maße in cm"
+  pruefen: "Prüfen", weiterA: "Nächste Aufgabe", punkte: "{p} von {n} richtig", richtig: "Richtig!", nochmal: "Noch nicht richtig – versuch es noch einmal.", falsch: "Leider nicht. Richtig ist: {l}", masse: "Maße in {e}", einheit: "Einheit"
 },
 en: {
   titel: "Solids: Volume and Surface Area", tab_grund: "Basic solids", tab_zus: "Composite", tab_ueben: "Practice",
@@ -31,7 +31,7 @@ en: {
   merkeGrund: "Prisms and cylinders: V = B · h. Pointed solids (pyramid, cone): V = ⅓ · B · h.",
   fehler: "Please enter positive numbers.", fehlerPasst: "The hole does not fit into the cube like this.",
   u_vol: "Calculate the volume of the solid.", u_ofl: "Calculate the surface area of the solid.", runden: "to 2 decimal places",
-  pruefen: "Check", weiterA: "Next exercise", punkte: "{p} of {n} correct", richtig: "Correct!", nochmal: "Not quite – try once more.", falsch: "Not quite. The answer is: {l}", masse: "Lengths in cm"
+  pruefen: "Check", weiterA: "Next exercise", punkte: "{p} of {n} correct", richtig: "Correct!", nochmal: "Not quite – try once more.", falsch: "Not quite. The answer is: {l}", masse: "Lengths in {e}", einheit: "Unit"
 },
 es: {
   titel: "Cuerpos: volumen y superficie", tab_grund: "Cuerpos básicos", tab_zus: "Compuestos", tab_ueben: "Practicar",
@@ -47,7 +47,7 @@ es: {
   merkeGrund: "Prismas y cilindros: V = B · h. Cuerpos con vértice (pirámide, cono): V = ⅓ · B · h.",
   fehler: "Escribe números positivos.", fehlerPasst: "Así el agujero no cabe en el cubo.",
   u_vol: "Calcula el volumen del cuerpo.", u_ofl: "Calcula el área total del cuerpo.", runden: "con 2 decimales",
-  pruefen: "Comprobar", weiterA: "Siguiente ejercicio", punkte: "{p} de {n} correctas", richtig: "¡Correcto!", nochmal: "Todavía no – inténtalo otra vez.", falsch: "No. La respuesta es: {l}", masse: "Medidas en cm"
+  pruefen: "Comprobar", weiterA: "Siguiente ejercicio", punkte: "{p} de {n} correctas", richtig: "¡Correcto!", nochmal: "Todavía no – inténtalo otra vez.", falsch: "No. La respuesta es: {l}", masse: "Medidas en {e}", einheit: "Unidad"
 },
 zh: {
   titel: "立体图形：体积和表面积", tab_grund: "基本立体", tab_zus: "组合体", tab_ueben: "练习",
@@ -63,7 +63,7 @@ zh: {
   merkeGrund: "棱柱和圆柱：V = 底面积 · h。锥体（棱锥、圆锥）：V = ⅓ · 底面积 · h。",
   fehler: "请输入正数。", fehlerPasst: "这样孔放不进正方体。",
   u_vol: "计算这个立体的体积。", u_ofl: "计算这个立体的表面积。", runden: "保留两位小数",
-  pruefen: "检查", weiterA: "下一题", punkte: "答对 {p} / {n}", richtig: "对了！", nochmal: "还不对——再试一次。", falsch: "不对。正确答案：{l}", masse: "单位 cm"
+  pruefen: "检查", weiterA: "下一题", punkte: "答对 {p} / {n}", richtig: "对了！", nochmal: "还不对——再试一次。", falsch: "不对。正确答案：{l}", masse: "单位 {e}", einheit: "单位"
 },
 fr: {
   titel: "Solides : volume et aire", tab_grund: "Solides de base", tab_zus: "Composés", tab_ueben: "S’entraîner",
@@ -79,7 +79,7 @@ fr: {
   merkeGrund: "Prismes et cylindres : V = B · h. Solides pointus (pyramide, cône) : V = ⅓ · B · h.",
   fehler: "Écris des nombres positifs.", fehlerPasst: "Le trou ne rentre pas ainsi dans le cube.",
   u_vol: "Calcule le volume du solide.", u_ofl: "Calcule l’aire totale du solide.", runden: "à 2 décimales",
-  pruefen: "Vérifier", weiterA: "Exercice suivant", punkte: "{p} sur {n} justes", richtig: "Juste !", nochmal: "Pas encore – essaie encore une fois.", falsch: "Non. La réponse est : {l}", masse: "Mesures en cm"
+  pruefen: "Vérifier", weiterA: "Exercice suivant", punkte: "{p} sur {n} justes", richtig: "Juste !", nochmal: "Pas encore – essaie encore une fois.", falsch: "Non. La réponse est : {l}", masse: "Mesures en {e}", einheit: "Unité"
 },
 ru: {
   titel: "Тела: объём и площадь поверхности", tab_grund: "Простые тела", tab_zus: "Составные", tab_ueben: "Упражнения",
@@ -95,7 +95,7 @@ ru: {
   merkeGrund: "Призмы и цилиндры: V = S · h. Тела с вершиной (пирамида, конус): V = ⅓ · S · h.",
   fehler: "Введи положительные числа.", fehlerPasst: "Так отверстие не помещается в куб.",
   u_vol: "Вычисли объём тела.", u_ofl: "Вычисли площадь поверхности тела.", runden: "до 2 знаков после запятой",
-  pruefen: "Проверить", weiterA: "Следующее задание", punkte: "{p} из {n} верно", richtig: "Верно!", nochmal: "Пока неверно – попробуй ещё раз.", falsch: "Неверно. Правильно: {l}", masse: "Размеры в см"
+  pruefen: "Проверить", weiterA: "Следующее задание", punkte: "{p} из {n} верно", richtig: "Верно!", nochmal: "Пока неверно – попробуй ещё раз.", falsch: "Неверно. Правильно: {l}", masse: "Размеры в {e}", einheit: "Единица"
 },
 ar: {
   titel: "المجسمات: الحجم والمساحة الكلية", tab_grund: "مجسمات أساسية", tab_zus: "مجسمات مركبة", tab_ueben: "تمرين",
@@ -111,7 +111,7 @@ ar: {
   merkeGrund: "المنشورات والأسطوانات: V = مساحة القاعدة · h. المجسمات المدببة (الهرم، المخروط): V = ⅓ · مساحة القاعدة · h.",
   fehler: "أدخل أعدادًا موجبة.", fehlerPasst: "الثقب لا يتسع في المكعب بهذا الشكل.",
   u_vol: "احسب حجم المجسم.", u_ofl: "احسب المساحة الكلية للمجسم.", runden: "لأقرب منزلتين عشريتين",
-  pruefen: "تحقق", weiterA: "التمرين التالي", punkte: "{p} من {n} صحيحة", richtig: "صحيح!", nochmal: "ليس بعد – حاول مرة أخرى.", falsch: "خطأ. الإجابة الصحيحة: {l}", masse: "الأطوال بالسنتيمتر"
+  pruefen: "تحقق", weiterA: "التمرين التالي", punkte: "{p} من {n} صحيحة", richtig: "صحيح!", nochmal: "ليس بعد – حاول مرة أخرى.", falsch: "خطأ. الإجابة الصحيحة: {l}", masse: "الأطوال بوحدة {e}", einheit: "الوحدة"
 },
 ja: {
   titel: "立体：体積と表面積", tab_grund: "基本の立体", tab_zus: "組み合わせた立体", tab_ueben: "練習",
@@ -127,7 +127,7 @@ ja: {
   merkeGrund: "角柱・円柱：V = 底面積 · h。とがった立体（角すい・円すい）：V = ⅓ · 底面積 · h。",
   fehler: "正の数を入れてください。", fehlerPasst: "この大きさでは穴が立方体に入りません。",
   u_vol: "この立体の体積を求めよう。", u_ofl: "この立体の表面積を求めよう。", runden: "小数第2位まで",
-  pruefen: "確かめる", weiterA: "次の問題", punkte: "{n} 問中 {p} 問正解", richtig: "正解！", nochmal: "まだちがうよ――もう一度やってみよう。", falsch: "ざんねん。正解は {l}", masse: "単位 cm"
+  pruefen: "確かめる", weiterA: "次の問題", punkte: "{n} 問中 {p} 問正解", richtig: "正解！", nochmal: "まだちがうよ――もう一度やってみよう。", falsch: "ざんねん。正解は {l}", masse: "単位 {e}", einheit: "単位"
 },
 pt: {
   titel: "Sólidos: volume e área total", tab_grund: "Sólidos básicos", tab_zus: "Compostos", tab_ueben: "Praticar",
@@ -143,6 +143,6 @@ pt: {
   merkeGrund: "Prismas e cilindros: V = B · h. Sólidos com ponta (pirâmide, cone): V = ⅓ · B · h.",
   fehler: "Digite números positivos.", fehlerPasst: "Assim o furo não cabe no cubo.",
   u_vol: "Calcule o volume do sólido.", u_ofl: "Calcule a área total do sólido.", runden: "com 2 casas decimais",
-  pruefen: "Verificar", weiterA: "Próximo exercício", punkte: "{p} de {n} certas", richtig: "Certo!", nochmal: "Ainda não – tente mais uma vez.", falsch: "Não. A resposta é: {l}", masse: "Medidas em cm"
+  pruefen: "Verificar", weiterA: "Próximo exercício", punkte: "{p} de {n} certas", richtig: "Certo!", nochmal: "Ainda não – tente mais uma vez.", falsch: "Não. A resposta é: {l}", masse: "Medidas em {e}", einheit: "Unidade"
 }
 };
