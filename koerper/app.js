@@ -129,14 +129,26 @@
     }
     var ord = []; S.F.forEach(function(f, i){ if(vorn[i]) ord.push(i); });
     ord.sort(function(a, b){ return S.F[a].tief - S.F[b].tief; });
-    ord.forEach(function(i){
-      var f = S.F[i], B = FARBEN[f.f] || FARBEN[0], w = 0.15 + 0.35 * f.licht, h = 0.8 + 0.2 * f.licht;
+    // Aussparung (Loch, ausgeschnittener Körper): wie im Schulbuch rot „durchscheinend“ über den blauen Grundkörper legen
+    var loch = S.F.some(function(f){ return f.inv; }), innen = [];
+    function flaeche(f, ziel){
+      var B = FARBEN[f.f] || FARBEN[0], w = 0.15 + 0.35 * f.licht, h = 0.8 + 0.2 * f.licht;
       var col = "rgb(" + B.map(function(v){ return Math.round((v * (1 - w) + 255 * w) * h); }).join(",") + ")";
       var a = { d: pfad(f.p) + (f.loch ? pfad(f.loch) : ""), fill: col, "fill-rule": "evenodd" };
       if(f.g){ a.stroke = col; a["stroke-width"] = 0.9; a["stroke-linejoin"] = "round"; }
-      sv.appendChild(el("path", a));
+      ziel.appendChild(el("path", a));
+    }
+    ord.forEach(function(i){
+      var f = S.F[i];
+      if(loch){ if(f.inv) innen.push(f); else flaeche(f, sv); return; }
+      flaeche(f, sv);
       f.k.forEach(function(kk){ var e = S.E[kk]; if(e.glatt ? e.f.some(function(j){ return !vorn[j]; }) : sichtbar(e)) kante(e, false); });
     });
+    if(loch){
+      var gI = el("g", { opacity: 0.82 }); sv.appendChild(gI); innen.forEach(function(f){ flaeche(f, gI); });
+      for(var k2 in S.E){ var e2 = S.E[k2];
+        if(e2.glatt ? (e2.f.some(function(j){ return vorn[j]; }) && e2.f.some(function(j){ return !vorn[j]; })) : sichtbar(e2)) kante(e2, false); }
+    }
     // verdeckte Kanten zu Linienzügen verbinden, damit die Strichelung auch bei Kreisen durchläuft
     var VK = [], AN = {};
     for(var kk in S.E){ var e = S.E[kk]; if(!e.glatt && !sichtbar(e)){ var ka = schluessel(e.a), kb = schluessel(e.b), x = { a: e.a, b: e.b, ka: ka, kb: kb, weg: false }; VK.push(x); (AN[ka] = AN[ka] || []).push(x); (AN[kb] = AN[kb] || []).push(x); } }
