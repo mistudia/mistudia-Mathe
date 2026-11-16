@@ -34,6 +34,10 @@ var FA_BILD = (function(){
       function(){ // Taxi
         var marken = ""; for(var i = 0; i <= 8; i += 2) marken += '<line x1="' + (40 + i * 30) + '" y1="118" x2="' + (40 + i * 30) + '" y2="128" stroke="#ffffff" stroke-width="2"/>' + txt(40 + i * 30, 145, i + " km", ' text-anchor="middle" style="font-size:10px"');
         return svg(himmel() + '<rect x="0" y="108" width="' + W + '" height="24" fill="#4b5563"/><line x1="0" y1="120" x2="' + W + '" y2="120" stroke="#fde047" stroke-width="2" stroke-dasharray="12 8"/>' + marken + auto(70, 110, "#facc15", "TAXI") + '<line x1="280" y1="108" x2="280" y2="60" stroke="#475569" stroke-width="3"/><path d="M280 60 L305 68 L280 76Z" fill="#16a34a"/>' + txt(150, 40, "4 € + 2,50 € / km".replace(",", window.FK && !FK.kommaSprache() ? "." : ","), ' text-anchor="middle"'));
+      },
+      function(){ // Milch im Supermarkt: f(x) = 1,15·x
+        var tueten = ""; for(var i = 0; i < 3; i++) tueten += '<g transform="translate(' + (24 + i * 34) + ' 52)"><path d="M0 18 L6 6 L22 6 L28 18 Z" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.5"/><rect x="0" y="18" width="28" height="52" fill="#ffffff" stroke="#0369a1" stroke-width="2"/><rect x="0" y="34" width="28" height="16" fill="#38bdf8"/></g>';
+        return svg(himmel() + tueten + txt(66, 140, "1 l = 1,15 €", ' text-anchor="middle"') + miniGraph(150, 14, 156, 108, function(x){ return 1.15 * x; }, 0, 6, 0, 7.5, "#2563eb") + txt(228, 140, "f(x) = 1,15·x", ' text-anchor="middle"'));
       }
     ],
     quadratisch: [

@@ -37,7 +37,7 @@
       if(Math.abs(P[1]) > 6){ P = [-dx, b - dy]; if(Math.abs(P[1]) > 6) continue; dx = -dx; dy = -dy; }
       var p = FK.trim([B(b), m]);
       return { typ: "lin", p: p, pkt: [[0, b], P], dreieck: { x: 0, y: b, dx: dx, dy: dy },
-        weg: function(){ return [{ h: t("w_b"), z: ["b = " + bt(b)] }, { h: t("w_m"), z: ["m = Δy : Δx", "m = " + bt(dy) + " : " + bt(dx), "m = " + bt(m)] }, { h: t("w_erg"), z: ["f(x) = " + FK.ptxt(p)] }]; } };
+        weg: function(){ return [{ h: t("w_b"), z: ["t = " + bt(b)] }, { h: t("w_m"), z: ["m = Δy : Δx", "m = " + bt(dy) + " : " + bt(dx), "m = " + bt(m)] }, { h: t("w_erg"), z: ["f(x) = " + FK.ptxt(p)] }]; } };
     }
   }
   function parabel(){

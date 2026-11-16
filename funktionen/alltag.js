@@ -9,7 +9,7 @@
 // ============================================================
 var FA = (function(){
   "use strict";
-  var F = {"linear": ["2x + 10", "-2,5x + 20", "2,5x + 4"], "quadratisch": ["-0,05x^2 + x + 1,5", "-0,02x^2 + 8", "-10x^2 + 80x - 70"], "polynom": ["4x^3 - 80x^2 + 400x", "0,01x^3 - 0,3x^2 + 2,25x + 5"], "rational": ["(2x + 600)/x", "120/x", "(x + 2)/(x + 10)"], "sinus": [null, null, null, null], "waage": [["3x+2", "8"], ["x+x+3", "21"], ["12+4x", "30+x"], ["5+0,1x", "15+0,05x"], ["2x+4x", "36"]]};
+  var F = {"linear": ["2x + 10", "-2,5x + 20", "2,5x + 4", "1,15x"], "quadratisch": ["-0,05x^2 + x + 1,5", "-0,02x^2 + 8", "-10x^2 + 80x - 70"], "polynom": ["4x^3 - 80x^2 + 400x", "0,01x^3 - 0,3x^2 + 2,25x + 5"], "rational": ["(2x + 600)/x", "120/x", "(x + 2)/(x + 10)"], "sinus": [null, null, null, null], "waage": [["3x+2", "8"], ["x+x+3", "21"], ["12+4x", "30+x"], ["5+0,1x", "15+0,05x"], ["2x+4x", "36"]]};
   var UI = {"de": {"titel": "Aus dem Alltag", "probieren": "Ausprobieren", "bedeutung": "Was bedeutet was?", "waage": "Auf die Waage legen"}, "en": {"titel": "Everyday examples", "probieren": "Try it", "bedeutung": "What means what?", "waage": "Put it on the balance"}, "es": {"titel": "Ejemplos de la vida real", "probieren": "Probar", "bedeutung": "¿Qué significa cada cosa?", "waage": "Poner en la balanza"}, "fr": {"titel": "Exemples du quotidien", "probieren": "Essayer", "bedeutung": "Que signifie quoi ?", "waage": "Mettre sur la balance"}, "pt": {"titel": "Exemplos do dia a dia", "probieren": "Experimentar", "bedeutung": "O que significa o quê?", "waage": "Colocar na balança"}, "ru": {"titel": "Примеры из жизни", "probieren": "Попробовать", "bedeutung": "Что что значит?", "waage": "Положить на весы"}, "zh": {"titel": "生活中的例子", "probieren": "试一试", "bedeutung": "各部分的含义", "waage": "放到天平上"}, "ja": {"titel": "身近な例", "probieren": "試してみる", "bedeutung": "それぞれの意味", "waage": "てんびんにのせる"}, "ar": {"titel": "أمثلة من الحياة", "probieren": "جرّب", "bedeutung": "ماذا يعني كل جزء؟", "waage": "ضعها على الميزان"}};
   var D = {
 "de": {
@@ -28,6 +28,11 @@ var FA = (function(){
 "Taxifahrt",
 "Eine Taxifahrt kostet 4 € Grundpreis und 2,50 € pro Kilometer. x = Kilometer, f(x) = Preis in €.",
 "t = 4 € zahlt man schon beim Einsteigen, m = 2,5 € pro km. Wie weit kommst du mit 24 €? Löse 2,5x + 4 = 24 → x = 8 km."
+],
+[
+"Milch im Supermarkt",
+"Ein Liter Milch kostet 1,15 €. x = Anzahl Liter, f(x) = Gesamtpreis in €.",
+"f(x) = 1,15·x: m = 1,15 € pro Liter, t = 0 (0 Liter kosten nichts – Ursprungsgerade, proportional). 2 Liter: f(2) = 1,15·2 = 2,30 €. 3 Liter: f(3) = 1,15·3 = 3,45 €. 6 Liter: f(6) = 1,15·6 = 6,90 €. Rückwärts: Für 9,20 € bekommst du 9,20 : 1,15 = 8 Liter."
 ]
 ],
 "quadratisch": [
@@ -142,6 +147,11 @@ var FA = (function(){
 "Taxi ride",
 "A taxi ride costs a 4 € base fare plus 2.50 € per kilometre. x = kilometres, f(x) = price in €.",
 "You pay t = 4 € as soon as you get in, m = 2.5 € per km. How far can you go with 24 €? Solve 2.5x + 4 = 24 → x = 8 km."
+],
+[
+"Milk in the supermarket",
+"One litre of milk costs €1.15. x = number of litres, f(x) = total price in €.",
+"f(x) = 1.15·x: m = €1.15 per litre, t = 0 (0 litres cost nothing – line through the origin, proportional). 2 litres: f(2) = 1.15·2 = €2.30. 3 litres: f(3) = 1.15·3 = €3.45. 6 litres: f(6) = 1.15·6 = €6.90. Backwards: for €9.20 you get 9.20 : 1.15 = 8 litres."
 ]
 ],
 "quadratisch": [
@@ -256,6 +266,11 @@ var FA = (function(){
 "Taxi",
 "Un viaje en taxi cuesta 4 € de bajada de bandera y 2,50 € por kilómetro. x = kilómetros, f(x) = precio en €.",
 "t = 4 € se paga nada más subir, m = 2,5 € por km. ¿Hasta dónde llegas con 24 €? Resuelve 2,5x + 4 = 24 → x = 8 km."
+],
+[
+"Leche en el supermercado",
+"Un litro de leche cuesta 1,15 €. x = número de litros, f(x) = precio total en €.",
+"f(x) = 1,15·x: m = 1,15 € por litro, t = 0 (0 litros no cuestan nada: recta por el origen, proporcional). 2 litros: f(2) = 1,15·2 = 2,30 €. 3 litros: f(3) = 1,15·3 = 3,45 €. 6 litros: f(6) = 1,15·6 = 6,90 €. Al revés: con 9,20 € compras 9,20 : 1,15 = 8 litros."
 ]
 ],
 "quadratisch": [
@@ -370,6 +385,11 @@ var FA = (function(){
 "Course en taxi",
 "Une course en taxi coûte 4 € de prise en charge plus 2,50 € par kilomètre. x = kilomètres, f(x) = prix en €.",
 "On paie t = 4 € dès qu’on monte, m = 2,5 € par km. Jusqu’où va-t-on avec 24 € ? Résous 2,5x + 4 = 24 → x = 8 km."
+],
+[
+"Lait au supermarché",
+"Un litre de lait coûte 1,15 €. x = nombre de litres, f(x) = prix total en €.",
+"f(x) = 1,15·x : m = 1,15 € par litre, t = 0 (0 litre ne coûte rien – droite passant par l’origine, proportionnalité). 2 litres : f(2) = 1,15·2 = 2,30 €. 3 litres : f(3) = 1,15·3 = 3,45 €. 6 litres : f(6) = 1,15·6 = 6,90 €. À l’envers : avec 9,20 € tu as 9,20 : 1,15 = 8 litres."
 ]
 ],
 "quadratisch": [
@@ -484,6 +504,11 @@ var FA = (function(){
 "Corrida de táxi",
 "Uma corrida de táxi custa 4 € de bandeirada e 2,50 € por quilômetro. x = quilômetros, f(x) = preço em €.",
 "t = 4 € se paga ao entrar, m = 2,5 € por km. Até onde você vai com 24 €? Resolva 2,5x + 4 = 24 → x = 8 km."
+],
+[
+"Leite no supermercado",
+"Um litro de leite custa 1,15 €. x = número de litros, f(x) = preço total em €.",
+"f(x) = 1,15·x: m = 1,15 € por litro, t = 0 (0 litro não custa nada – reta pela origem, proporcional). 2 litros: f(2) = 1,15·2 = 2,30 €. 3 litros: f(3) = 1,15·3 = 3,45 €. 6 litros: f(6) = 1,15·6 = 6,90 €. Ao contrário: com 9,20 € você compra 9,20 : 1,15 = 8 litros."
 ]
 ],
 "quadratisch": [
@@ -598,6 +623,11 @@ var FA = (function(){
 "Такси",
 "Поездка на такси стоит 4 € за посадку и 2,50 € за километр. x — километры, f(x) — цена в €.",
 "t = 4 € платишь сразу при посадке, m = 2,5 € за км. Как далеко уедешь на 24 €? Реши 2,5x + 4 = 24 → x = 8 км."
+],
+[
+"Молоко в супермаркете",
+"Литр молока стоит 1,15 €. x = число литров, f(x) = общая цена в €.",
+"f(x) = 1,15·x: m = 1,15 € за литр, t = 0 (0 литров ничего не стоят – прямая через начало координат, пропорциональность). 2 литра: f(2) = 1,15·2 = 2,30 €. 3 литра: f(3) = 1,15·3 = 3,45 €. 6 литров: f(6) = 1,15·6 = 6,90 €. Обратно: на 9,20 € купишь 9,20 : 1,15 = 8 литров."
 ]
 ],
 "quadratisch": [
@@ -712,6 +742,11 @@ var FA = (function(){
 "打车",
 "打车起步价 4 €，每公里 2.50 €。x = 公里数，f(x) = 价格（€）。",
 "上车就付 t = 4 €，每公里 m = 2.5 €。24 € 能坐多远？解 2.5x + 4 = 24 → x = 8 km。"
+],
+[
+"超市里的牛奶",
+"1 升牛奶 1.15 €。x = 升数，f(x) = 总价（€）。",
+"f(x) = 1.15·x：m = 每升 1.15 €，t = 0（0 升不花钱——过原点的直线，成正比）。2 升：f(2) = 1.15·2 = 2.30 €。3 升：f(3) = 1.15·3 = 3.45 €。6 升：f(6) = 1.15·6 = 6.90 €。反过来：9.20 € 能买 9.20 : 1.15 = 8 升。"
 ]
 ],
 "quadratisch": [
@@ -826,6 +861,11 @@ var FA = (function(){
 "タクシー",
 "タクシーは初乗り 4 €、1 km ごとに 2.50 €。x = キロメートル、f(x) = 料金（€）。",
 "乗った瞬間に t = 4 €、1 km ごとに m = 2.5 €。24 € でどこまで行ける？ 2.5x + 4 = 24 を解くと x = 8 km。"
+],
+[
+"スーパーの牛乳",
+"牛乳 1 L は 1.15 €。x = 何 L、f(x) = 合計金額（€）。",
+"f(x) = 1.15·x：m = 1 L あたり 1.15 €、t = 0（0 L なら 0 € ――原点を通る直線、比例）。2 L：f(2) = 1.15·2 = 2.30 €。3 L：f(3) = 1.15·3 = 3.45 €。6 L：f(6) = 1.15·6 = 6.90 €。逆に：9.20 € なら 9.20 : 1.15 = 8 L。"
 ]
 ],
 "quadratisch": [
@@ -940,6 +980,11 @@ var FA = (function(){
 "سيارة أجرة",
 "رحلة سيارة الأجرة تكلّف 4 € أجرة بداية و 2.50 € لكل كيلومتر. x = الكيلومترات، f(x) = السعر باليورو.",
 "تدفع t = 4 € بمجرد الركوب، و m = 2.5 € لكل كيلومتر. إلى أي مسافة تصل بـ 24 €؟ حلّ 2.5x + 4 = 24 → x = 8 km."
+],
+[
+"الحليب في السوبرماركت",
+"لتر الحليب بـ 1.15 €. x = عدد اللترات، f(x) = السعر الكلي بالـ €.",
+"f(x) = 1.15·x: ‏m = 1.15 € للتر، t = 0 (صفر لتر لا يكلف شيئًا – مستقيم يمر بالأصل، تناسب طردي). لتران: f(2) = 1.15·2 = 2.30 €. ‏3 لترات: f(3) = 1.15·3 = 3.45 €. ‏6 لترات: f(6) = 1.15·6 = 6.90 €. وبالعكس: بـ 9.20 € تحصل على 9.20 : 1.15 = 8 لترات."
 ]
 ],
 "quadratisch": [

@@ -45,7 +45,7 @@ var FU = (function(){
         var m = Math.random() < 0.7 ? B(wahl([-3, -2, -1, 1, 2, 3, 4])) : wahl(BRUECHE), b = B(zuf(-6, 6));
         var p = FK.trim([b, m]);
         return { text: "f(x) = " + FK.ptxt(p), eingabe: eingabeTxt(p), schritte: [
-          { art: "zahl", q: "qM", h: "hM", soll: m, weg: function(){ return zeilen(["f(x) = m · x + b", "f(x) = " + FK.ptxt(p) + "  ⇒  m = " + bt(m)]); } },
+          { art: "zahl", q: "qM", h: "hM", soll: m, weg: function(){ return zeilen(["f(x) = m · x + t", "f(x) = " + FK.ptxt(p) + "  ⇒  m = " + bt(m)]); } },
           { art: "zahl", q: "qB", h: "hB", soll: b, weg: function(){ return zeilen(["f(0) = " + kl(m) + " · 0 + " + kl(b) + " = " + bt(b)]); } },
           { art: "zahlen", q: "qNst", h: "hNstLin", soll: [Bz.div(Bz.neg(b), m)], weg: function(){ return lw(p, "f(x)"); } } ] };
       }
@@ -56,7 +56,7 @@ var FU = (function(){
       var P1 = FK.punkt("P₁", FK.zahl(x1, 0), FK.zahl(y1, 0)), P2 = FK.punkt("P₂", FK.zahl(x2, 0), FK.btxt(y2));
       return { text: t("aufg2P", { p1: P1, p2: P2 }), eingabe: eingabeTxt(p2), schritte: [
         { art: "zahl", q: "qM", h: "h2Pm", soll: m2, weg: function(){ return zeilen(["m = (y₂ − y₁) : (x₂ − x₁)", "m = (" + bt(y2) + " − " + kl(B(y1)) + ") : (" + (x2) + " − " + kl(B(x1)) + ") = " + bt(Bz.sub(y2, B(y1))) + " : " + d + " = " + bt(m2)]); } },
-        { art: "zahl", q: "qBb", h: "h2Pb", soll: b2, weg: function(){ return zeilen(["y₁ = m · x₁ + b  ⇒  b = y₁ − m · x₁", "b = " + y1 + " − " + kl(m2) + " · " + kl(B(x1)) + " = " + bt(b2)]); } },
+        { art: "zahl", q: "qBb", h: "h2Pb", soll: b2, weg: function(){ return zeilen(["y₁ = m · x₁ + t  ⇒  t = y₁ − m · x₁", "t = " + y1 + " − " + kl(m2) + " · " + kl(B(x1)) + " = " + bt(b2)]); } },
         { art: "zahlen", q: "qNst", h: "hNstLin", soll: [Bz.div(Bz.neg(b2), m2)], weg: function(){ return lw(p2, "f(x)"); } } ] };
     },
     quadratisch: function(){
