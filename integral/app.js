@@ -68,6 +68,62 @@
     return { v: Bw.v - A.v, txt: z(Bw.v - A.v), exakt: false, Fa: A, Fb: Bw };
   }
 
+
+  // ---------- Ausführlicher Rechenweg (ein „=“ pro Zeile) ----------
+  var M = FK.MINUS, HOCH = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+  function hoch(n){ return n > 1 ? String(n).split("").map(function(c){ return HOCH[+c]; }).join("") : ""; }
+  function kl(s){ s = String(s); return s.charAt(0) === M || s.charAt(0) === "-" ? "(" + s + ")" : s; }
+  function bt(b){ return FK.btxt(b); }
+  function summe(L){ // [{neg, s}] → "a + b − c"
+    return L.map(function(x, i){ return i ? (x.neg ? " " + M + " " : " + ") + x.s : (x.neg ? M : "") + x.s; }).join("");
+  }
+  function koeffTxt(c){ var s = bt(B(Math.abs(c.n), c.d)); return s === "1" ? "" : s + "·"; }
+  // Stammfunktion Summand für Summand: 3x² → x³
+  function stammZeilen(p){
+    var L = [];
+    for(var k = p.length - 1; k >= 0; k--){ var c = p[k]; if(Bz.null(c)) continue;
+      var tp = []; for(var i = 0; i <= k; i++) tp.push(B(0)); tp[k] = c;
+      L.push(FK.ptxt(tp) + " → " + (k === 0 ? "" : (c.n < 0 ? M : "") + koeffTxt(c) + "x" + hoch(k + 1) + " : " + (k + 1) + " → ") + FK.ptxt(stamm(tp)));
+    }
+    return L;
+  }
+  // F(x₀) ausführlich: Einsetzen, Summanden ausrechnen, zusammenfassen
+  function fWert(fn, x, xb, xt, name){
+    name = name || "F";
+    var links = name + "(" + xt + ")";
+    if(!fn.Fp) return { zeilen: [links + " = " + fn.Ftxt.replace(/x/g, kl(xt)), links + " ≈ " + z(fn.F(x))], txt: z(fn.F(x)), v: fn.F(x), exakt: false };
+    var T = [], W = [], Fp = fn.Fp;
+    for(var k = Fp.length - 1; k >= 0; k--){ var c = Fp[k]; if(Bz.null(c)) continue;
+      T.push({ neg: c.n < 0, s: k === 0 ? bt(B(Math.abs(c.n), c.d)) : koeffTxt(c) + kl(xt) + hoch(k) });
+      if(xb){ var w = Bz.mul(c, pot(xb, k)); W.push({ neg: w.n < 0, s: bt(B(Math.abs(w.n), w.d)) }); }
+    }
+    var Z = [links + " = " + summe(T)];
+    if(!xb){ var v = fn.F(x); Z.push(links + " ≈ " + z(v)); return { zeilen: Z, txt: z(v), v: v, exakt: false }; }
+    var wert = FK.wertB(Fp, xb), wt = bt(wert);
+    if(T.length > 1 && summe(W) !== summe(T)) Z.push(links + " = " + summe(W));
+    if(Z[Z.length - 1] !== links + " = " + wt) Z.push(links + " = " + wt);
+    return { zeilen: Z, txt: wt, v: Bz.num(wert), exakt: true, b: wert };
+  }
+  function pot(b, k){ var r = B(1); for(var i = 0; i < k; i++) r = Bz.mul(r, b); return r; }
+  // ∫ von a bis b ausführlich; gibt Zeilen-Blöcke zurück
+  function integralWeg(fn, a, b, name, fx){
+    var at = a.txt || (a.b ? bt(a.b) : z(a.v, 3)), btx = b.txt || (b.b ? bt(b.b) : z(b.v, 3));
+    var Fa = fWert(fn, a.v, a.b, at), Fb = fWert(fn, b.v, b.b, btx), Z = [];
+    Z.push(name + " = " + int(at, btx, fx || "f(x)"));
+    Z.push(name + " = [" + fn.Ftxt + "]<sub>" + at + "</sub><sup>" + btx + "</sup>");
+    Z.push(name + " = F(" + btx + ") " + M + " F(" + at + ")");
+    var Zb = Fb.zeilen, Za = Fa.zeilen;
+    var ex = Fa.exakt && Fb.exakt, erg = ex ? Bz.sub(Fb.b, Fa.b) : null, v = Fb.v - Fa.v;
+    var Z2 = [name + (ex ? " = " : " ≈ ") + Fb.txt + " " + M + " " + kl(Fa.txt)];
+    if(ex){ Z2.push(name + " = " + bt(erg)); if(bt(erg).indexOf("/") >= 0) Z2.push(name + " ≈ " + z(Bz.num(erg))); }
+    else Z2.push(name + " ≈ " + z(v));
+    return { bloecke: [Z, Zb, Za, Z2], v: ex ? Bz.num(erg) : v, txt: ex ? bt(erg) : z(v), b: erg, exakt: ex };
+  }
+  function blockHtml(L){ return L.map(function(x){ return bdi(x); }).join("<br>"); }
+  function stammBlock(fn, fx){
+    if(fn.poly){ return t("wStamm") + "<br>" + blockHtml(stammZeilen(fn.poly)) + "<br>" + bdi("F(x) = " + fn.Ftxt); }
+    return t("wStamm") + "<br>" + bdi(fn.regel) + "<br>" + bdi("F(x) = " + fn.Ftxt);
+  }
   // ---------- Graph ----------
   function schritt(r){ var s = Math.pow(10, Math.floor(Math.log10(r / 6))), m = r / 6 / s; return s * (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10); }
   var GL = 44, GR = 628, GT = 14, GB = 378;
@@ -197,7 +253,8 @@
     S.push(t("sProbe") + " " + bdi("F′(x) = " + fn.txt + " = f(x)"));
     $("sSchritte").innerHTML = S.map(function(s){ return "<li>" + s + "</li>"; }).join("");
     var I = integral(fn, E.a, E.b), at = z(E.a.v), bt = z(E.b.v);
-    $("sBestimmt").innerHTML = bdi(int(at, bt) + " = [" + fn.Ftxt + "]<sub>" + at + "</sub><sup>" + bt + "</sup> = F(" + bt + ") − F(" + at + ") = " + (I.Fb.exakt ? I.Fb.txt : z(I.Fb.v)) + " − " + (I.Fa.v < 0 ? "(" : "") + (I.Fa.exakt ? I.Fa.txt : z(I.Fa.v)) + (I.Fa.v < 0 ? ")" : "") + " " + (I.exakt ? "= " + wertTxt({ v: I.v, txt: I.txt, exakt: true }) : "≈ " + z(I.v)));
+    var IW = integralWeg(fn, E.a, E.b, "I"); void I; void at; void bt;
+    $("sBestimmt").innerHTML = '<span class="weg-l">' + IW.bloecke.map(blockHtml).join('</span><span class="weg-l">') + "</span>";
     zeichne(svg, { xr: xBereich(E.a.v, E.b.v), abl: ["f(x)", "F(x)"], kurven: [{ fn: fn, cls: "g-f" }, { fn: fn, cls: "g-F", F: true }], polys: flaechenPolys(fn, null, E.a.v, E.b.v), punkte: [{ x: E.a.v, y: fn.F(E.a.v) }, { x: E.b.v, y: fn.F(E.b.v) }],
       namen: [{ x: E.b.v, y: fn.F(E.b.v) + 0, text: "F(b)", farbe: "var(--F)" }, { x: E.a.v, y: fn.F(E.a.v), text: "F(a)", farbe: "var(--F)" }] });
     $("sLegende").textContent = t("legende"); $("sHaupt").textContent = t("hauptsatz");
@@ -232,6 +289,13 @@
     var ganz = integral(d, a, b);
     return { d: d, Z: Z, teile: teile, A: summe, Atxt: exakt ? FK.btxt(sB) : null, ganz: ganz };
   }
+  function flSumme(R){ // A = |I₁| + |I₂| …, dann Zahlen, dann Ergebnis
+    var n = R.teile.map(function(tl, i){ return "|I" + tief(i + 1) + "|"; }).join(" + "), w = R.teile.map(function(tl){ var b = tl.I.exakt ? Bz.sub(FK.wertB(R.d.Fp, tl.bis.b), FK.wertB(R.d.Fp, tl.von.b)) : null; return b ? bt(b.n < 0 ? Bz.neg(b) : b) : z(Math.abs(tl.I.v)); });
+    var L = ["A = " + n];
+    if(R.teile.length > 1) L.push("A " + (R.Atxt ? "=" : "≈") + " " + w.join(" + "));
+    L.push("A " + (R.Atxt ? "= " + R.Atxt : "≈ " + z(R.A))); if(R.Atxt && R.Atxt.indexOf("/") >= 0) L.push("A ≈ " + z(R.A));
+    return L;
+  }
   function flaeche(){
     var E = eingaben(), svg = $("gF"), zwei = fArt === "zwei";
     sicht($("zweiBox"), zwei); sicht($("schnittBox"), zwei);
@@ -250,14 +314,16 @@
     }
     var R = flaechenRechnung(E.fn, gn, a, b), dname = zwei ? "(f − g)(x)" : "f(x)";
     if(zwei) S.push(t("differenz") + " " + bdi("f(x) − g(x) = " + (R.d.txt || "f(x) − g(x)")));
-    if(!(zwei && $("schnitt").checked)) S.push(R.Z.length ? t(zwei ? "schnittIn" : "nullIn", { n: bdi(R.Z.map(stelleTxt).join("; ")) }) : t(zwei ? "keinSchnittIn" : "keineNull"));
-    R.teile.forEach(function(tl, i){
-      var vt = tl.von.txt || z(tl.von.v, 3), bt = tl.bis.txt || z(tl.bis.v, 3);
-      S.push(bdi("I" + tief(i + 1) + " = " + int(vt, bt, dname) + " " + (tl.I.exakt ? "= " + wertTxt({ v: tl.I.v, txt: tl.I.txt, exakt: true }) : "≈ " + z(tl.I.v))));
-    });
+    if(!(zwei && $("schnitt").checked)){
+      if(R.d.poly && window.FL && FK.grad(R.d.poly) >= 1) S.push(t("wNst") + '<div class="fl-weg">' + FL.html(R.d.poly, zwei ? "f(x) − g(x)" : "f(x)") + "</div>");
+      S.push(R.Z.length ? t(zwei ? "schnittIn" : "nullIn", { n: bdi(R.Z.map(stelleTxt).join("; ")) }) : t(zwei ? "keinSchnittIn" : "keineNull"));
+    }
+    S.push(stammBlock(R.d));
+    R.teile.forEach(function(tl, i){ S.push(integralWeg(R.d, tl.von, tl.bis, "I" + tief(i + 1), dname).bloecke.map(blockHtml).join("<br>")); });
+    S.push(t("wAdd") + "<br>" + blockHtml(flSumme(R)));
     $("fSchritte").innerHTML = S.map(function(s){ return "<li>" + s + "</li>"; }).join("");
     var summeTxt = R.teile.map(function(tl, i){ return "|I" + tief(i + 1) + "|"; }).join(" + ");
-    $("fErg").innerHTML = "<b>" + t("flaecheL") + "</b> " + bdi("A = " + summeTxt + (R.Atxt ? " = " + R.Atxt + (R.Atxt.indexOf("/") >= 0 ? " ≈ " + z(R.A) : "") : " ≈ " + z(R.A)));
+    $("fErg").innerHTML = "<b>" + t("flaecheL") + "</b> " + bdi("A " + (R.Atxt ? "= " + R.Atxt + (R.Atxt.indexOf("/") >= 0 ? " ≈ " + z(R.A) : "") : "≈ " + z(R.A))); void summeTxt;
     var neg = R.teile.some(function(tl){ return tl.I.v < -1e-12; });
     sicht($("fWarn"), neg);
     if(neg) $("fWarn").innerHTML = R.teile.length > 1 ? t(zwei ? "warnungZwei" : "warnung", { w: bdi(int(a.txt || z(a.v, 3), b.txt || z(b.v, 3), dname) + (R.ganz.exakt ? " = " + R.ganz.txt : " ≈ " + z(R.ganz.v))) }) : t(zwei ? "warnNegZwei" : "warnNeg");
@@ -340,19 +406,21 @@
   function pruefe(e){
     if(beantwortet) return;
     var ok, ltxt, L = [];
-    if(auf.typ === "stamm"){ ok = e === auf.l; ltxt = "F(x) = " + auf.l + " + C"; L.push(t("tippStamm")); }
+    if(auf.typ === "stamm"){ ok = e === auf.l; ltxt = "F(x) = " + auf.l + " + C"; L.push(t("tippStamm")); L.push(stammBlock(ausPoly(auf.p)) + bdi(" + C")); }
     else {
       var v = lies(e); if(!isFinite(v)) return;
       ok = Math.abs(v - auf.l) <= 0.011;
       if(auf.typ === "integral"){
         var I = auf.I; ltxt = I.txt + (I.txt.indexOf("/") >= 0 ? " ≈ " + z(I.v, 2) : "");
-        L.push(bdi("F(x) = " + auf.fn.Ftxt));
-        L.push(bdi("F(" + auf.b + ") − F(" + auf.a + ") = " + I.Fb.txt + " − " + (I.Fa.v < 0 ? "(" + I.Fa.txt + ")" : I.Fa.txt) + " = " + I.txt));
+        L.push(stammBlock(auf.fn));
+        L.push(integralWeg(auf.fn, { v: auf.a, b: B(auf.a) }, { v: auf.b, b: B(auf.b) }, "I", "(" + auf.fn.txt + ")").bloecke.map(blockHtml).join("<br>"));
       } else {
         var R = auf.R; ltxt = (R.Atxt || "") + (R.Atxt && R.Atxt.indexOf("/") < 0 ? "" : " ≈ " + z(R.A, 2));
+        if(window.FL) L.push(t("wNst") + '<div class="fl-weg">' + FL.html(auf.fn.poly, "f(x)") + "</div>");
         L.push(R.Z.length ? t("nullIn", { n: bdi(R.Z.map(stelleTxt).join("; ")) }) : t("keineNull"));
-        R.teile.forEach(function(tl, i){ L.push(bdi("I" + tief(i + 1) + " = " + int(tl.von.txt || z(tl.von.v), tl.bis.txt || z(tl.bis.v)) + " = " + tl.I.txt)); });
-        L.push(bdi("A = " + R.teile.map(function(tl, i){ return "|I" + tief(i + 1) + "|"; }).join(" + ") + " = " + ltxt));
+        L.push(stammBlock(auf.fn));
+        R.teile.forEach(function(tl, i){ L.push(integralWeg(auf.fn, tl.von, tl.bis, "I" + tief(i + 1)).bloecke.map(blockHtml).join("<br>")); });
+        L.push(t("wAdd") + "<br>" + blockHtml(flSumme(R)));
         zeichne($("gU"), { xr: xBereich(auf.a, auf.b), kurven: [{ fn: auf.fn, cls: "g-f" }], polys: flaechenPolys(auf.fn, null, auf.a, auf.b), grenzen: [{ x: auf.a, name: "a" }, { x: auf.b, name: "b" }],
           namen: R.teile.map(function(tl, i){ var m = (tl.von.v + tl.bis.v) / 2; return { x: m, y: auf.fn.f(m) / 2, text: "I" + tief(i + 1) }; }) });
       }

@@ -1,6 +1,7 @@
 // Texte für „Integralrechnung“ (integral/app.js) in 9 Sprachen.
 var IT = {
 de: {
+  wStamm: "Stammfunktion bilden (Potenzregel: xⁿ → xⁿ⁺¹ : (n + 1)):", wNst: "Nullstellen berechnen:", wAdd: "Flächen addieren (Beträge, weil Flächen unter der x-Achse negativ zählen):",
   warnungZwei: "Achtung: {w} wäre falsch – wo g über f liegt (rot), zählt das Integral negativ. Deshalb an den Schnittstellen aufteilen und die Beträge addieren.", warnNegZwei: "Das Integral ist negativ, weil g über f liegt. Der Flächeninhalt ist der Betrag – man kann auch gleich „oben minus unten“ rechnen.",
   titel: "Integralrechnung", tab_riemann: "Fläche annähern", tab_stamm: "Stammfunktion", tab_flaeche: "Flächen", tab_ueben: "Üben",
   fkt: "Funktion:", fkt2: "Zweite Funktion:", von: "von a =", bis: "bis b =", zieh: "Die Grenzen a und b kannst du auch im Bild ziehen.",
@@ -27,6 +28,7 @@ de: {
   tippStamm: "Probe: Leite F ab – es muss wieder f herauskommen. Beim Integrieren steigt der Exponent um 1, und man teilt durch den neuen Exponenten."
 },
 en: {
+  wStamm: "Find the antiderivative (power rule: xⁿ → xⁿ⁺¹ : (n + 1)):", wNst: "Calculate the zeros:", wAdd: "Add the areas (absolute values, because areas below the x-axis count as negative):",
   warnungZwei: "Careful: {w} would be wrong – where g lies above f (red), the integral counts negative. So split at the intersections and add the absolute values.", warnNegZwei: "The integral is negative because g lies above f. The area is its absolute value – you can also calculate “top minus bottom” right away.",
   titel: "Integral Calculus", tab_riemann: "Approximate area", tab_stamm: "Antiderivative", tab_flaeche: "Areas", tab_ueben: "Practice",
   fkt: "Function:", fkt2: "Second function:", von: "from a =", bis: "to b =", zieh: "You can also drag the limits a and b in the picture.",
@@ -53,6 +55,7 @@ en: {
   tippStamm: "Check: differentiate F – you must get f again. When integrating, the exponent goes up by 1 and you divide by the new exponent."
 },
 es: {
+  wStamm: "Hallar la primitiva (regla de la potencia: xⁿ → xⁿ⁺¹ : (n + 1)):", wNst: "Calcular los ceros:", wAdd: "Sumar las áreas (valores absolutos, porque las áreas bajo el eje x cuentan negativas):",
   warnungZwei: "Atención: {w} sería incorrecto: donde g está por encima de f (rojo), la integral cuenta negativa. Por eso se divide en los puntos de corte y se suman los valores absolutos.", warnNegZwei: "La integral es negativa porque g está por encima de f. El área es su valor absoluto; también se puede calcular directamente «la de arriba menos la de abajo».",
   titel: "Cálculo integral", tab_riemann: "Aproximar el área", tab_stamm: "Primitiva", tab_flaeche: "Áreas", tab_ueben: "Practicar",
   fkt: "Función:", fkt2: "Segunda función:", von: "desde a =", bis: "hasta b =", zieh: "También puedes arrastrar los límites a y b en la gráfica.",
@@ -79,6 +82,7 @@ es: {
   tippStamm: "Comprobación: deriva F; tiene que salir otra vez f. Al integrar, el exponente sube en 1 y se divide entre el nuevo exponente."
 },
 zh: {
+  wStamm: "求原函数（幂函数法则：xⁿ → xⁿ⁺¹ : (n + 1)）：", wNst: "计算零点：", wAdd: "面积相加（取绝对值，因为 x 轴下方的面积为负）：",
   warnungZwei: "注意：{w} 是错的——g 在 f 上方的部分（红色）积分为负。所以要在交点处分开，再把绝对值相加。", warnNegZwei: "积分是负的，因为 g 在 f 的上方。面积是它的绝对值——也可以直接用“上面减下面”。",
   titel: "积分", tab_riemann: "近似求面积", tab_stamm: "原函数", tab_flaeche: "面积", tab_ueben: "练习",
   fkt: "函数：", fkt2: "第二个函数：", von: "从 a =", bis: "到 b =", zieh: "也可以在图上拖动上下限 a 和 b。",
@@ -105,6 +109,7 @@ zh: {
   tippStamm: "验算：对 F 求导，必须得到 f。积分时指数加 1，再除以新的指数。"
 },
 fr: {
+  wStamm: "Trouver la primitive (règle des puissances : xⁿ → xⁿ⁺¹ : (n + 1)) :", wNst: "Calculer les zéros :", wAdd: "Additionner les aires (valeurs absolues, car les aires sous l’axe des x comptent négativement) :",
   warnungZwei: "Attention : {w} serait faux – là où g est au-dessus de f (en rouge), l’intégrale compte négativement. Il faut donc découper aux intersections et additionner les valeurs absolues.", warnNegZwei: "L’intégrale est négative car g est au-dessus de f. L’aire est sa valeur absolue – on peut aussi calculer directement « celle du haut moins celle du bas ».",
   titel: "Calcul intégral", tab_riemann: "Approcher l’aire", tab_stamm: "Primitive", tab_flaeche: "Aires", tab_ueben: "S’entraîner",
   fkt: "Fonction :", fkt2: "Deuxième fonction :", von: "de a =", bis: "à b =", zieh: "Tu peux aussi faire glisser les bornes a et b sur le graphique.",
@@ -131,6 +136,7 @@ fr: {
   tippStamm: "Vérification : dérive F – tu dois retrouver f. En intégrant, l’exposant augmente de 1 et on divise par le nouvel exposant."
 },
 ru: {
+  wStamm: "Находим первообразную (правило степени: xⁿ → xⁿ⁺¹ : (n + 1)):", wNst: "Находим нули:", wAdd: "Складываем площади (по модулю, т. к. площади под осью x считаются отрицательными):",
   warnungZwei: "Внимание: {w} было бы неверно – где g выше f (красное), интеграл отрицательный. Поэтому разбивают по точкам пересечения и складывают модули.", warnNegZwei: "Интеграл отрицательный, потому что g выше f. Площадь – это его модуль; можно сразу считать «верхняя минус нижняя».",
   titel: "Интегралы", tab_riemann: "Приближение площади", tab_stamm: "Первообразная", tab_flaeche: "Площади", tab_ueben: "Тренировка",
   fkt: "Функция:", fkt2: "Вторая функция:", von: "от a =", bis: "до b =", zieh: "Границы a и b можно двигать прямо на рисунке.",
@@ -157,6 +163,7 @@ ru: {
   tippStamm: "Проверка: продифференцируй F – должна получиться f. При интегрировании показатель степени увеличивается на 1, и делят на новый показатель."
 },
 ar: {
+  wStamm: "إيجاد الدالة الأصلية (قاعدة القوة: xⁿ → xⁿ⁺¹ : (n + 1)):", wNst: "حساب الأصفار:", wAdd: "جمع المساحات (بالقيم المطلقة لأن المساحات تحت المحور x تُحسب سالبة):",
   warnungZwei: "انتبه: {w} سيكون خطأ – حيث تقع g فوق f (بالأحمر) يكون التكامل سالبًا. لذلك نقسم عند نقاط التقاطع ونجمع القيم المطلقة.", warnNegZwei: "التكامل سالب لأن g تقع فوق f. المساحة هي قيمته المطلقة – ويمكن أيضًا حساب «العليا ناقص السفلى» مباشرة.",
   titel: "حساب التكامل", tab_riemann: "تقريب المساحة", tab_stamm: "الدالة الأصلية", tab_flaeche: "المساحات", tab_ueben: "تمرين",
   fkt: "الدالة:", fkt2: "الدالة الثانية:", von: "من a =", bis: "إلى b =", zieh: "يمكنك أيضًا سحب الحدّين a و b في الرسم.",
@@ -183,6 +190,7 @@ ar: {
   tippStamm: "التحقق: اشتق F – يجب أن تحصل على f من جديد. عند التكامل يزيد الأس بمقدار 1 ونقسم على الأس الجديد."
 },
 ja: {
+  wStamm: "原始関数を求める（べき乗の公式：xⁿ → xⁿ⁺¹ : (n + 1)）：", wNst: "x 軸との交点を計算：", wAdd: "面積をたす（x 軸より下の面積は負になるので絶対値）：",
   warnungZwei: "注意：{w} は正しくありません。g が f より上にある部分（赤）は積分が負になるからです。交点で分けて、絶対値をたしましょう。", warnNegZwei: "g が f より上にあるので積分は負になります。面積はその絶対値です。はじめから「上 − 下」で計算してもかまいません。",
   titel: "積分", tab_riemann: "面積を近似する", tab_stamm: "原始関数", tab_flaeche: "面積", tab_ueben: "練習",
   fkt: "関数：", fkt2: "2つ目の関数：", von: "a =", bis: "b =", zieh: "区間の端 a と b は図の上でもドラッグできます。",
@@ -209,6 +217,7 @@ ja: {
   tippStamm: "たしかめ：F を微分すると f にもどるはず。積分では指数が 1 ふえ、新しい指数でわります。"
 },
 pt: {
+  wStamm: "Achar a primitiva (regra da potência: xⁿ → xⁿ⁺¹ : (n + 1)):", wNst: "Calcular os zeros:", wAdd: "Somar as áreas (valores absolutos, porque áreas abaixo do eixo x contam negativas):",
   warnungZwei: "Atenção: {w} estaria errado – onde g está acima de f (a vermelho), o integral conta negativo. Por isso divide-se nas interseções e somam-se os valores absolutos.", warnNegZwei: "O integral é negativo porque g está acima de f. A área é o seu valor absoluto – também se pode calcular logo «o de cima menos o de baixo».",
   titel: "Cálculo integral", tab_riemann: "Aproximar a área", tab_stamm: "Primitiva", tab_flaeche: "Áreas", tab_ueben: "Praticar",
   fkt: "Função:", fkt2: "Segunda função:", von: "de a =", bis: "até b =", zieh: "Também podes arrastar os limites a e b no gráfico.",
