@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     koerper/index.html – Körper: Volumen und Oberfläche (miStudia Mathe)
+     Grundkörper (drehbare 3D-Zeichnung, V und O mit Rechenweg),
+     zusammengesetzte Körper (aufgesetzt / ausgeschnitten, Pythagoras), Üben.
+     Logik: app.js, Texte: texte.js (9 Sprachen), Sprache aus dem Startmenü.
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Körper</title>
+<!-- SEO -->
+<meta name="description" content="Volumen und Oberfläche – Grundkörper, zusammengesetzte Körper, drehbar in 3D – Klasse 7–10. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<link rel="alternate" hreflang="de" href="https://math.mistudia.com/koerper/?lang=de">
+<link rel="alternate" hreflang="en" href="https://math.mistudia.com/koerper/?lang=en">
+<link rel="alternate" hreflang="es" href="https://math.mistudia.com/koerper/?lang=es">
+<link rel="alternate" hreflang="zh" href="https://math.mistudia.com/koerper/?lang=zh">
+<link rel="alternate" hreflang="fr" href="https://math.mistudia.com/koerper/?lang=fr">
+<link rel="alternate" hreflang="ru" href="https://math.mistudia.com/koerper/?lang=ru">
+<link rel="alternate" hreflang="ar" href="https://math.mistudia.com/koerper/?lang=ar">
+<link rel="alternate" hreflang="ja" href="https://math.mistudia.com/koerper/?lang=ja">
+<link rel="alternate" hreflang="pt" href="https://math.mistudia.com/koerper/?lang=pt">
+<link rel="alternate" hreflang="x-default" href="https://math.mistudia.com/koerper/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="miStudia Mathe">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Körper – miStudia Mathe">
+<meta property="og:description" content="Volumen und Oberfläche – Grundkörper, zusammengesetzte Körper, drehbar in 3D – Klasse 7–10. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<meta property="og:url" content="https://math.mistudia.com/koerper/">
+<meta property="og:image" content="https://math.mistudia.com/img/beispiele/zylinder-volumen-oberflaeche-3d.webp">
+<meta name="twitter:card" content="summary_large_image">
+<script>var MS_SEO = {"de":["Körper – miStudia Mathe","Volumen und Oberfläche – Grundkörper, zusammengesetzte Körper, drehbar in 3D – Klasse 7–10. Kostenlos üben mit miStudia, in 9 Sprachen."],"en":["Solids – miStudia Mathe","Volume and surface area – basic and composite solids, rotatable in 3D – Grade 7–10. Free practice with miStudia, in 9 languages."],"es":["Cuerpos geométricos – miStudia Mathe","Volumen y área – cuerpos básicos y compuestos, giratorios en 3D – Curso 7–10. Practica gratis con miStudia, en 9 idiomas."],"zh":["立体图形 – miStudia Mathe","体积和表面积——基本立体和组合体，可 3D 旋转 – 7–10年级. 用 miStudia 免费练习，支持 9 种语言。"],"fr":["Solides – miStudia Mathe","Volume et aire – solides de base et composés, à tourner en 3D – 5e–2de. S’entraîner gratuitement avec miStudia, en 9 langues."],"ru":["Геометрические тела – miStudia Mathe","Объём и площадь поверхности – простые и составные тела, вращение в 3D – 7–10 класс. Бесплатные упражнения с miStudia на 9 языках."],"ar":["المجسمات – miStudia Mathe","الحجم والمساحة الكلية – مجسمات أساسية ومركبة قابلة للتدوير ثلاثي الأبعاد – الصف 7–10. تدرّب مجانًا مع miStudia بتسع لغات."],"ja":["立体 – miStudia Mathe","体積と表面積――基本の立体と組み合わせた立体、3D で回せる – 中1〜高1. miStudia で無料練習（9か国語）。"],"pt":["Sólidos geométricos – miStudia Mathe","Volume e área total – sólidos básicos e compostos, giratórios em 3D – 7º–10º ano. Pratique grátis com o miStudia, em 9 idiomas."]};</script>
+<script src="/sprache-url.js"></script>
+<!-- /SEO -->
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 19px; margin: 4px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  .reihe label { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; max-width: 100%; }
+  input.zahl { width: 180px; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; font-variant-numeric: tabular-nums; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .knopf:disabled { opacity: 0.5; cursor: default; }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; margin: 8px 0; }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .fehler { color: var(--schlecht); font-weight: 700; }
+  .wahl { display: inline-flex; background: #e3eefc; border-radius: 12px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+  .wahl button { font: 700 15px system-ui, sans-serif; padding: 7px 12px; border: 0; border-radius: 9px; background: transparent; color: var(--blue); cursor: pointer; }
+  .wahl button[aria-pressed="true"] { background: var(--blue); color: #ffffff; }
+  select { font: 18px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; max-width: 100%; }
+  .zwei { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+  @media (max-width: 760px) { .zwei { grid-template-columns: 1fr; } }
+  svg.bild { width: 100%; height: auto; display: block; user-select: none; -webkit-user-select: none; }
+  #raster, #uRaster { touch-action: none; cursor: pointer; max-width: 520px; }
+  #koSvg { touch-action: none; max-width: 520px; }
+  #figSvg { max-width: 420px; margin: 0 auto; }
+  .farben { display: inline-flex; gap: 6px; }
+  .farben button { width: 34px; height: 34px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 0 2px var(--line); cursor: pointer; padding: 0; }
+  .farben button[aria-pressed="true"] { box-shadow: 0 0 0 3px #1a2233; }
+  .zelle { stroke: #c7d2e0; stroke-width: 1; fill: #ffffff; }
+  .achse { stroke: #dc2626; stroke-width: 3.5; stroke-dasharray: 10 7; fill: none; }
+  .zentrum { fill: #dc2626; stroke: #ffffff; stroke-width: 2; }
+  .fig { fill: #c7d2fe; stroke: #3730a3; stroke-width: 4; stroke-linejoin: round; }
+  .figL { fill: none; stroke: #3730a3; stroke-width: 20; stroke-linecap: round; stroke-linejoin: round; }
+  .kopie { fill: rgba(249,115,22,0.30); stroke: #ea580c; stroke-width: 3; stroke-dasharray: 6 4; }
+  .kopieL { fill: none; stroke: rgba(234,88,12,0.55); stroke-width: 12; stroke-linecap: round; }
+  .kopie.deckt, .kopieL.deckt { stroke: #16a34a; } .kopie.deckt { fill: rgba(22,163,74,0.25); }
+  .info { font-size: 18px; line-height: 1.7; }
+  .info b { color: var(--blue); }
+  input[type=range] { width: 100%; max-width: 420px; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  .eing { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 14px; margin: 10px 0 8px; }
+  .eing label { font-weight: 700; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .eing input.zahl { width: 110px; font-size: 20px; }
+  .einh { font-weight: 600; color: var(--muted); }
+  svg.k3 { touch-action: none; cursor: grab; max-width: 480px; margin: 0 auto; max-height: 58vh; max-height: 58dvh; }
+  svg.k3:active { cursor: grabbing; }
+  .ks { stroke: #1a2233; stroke-width: 2; stroke-linecap: round; }
+  .kv { stroke: #475569; stroke-width: 1.5; stroke-dasharray: 6 5; stroke-linecap: round; }
+  .ml { stroke-width: 2.5; stroke-linecap: round; } .ml.h { stroke: #dc2626; stroke-dasharray: 7 5; } .ml.r { stroke: #7c3aed; } .ml.s { stroke: #15803d; stroke-dasharray: 7 5; }
+  .mp { fill: #7c3aed; }
+  .lab { font: 700 16px system-ui, sans-serif; fill: #1a2233; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+  .lab.h { fill: #dc2626; } .lab.d { fill: #7c3aed; } .lab.s { fill: #15803d; }
+  .hinweis { text-align: center; font-size: 14px; margin: 4px 0 0; }
+  .rechnung { font-size: 17.5px; line-height: 1.55; font-variant-numeric: tabular-nums; }
+  .rechnung h3, .lauf h3 { margin: 10px 0 2px; font-size: 17px; color: var(--blue); }
+  .rechnung p, .lauf p { margin: 2px 0; }
+  .rechnung p.namen, .lauf p.namen { color: var(--muted); font-size: 15.5px; }
+  .rechnung p.ende, .lauf p.ende { font-weight: 800; color: var(--blue); font-size: 19px; }
+  .auftrag { font-size: 20px; line-height: 1.5; margin: 4px 0 10px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  .lauf { font-size: 17px; line-height: 1.55; margin: 8px 0; padding: 8px 12px; border: 2px dashed #c9dcf2; border-radius: 12px; font-variant-numeric: tabular-nums; }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .tabs button { padding: 8px 12px; font-size: 14px; }
+    .wahl button { font-size: 14px; padding: 6px 9px; }
+    .rechnung { font-size: 16.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Körper</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="grund" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="zus" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+
+  <section id="s_grund">
+    <div class="karte">
+      <div class="wahl" id="gWahl"></div>
+      <div class="eing" id="gEing"></div>
+      <p class="fehler" id="gFehler"></p>
+      <div class="zwei">
+        <div><svg id="gSvg" class="bild k3" viewBox="0 0 440 380"></svg><p class="hinweis muted"><span id="gDrehen"></span> <span id="gMasse"></span></p></div>
+        <div class="rechnung" id="gRechnung"></div>
+      </div>
+      <p class="merke" id="gMerke"></p>
+    </div>
+  </section>
+
+  <section id="s_zus" hidden>
+    <div class="karte">
+      <div class="wahl" id="zWahl"></div>
+      <div class="eing" id="zEing"></div>
+      <p class="fehler" id="zFehler"></p>
+      <div class="zwei">
+        <div><svg id="zSvg" class="bild k3" viewBox="0 0 440 380"></svg><p class="hinweis muted"><span id="zDrehen"></span> <span id="zMasse"></span></p></div>
+        <div class="rechnung" id="zRechnung"></div>
+      </div>
+      <p class="merke" id="zMerke"></p>
+    </div>
+  </section>
+
+  <section id="s_ueben" hidden>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <p class="auftrag" id="auftrag"></p>
+      <svg id="uSvg" class="bild k3" viewBox="0 0 440 380" style="max-width:420px"></svg>
+      <p class="hinweis muted"><span id="uDrehen"></span> <span id="uMasse"></span></p>
+      <div class="antwortzeile" id="antwortzeile"></div>
+      <p class="meldung" id="meldung"></p>
+      <div class="lauf rechnung" id="uLauf" hidden></div>
+      <p><button type="button" class="knopf hell" id="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/alltag.js"></script>
+<script src="alltag-daten.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>
