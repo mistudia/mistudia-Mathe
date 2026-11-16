@@ -164,8 +164,8 @@
     svg.appendChild(el("line", { x1: A.x, y1: A.y, x2: C.x, y2: C.y, "class": rolle("b") }));
     svg.appendChild(el("line", { x1: A.x, y1: A.y, x2: B.x, y2: B.y, "class": rolle("c") }));
     // rechter Winkel bei C
-    var q = 18; svg.appendChild(el("path", { d: "M" + (C.x - q) + " " + C.y + "V" + (C.y - q) + "H" + C.x, "class": "d-rw" }));
-    svg.appendChild(el("circle", { cx: C.x - q / 2, cy: C.y - q / 2, r: 2.5, fill: "#1a2233" }));
+    var q = 21, sw0 = 1; svg.appendChild(el("path", { d: "M" + (C.x - q) + " " + C.y + " A" + q + " " + q + " 0 0 " + sw0 + " " + C.x + " " + (C.y - q), "class": "d-rw" }));
+    svg.appendChild(el("circle", { cx: C.x - q * 0.36, cy: C.y - q * 0.36, r: 2.5, fill: "#1a2233" }));
     // Winkelbögen
     var al = Math.atan2(a, b), rb = 44;
     var bogenA = "M" + A.x + " " + A.y + "L" + (A.x + rb) + " " + A.y + "A" + rb + " " + rb + " 0 0 0 " + (A.x + rb * Math.cos(al)) + " " + (A.y - rb * Math.sin(al)) + "Z";

@@ -52,7 +52,15 @@
     b = k / a;
     return { art: art, tpl: tpl, a: a, b: b, c: c, r: k / c, eins: k };
   }
-  function vor(tpl){ return t(tpl).split("|"); } // [Text, Kopf x, Einheit x, Kopf y, Einheit y]
+  function vor(tpl){
+    var a = t(tpl).split("|");
+    if(tpl === "tE"){ // eigene Aufgabe: selbst benannte Größen
+      var n1 = ($("eN1") && $("eN1").value || "").trim(), n2 = ($("eN2") && $("eN2").value || "").trim();
+      if(n1) a[1] = esc(n1); if(n2) a[3] = esc(n2);
+    }
+    return a;
+  }
+  function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); } // [Text, Kopf x, Einheit x, Kopf y, Einheit y]
   function xZelle(V, v){ var e = vor(V.tpl)[2]; return z(v) + (e ? " " + e : ""); }
   function yZelle(V, v){ var e = vor(V.tpl)[4]; return e === "geld" ? geld(v) : z(v) + (e ? " " + e : ""); }
   function problemText(V){ return vor(V.tpl)[0].split("{a}").join(bdi(xZelle(V, V.a))).split("{b}").join(bdi(yZelle(V, V.b))).split("{c}").join(bdi(xZelle(V, V.c))); }
@@ -86,7 +94,10 @@
     var sel = $("bsp").value, V = sel === "eigene" ? eigeneWerte() : D;
     $("eigeneBox").hidden = sel !== "eigene"; $("neuZ").hidden = sel === "eigene";
     if(!V){ $("drei").innerHTML = ""; $("antwort").textContent = ""; $("problem").textContent = t("eigFehlt"); return; }
-    $("problem").innerHTML = V.tpl === "tE" ? t("eigText") : problemText(V);
+    var n1 = $("eN1").value.trim(), n2 = $("eN2").value.trim();
+    $("problem").innerHTML = V.tpl !== "tE" ? problemText(V)
+      : (n1 && n2) ? t("eigFrage", { a: bdi(z(V.a) + " " + esc(n1)), b: bdi(z(V.b) + " " + esc(n2)), c: bdi(z(V.c) + " " + esc(n1)), n2: esc(n2) }) : t("eigText");
+    $("eigBtn").setAttribute("aria-pressed", sel === "eigene" ? "true" : "false");
     $("artText").innerHTML = "<b>" + t(V.art === "p" ? "prop" : "anti") + "</b>: " + t(V.art === "p" ? "propL" : "antiL");
     $("drei").innerHTML = dreisatzHTML(V);
     $("antwort").innerHTML = t("antwortL", { x: bdi(xZelle(V, V.c)), y: "<b>" + bdi((genau(V.r) ? "" : "≈ ") + yZelle(V, V.r)) + "</b>" });
@@ -94,7 +105,8 @@
   }
   $("bsp").addEventListener("change", function(){ if(this.value !== "eigene") D = erzeuge(this.value); dreisatz(); });
   $("neuZ").addEventListener("click", function(){ D = erzeuge($("bsp").value); dreisatz(); });
-  ["eA", "eB", "eC"].forEach(function(id){ $(id).addEventListener("input", dreisatz); });
+  ["eA", "eB", "eC", "eN1", "eN2"].forEach(function(id){ $(id).addEventListener("input", dreisatz); });
+  $("eigBtn").addEventListener("click", function(){ $("bsp").value = "eigene"; dreisatz(); $("eN1").focus(); });
   $("artWahl").querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ eigeneArt = b.dataset.art; $("artWahl").querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); dreisatz(); }); });
 
   // ---------- Reiter Zuordnungen ----------
@@ -253,6 +265,8 @@
     $("artWahl").querySelectorAll("button").forEach(function(b){ b.textContent = t(b.dataset.art === "p" ? "prop" : "anti"); });
     $("zArt").querySelectorAll("button").forEach(function(b){ b.textContent = t(b.dataset.art === "p" ? "prop" : "anti"); });
     $("tEA").textContent = t("eA"); $("tEB").textContent = t("eB"); $("tEC").textContent = t("eC");
+    $("eigBtn").textContent = t("eigBtn"); $("tEN1").textContent = t("eN1"); $("tEN2").textContent = t("eN2");
+    $("eN1").placeholder = t("eN1ph"); $("eN2").placeholder = t("eN2ph");
     $("tZuo").textContent = t("tZuo"); $("tK").textContent = t("kL"); $("tTab").textContent = t("tTab"); $("tGraph").textContent = t("tGraph");
     $("tPruef").textContent = t("tPruef"); $("pruefH").textContent = t("pruefH"); $("pruefBtn").textContent = t("pruefBtn");
     if($("pErg").textContent) pruefeTabelle();

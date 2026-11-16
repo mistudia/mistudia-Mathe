@@ -131,6 +131,9 @@
   input[type=range] { width: 220px; max-width: 60vw; }
   .knopfreihe { display: flex; gap: 8px; flex-wrap: wrap; }
   @media (max-width: 600px) { .drei { font-size: 17px; gap: 2px 4px; } .problem { font-size: 17px; } table.wt { font-size: 16px; } table.wt th, table.wt td { padding: 5px 6px; min-width: 40px; } }
+  /* Eigene Aufgabe: Namen der beiden Größen */
+  input.name { width: 150px; padding: 8px 10px; font-size: 16px; border: 2px solid #b0b0b8; border-radius: 10px; background: #ffffff; color: #1a2233; }
+  #eigBtn[aria-pressed="true"] { box-shadow: 0 0 0 3px #99f6e4; }
 </style>
 </head>
 <body>
@@ -149,9 +152,12 @@
         <label for="bsp" id="tBsp"></label>
         <select id="bsp"></select>
         <button type="button" class="knopf hell" id="neuZ"></button>
+        <button type="button" class="knopf" id="eigBtn"></button>
       </div>
       <div class="reihe" id="eigeneBox" hidden>
         <div class="wahl" id="artWahl"><button type="button" data-art="p" aria-pressed="true"></button><button type="button" data-art="a" aria-pressed="false"></button></div>
+        <label><span id="tEN1"></span> <input class="name" id="eN1" maxlength="24" autocomplete="off"></label>
+        <label><span id="tEN2"></span> <input class="name" id="eN2" maxlength="24" autocomplete="off"></label>
         <label><span id="tEA"></span> <input class="zahl" id="eA" inputmode="decimal" value="3"></label>
         <label><span id="tEB"></span> <input class="zahl" id="eB" inputmode="decimal" value="4,5"></label>
         <label><span id="tEC"></span> <input class="zahl" id="eC" inputmode="decimal" value="7"></label>
@@ -203,6 +209,8 @@
 </div>
 <script src="texte.js"></script>
 <script src="app.js"></script>
+<script src="/alltag.js"></script>
+<script src="alltag-daten.js"></script>
 <script src="/home-button.js"></script>
 </body>
 </html>

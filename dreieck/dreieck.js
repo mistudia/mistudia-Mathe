@@ -498,13 +498,14 @@
     if(D.length && (zeigeMasse || modus === "aufg")){
       var d0 = D[D.length - 1];
       svg.appendChild(el("polygon", { points: d0.P.map(function(p){ return p.x + "," + p.y; }).join(" "), "class": "dreieck" }));
-      // rechter Winkel: Quadrat mit Punkt
+      // rechter Winkel: Bogen mit Punkt
       [0, 1, 2].forEach(function(i){
         var p = d0.P[i], q1 = d0.P[(i + 1) % 3], q2 = d0.P[(i + 2) % 3];
         if(Math.abs(winkelBei(q1, p, q2) - Math.PI / 2) > 0.004) return;
-        var s = 11 * k, u1 = { x: (q1.x - p.x) / dist(p, q1), y: (q1.y - p.y) / dist(p, q1) }, u2 = { x: (q2.x - p.x) / dist(p, q2), y: (q2.y - p.y) / dist(p, q2) };
-        svg.appendChild(el("path", { d: "M" + (p.x + u1.x * s) + " " + (p.y + u1.y * s) + "L" + (p.x + (u1.x + u2.x) * s) + " " + (p.y + (u1.y + u2.y) * s) + "L" + (p.x + u2.x * s) + " " + (p.y + u2.y * s), "class": "rw", "vector-effect": "non-scaling-stroke" }));
-        svg.appendChild(el("circle", { cx: p.x + (u1.x + u2.x) * s / 2, cy: p.y + (u1.y + u2.y) * s / 2, r: 1.6 * k, "class": "rwpunkt" }));
+        var s = 13 * k, u1 = { x: (q1.x - p.x) / dist(p, q1), y: (q1.y - p.y) / dist(p, q1) }, u2 = { x: (q2.x - p.x) / dist(p, q2), y: (q2.y - p.y) / dist(p, q2) };
+        var sw = (u1.x * u2.y - u1.y * u2.x) > 0 ? 1 : 0;
+        svg.appendChild(el("path", { d: "M" + (p.x + u1.x * s) + " " + (p.y + u1.y * s) + "A" + s + " " + s + " 0 0 " + sw + " " + (p.x + u2.x * s) + " " + (p.y + u2.y * s), "class": "rw", "vector-effect": "non-scaling-stroke" }));
+        svg.appendChild(el("circle", { cx: p.x + (u1.x + u2.x) * s * 0.36, cy: p.y + (u1.y + u2.y) * s * 0.36, r: 1.6 * k, "class": "rwpunkt" }));
       });
       if(zeigeMasse){
         var mx = (d0.P[0].x + d0.P[1].x + d0.P[2].x) / 3, my = (d0.P[0].y + d0.P[1].y + d0.P[2].y) / 3;

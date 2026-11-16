@@ -146,7 +146,7 @@
     if(zeigDrei) s += '<polygon points="' + G.drei.map(function(k){ return Q[k].join(","); }).join(" ") + '" class="fg-drei"/>';
     (G.linien || []).forEach(function(l){ s += '<line x1="' + Q[l[0]][0] + '" y1="' + Q[l[0]][1] + '" x2="' + Q[l[1]][0] + '" y2="' + Q[l[1]][1] + '" class="' + (l[2] === 2 ? "fg-hilf" : "fg-diag") + '"/>'; });
     // rechte Winkel
-    function rwMark(k, a, b){ var p = Q[k], u = norm(Q[a], p), v = norm(Q[b], p), r = 13; s += '<path d="M' + (p[0] + u[0] * r) + " " + (p[1] + u[1] * r) + " L" + (p[0] + (u[0] + v[0]) * r) + " " + (p[1] + (u[1] + v[1]) * r) + " L" + (p[0] + v[0] * r) + " " + (p[1] + v[1] * r) + '" class="fg-rw"/><circle cx="' + (p[0] + (u[0] + v[0]) * r * 0.5) + '" cy="' + (p[1] + (u[1] + v[1]) * r * 0.5) + '" r="1.8" fill="#1a2233"/>'; }
+    function rwMark(k, a, b){ var p = Q[k], u = norm(Q[a], p), v = norm(Q[b], p), r = 15, sw = (u[0] * v[1] - u[1] * v[0]) > 0 ? 1 : 0; s += '<path d="M' + (p[0] + u[0] * r) + " " + (p[1] + u[1] * r) + " A" + r + " " + r + " 0 0 " + sw + " " + (p[0] + v[0] * r) + " " + (p[1] + v[1] * r) + '" class="fg-rw"/><circle cx="' + (p[0] + (u[0] + v[0]) * r * 0.36) + '" cy="' + (p[1] + (u[1] + v[1]) * r * 0.36) + '" r="1.8" fill="#1a2233"/>'; }
     var idx = function(k){ return G.poly.indexOf(k); };
     (G.rw || []).forEach(function(k){ var i = idx(k), n = G.poly.length; rwMark(k, G.poly[(i + 1) % n], G.poly[(i + n - 1) % n]); });
     if(G.rwExtra) G.rwExtra.forEach(function(k){
@@ -197,7 +197,7 @@
     s += '<text x="' + (fx + 14) + '" y="' + (fy - h + 60) + '" class="fg-t' + (gel.al ? "" : " rot") + '">' + (gel.al ? "α ≈ " + z(gel.al) + "°" : "α") + "</text>";
     s += '<text x="' + (fx - 16) + '" y="' + (fy - h / 2) + '" class="fg-t" text-anchor="end">' + P0.H + " m</text>";
     s += '<text x="' + (fx + sl / 2) + '" y="' + (fy + 24) + '" class="fg-t" text-anchor="middle">' + z(P0.S) + " m</text>";
-    s += '<path d="M' + (fx + 12) + " " + fy + " v-12 h-12" + '" class="fg-rw"/>';
+    s += '<path d="M' + (fx + 14) + " " + fy + " A14 14 0 0 0 " + fx + " " + (fy - 14) + '" class="fg-rw"/><circle cx="' + (fx + 5) + '" cy="' + (fy - 5) + '" r="1.8" fill="#1a2233"/>';
     // rechts: Erde mit den beiden Städten
     var ex = 420, ey = 170, er = 105, aw2 = Math.max(al * 3, 16 * RAD), wS = -90 * RAD, wA = wS - aw2;
     var Sy = [ex + er * Math.cos(wS), ey + er * Math.sin(wS)], Al = [ex + er * Math.cos(wA), ey + er * Math.sin(wA)];

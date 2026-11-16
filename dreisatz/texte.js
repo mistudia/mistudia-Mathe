@@ -31,7 +31,8 @@ de: {
   tA2: "Ein Futtervorrat reicht für {a} Pferde {b} lang. Wie lange reicht er für {c} Pferde?|Pferde||Zeit|Tage",
   tA3: "Mit {a} Pumpen ist ein Becken nach {b} leer. Wie lange dauert es mit {c} Pumpen?|Pumpen||Zeit|h",
   tA4: "Eine Tüte Gummibärchen reicht für {a} Kinder mit je {b}. Wie viele bekommt jedes Kind, wenn {c} Kinder teilen?|Kinder||pro Kind|Stück",
-  tE: "|Menge||Wert|"
+  tE: "|Menge||Wert|",
+  eigBtn: "✏️ Eigene Aufgabe", eN1: "Größe 1:", eN2: "Größe 2:", eN1ph: "z. B. Äpfel", eN2ph: "z. B. Euro", eigFrage: "{a} ≙ {b}. Wie viel {n2} gehören zu {c}?"
 },
 en: {
   titel: "Rule of Three & Proportions", tab_drei: "Rule of three", tab_zuo: "Proportions", tab_ueben: "Practice",
@@ -62,7 +63,8 @@ en: {
   tA2: "A supply of feed lasts {a} horses for {b}. How long does it last {c} horses?|Horses||Time|days",
   tA3: "With {a} pumps a pool is empty after {b}. How long does it take with {c} pumps?|Pumps||Time|h",
   tA4: "A bag of gummy bears is enough for {a} children with {b} each. How many does each child get if {c} children share?|Children||per child|pieces",
-  tE: "|Amount||Value|"
+  tE: "|Amount||Value|",
+  eigBtn: "✏️ Own exercise", eN1: "Quantity 1:", eN2: "Quantity 2:", eN1ph: "e.g. apples", eN2ph: "e.g. dollars", eigFrage: "{a} ≙ {b}. How much {n2} for {c}?"
 },
 es: {
   titel: "Regla de tres y proporcionalidad", tab_drei: "Regla de tres", tab_zuo: "Proporcionalidad", tab_ueben: "Practicar",
@@ -93,7 +95,8 @@ es: {
   tA2: "Una reserva de pienso alcanza para {a} caballos durante {b}. ¿Cuánto dura para {c} caballos?|Caballos||Tiempo|días",
   tA3: "Con {a} bombas una piscina se vacía en {b}. ¿Cuánto se tarda con {c} bombas?|Bombas||Tiempo|h",
   tA4: "Una bolsa de ositos de goma alcanza para {a} niños, con {b} cada uno. ¿Cuántos recibe cada niño si la reparten {c} niños?|Niños||por niño|unidades",
-  tE: "|Cantidad||Valor|"
+  tE: "|Cantidad||Valor|",
+  eigBtn: "✏️ Ejercicio propio", eN1: "Magnitud 1:", eN2: "Magnitud 2:", eN1ph: "p. ej. manzanas", eN2ph: "p. ej. euros", eigFrage: "{a} ≙ {b}. ¿Cuánto {n2} corresponde a {c}?"
 },
 zh: {
   titel: "比例与反比例", tab_drei: "三步算法", tab_zuo: "对应关系", tab_ueben: "练习",
@@ -124,7 +127,8 @@ zh: {
   tA2: "一批饲料够 {a} 匹马吃 {b}。够 {c} 匹马吃多久？|马||时间|天",
   tA3: "用 {a} 台水泵，一个水池 {b} 后抽干。用 {c} 台水泵要多长时间？|水泵||时间|h",
   tA4: "一袋小熊软糖分给 {a} 个孩子，每人 {b}。如果 {c} 个孩子分，每人能分到多少？|孩子||每人|个",
-  tE: "|数量||值|"
+  tE: "|数量||值|",
+  eigBtn: "✏️ 自己出题", eN1: "量 1：", eN2: "量 2：", eN1ph: "例如 苹果", eN2ph: "例如 元", eigFrage: "{a} ≙ {b}。{c} 对应多少 {n2}？"
 },
 fr: {
   titel: "Règle de trois et proportionnalité", tab_drei: "Règle de trois", tab_zuo: "Proportionnalité", tab_ueben: "S’entraîner",
@@ -155,7 +159,8 @@ fr: {
   tA2: "Une réserve de fourrage nourrit {a} chevaux pendant {b}. Combien de temps dure-t-elle pour {c} chevaux ?|Chevaux||Durée|jours",
   tA3: "Avec {a} pompes, un bassin est vide au bout de {b}. Combien de temps faut-il avec {c} pompes ?|Pompes||Durée|h",
   tA4: "Un sachet d’oursons en gomme suffit pour {a} enfants, avec {b} chacun. Combien chaque enfant en reçoit-il si {c} enfants se le partagent ?|Enfants||par enfant|bonbons",
-  tE: "|Quantité||Valeur|"
+  tE: "|Quantité||Valeur|",
+  eigBtn: "✏️ Exercice perso", eN1: "Grandeur 1 :", eN2: "Grandeur 2 :", eN1ph: "p. ex. pommes", eN2ph: "p. ex. euros", eigFrage: "{a} ≙ {b}. Combien de {n2} pour {c} ?"
 },
 ru: {
   titel: "Пропорции и тройное правило", tab_drei: "Тройное правило", tab_zuo: "Зависимости", tab_ueben: "Тренировка",
@@ -186,7 +191,8 @@ ru: {
   tA2: "Запаса корма хватает {a} лошадям на {b}. На сколько хватит {c} лошадям?|Лошади||Время|дн.",
   tA3: "{a} насоса откачивают бассейн за {b}. Сколько времени нужно {c} насосам?|Насосы||Время|ч",
   tA4: "Пакета мармеладных мишек хватает {a} детям по {b}. Сколько получит каждый, если делить на {c} детей?|Дети||каждому|шт.",
-  tE: "|Количество||Значение|"
+  tE: "|Количество||Значение|",
+  eigBtn: "✏️ Своё задание", eN1: "Величина 1:", eN2: "Величина 2:", eN1ph: "напр. яблоки", eN2ph: "напр. рубли", eigFrage: "{a} ≙ {b}. Сколько {n2} приходится на {c}?"
 },
 ar: {
   titel: "القاعدة الثلاثية والتناسب", tab_drei: "القاعدة الثلاثية", tab_zuo: "التناسب", tab_ueben: "تمرين",
@@ -217,7 +223,8 @@ ar: {
   tA2: "يكفي مخزون علف {a} خيول مدة {b}. كم يكفي {c} خيول؟|الخيول||الزمن|أيام",
   tA3: "بـ {a} مضخات يفرغ حوض بعد {b}. كم يستغرق بـ {c} مضخات؟|المضخات||الزمن|h",
   tA4: "كيس حلوى جيلاتين يكفي {a} أطفال لكل منهم {b}. كم يأخذ كل طفل إذا اقتسمه {c} أطفال؟|الأطفال||لكل طفل|قطع",
-  tE: "|الكمية||القيمة|"
+  tE: "|الكمية||القيمة|",
+  eigBtn: "✏️ تمرين خاص", eN1: "الكمية 1:", eN2: "الكمية 2:", eN1ph: "مثلًا تفاح", eN2ph: "مثلًا ريال", eigFrage: "{a} ≙ {b}. كم {n2} يقابل {c}؟"
 },
 ja: {
   titel: "比例・反比例", tab_drei: "単位量で考える", tab_zuo: "比例と反比例", tab_ueben: "練習",
@@ -248,7 +255,8 @@ ja: {
   tA2: "えさのたくわえは馬 {a} 頭で {b} もちます。馬 {c} 頭では何日もちますか。|馬（頭）||日数|日",
   tA3: "ポンプ {a} 台でプールの水が {b} でなくなります。{c} 台では何時間かかりますか。|ポンプ（台）||時間|時間",
   tA4: "グミ1ふくろを子ども {a} 人で分けると1人 {b} です。{c} 人で分けると1人何個ですか。|子ども（人）||1人分|個",
-  tE: "|量||値|"
+  tE: "|量||値|",
+  eigBtn: "✏️ 自分で問題", eN1: "量 1：", eN2: "量 2：", eN1ph: "例：りんご", eN2ph: "例：円", eigFrage: "{a} ≙ {b}。{c} のとき {n2} はいくつ？"
 },
 pt: {
   titel: "Regra de três e proporcionalidade", tab_drei: "Regra de três", tab_zuo: "Proporcionalidade", tab_ueben: "Praticar",
@@ -279,6 +287,7 @@ pt: {
   tA2: "Uma reserva de ração chega para {a} cavalos durante {b}. Quanto tempo chega para {c} cavalos?|Cavalos||Tempo|dias",
   tA3: "Com {a} bombas, uma piscina fica vazia ao fim de {b}. Quanto tempo demora com {c} bombas?|Bombas||Tempo|h",
   tA4: "Um saco de gomas chega para {a} crianças com {b} cada. Quantas recebe cada criança se {c} crianças o dividirem?|Crianças||por criança|unidades",
-  tE: "|Quantidade||Valor|"
+  tE: "|Quantidade||Valor|",
+  eigBtn: "✏️ Exercício próprio", eN1: "Grandeza 1:", eN2: "Grandeza 2:", eN1ph: "ex.: maçãs", eN2ph: "ex.: reais", eigFrage: "{a} ≙ {b}. Quanto de {n2} para {c}?"
 }
 };

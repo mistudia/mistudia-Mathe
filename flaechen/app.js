@@ -95,7 +95,8 @@
     if(G.verl) sv.appendChild(el("line", { x1: X(G.verl[0][0]), y1: Y(0), x2: X(G.verl[1][0]), y2: Y(0), "class": "hoehe", style: "stroke:#64748b" }));
     if(G.hoehe && !stuecke.ohneHoehe){
       sv.appendChild(el("line", { x1: X(G.hoehe[0][0]), y1: Y(G.hoehe[0][1]), x2: X(G.hoehe[1][0]), y2: Y(G.hoehe[1][1]), "class": "hoehe" }));
-      var hx = X(G.hoehe[1][0]), hy = Y(G.hoehe[1][1]), q = 10; sv.appendChild(el("path", { d: "M" + (hx + q) + " " + hy + " V" + (hy - q) + " H" + hx, "class": "rw" }));
+      var hx = X(G.hoehe[1][0]), hy = Y(G.hoehe[1][1]), q = 12; sv.appendChild(el("path", { d: "M" + (hx + q) + " " + hy + " A" + q + " " + q + " 0 0 0 " + hx + " " + (hy - q), "class": "rw" }));
+      sv.appendChild(el("circle", { cx: hx + q * 0.36, cy: hy - q * 0.36, r: 1.8, fill: "#dc2626" }));
     }
     G.diag.forEach(function(d){ sv.appendChild(el("line", { x1: X(d[0][0]), y1: Y(d[0][1]), x2: X(d[1][0]), y2: Y(d[1][1]), "class": "diag" })); });
     if(G.radius && !stuecke.sektoren){ sv.appendChild(el("line", { x1: X(0), y1: Y(0), x2: X(G.kreis), y2: Y(0), "class": "hoehe", style: "stroke:#1d4ed8;stroke-dasharray:none" })); sv.appendChild(el("circle", { cx: X(0), cy: Y(0), r: 4, fill: "#1d4ed8" })); }

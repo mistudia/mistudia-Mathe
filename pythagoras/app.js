@@ -41,6 +41,10 @@
     var seite = (R[0] - P[0]) * n[0] + (R[1] - P[1]) * n[1]; if(seite > 0) n = [dy, -dx];
     return [P, Q, [Q[0] + n[0], Q[1] + n[1]], [P[0] + n[0], P[1] + n[1]]];
   }
+  function rwBogen(px, py, ux, uy, vx, vy, r){ // rechter Winkel: Viertelkreisbogen + Punkt (Bildschirm-Koordinaten, u/v Einheitsvektoren)
+    var sw = (ux * vy - uy * vx) > 0 ? 1 : 0, f = r * 0.36;
+    return { d: "M" + (px + ux * r) + " " + (py + uy * r) + " A" + r + " " + r + " 0 0 " + sw + " " + (px + vx * r) + " " + (py + vy * r), cx: px + (ux + vx) * f, cy: py + (uy + vy) * f };
+  }
   function mitte(L){ var x = 0, y = 0; L.forEach(function(p){ x += p[0]; y += p[1]; }); return [x / L.length, y / L.length]; }
   function abst(p, q){ return Math.hypot(p[0] - q[0], p[1] - q[1]); }
 
@@ -57,10 +61,11 @@
     var ca = (a * a + b * b - c * c) / (2 * a * b), w = Math.acos(Math.max(-1, Math.min(1, ca))) * 180 / Math.PI, recht = Math.abs(w - 90) < 0.05;
     poly(sv, V, [A, B, C], "dr" + (recht ? " recht" : ""));
     if(recht){ // rechter Winkel bei C
-      var u = [(A[0] - C[0]) / b, (A[1] - C[1]) / b], v = [(B[0] - C[0]) / a, (B[1] - C[1]) / a], s = 0.45;
-      var p1 = [C[0] + u[0] * s, C[1] + u[1] * s], p2 = [p1[0] + v[0] * s, p1[1] + v[1] * s], p3 = [C[0] + v[0] * s, C[1] + v[1] * s];
-      sv.appendChild(el("polyline", { points: [p1, p2, p3].map(function(q){ return V.X(q[0]) + "," + V.Y(q[1]); }).join(" "), fill: "none", stroke: "#dc2626", "stroke-width": 2 }));
-      sv.appendChild(el("circle", { cx: V.X(mitte([p1, p3, C, p2])[0]), cy: V.Y(mitte([p1, p3, C, p2])[1]), r: 2.5, fill: "#dc2626" }));
+      var cx0 = V.X(C[0]), cy0 = V.Y(C[1]), ua = [V.X(A[0]) - cx0, V.Y(A[1]) - cy0], vb = [V.X(B[0]) - cx0, V.Y(B[1]) - cy0];
+      var la = Math.hypot(ua[0], ua[1]) || 1, lb = Math.hypot(vb[0], vb[1]) || 1;
+      var rb = rwBogen(cx0, cy0, ua[0] / la, ua[1] / la, vb[0] / lb, vb[1] / lb, 0.55 * V.k);
+      sv.appendChild(el("path", { d: rb.d, fill: "none", stroke: "#dc2626", "stroke-width": 2 }));
+      sv.appendChild(el("circle", { cx: rb.cx, cy: rb.cy, r: 2.5, fill: "#dc2626" }));
     }
     text(sv, V, mitte(Qa), "a² = " + zahl(a * a), "labA"); text(sv, V, mitte(Qb), "b² = " + zahl(b * b), "labB"); text(sv, V, mitte(Qc), "c² = " + zahl(c * c), "labC");
     var mi = mitte([A, B, C]);
@@ -116,7 +121,9 @@
   function dreieckZeichnen(sv, a, b, ges, werte){
     leer(sv); var V = ansicht(sv, [[0, 0], [b, 0], [0, a]], 400, 300, 40), C0 = [0, 0], Aa = [b, 0], Bb = [0, a];
     poly(sv, V, [C0, Aa, Bb], "dr");
-    var s = Math.min(a, b) * 0.15; sv.appendChild(el("polyline", { points: [[s, 0], [s, s], [0, s]].map(function(q){ return V.X(q[0]) + "," + V.Y(q[1]); }).join(" "), fill: "none", stroke: "#dc2626", "stroke-width": 2 }));
+    var rb = rwBogen(V.X(0), V.Y(0), 1, 0, 0, -1, Math.min(a, b) * 0.13 * V.k);
+    sv.appendChild(el("path", { d: rb.d, fill: "none", stroke: "#dc2626", "stroke-width": 2 }));
+    sv.appendChild(el("circle", { cx: rb.cx, cy: rb.cy, r: 2.5, fill: "#dc2626" }));
     function lab(p, txt, cls){ sv.appendChild(el("text", { x: p[0], y: p[1], "class": "lab " + cls }, txt)); }
     lab([V.X(0) - 22, V.Y(a / 2) + 5], werte.a, "labA" + (ges === "a" ? " h" : ""));
     lab([V.X(b / 2), V.Y(0) + 24], werte.b, "labB" + (ges === "b" ? " h" : ""));
