@@ -12,7 +12,7 @@ const { chromium } = require("playwright");
 const fs = require("fs"), path = require("path");
 const BASIS = "http://localhost:8771", ZIEL = path.join(__dirname, "..", "img", "beispiele");
 const FA_KACHELN = ["linear", "quadratisch", "polynom", "rational", "sinus", "waage"];
-const MSA_KACHELN = ["binome", "flaechen", "groessen", "integral", "logarithmus", "prozent", "schriftlich", "symmetrie", "teilbarkeit", "terme", "trigonometrie", "vektoren"];
+const MSA_KACHELN = ["binome", "flaechen", "groessen", "integral", "logarithmus", "prozent", "schriftlich", "symmetrie", "teilbarkeit", "terme", "trigonometrie", "vektoren", "brueche", "dreisatz", "einmaleins", "zinsen", "binomial", "dreieck", "exponential", "kombinatorik", "normalverteilung", "pythagoras", "winkel"];
 // Koordinatensystem-Grundansichten: Kachel → [Selektor, Reiter zum Anklicken]
 const GRAPH = { linear: ["#graph"], quadratisch: ["#graph"], polynom: ["#graph"], rational: ["#graph"], sinus: ["#graph"],
   exponential: ["#gSvg"], logarithmus: ["#gSvg", '[data-tab="funktion"]'], integral: ["#gR"], differential: ["#aSvg"],

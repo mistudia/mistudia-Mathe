@@ -36,6 +36,29 @@ var MS_ALLTAG_BILD = (function(){
     return r(x0, y0, a, a, fa, "#1f2937") + r(x0 + a, y0, b, a, fb, "#1f2937") + r(x0, y0 + a, a, b, fb, "#1f2937") + r(x0 + a, y0 + a, b, b, fab, "#1f2937");
   }
 
+  // ---- Helfer für die neuen Kacheln (Brüche, Dreisatz, … Winkel) ----
+  function stueck(cx, cy, rr, a0, a1, f, s){ // Kreisausschnitt, Winkel in Grad (0° = oben, im Uhrzeigersinn)
+    var A = function(a){ var w = (a - 90) * Math.PI / 180; return (cx + rr * Math.cos(w)).toFixed(1) + " " + (cy + rr * Math.sin(w)).toFixed(1); };
+    return p("M" + cx + " " + cy + " L" + A(a0) + " A" + rr + " " + rr + " 0 " + (a1 - a0 > 180 ? 1 : 0) + " 1 " + A(a1) + "Z", f, s || "#7c2d12", 1.5);
+  }
+  function pizza(cx, cy, rr, n, farben){ var s = c(cx, cy, rr + 4, "#f59e0b", "#92400e"); for(var i = 0; i < n; i++) s += stueck(cx, cy, rr, i * 360 / n, (i + 1) * 360 / n, farben[i] || "#fde68a"); return s; }
+  function rwb(x, y, ux, uy, vx, vy, rr, col){ // rechter Winkel: Bogen mit Punkt
+    var sw = (ux * vy - uy * vx) > 0 ? 1 : 0;
+    return p("M" + (x + ux * rr) + " " + (y + uy * rr) + " A" + rr + " " + rr + " 0 0 " + sw + " " + (x + vx * rr) + " " + (y + vy * rr), "none", col || "#dc2626", 2) + c(x + (ux + vx) * rr * 0.36, y + (uy + vy) * rr * 0.36, 2, col || "#dc2626");
+  }
+  function glas(x, y, f){ return p("M" + x + " " + y + " h16 l-2 24 h-12 z", f || "#e0f2fe", "#0369a1", 1.5); }
+  function flasche(x, y, h, f){ return r(x + 8, y, 12, 10, "#1e3a8a") + r(x, y + 10, 28, h, f || "#fdba74", "#7c2d12", ' rx="6"'); }
+  function broetchen(x, y){ return '<ellipse cx="' + x + '" cy="' + y + '" rx="14" ry="9" fill="#f5c26b" stroke="#92400e" stroke-width="2"/>' + p("M" + (x - 6) + " " + (y - 5) + " q6 4 12 0", "none", "#92400e", 1.5); }
+  function bus(x, y, f){ return r(x, y, 100, 40, f || "#facc15", "#1f2937", ' rx="8"') + r(x + 8, y + 7, 84, 14, "#e0f2fe") + c(x + 20, y + 42, 8, "#111827") + c(x + 80, y + 42, 8, "#111827"); }
+  function rad(x, y, col){ return c(x, y, 14, "none", "#1f2937") + c(x + 44, y, 14, "none", "#1f2937") + p("M" + x + " " + y + " L" + (x + 18) + " " + (y - 20) + " L" + (x + 36) + " " + (y - 20) + " L" + (x + 44) + " " + y + " M" + (x + 18) + " " + (y - 20) + " L" + (x + 26) + " " + y + " L" + (x + 36) + " " + (y - 20), "none", col || "#dc2626", 3); }
+  function glocke(x, y, w, h, a, b, f){ // Normalverteilung, a/b in σ (−3 … 3), Fläche zwischen a und b gefüllt
+    var X = function(z){ return x + (z + 3.2) / 6.4 * w; }, Y = function(z){ return y + h - h * Math.exp(-z * z / 2); }, d = "", fl = "";
+    for(var i = 0; i <= 64; i++){ var z = -3.2 + 6.4 * i / 64; d += (i ? "L" : "M") + X(z).toFixed(1) + " " + Y(z).toFixed(1); }
+    for(var j = 0; j <= 40; j++){ var z2 = a + (b - a) * j / 40; fl += (j ? "L" : "M") + X(z2).toFixed(1) + " " + Y(z2).toFixed(1); }
+    fl += "L" + X(b).toFixed(1) + " " + (y + h) + "L" + X(a).toFixed(1) + " " + (y + h) + "Z";
+    return p(fl, f || "#93c5fd", null, 0, ' opacity="0.85"') + p(d, "none", "#1d4ed8", 2.5) + l(x, y + h, x + w, y + h, "#475569", 1.5);
+  }
+  function balken(x, y, werte, max, h, col, bw){ var s = ""; bw = bw || 26; werte.forEach(function(v, i){ var hh = h * v / max; s += r(x + i * (bw + 8), y + h - hh, bw, hh, col || "#60a5fa", "#1e3a8a"); }); return s; }
   var B = {
     binome: [
       function(){ return svg(himmel() + quadratZerl(40, 15, 100, 10, "#93c5fd", "#fdba74", "#f87171") + tm(90, 140, "20") + tm(145, 140, "1") + tm(230, 60, "21² =", null, 15) + tm(230, 85, "20² + 2·20·1 + 1²", "#1d4ed8", 12)); },
@@ -129,6 +152,72 @@ var MS_ALLTAG_BILD = (function(){
       function(){ return svg(himmel() + boden(125) + p("M140 115 h90 q10 0 14 -8 M140 115 l-6 -8", "none", "#78350f", 4) + r(150, 102, 70, 10, "#dc2626") + figur(60, 125, 0.95) + l(70, 95, 150, 105, "#475569", 2) + pf(150, 105, 230, 45, "#7c3aed", 3) + pf(150, 120, 270, 120, "#2563eb", 3) + tm(250, 40, "a", "#7c3aed", 13) + tm(280, 140, "b", "#2563eb", 13) + bogen(150, 105, 28, 0, Math.atan(60 / 80), "#dc2626")); },
       function(){ var O = [50, 135], ex = [38, -6], ey = [16, -12], ez = [0, -15]; var P = function(x, y, z){ return [O[0] + x * ex[0] + y * ey[0] + z * ez[0], O[1] + x * ex[1] + y * ey[1] + z * ez[1]]; }; var b = P(3, 4, 2), cc = P(3, 4, 0), a = P(0, 0, 0);
         return svg(himmel() + p("M" + P(0, 0, 0) + " L" + P(4, 0, 0) + " L" + P(4, 5, 0) + " L" + P(0, 5, 0) + "Z", "#d9f99d", "#65a30d", 1) + pf(a[0], a[1], b[0], b[1], "#dc2626", 3) + l(b[0], b[1], cc[0], cc[1], "#1f2937", 2, ST) + l(a[0], a[1], cc[0], cc[1], "#64748b", 2, ST) + c(a[0], a[1], 4, "#1f2937") + c(cc[0], cc[1], 4, "#1f2937") + p("M" + (b[0] - 14) + " " + (b[1] - 6) + " h28 M" + (b[0] - 10) + " " + (b[1] - 10) + " h6 M" + (b[0] + 4) + " " + (b[1] - 10) + " h6", "none", "#1f2937", 3) + t(a[0] - 16, a[1] + 4, "A") + t(b[0] + 8, b[1] - 10, "B") + t(cc[0] + 8, cc[1] + 12, "C")); }
+    ],
+    brueche: [
+      function(){ var f = ["#fb923c", "#fb923c", "#fb923c", "#60a5fa", "#60a5fa"]; return svg(himmel() + pizza(90, 75, 55, 8, f) + tm(230, 55, "3/8 + 2/8", "#1f2937", 16) + tm(230, 85, "= 5/8", "#ea580c", 18)); },
+      function(){ return svg(himmel() + p("M50 40 h50 v-12 l-8 -10 h-34 l-8 10z", "#e0f2fe", "#1e3a8a") + r(50, 40, 50, 85, "#ffffff", "#1e3a8a") + r(50, 62, 50, 63, "#bfdbfe") + tm(75, 100, "3/4 l", "#1e3a8a", 14) + tm(170, 80, "· 1/2", "#dc2626", 18) + pf(200, 75, 230, 75, "#1f2937") + tm(270, 82, "3/8 l", "#16a34a", 18)); },
+      function(){ var s = ""; for(var i = 0; i < 24; i++){ var x = 40 + (i % 6) * 26, y = 25 + Math.floor(i / 6) * 26; s += r(x, y, 24, 24, i < 16 ? "#f9a8d4" : "#7c2d12", "#451a03", ' rx="3"'); } return svg(himmel() + s + tm(255, 60, "2/3 · 24", "#1f2937", 15) + tm(255, 90, "= 16", "#db2777", 18)); },
+      function(){ var g = ""; for(var i = 0; i < 12; i++) g += glas(130 + (i % 6) * 26, 30 + Math.floor(i / 6) * 40, "#fdba74"); return svg(himmel() + flasche(30, 30, 90) + tm(44, 95, "3 l", "#7c2d12", 14) + g + tm(210, 135, "1/4 l", "#0369a1", 13)); }
+    ],
+    dreisatz: [
+      function(){ return svg(himmel() + broetchen(40, 50) + broetchen(70, 50) + broetchen(100, 50) + tm(70, 85, "1,20 €", "#1f2937", 15) + pf(130, 60, 165, 60) + broetchen(190, 45) + broetchen(220, 45) + broetchen(250, 45) + broetchen(280, 45) + broetchen(205, 70) + broetchen(235, 70) + broetchen(265, 70) + tm(235, 110, "? €", "#dc2626", 18)); },
+      function(){ return svg(himmel() + boden(130) + figur(30, 128, 0.7, "#2563eb") + figur(55, 128, 0.7, "#2563eb") + figur(80, 128, 0.7, "#2563eb") + figur(105, 128, 0.7, "#2563eb") + tm(68, 40, "6 d", "#1f2937", 16) + figur(200, 128, 0.7, "#16a34a") + figur(225, 128, 0.7, "#16a34a") + figur(250, 128, 0.7, "#16a34a") + tm(225, 40, "? d", "#dc2626", 16) + tm(155, 90, "↔", "#7c3aed", 22)); },
+      function(){ return svg(himmel() + boden(120) + l(20, 125, 300, 125, "#64748b", 3) + rad(40, 112, "#dc2626") + tm(160, 40, "15 km ≙ 60 min", "#1f2937", 15) + tm(160, 75, "? km ≙ 20 min", "#dc2626", 15)); },
+      function(){ return svg(himmel() + bus(20, 50, "#facc15") + tm(70, 40, "600 €", "#1f2937", 16) + tm(200, 55, "600 € : 20", "#1f2937", 14) + tm(200, 80, "600 € : 25", "#1f2937", 14) + tm(285, 55, "30 €", "#16a34a", 14) + tm(285, 80, "24 €", "#16a34a", 14)); }
+    ],
+    einmaleins: [
+      function(){ var s = ""; for(var k = 0; k < 7; k++){ var x = 12 + k * 42; s += r(x, 50, 38, 26, "#d6c7a1", "#7c6a43", ' rx="4"'); for(var e = 0; e < 6; e++) s += '<ellipse cx="' + (x + 7 + (e % 3) * 12) + '" cy="' + (57 + Math.floor(e / 3) * 12) + '" rx="5" ry="6" fill="#fffbeb" stroke="#a16207" stroke-width="1"/>'; } return svg(himmel() + s + tm(160, 115, "7 · 6 = 42", "#1f2937", 18)); },
+      function(){ var s = ""; for(var rr = 0; rr < 8; rr++) for(var k = 0; k < 9; k++) s += r(20 + k * 17, 12 + rr * 15, 12, 10, "#60a5fa", "#1e3a8a", ' rx="2"'); return svg(himmel() + s + tm(250, 70, "8 · 9", "#1f2937", 20) + tm(250, 100, "= 72", "#2563eb", 20)); },
+      function(){ var s = ""; for(var pg = 0; pg < 5; pg++){ var x = 10 + pg * 44; s += r(x, 30, 40, 60, "#ffffff", "#7c3aed", ' rx="4"'); for(var k = 0; k < 8; k++) s += tm(x + 10 + (k % 2) * 20, 46 + Math.floor(k / 2) * 13, "★", ["#f59e0b", "#ec4899", "#22c55e", "#3b82f6"][k % 4], 12); } return svg(himmel() + s + tm(275, 70, "5 · 8", "#1f2937", 18) + tm(275, 98, "= 40", "#7c3aed", 18)); },
+      function(){ var b = ""; for(var i = 0; i < 56; i++) b += c(20 + (i % 14) * 9, 25 + Math.floor(i / 14) * 9, 3.5, ["#f87171", "#60a5fa", "#4ade80", "#facc15"][i % 4]); var k = ""; for(var j = 0; j < 7; j++) k += figur(30 + j * 40, 140, 0.55, "#1e3a8a"); return svg(himmel() + b + tm(230, 45, "56 : 7 = 8", "#1f2937", 16) + k); }
+    ],
+    zinsen: [
+      function(){ return svg(himmel() + schwein(90, 80, "500 €") + tm(230, 60, "2 %", "#16a34a", 22) + tm(230, 95, "+ 10 €", "#16a34a", 18)); },
+      function(){ return svg(himmel() + p("M80 30 L110 20 Q130 32 150 20 L180 30 L200 65 L180 72 L176 60 L176 130 L84 130 L84 60 L80 72 L60 65 Z", "#86efac", "#166534") + p("M205 40 L270 40 L290 62 L270 84 L205 84 Z", "#fef08a", "#a16207") + tm(244, 60, "80 €", null, 13) + tm(244, 78, "−30 %", "#dc2626", 13) + tm(250, 120, "56 €", "#16a34a", 18)); },
+      function(){ return svg(himmel() + boden(130) + rad(60, 115, "#2563eb") + tm(220, 50, "400 €", "#1f2937", 16) + tm(220, 78, "+ 19 %", "#dc2626", 16) + tm(220, 108, "476 €", "#16a34a", 18)); },
+      function(){ return svg(himmel() + balken(40, 25, [1000, 1050, 1102.5, 1157.63], 1200, 100, "#4ade80", 40) + tm(60, 140, "0", null, 12) + tm(108, 140, "1", null, 12) + tm(156, 140, "2", null, 12) + tm(204, 140, "3", null, 12) + tm(270, 60, "· 1,05", "#16a34a", 16) + tm(270, 90, "1157,63 €", "#166534", 13)); }
+    ],
+    binomial: [
+      function(){ var s = ""; for(var i = 0; i < 10; i++){ var x = 25 + (i % 5) * 34, y = 40 + Math.floor(i / 5) * 40, k = [0, 2, 3, 6, 8].indexOf(i) >= 0; s += c(x, y, 14, k ? "#fde047" : "#e5e7eb", k ? "#a16207" : "#64748b") + tm(x, y + 5, k ? "K" : "Z", k ? "#a16207" : "#64748b", 12); } return svg(himmel() + s + tm(255, 60, "n = 10", "#1f2937", 15) + tm(255, 88, "k = 5", "#a16207", 15) + tm(255, 116, "p = 0,5", "#1f2937", 15)); },
+      function(){ var s = r(30, 15, 150, 125, "#ffffff", "#475569", ' rx="6"'); for(var q = 0; q < 5; q++) for(var a = 0; a < 4; a++) s += r(60 + a * 28, 25 + q * 22, 14, 14, "#ffffff", "#64748b") + (q === 0 ? tm(67 + a * 28, 20, "ABCD"[a], "#475569", 10) : ""); for(var q2 = 0; q2 < 5; q2++) s += tm(45, 37 + q2 * 22, String(q2 + 1), "#475569", 12) + tm(67 + ((q2 * 3 + 1) % 4) * 28, 37 + q2 * 22, "✕", "#dc2626", 13); return svg(himmel() + s + tm(250, 70, "p = 0,25", "#1f2937", 16) + tm(250, 100, "0,75⁵", "#dc2626", 16)); },
+      function(){ var net = ""; for(var i = 0; i <= 6; i++) net += l(100 + i * 20, 30, 100 + i * 20, 90, "#cbd5e1", 1); for(var j = 0; j <= 3; j++) net += l(100, 30 + j * 20, 220, 30 + j * 20, "#cbd5e1", 1); return svg(himmel() + boden(110) + net + p("M100 90 V30 H220 V90", "none", "#1f2937", 5) + c(125, 55, 9, "#ffffff", "#1f2937") + c(160, 70, 9, "#ffffff", "#1f2937") + c(195, 50, 9, "#ffffff", "#1f2937") + tm(60, 60, "80 %", "#16a34a", 16) + tm(270, 60, "0,8³", "#1f2937", 16) + tm(270, 88, "≈ 51 %", "#16a34a", 15)); },
+      function(){ var s = ""; for(var i = 0; i < 30; i++){ var x = 20 + (i % 10) * 22, y = 30 + Math.floor(i / 10) * 32, f = i % 6 === 5; s += '<ellipse cx="' + x + '" cy="' + y + '" rx="8" ry="11" fill="' + (f ? "#f472b6" : "#ffffff") + '" stroke="#b45309" stroke-width="1.5"/>' + (f ? tm(x, y + 4, "★", "#ffffff", 10) : ""); } return svg(himmel() + s + tm(275, 55, "30 · 1/6", "#1f2937", 15) + tm(275, 85, "= 5", "#db2777", 18)); }
+    ],
+    dreieck: [
+      function(){ return svg(himmel() + boden(125) + r(80, 85, 160, 40, "#fde68a", "#92400e") + p("M80 85 L160 25 L240 85 Z", "#b91c1c", "#7f1d1d") + l(160, 25, 160, 85, "#ffffff", 2, ST) + rwb(160, 85, 1, 0, 0, -1, 10, "#ffffff") + tm(160, 100, "8 m", "#1f2937", 13) + tm(105, 50, "5 m", "#1f2937", 13) + tm(216, 50, "5 m", "#1f2937", 13) + t(166, 62, "h", ' style="fill:#ffffff"')); },
+      function(){ return svg(r(0, 0, W, H, "#d9f99d") + r(0, 55, W, 45, "#60a5fa") + c(169, 30, 12, "#16a34a") + r(166, 36, 6, 10, "#78350f") + l(120, 130, 200, 130, "#1f2937", 3) + l(120, 130, 169, 45, "#7c3aed", 2, ST) + l(200, 130, 169, 45, "#7c3aed", 2, ST) + bogen(120, 130, 24, 0, 60 * Math.PI / 180, "#dc2626") + bogen(200, 130, 24, Math.PI - 70 * Math.PI / 180, Math.PI, "#dc2626") + tm(95, 122, "60°", "#dc2626", 12) + tm(228, 122, "70°", "#dc2626", 12) + tm(160, 146, "50 m", "#1f2937", 13)); },
+      function(){ return svg(himmel() + boden(125) + p("M160 25 L110 125 L210 125 Z", "#fdba74", "#9a3412") + l(160, 25, 110, 125, "#1f2937", 4) + l(160, 25, 210, 125, "#1f2937", 4) + bogen(160, 25, 26, -Math.PI / 2 - 25 * Math.PI / 180, -Math.PI / 2 + 25 * Math.PI / 180, "#dc2626") + tm(160, 66, "50°", "#dc2626", 12) + tm(118, 75, "2 m", "#1f2937", 13) + tm(204, 75, "2 m", "#1f2937", 13) + tm(160, 145, "?", "#dc2626", 15)); },
+      function(){ return svg(himmel() + p("M160 15 L235 130 L85 130 Z", "#ffffff", "#dc2626", 10) + tm(160, 110, "!", "#1f2937", 46) + tm(270, 70, "3 · 60°", "#1f2937", 15) + tm(270, 98, "= 180°", "#dc2626", 15)); }
+    ],
+    exponential: [
+      function(){ return svg(himmel() + balken(25, 15, [100, 200, 400, 800, 1600, 3200], 3200, 110, "#a3e635", 30) + tm(42, 142, "0", null, 11) + tm(232, 142, "5 h", null, 11) + tm(190, 30, "3200", "#3f6212", 13) + tm(280, 80, "· 2", "#16a34a", 18)); },
+      function(){ return svg(himmel() + graph(20, 15, 180, 110, function(x){ return 1000 * Math.pow(1.03, x); }, 0, 10, 900, 1400, "#16a34a", null) + schwein(260, 80, "") + tm(110, 145, "0 … 10", null, 11) + tm(260, 135, "1343,92 €", "#166534", 12)); },
+      function(){ return svg(himmel() + p("M20 70 h50 l12 -18 h45 l15 18 h20 v22 h-142z", "#3b82f6", "#1e3a8a") + c(50, 94, 10, "#111827") + c(130, 94, 10, "#111827") + balken(180, 20, [20000, 17000, 14450, 12283, 10440], 20000, 100, "#fca5a5", 18) + tm(240, 140, "· 0,85", "#dc2626", 14)); },
+      function(){ return svg(himmel() + r(30, 50, 40, 20, "#f472b6", "#9d174d", ' rx="10"') + r(50, 50, 20, 20, "#ffffff", "#9d174d") + balken(110, 20, [400, 200, 100, 50, 25], 400, 100, "#c4b5fd", 26) + tm(123, 140, "0", null, 11) + tm(261, 140, "24 h", null, 11) + tm(50, 100, "400 mg", "#9d174d", 12) + tm(261, 110, "25", "#6d28d9", 12)); }
+    ],
+    kombinatorik: [
+      function(){ var s = "", tf = ["#ef4444", "#3b82f6", "#22c55e", "#f59e0b"], hf = ["#1e3a8a", "#78350f", "#374151"]; tf.forEach(function(f, i){ s += p("M" + (16 + i * 46) + " 30 h30 l6 10 l-6 4 v26 h-30 v-26 l-6 -4z", f, "#1f2937", 1.5); }); hf.forEach(function(f, i){ s += p("M" + (30 + i * 45) + " 85 h28 v50 h-11 l-3 -30 l-3 30 h-11z", f, "#111827", 1.5); }); return svg(himmel() + s + tm(250, 70, "4 · 3", "#1f2937", 20) + tm(250, 100, "= 12", "#7c3aed", 20)); },
+      function(){ return svg(himmel() + r(110, 60, 60, 70, "#fde047", "#a16207") + r(50, 85, 60, 45, "#e5e7eb", "#64748b") + r(170, 100, 60, 30, "#fdba74", "#9a3412") + tm(140, 100, "1", "#a16207", 22) + tm(80, 115, "2", "#475569", 20) + tm(200, 122, "3", "#9a3412", 18) + tm(275, 70, "8 · 7 · 6", "#1f2937", 14) + tm(275, 98, "= 336", "#7c3aed", 16)); },
+      function(){ var s = p("M70 60 v-22 a30 30 0 0 1 60 0 v22", "none", "#475569", 7) + r(45, 60, 110, 70, "#fbbf24", "#92400e", ' rx="10"'); for(var i = 0; i < 4; i++) s += r(57 + i * 23, 78, 18, 32, "#ffffff", "#1f2937", ' rx="3"') + tm(66 + i * 23, 100, String([3, 0, 7, 9][i]), "#1f2937", 14); return svg(himmel() + s + tm(250, 70, "10⁴", "#1f2937", 22) + tm(250, 100, "= 10000", "#7c3aed", 15)); },
+      function(){ var k = ""; for(var j = 0; j < 5; j++) k += figur(30 + j * 40, 130, 0.6, j === 1 || j === 3 ? "#dc2626" : "#1e3a8a"); return svg(himmel() + k + r(225, 35, 60, 28, "#fde68a", "#a16207", ' rx="4"') + r(235, 70, 60, 28, "#fde68a", "#a16207", ' rx="4"') + tm(255, 54, "★", "#a16207", 14) + tm(265, 89, "★", "#a16207", 14) + tm(260, 130, "5 · 4 : 2 = 10", "#7c3aed", 13)); }
+    ],
+    normalverteilung: [
+      function(){ return svg(himmel() + glocke(20, 20, 200, 105, -1, 1, "#93c5fd") + tm(120, 145, "142 … 158 cm", "#1e3a8a", 12) + tm(120, 95, "68 %", "#1e3a8a", 16) + tm(270, 70, "μ ± σ", "#1f2937", 18)); },
+      function(){ return svg(himmel() + glocke(20, 20, 200, 105, -3.2, -2, "#fca5a5") + tm(55, 145, "< 990 ml", "#dc2626", 12) + tm(60, 100, "2,3 %", "#dc2626", 13) + flasche(260, 30, 80, "#fdba74") + tm(274, 135, "1000 ml", "#7c2d12", 11)); },
+      function(){ return svg(himmel() + glocke(20, 20, 200, 105, 1, 3.2, "#86efac") + tm(190, 118, "16 %", "#166534", 13) + tm(155, 145, "≥ 70", "#166534", 12) + tm(270, 60, "μ = 60", "#1f2937", 15) + tm(270, 88, "σ = 10", "#1f2937", 15)); },
+      function(){ return svg(himmel() + glocke(20, 20, 200, 105, -2, 2, "#fde047") + tm(120, 95, "95 %", "#a16207", 16) + tm(120, 145, "140 … 220 g", "#a16207", 12) + c(270, 80, 26, "#ef4444", "#991b1b") + p("M270 54 q4 -12 12 -14", "none", "#78350f", 3) + p("M274 48 q12 -10 20 -2 q-10 6 -20 2z", "#22c55e")); }
+    ],
+    pythagoras: [
+      function(){ return svg(himmel() + boden(130) + r(200, 10, 30, 120, "#e5e7eb", "#64748b") + l(130, 130, 200, 20, "#a16207", 5) + l(130, 130, 200, 130, "#dc2626", 2, ST) + l(200, 20, 200, 130, "#2563eb", 2, ST) + rwb(200, 130, -1, 0, 0, -1, 12, "#1f2937") + tm(150, 70, "5 m", "#a16207", 13) + tm(165, 145, "1,5 m", "#dc2626", 12) + t(208, 80, "h", ' style="fill:#2563eb"')); },
+      function(){ return svg(himmel() + r(60, 20, 160, 90, "#1f2937", null, ' rx="4"') + r(66, 26, 148, 78, "#93c5fd") + l(66, 104, 214, 26, "#dc2626", 2.5) + r(130, 110, 20, 10, "#475569") + r(110, 120, 60, 6, "#475569") + tm(140, 140, "80 cm", "#1f2937", 12) + t(226, 70, "45 cm", ' style="fill:#1f2937"') + tm(150, 60, "d", "#dc2626", 15)); },
+      function(){ return svg(r(0, 0, W, H, "#bbf7d0") + p("M40 125 H280 V20", "none", "#a8a29e", 10) + l(40, 125, 280, 20, "#dc2626", 3, ST) + rwb(280, 125, -1, 0, 0, -1, 16, "#1f2937") + tm(160, 145, "80 m", "#1f2937", 13) + t(288, 75, "60 m", ' style="fill:#1f2937"') + tm(150, 60, "100 m", "#dc2626", 14) + figur(60, 118, 0.5, "#1e3a8a")); },
+      function(){ return svg(himmel() + boden(125) + p("M40 125 L280 125 L280 95 Z", "#cbd5e1", "#475569") + rwb(280, 125, -1, 0, 0, -1, 12, "#1f2937") + tm(160, 100, "4 m", "#1f2937", 13) + t(286, 115, "0,5 m", ' style="fill:#1f2937"') + tm(160, 145, "?", "#dc2626", 15) + c(90, 108, 10, "none", "#1f2937") + c(115, 106, 10, "none", "#1f2937")); }
+    ],
+    winkel: [
+      function(){ var s = c(90, 75, 60, "#ffffff", "#1f2937"); for(var i = 0; i < 12; i++){ var w = i * Math.PI / 6; s += l(90 + 52 * Math.sin(w), 75 - 52 * Math.cos(w), 90 + 58 * Math.sin(w), 75 - 58 * Math.cos(w), "#1f2937", 2); } return svg(himmel() + s + l(90, 75, 90, 25, "#1f2937", 4) + l(90, 75, 125, 75, "#dc2626", 5) + rwb(90, 75, 0, -1, 1, 0, 16, "#16a34a") + c(90, 75, 4, "#1f2937") + tm(240, 65, "3 · 30°", "#1f2937", 16) + tm(240, 95, "= 90°", "#16a34a", 18)); },
+      function(){ return svg(himmel() + pizza(90, 75, 55, 6, ["#fb923c"]) + bogen(90, 75, 22, Math.PI / 2 - Math.PI / 3, Math.PI / 2, "#1d4ed8") + tm(230, 65, "360° : 6", "#1f2937", 16) + tm(230, 95, "= 60°", "#1d4ed8", 18)); },
+      function(){ return svg(himmel() + boden(125) + r(80, 95, 90, 8, "#7c3aed", null, ' rx="4"') + c(95, 108, 6, "#111827") + c(155, 108, 6, "#111827") + p("M60 70 A65 40 0 1 1 190 70", "none", "#ea580c", 3, ' marker-end="url(#msaPea580c)"') + tm(125, 25, "540°", "#ea580c", 16) + tm(255, 65, "540° : 360°", "#1f2937", 13) + tm(255, 95, "= 1,5", "#ea580c", 18)); },
+      function(){ return svg(r(0, 0, W, H, "#d9f99d") + p("M0 75 L320 75", "none", "#6b7280", 26) + p("M125 150 L195 0", "none", "#6b7280", 26) + bogen(160, 75, 30, 0, 65 * Math.PI / 180, "#dc2626") + bogen(160, 75, 24, 65 * Math.PI / 180, Math.PI, "#2563eb") + tm(215, 55, "65°", "#dc2626", 13) + tm(110, 55, "115°", "#2563eb", 13) + tm(250, 130, "65° + 115° = 180°", "#1f2937", 12)); }
     ]
   };
   var css = document.createElement("style");
