@@ -166,11 +166,16 @@
   <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
   <h1 id="titel">Terme vereinfachen</h1>
   <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="grund" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="einfach" aria-selected="true"></button>
     <button type="button" role="tab" data-tab="mult" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="klammer" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
   </div>
+
+  <section id="s_grund" hidden>
+    <div id="grundBox"></div>
+  </section>
 
   <section id="s_einfach">
     <div class="karte">
@@ -224,6 +229,7 @@
   </section>
   <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
 </div>
+<script src="/grundlagen.js"></script>
 <script src="texte.js"></script>
 <script src="app.js"></script>
 <script src="/alltag.js"></script>

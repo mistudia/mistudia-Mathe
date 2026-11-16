@@ -3,6 +3,7 @@
 // für die Kacheln ohne Funktionen-Lexikon (Prozent, Flächen, Trigonometrie …).
 //   MS_ALLTAG.einbauen({ nach: Element, daten: {de: [[Titel, Situation, Lösung], …], …},
 //                        werte: [w0, w1, …] (optional), laden: function(w){…} (optional) })
+//                        loesBild: [f0, f1, …] (optional, HTML-Bild unter der Lösung, z. B. Pfeildarstellung)
 //     → Knopf hinter „nach“; jede Karte: Situation, aufklappbare Lösung,
 //       bei vorhandenem Wert ein Knopf „Ausprobieren“, der laden(w) aufruft.
 //   MS_ALLTAG.sprache(l) – bei jedem Sprachwechsel aufrufen (Knopf + offenes Fenster).
@@ -35,7 +36,8 @@ var MS_ALLTAG = (function(){
     liste(B).forEach(function(e, i){
       h += '<div class="msa-bsp"><h3>' + esc(e[0]) + "</h3><p>" + text(e[1]) + "</p>";
       var bf = bilder(B); if(bf && bf[i]){ try { h += '<div class="msa-bild">' + bf[i]() + "</div>"; } catch(x){} }
-      if(e[2]) h += '<details><summary>' + esc(ui("loesung")) + "</summary><p>" + text(e[2]) + "</p></details>";
+      var lb = ""; if(B.loesBild && B.loesBild[i]){ try { lb = '<div class="msa-lbild" dir="ltr">' + B.loesBild[i]() + "</div>"; } catch(x){} }
+      if(e[2]) h += '<details><summary>' + esc(ui("loesung")) + "</summary><p>" + text(e[2]) + "</p>" + lb + "</details>";
       if(B.laden && B.werte && B.werte[i] != null) h += '<button type="button" class="msa-los" data-i="' + i + '">' + esc(ui("probieren")) + "</button>";
       h += "</div>";
     });
@@ -81,6 +83,7 @@ var MS_ALLTAG = (function(){
     ".msa-bsp h3{margin:0 0 4px;font-size:17px;color:#0f766e}.msa-bsp p{margin:4px 0;font-size:16px;line-height:1.45;color:#1a2233}" +
     ".msa-bsp summary{cursor:pointer;color:#1565c0;font-weight:700;font-size:15px;margin-top:4px}" +
     ".msa-bsp details p{background:#f4f8ff;border-radius:8px;padding:6px 8px;font-size:15px}" +
+    ".msa-lbild{margin:6px 0;text-align:center}.msa-lbild svg{max-width:100%;height:auto}" +
     ".msa-los{margin-top:6px;font:700 14px system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:0;background:#1565c0;color:#ffffff;cursor:pointer}";
   document.head.appendChild(css);
   return { einbauen: einbauen, sprache: sprache, schliessen: schliessen, lang: function(){ return lang; }, boxen: function(){ return boxen; }, zeigen: zeigen };

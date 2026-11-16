@@ -56,7 +56,7 @@
   var box = document.createElement("section"); box.className = "fm-karte"; box.id = "fmKarte";
   box.innerHTML = '<h2 id="fmTitel"></h2><p class="fm-text" id="fmText"></p><div class="fm-wahl" id="fmWahl"><button type="button" data-f="1"></button><button type="button" data-f="2"></button><button type="button" data-f="3"></button></div>' +
     '<div class="fm-regler" dir="ltr"><label><b>a</b> <input type="range" id="fmA" min="1" max="9" step="1" value="5"> <b id="fmAW"></b></label><label><b>b</b> <input type="range" id="fmB" min="1" max="6" step="1" value="3"> <b id="fmBW"></b></label></div>' +
-    '<p class="fm-hinweis" id="fmHinweis"></p><svg id="fmSvg" viewBox="0 0 640 340"></svg><p class="fm-rech" id="fmRech" dir="ltr"></p><p class="fm-text" id="fmErkl"></p>';
+    '<p class="fm-hinweis" id="fmHinweis"></p><div class="fm-unten"><svg id="fmSvg" viewBox="0 0 640 340"></svg><div><p class="fm-rech" id="fmRech" dir="ltr"></p><p class="fm-text" id="fmErkl"></p></div></div>';
   var main = document.querySelector("main"); main.parentNode.insertBefore(box, main.nextSibling);
   var css = document.createElement("style");
   css.textContent = ".fm-karte{max-width:900px;margin:18px auto;padding:16px;background:#fff;border:2px solid #b0b0b8;border-radius:16px;color:#1f2937;box-sizing:border-box}" +
@@ -65,7 +65,9 @@
     ".fm-wahl button.aktiv{background:#1565c0;border-color:#1565c0;color:#fff}" +
     ".fm-regler{display:flex;flex-wrap:wrap;gap:8px 22px;margin:6px 0}.fm-regler label{display:inline-flex;gap:8px;align-items:center;font-size:18px}.fm-regler input{width:180px;max-width:55vw}" +
     "#fmSvg{width:100%;height:auto;display:block}.fm-rech{font-size:20px;font-weight:bold;color:#1e3a8a;line-height:1.6;margin:6px 0}" +
-    ".fm-hinweis{color:#b45309;font-weight:bold;margin:2px 0}.fm-hinweis:empty{display:none}";
+    ".fm-hinweis{color:#b45309;font-weight:bold;margin:2px 0}.fm-hinweis:empty{display:none}" +
+    // PC: Bild links, Rechnung rechts (spart Platz)
+    "@media (min-width:860px){.fm-unten{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:center}}";
   document.head.appendChild(css);
   var FA = "#93c5fd", FB = "#fca5a5", FAB = "#fde68a", FR = "#86efac", RAND = "#1e3a8a";
   function rechteck(sv, x, y, w, h, f, txt, extra){

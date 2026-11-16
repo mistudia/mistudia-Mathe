@@ -73,6 +73,9 @@ footer a:hover{text-decoration:underline}
 #term span.t{padding:0 3px;border-radius:6px;transition:.2s}
 #pfeile{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .schrittZeile{margin:16px 0;font-size:20px;text-align:center}
+/* PC: Zwischenergebnisse nebeneinander statt untereinander (spart Platz) */
+@media (min-width:760px){#schritte{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px;max-width:780px;margin:0 auto}#schritte .schrittZeile{margin:8px 0}#aufgabeBox{padding:112px 0}#ursprungZeile{margin-top:12px;padding-top:12px}}
+@media (min-width:1060px){#schritte{grid-template-columns:repeat(4,minmax(0,1fr));max-width:none}#schritte .math-eingabe.schritt{width:130px}}
 .zeile-oben{display:inline-flex;align-items:center;gap:12px;text-align:left;max-width:620px}
 .ursprung-text{font-size:24px;font-weight:bold;color:#222}
 .marke{width:26px;height:26px;border-radius:50%;color:#fff;font-size:15px;font-weight:bold;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}

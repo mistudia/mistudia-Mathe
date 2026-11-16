@@ -147,6 +147,20 @@
   function zahl(v){ var r = Math.round(v * 1e6) / 1e6, s = String(Math.abs(r)); if(komma()) s = s.replace(".", ","); return (r < 0 ? "−" : "") + s; }
   function fehlerText(e){ return t("err_" + (typeof e === "string" ? e : "zeichen")); }
 
+  // Zwischenschritt beim Klammerauflösen: Faktor · jedes Glied, z. B. −2(a − 3) → (−2) · a + (−2) · (−3)
+  function faktorKl(p){ var K = sortKeys(p); if(K.length !== 1) return null; var s = mtxt(K[0], p[K[0]], true); return p[K[0]].n < 0 ? "(" + s + ")" : s; }
+  function verteilZeile(it){
+    var n = it.n, vor = [], par = null;
+    if(n.t === "par") par = n;
+    else if(n.t === "prod"){ for(var i = 0; i < n.f.length; i++){ var f = n.f[i]; if(f.t === "par"){ if(par) return null; par = f; } else if(hatKlammer(f) || (f.t === "num" && f.div)) return null; else vor.push(f); } }
+    else return null;
+    if(!par || par.e.t !== "sum") return null;
+    var k = pskal(expand(vor.length ? { t: "prod", f: vor } : { t: "num", v: F(1) }), F(it.s)), kt = faktorKl(k); if(!kt || kt === "1") return null; // Plus vor der Klammer: Klammer fällt einfach weg
+    var teile = par.e.items.map(function(x){ return faktorKl(pskal(expand(x.n), F(x.s))); });
+    if(teile.some(function(x){ return !x; })) return null;
+    return teile.map(function(x){ return kt + " · " + x; }).join(" + ");
+  }
+
   // ---------- Reiter Vereinfachen ----------
   var probeW = {}, probeSig = null;
   function vereinfachen(){
@@ -154,18 +168,20 @@
     try { ast = parse($("term").value); } catch(e){ $("fehler").textContent = fehlerText(e); ["schritte", "ergebnis", "probe"].forEach(function(id){ $(id).innerHTML = ""; }); return; }
     $("fehler").textContent = "";
     var S = summanden(ast), glieder = [];
-    // 1. Klammern auflösen
+    // Glieder und Farben vorab (gleiche Farbe = gleichartige Terme, schon beim Klammerauflösen)
+    S.forEach(function(it){ var p = pskal(expand(it.n), F(it.s)); sortKeys(p).forEach(function(k){ glieder.push({ k: k, c: p[k] }); }); });
+    var gruppen = [], farbe = {};
+    glieder.forEach(function(g){ if(!(g.k in farbe)){ farbe[g.k] = g.k === "" ? "gk" : "g" + (gruppen.length % 6); gruppen.push(g.k); } });
+    function pchips(p){ return sortKeys(p).map(function(k, i){ return '<span class="chip ' + farbe[k] + '">' + mtxt(k, p[k], i === 0).trim() + "</span>"; }).join(" "); }
+    // 1. Klammern auflösen – mit Zwischenschritt „jedes Glied einzeln malnehmen“
     var kl = S.filter(function(it){ return hatKlammer(it.n); });
     if(kl.length){
-      L.push({ h: t("s_klammer"), f: kl.map(function(it){ var p = pskal(expand(it.n), F(it.s)); return bdi((it.s < 0 ? "−" : "+") + " " + esc(render(it.n)) + " = " + ptxt(p)); }).join("<br>") + '<br><span class="muted" style="font-size:15px;line-height:1.35;display:inline-block">' + t(kl.some(function(it){ return it.s < 0; }) ? "s_klammerMinus" : "s_klammerInfo") + "</span>" });
+      L.push({ h: t("s_klammer"), f: kl.map(function(it){ var p = pskal(expand(it.n), F(it.s)), z = verteilZeile(it); return bdi((it.s < 0 ? "−" : "+") + " " + esc(render(it.n)) + (z ? " = " + z : "") + " = " + pchips(p)); }).join("<br>") + '<br><span class="muted" style="font-size:15px;line-height:1.35;display:inline-block">' + t(kl.some(function(it){ return it.s < 0; }) ? "s_klammerMinus" : "s_klammerInfo") + "</span>" });
     }
     // 2. Produkte ausrechnen
     var pr = S.filter(function(it){ if(hatKlammer(it.n)) return false; var p = expand(it.n), k = Object.keys(p); return k.length === 1 && esc(render(it.n)) !== ptxt(p).replace(/^−/, ""); });
     if(pr.length) L.push({ h: t("s_produkt"), f: pr.map(function(it){ return bdi(esc(render(it.n)) + " = " + ptxt(expand(it.n))); }).join("<br>") + '<br><span class="muted" style="font-size:15px;line-height:1.35;display:inline-block">' + t("s_produktInfo") + "</span>" });
-    S.forEach(function(it){ var p = pskal(expand(it.n), F(it.s)); sortKeys(p).forEach(function(k){ glieder.push({ k: k, c: p[k] }); }); });
     // 3. Gleichartige Terme ordnen
-    var gruppen = [], farbe = {};
-    glieder.forEach(function(g){ if(!(g.k in farbe)){ farbe[g.k] = g.k === "" ? "gk" : "g" + (gruppen.length % 6); gruppen.push(g.k); } });
     function chip(g, i){ return '<span class="chip ' + farbe[g.k] + '">' + mtxt(g.k, g.c, i === 0).trim() + "</span>"; }
     var vorher = glieder.map(function(g, i){ return chip(g, i); }).join(" ");
     var mehrfach = gruppen.some(function(k){ return glieder.filter(function(g){ return g.k === k; }).length > 1; });
@@ -280,7 +296,7 @@
   function nz(a, b){ var x; do { x = zuf(a, b); } while(!x); return x; }
   function neueAufgabe(){
     beantwortet = false; letzte = null;
-    var typ = wahl(["zus", "zus", "prod", "klammer", "klammer", "binom", "aus", "aus"]), txt = "", V = wahl([["a", "b"], ["x", "y"], ["m", "n"]]);
+    var typ = wahl(["zus", "zus", "prod", "klammer", "klammer", "pm", "pm", "binom", "aus", "aus"]), txt = "", V = wahl([["a", "b"], ["x", "y"], ["m", "n"]]);
     if(typ === "zus"){
       var n = zuf(4, 6), L = [];
       for(var i = 0; i < n; i++){ var art = wahl([V[0], V[0], V[1], V[1], ""]); L.push(glied(nz(-9, 9), art, i === 0)); }
@@ -291,6 +307,10 @@
     } else if(typ === "klammer"){
       var k1 = zuf(2, 6), k2 = nz(-5, 5), p1 = nz(-9, 9), p2 = nz(-9, 9), q1 = zuf(1, 4), q2 = nz(-9, 9);
       txt = k1 + "(" + glied(q1, V[0], true) + glied(p1, "", false) + ")" + (k2 < 0 ? " − " : " + ") + (Math.abs(k2) === 1 ? "" : Math.abs(k2)) + "(" + glied(zuf(1, 5), V[0], true) + glied(p2, "", false) + ")"; void q2;
+    } else if(typ === "pm"){ // Plus- und Minusklammern ohne Zahl davor
+      var s0 = nz(-9, 9), u1 = nz(-6, 6), u2 = nz(-9, 9), w1 = nz(-6, 6), w2 = nz(-9, 9);
+      txt = glied(s0, V[0], true) + " + (" + glied(u1, V[0], true) + glied(u2, "", false) + ") − (" + glied(w1, V[0], true) + glied(w2, "", false) + ")";
+      if(Math.random() < 0.5) txt = glied(nz(1, 9), "", true) + " − (" + glied(u1, V[0], true) + glied(u2, "", false) + ") + (" + glied(w1, V[0], true) + glied(w2, "", false) + ")";
     } else if(typ === "binom"){
       var b1 = zuf(1, 3), c1 = nz(-7, 7), b2 = zuf(1, 3), c2 = nz(-7, 7);
       txt = "(" + glied(b1, V[0], true) + glied(c1, "", false) + ")(" + glied(b2, V[0], true) + glied(c2, "", false) + ")";
@@ -355,7 +375,10 @@
     var L = [];
     if(A.typ === "aus"){ var R2 = ausklammern(A.p); L.push(t("ggtL") + " " + bdi(faktorTxt(R2.G))); L.push(t("k_probe") + " " + bdi(faktorTxt(R2.G) + "(" + ptxt(R2.innen) + ") = " + ptxt(A.p))); }
     else {
-      var S2 = summanden(A.ast); if(hatKlammer(A.ast)) L.push(t("s_klammer") + " " + bdi(S2.map(function(it, i){ var q = pskal(expand(it.n), F(it.s)); return sortKeys(q).map(function(k, j){ return mtxt(k, q[k], i === 0 && j === 0); }).join(""); }).join("")));
+      var S2 = summanden(A.ast);
+      // jede Klammer einzeln mit Zwischenschritt
+      S2.filter(function(it){ return hatKlammer(it.n); }).forEach(function(it){ var z = verteilZeile(it); if(z) L.push(bdi((it.s < 0 ? "−" : "+") + " " + esc(render(it.n)) + " = " + z + " = " + ptxt(pskal(expand(it.n), F(it.s))))); });
+      if(hatKlammer(A.ast)) L.push(t("s_klammer") + " " + bdi(S2.map(function(it, i){ var q = pskal(expand(it.n), F(it.s)); return sortKeys(q).map(function(k, j){ return mtxt(k, q[k], i === 0 && j === 0); }).join(""); }).join("")));
       L.push(t("s_zusammen") + " " + bdi(ptxt(A.p)));
     }
     $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);
@@ -364,7 +387,7 @@
   $("weiter").addEventListener("click", neueAufgabe);
 
   // ---------- Reiter & Texte ----------
-  var tab = "einfach", TABS = ["einfach", "mult", "klammer", "ueben"];
+  var tab = "einfach", TABS = ["grund", "einfach", "mult", "klammer", "ueben"];
   function zeigeTab(k){
     tab = k;
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
@@ -377,9 +400,11 @@
     if(!nurRechnen){
       document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
       document.title = "miStudia – " + t("titel"); $("titel").textContent = t("titel");
-      document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
+      document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = b.dataset.tab === "grund" ? MS_GRUND.t("tab", lang) : t("tab_" + b.dataset.tab); });
+      // Grundlagen-Karten (gemeinsam mit „Negative Zahlen“, /grundlagen.js) in der aktuellen Sprache
+      if(window.MS_GRUND) MS_GRUND.karten($("grundBox"), ["minus", "verteilen", "sorten", "potenz", "kuerzen"], lang);
       $("tTerm").textContent = t("termL"); $("tTerm2").textContent = t("termL2"); $("tTerm3").textContent = t("termL3"); $("hinweis").textContent = t("hinweis");
-      beispiele($("bsp1"), $("term"), ["3a + 5b − a + 2b + 4", "4x − 7 + 2x + 9 − x", "2a · 3b + 5ab − ab", "3x² + 2x − x² + 4x", "5(2a − 3) − 2(a − 4)", "−(x − 3) + 4x"], vereinfachen);
+      beispiele($("bsp1"), $("term"), ["3a + 5b − a + 2b + 4", "4x − 7 + 2x + 9 − x", "2a · 3b + 5ab − ab", "3x² + 2x − x² + 4x", "5(2a − 3) − 2(a − 4)", "−(x − 3) + 4x", "7x − (3x + 2)", "4 + (2x − 5) − (x − 1)", "8a − (−2a + 5)", "−2(3a − b) + 4(a + 2b)", "3(x + 2) − (x − 4) + 2(5 − x)"], vereinfachen);
       beispiele($("bsp2"), $("term2"), ["3(2x − 5)", "−4a(a + 2b)", "(a + 2)(a + 5)", "(2x + 3)(x − 4)", "(x − 3)²", "(a + b)(c − d)"], ausmult);
       beispiele($("bsp3"), $("term3"), ["12x + 18", "8a − 20b + 4", "12x² + 18x", "6a²b − 9ab²", "15xy − 10x + 5"], klammer);
     }

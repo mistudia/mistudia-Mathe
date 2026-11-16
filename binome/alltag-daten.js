@@ -1,7 +1,42 @@
 // Alltagsbeispiele für /binome/, 9 Sprachen. „Ausprobieren“ lädt eine eigene Aufgabe (MS_BINOM.laden).
+// Pfeildarstellung „jeder mit jedem“ für die Lösungen (wie in der Aufgabe: 1+2 oben, 3+4 unten)
+function msBinomPfeile(A1, A2, B1, B2, P, summe){
+  var F = ["#1976d2", "#e53935", "#f59e0b", "#1ea64b"];
+  function ohne(x){ return String(x).replace(/^\+/, ""); }
+  function op(x){ return /^[−-]/.test(x) ? "−" : "+"; }
+  function betrag(x){ return String(x).replace(/^[+−-]/, ""); }
+  function fak(x){ return /^[−-]/.test(x) ? "(" + x + ")" : ohne(x); }
+  var tok = ["(", A1, op(A2), betrag(A2), ")", "·", "(", B1, op(B2), betrag(B2), ")"];
+  var w = tok.map(function(t){ return t.length * 14 + 12; }), x = 10, mitte = [];
+  tok.forEach(function(t, i){ mitte.push(x + w[i] / 2); x += w[i]; });
+  var W = x + 10, H = 150, y = 82;
+  var s = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" role="img"><defs>' + F.map(function(c, i){ return '<marker id="msaP' + i + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + c + '"/></marker>'; }).join("") + "</defs>";
+  tok.forEach(function(t, i){ s += '<text x="' + mitte[i] + '" y="' + y + '" text-anchor="middle" font-size="24" font-weight="bold" font-family="Arial,sans-serif" fill="#1a2233">' + t + "</text>"; });
+  // Pfeile: [von, nach, oben?, Höhe]
+  var P4 = [[1, 7, true, 30], [1, 9, true, 52], [3, 7, false, 30], [3, 9, false, 52]];
+  P4.forEach(function(q, i){
+    var x1 = mitte[q[0]], x2 = mitte[q[1]], y0 = q[2] ? y - 24 : y + 10, yc = q[2] ? y0 - q[3] * 1.6 : y0 + q[3] * 1.6, xm = (x1 + x2) / 2, ym = (y0 + y0 + 2 * yc) / 4;
+    s += '<path d="M' + x1 + " " + y0 + " Q" + xm + " " + yc + " " + x2 + " " + y0 + '" fill="none" stroke="' + F[i] + '" stroke-width="2.6" marker-end="url(#msaP' + i + ')"/>';
+    s += '<circle cx="' + xm + '" cy="' + ym + '" r="10" fill="' + F[i] + '"/><text x="' + xm + '" y="' + (ym + 5) + '" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff" font-family="Arial,sans-serif">' + (i + 1) + "</text>";
+  });
+  s += "</svg>";
+  var R = [[A1, B1], [A1, B2], [A2, B1], [A2, B2]];
+  s += '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;font:600 16px Arial,sans-serif;margin-top:2px">' + R.map(function(r, i){
+    return '<span><span style="display:inline-block;width:20px;height:20px;line-height:20px;border-radius:50%;background:' + F[i] + ';color:#ffffff;font-size:12px;text-align:center;margin-right:4px">' + (i + 1) + "</span>" + fak(r[0]) + " · " + fak(r[1]) + " = " + P[i].replace(/^\+/, "") + "</span>";
+  }).join("") + '</div><div style="font:700 17px Arial,sans-serif;color:#0d47a1;margin-top:6px">' + summe + "</div>";
+  return s;
+}
 MS_ALLTAG.einbauen({ nach: document.querySelector("header") || document.getElementById("titel"),
 werte: [ null, null, null, { typ: "quadPlus", a: "x", b: "3" }, { typ: "quadMinus", a: "x", b: "1" }, { typ: "diff", a: "x", b: "5" } ],
 laden: function(w){ window.MS_BINOM.laden(w); },
+loesBild: [
+  function(){ return msBinomPfeile("20", "+1", "20", "+1", ["400", "+20", "+20", "+1"], "= 400 + 20 + 20 + 1 = 441"); },
+  function(){ return msBinomPfeile("20", "−1", "20", "−1", ["400", "−20", "−20", "+1"], "= 400 − 20 − 20 + 1 = 361"); },
+  function(){ return msBinomPfeile("50", "−1", "50", "+1", ["2500", "+50", "−50", "−1"], "= 2500 + 50 − 50 − 1 = 2499"); },
+  function(){ return msBinomPfeile("x", "+3", "x", "+3", ["x²", "+3x", "+3x", "+9"], "= x² + 3x + 3x + 9 = x² + 6x + 9"); },
+  function(){ return msBinomPfeile("x", "−1", "x", "−1", ["x²", "−x", "−x", "+1"], "= x² − x − x + 1 = x² − 2x + 1"); },
+  function(){ return msBinomPfeile("x", "+5", "x", "−5", ["x²", "−5x", "+5x", "−25"], "= x² − 5x + 5x − 25 = x² − 25"); }
+],
 daten: {
 de: [
   ["Kopfrechnen: 21²", "Wie rechnet man 21² schnell im Kopf?", "1. binomische Formel: $21² = (20 + 1)² = 20² + 2 · 20 · 1 + 1² = 400 + 40 + 1 = 441$"],

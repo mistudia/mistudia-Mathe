@@ -348,6 +348,8 @@
     $("tZieh").textContent = t("zieh");
     $("tVergleich").textContent = t("tVergleich"); $("tAlltag").textContent = t("tAlltag");
     $("tRechnen").textContent = t("tRechnen"); $("tVier").textContent = t("tVier"); $("tVarianten").textContent = t("tVarianten"); $("neuesBsp").textContent = t("neuesBsp"); $("tRegeln").textContent = t("tRegeln"); $("regelHinweis").textContent = t("regelHinweis");
+    // Guthaben/Schulden-Karte „Minus = Gegenzahl dazu“ (gemeinsam mit „Terme vereinfachen“, /grundlagen.js)
+    if(window.MS_GRUND) MS_GRUND.karten($("grundMinus"), ["minus"], lang);
     entdecken(); vergleich(); alltag(); rechnen();
     if(auf){
       var alt = $("meldung").innerHTML, war = beantwortet, eing = $("antwort") ? $("antwort").value : "";
