@@ -8,7 +8,7 @@ var MS_ALLTAG_BILD = (function(){
   function sp(){ var l = (window.MS_ALLTAG && MS_ALLTAG.lang) ? MS_ALLTAG.lang() : (document.documentElement.lang || "de"); return /^(en|zh|ja|ar)$/.test(l) ? "." : ","; }
   function dz(s){ return String(s).replace(/(\d),(\d)/g, "$1" + sp() + "$2"); }
   function svg(inner, h){ return '<svg class="msa-svg" viewBox="0 0 ' + W + " " + (h || H) + '" role="img" aria-hidden="true"><defs>' + mark("#1f2937") + mark("#dc2626") + mark("#2563eb") + mark("#16a34a") + mark("#7c3aed") + mark("#ea580c") + "</defs>" + inner + "</svg>"; }
-  function mark(c){ return '<marker id="msaP' + c.slice(1) + '" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L10 5 L0 10Z" fill="' + c + '"/></marker>'; }
+  function mark(c){ return '<marker id="msaP' + c.slice(1) + '" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 1.2 L10 5 L0 8.8 L2.4 5 Z" fill="' + c + '"/></marker>'; }
   function t(x, y, s, a){ return '<text x="' + x + '" y="' + y + '" class="msa-t"' + (a || "") + ">" + dz(s) + "</text>"; }
   function tm(x, y, s, f, gr){ return t(x, y, s, ' text-anchor="middle"' + (f || gr ? ' style="' + (f ? "fill:" + f + ";" : "") + (gr ? "font-size:" + gr + "px" : "") + '"' : "")); }
   function r(x, y, w, h, f, s, extra){ return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + (f || "none") + '"' + (s ? ' stroke="' + s + '" stroke-width="2"' : "") + (extra || "") + "/>"; }

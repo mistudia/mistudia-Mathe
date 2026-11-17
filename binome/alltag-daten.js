@@ -10,7 +10,7 @@ function msBinomPfeile(A1, A2, B1, B2, P, summe){
   var w = tok.map(function(t){ return t.length * 14 + 12; }), x = 10, mitte = [];
   tok.forEach(function(t, i){ mitte.push(x + w[i] / 2); x += w[i]; });
   var W = x + 10, H = 150, y = 82;
-  var s = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" role="img"><defs>' + F.map(function(c, i){ return '<marker id="msaP' + i + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + c + '"/></marker>'; }).join("") + "</defs>";
+  var s = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" role="img"><defs>' + F.map(function(c, i){ return '<marker id="msaP' + i + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 L10 5 L0 8.8 L2.4 5 Z" fill="' + c + '"/></marker>'; }).join("") + "</defs>";
   tok.forEach(function(t, i){ s += '<text x="' + mitte[i] + '" y="' + y + '" text-anchor="middle" font-size="24" font-weight="bold" font-family="Arial,sans-serif" fill="#1a2233">' + t + "</text>"; });
   // Pfeile: [von, nach, oben?, Höhe]
   var P4 = [[1, 7, true, 30], [1, 9, true, 52], [3, 7, false, 30], [3, 9, false, 52]];

@@ -136,7 +136,7 @@
     var A = ART[art], sv = $("kTreppe"); while(sv.lastChild) sv.removeChild(sv.lastChild);
     var n = A.e.length, dx = 78, W = 30 + n * dx, H = 150, y = 75;
     sv.setAttribute("viewBox", "0 0 " + W + " " + H); sv.style.width = "100%"; sv.style.maxWidth = W + "px";
-    var defs = el("defs", {}); ["r", "b"].forEach(function(c){ var m = el("marker", { id: "kp" + c, viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto" }); m.appendChild(el("path", { d: "M0 0 L10 5 L0 10 z", fill: c === "r" ? "#dc2626" : "#1e40af" })); defs.appendChild(m); }); sv.appendChild(defs);
+    var defs = el("defs", {}); ["r", "b"].forEach(function(c){ var m = el("marker", { id: "kp" + c, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto" }); m.appendChild(el("path", { d: "M0 1.2 L10 5 L0 8.8 L2.4 5 Z", fill: c === "r" ? "#dc2626" : "#1e40af" })); defs.appendChild(m); }); sv.appendChild(defs);
     A.e.forEach(function(u, i){
       var x = 30 + i * dx + dx / 2 - 15;
       sv.appendChild(el("rect", { x: x - 28, y: y - 18, width: 56, height: 36, rx: 9, fill: "#dbeafe", stroke: "#1e40af", "stroke-width": 1.5 }));

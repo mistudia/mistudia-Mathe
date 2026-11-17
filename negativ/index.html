@@ -93,6 +93,7 @@
   .mtext { fill: var(--blue); font: 800 17px system-ui, sans-serif; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
   .mtext.b { fill: #b45309; }
   .pfeil { fill: none; stroke-width: 3; stroke-linecap: round; }
+  .spitze.plus { fill: var(--plus); } .spitze.minus { fill: var(--minus); } .spitze.start { fill: var(--blue); }
   .pfeil.plus { stroke: var(--plus); } .pfeil.minus { stroke: var(--minus); } .pfeil.start { stroke: var(--blue); } .pfeil.gestr { stroke-dasharray: 6 5; }
   .ptext { font: 700 14px system-ui, sans-serif; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
   .ptext.plus { fill: var(--plus); } .ptext.minus { fill: var(--minus); } .ptext.start { fill: var(--blue); }
@@ -138,6 +139,8 @@
   .varianten.ohneMark .vmk { display: none; }
   .varianten.ohneMark .vpaar, .varianten.ohneMark .vpz, .varianten.ohneMark .vpm, .varianten.ohneMark .vsm { border: 0 !important; color: inherit !important; font-weight: inherit; display: inline !important; width: auto !important; height: auto !important; padding: 0 !important; margin: 0 !important; }
   .varianten.ohneMark .vzeile { padding-top: 7px !important; }
+  #vorzeichen { scroll-margin-top: 12px; }
+  .verg2 { display: inline-block; border-bottom: 4px double #1a2233; padding-bottom: 1px; line-height: 1.25; }
   .vpfeile { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
   .vpfeile path { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .vpfeile path.spitze { stroke: none; }
@@ -224,7 +227,7 @@
       <div class="reihe2"><p class="zeile" id="vierH"></p> <button type="button" class="knopf hell" id="neuesBsp"></button></div>
       <div class="vier" id="vier"></div>
     </div>
-    <div class="karte">
+    <div class="karte" id="vorzeichen">
       <h2 id="tVarianten"></h2>
       <p class="zeile" id="varH"></p>
       <div class="vmodus" id="varModus" role="group"><button type="button" data-m="zeigen"></button><button type="button" data-m="vz"></button><button type="button" data-m="selbst"></button></div>

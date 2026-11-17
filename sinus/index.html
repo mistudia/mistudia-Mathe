@@ -307,7 +307,7 @@ function pfeil(svg, x1, y1, x2, y2, farbe, beide){
   if(!svg.querySelector("#" + id)){
     var defs = svg.querySelector("defs") || svg.insertBefore(el("defs", {}), svg.firstChild);
     var m = el("marker", { id: id, viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse" });
-    m.appendChild(el("path", { d: "M0 0 L10 5 L0 10 z", fill: farbe }));
+    m.appendChild(el("path", { d: "M0 1.2 L10 5 L0 8.8 L2.4 5 Z", fill: farbe }));
     defs.appendChild(m);
   }
   var a = { x1: x1, y1: y1, x2: x2, y2: y2, stroke: farbe, "stroke-width": 3, "marker-end": "url(#" + id + ")" };

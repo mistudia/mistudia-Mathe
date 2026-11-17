@@ -51,7 +51,9 @@
       if(Math.abs(x2 - x1) < 2) return;
       var dir = x2 > x1 ? 1 : -1;
       svg.appendChild(el("path", { d: "M" + x1 + " " + yy + "Q" + ((x1 + x2) / 2) + " " + (yy - h) + " " + (x2 - dir * 2) + " " + yy, "class": "pfeil " + p.cls + (p.gestr ? " gestr" : "") }));
-      svg.appendChild(el("path", { d: "M" + x2 + " " + yy + "l" + (-dir * 11) + " -7M" + x2 + " " + yy + "l" + (-dir * 11) + " 3", "class": "pfeil " + p.cls }));
+      // gefüllte, schlanke Spitze in Richtung der Kurve am Ende (Tangente vom Kontrollpunkt zur Spitze)
+      var tx = x2 - (x1 + x2) / 2, ty = h, tl = Math.sqrt(tx * tx + ty * ty) || 1, ux = tx / tl, uy = ty / tl, SL = 15, SB = 6.3, bx = x2 - ux * SL, by = yy - uy * SL, nx = x2 - ux * SL * 0.76, ny = yy - uy * SL * 0.76;
+      svg.appendChild(el("path", { d: "M" + x2.toFixed(1) + " " + yy.toFixed(1) + "L" + (bx - uy * SB).toFixed(1) + " " + (by + ux * SB).toFixed(1) + "L" + nx.toFixed(1) + " " + ny.toFixed(1) + "L" + (bx + uy * SB).toFixed(1) + " " + (by - ux * SB).toFixed(1) + "Z", "class": "spitze " + p.cls }));
       if(p.text) svg.appendChild(el("text", { x: (x1 + x2) / 2, y: yy - h / 2 - 8, "class": "ptext " + p.cls }, p.text));
     });
     (o.marken || []).forEach(function(m){
@@ -272,16 +274,16 @@
     };
     if(VMOD === "zeigen"){
       if(strich) teile.push("= " + zp(x) + ' <b class="vsm vziel">' + m + "</b> " + z(Math.abs(y)));
-      teile.push(gl.trim() + " <b>" + (strich ? zp(r) : '<span class="vpm vziel">' + vzc(r) + "</span>" + z(Math.abs(vRund(r)))) + "</b>");
+      teile.push(gl.trim() + ' <b class="verg2">' + (strich ? zp(r) : '<span class="vpm vziel">' + vzc(r) + "</span>" + z(Math.abs(vRund(r)))) + "</b>");
     } else if(VMOD === "vz"){
       if(strich){
         teile.push("= " + zp(x) + " " + slot() + " " + z(Math.abs(y)));
-        if(VS[k] === m) teile.push(gl.trim() + " <b>" + zp(r) + "</b>");
-      } else teile.push(gl.trim() + " " + slot() + z(Math.abs(vRund(r))));
+        if(VS[k] === m) teile.push(gl.trim() + ' <b class="verg2">' + zp(r) + "</b>");
+      } else teile.push(gl.trim() + ' <span class="verg2">' + slot() + z(Math.abs(vRund(r))) + "</span>");
     } else {
       var wert = VE[k] || "";
       if(VZEIG && !wert) wert = zp(vRund(r));
-      teile.push(gl.trim() + ' <input class="vein vziel' + (VZEIG && !VE[k] ? " zeig" : "") + '" autocomplete="off" spellcheck="false" dir="ltr" data-k="' + k + '" data-r="' + r + '" value="' + wert.replace(/"/g, "") + '"' + (VZEIG && !VE[k] ? " readonly" : "") + ">");
+      teile.push(gl.trim() + ' <span class="verg2"><input class="vein vziel' + (VZEIG && !VE[k] ? " zeig" : "") + '" autocomplete="off" spellcheck="false" dir="ltr" data-k="' + k + '" data-r="' + r + '" value="' + wert.replace(/"/g, "") + '"' + (VZEIG && !VE[k] ? " readonly" : "") + "></span>");
     }
     return teile.map(function(s){ return '<span class="vseg">' + s + "</span>"; }).join(" ");
   }
@@ -377,7 +379,7 @@
       inp.value = v; VS[inp.dataset.k] = v;
       if(v === inp.dataset.m){
         inp.classList.add("richtig"); inp.readOnly = true;
-        if(inp.dataset.e && !inp.parentNode.parentNode.querySelector(".verg")){ var sp = document.createElement("span"); sp.className = "vseg verg"; sp.innerHTML = inp.dataset.e.replace(/(\S+)$/, "<b>$1</b>"); inp.parentNode.parentNode.insertBefore(sp, inp.parentNode.nextSibling); }
+        if(inp.dataset.e && !inp.parentNode.parentNode.querySelector(".verg")){ var sp = document.createElement("span"); sp.className = "vseg verg"; sp.innerHTML = inp.dataset.e.replace(/(\S+)$/, '<b class="verg2">$1</b>'); inp.parentNode.parentNode.insertBefore(sp, inp.parentNode.nextSibling); }
         vStand(); requestAnimationFrame(vPfeile);
         if(springen) vsWeiter(inp);
       } else { inp.classList.add("falsch"); vStand(); inp.select(); }
@@ -534,4 +536,20 @@
   }
   window.MS_LANG = { apply: function(l){ if(NT[l]){ lang = l; alles(); } } };
   alles();
+
+  // ---------- Direkte Links ----------
+  // #rechnen, #ueben öffnen den Reiter; #vorzeichen springt zur Karte „Alle Vorzeichen-Varianten“,
+  // #vorzeichen-ansehen / -zusammenfassen / -selbst wählen zusätzlich den Modus.
+  function perLink(){
+    var h = decodeURIComponent((location.hash || "").slice(1)).toLowerCase();
+    if(h === "entdecken") return zeigeTab("entd");
+    if(h === "rechnen") return zeigeTab("rech");
+    if(h === "ueben" || h === "üben") return zeigeTab("ueben");
+    var m = /^vorzeichen(?:-(ansehen|zusammenfassen|selbst))?$/.exec(h); if(!m) return;
+    if(m[1]){ VMOD = m[1] === "ansehen" ? "zeigen" : m[1] === "zusammenfassen" ? "vz" : "selbst"; VZEIG = false; }
+    zeigeTab("rech");
+    setTimeout(function(){ var k = $("vorzeichen"); if(k) k.scrollIntoView({ block: "start" }); }, 60);
+  }
+  window.addEventListener("hashchange", perLink);
+  perLink();
 })();
