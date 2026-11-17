@@ -224,12 +224,17 @@
       var B = bereich(werte, 20); zahlenstrahl(sv, { min: B.min, max: B.max, pfeile: pf, marken: mk });
     });
   }
-  // Alle Vorzeichen-Varianten: gleiche Beträge, vier Vorzeichenpaare × vier Rechenarten
-  // Selbst ausrechnen (optional, Schalter gemerkt): Ergebnisse als Eingabefelder,
-  // Eingaben bleiben bei Sprachwechsel/Neuzeichnen erhalten (VE, Schlüssel „x op y“).
-  var VSELBST = (function(){ try { return localStorage.getItem("msNegSelbst") === "1"; } catch(e){ return false; } })();
-  var VE = {}, VZEIG = false;
+  // Alle Vorzeichen-Varianten: eigene kleine Beträge (Start 3 und 4), vier Vorzeichenpaare × vier Rechenarten.
+  // Markierung: Plus/Minus (blau) – Rechenzeichen + Vorzeichen werden in der Rechnung zu EINEM Zeichen;
+  // Mal/Geteilt (rosa) – Rechenzeichen bleibt, die zwei Vorzeichen ergeben das Vorzeichen des Ergebnisses.
+  // Modi (gemerkt): "zeigen" (ansehen), "vz" (Vorzeichen zusammenfassen per +/−), "selbst" (Ergebnis eintippen).
+  // Eingaben bleiben bei Sprachwechsel/Neuzeichnen erhalten (VE/VS, Schlüssel „x op y“).
+  var VPAARE = [[3, 4], [4, 2], [2, 5], [6, 3], [5, 2], [8, 4], [4, 5], [9, 3], [6, 4], [2, 8]];
+  var VA = 3, VB = 4;
+  var VMOD = (function(){ try { var m = localStorage.getItem("msNegVarModus"); if(m === "zeigen" || m === "vz" || m === "selbst") return m; return localStorage.getItem("msNegSelbst") === "1" ? "selbst" : "zeigen"; } catch(e){ return "zeigen"; } })();
+  var VE = {}, VS = {}, VZEIG = false;
   function vRund(r){ return Math.round(r * 100) / 100; }
+  function vzc(v){ return v < 0 ? "−" : "+"; }
   function vPruefe(inp){
     var r = Number(inp.dataset.r), v = lies(inp.value);
     inp.classList.remove("richtig", "falsch", "zeig");
@@ -239,39 +244,79 @@
     vStand();
   }
   function vStand(){
-    var alle = document.querySelectorAll("#varianten .vein"), n = 0;
-    alle.forEach(function(i){ if(i.classList.contains("richtig")) n++; });
     var st = $("varStand"); if(!st) return;
+    if(VMOD === "zeigen"){ st.textContent = ""; return; }
+    var alle = document.querySelectorAll(VMOD === "selbst" ? "#varianten .vein" : "#varianten .vslot"), n = 0;
+    alle.forEach(function(i){ if(i.classList.contains("richtig")) n++; });
     st.textContent = n === alle.length && n ? t("selbstAlle") : t("selbstStand", { r: n, n: alle.length });
     st.className = "vstand" + (n === alle.length && n ? " gut" : "");
   }
+  // Eine Zeile als HTML-Teile: Aufgabe (markiert), Zwischenschritt/Ergebnis je nach Modus
+  function vZeile(x, op, y, r, ex){
+    var strich = op === "+" || op === "-", k = z(x) + op + z(y), gl = ex ? " ≈ " : " = ";
+    var m = strich ? ((op === "+") === (y > 0) ? "+" : "−") : vzc(r);
+    var auf, teile = [];
+    if(strich){
+      auf = zp(x) + ' <span class="vpaar' + (VMOD === "zeigen" ? " mit" : "") + '" data-m="' + m + '">' + opZ(op) + " (" + vzc(y) + "</span>" + z(Math.abs(y)) + ")";
+    } else {
+      auf = '<span class="vpz">' + vzc(x) + "</span>" + z(Math.abs(x)) + " " + opZ(op) + ' (<span class="vpz">' + vzc(y) + "</span>" + z(Math.abs(y)) + ")";
+    }
+    teile.push(auf);
+    var slot = function(){
+      var g = VS[k];
+      if(g === m) return '<span class="vslot richtig" data-k="' + k + '"><b class="' + (strich ? "vsm" : "vpm") + '">' + m + "</b></span>";
+      if(VZEIG && !g) return '<span class="vslot zeig" data-k="' + k + '"><b>' + m + "</b></span>";
+      return '<span class="vslot' + (g ? " falsch" : "") + '" data-k="' + k + '" data-m="' + m + '">' +
+        '<button type="button" class="vsb' + (g === "+" ? " weg" : "") + '" data-s="+">+</button><button type="button" class="vsb' + (g === "−" ? " weg" : "") + '" data-s="−">−</button></span>';
+    };
+    if(VMOD === "zeigen"){
+      if(strich) teile.push("= " + zp(x) + ' <b class="vsm">' + m + "</b> " + z(Math.abs(y)));
+      teile.push(gl.trim() + " <b>" + (strich ? zp(r) : '<span class="vpm">' + vzc(r) + "</span>" + z(Math.abs(vRund(r)))) + "</b>");
+    } else if(VMOD === "vz"){
+      if(strich){
+        teile.push("= " + zp(x) + " " + slot() + " " + z(Math.abs(y)));
+        if(VS[k] === m) teile.push(gl.trim() + " <b>" + zp(r) + "</b>");
+      } else teile.push(gl.trim() + " " + slot() + z(Math.abs(vRund(r))));
+    } else {
+      var wert = VE[k] || "";
+      if(VZEIG && !wert) wert = zp(vRund(r));
+      teile.push(gl.trim() + ' <input class="vein' + (VZEIG && !VE[k] ? " zeig" : "") + '" autocomplete="off" spellcheck="false" dir="ltr" data-k="' + k + '" data-r="' + r + '" value="' + wert.replace(/"/g, "") + '"' + (VZEIG && !VE[k] ? " readonly" : "") + ">");
+    }
+    return teile.map(function(s){ return '<span class="vseg">' + s + "</span>"; }).join(" ");
+  }
   function varianten(){
     var a = lies($("ra").value), b = lies($("rb").value), tb = $("varianten");
-    if(!isFinite(a) || !isFinite(b)){ tb.innerHTML = ""; return; }
-    var A = Math.abs(a), B = Math.abs(b);
+    var A = VA, B = VB;
     $("varH").innerHTML = t("varH", { a: "<b>" + bdi(z(A)) + "</b>", b: "<b>" + bdi(z(B)) + "</b>" });
-    $("varSelbstTxt").textContent = t("selbst"); $("varSelbst").checked = VSELBST;
-    $("varSelbstLeiste").hidden = !VSELBST; $("varSelbstH").textContent = t("selbstH");
+    document.querySelectorAll("#varModus button").forEach(function(bt){
+      var mm = bt.dataset.m; bt.textContent = mm === "zeigen" ? t("modAnsehen") : mm === "vz" ? t("modVz") : t("selbst");
+      bt.setAttribute("aria-pressed", mm === VMOD ? "true" : "false");
+    });
+    $("varSelbstH").textContent = VMOD === "selbst" ? t("selbstH") : VMOD === "vz" ? t("vzH") : "";
+    $("varSelbstH").hidden = VMOD === "zeigen"; $("varStand").hidden = VMOD === "zeigen";
+    $("varLoes").hidden = VMOD === "zeigen";
     $("varLoes").textContent = VZEIG ? t("selbstVerbergen") : t("selbstLoes"); $("varNeu").textContent = t("neuesBsp");
+    $("varLegS").textContent = t("legS"); $("varLegP").textContent = t("legP");
     var paare = [[A, B], [A, -B], [-A, B], [-A, -B]], h = "";
     [["+", "regelPlus"], ["-", "regelMinus"], ["*", "regelMal"], [":", "regelGeteilt"]].forEach(function(o){
       var op = o[0];
-      h += '<div class="vbox"><div class="vkopf">' + opZ(op) + "</div>";
+      h += '<div class="vbox ' + (op === "+" || op === "-" ? "strich" : "punkt") + '"><div class="vkopf">' + opZ(op) + "</div>";
       paare.forEach(function(p){
         var x = p[0], y = p[1], r = rechne(x, op, y), ex = isFinite(r) && Math.abs(r * 100 - Math.round(r * 100)) > 1e-9, an = x === a && y === b;
-        if(VSELBST && isFinite(r)){
-          var k = z(x) + op + z(y), wert = VE[k] || "";
-          if(VZEIG && !wert) wert = zp(vRund(r));
-          h += '<div class="vzeile vselbst' + (an ? " an" : "") + '">' + bdi(zp(x) + " " + opZ(op) + " " + zkp(y) + (ex ? " ≈ " : " = ")) +
-            '<input class="vein' + (VZEIG && !VE[k] ? " zeig" : "") + '" autocomplete="off" spellcheck="false" dir="ltr" data-k="' + k + '" data-r="' + r + '" value="' + wert.replace(/"/g, "") + '"' + (VZEIG && !VE[k] ? " readonly" : "") + "></div>";
-        } else {
-          h += '<button type="button" class="vzeile' + (an ? " an" : "") + '" data-a="' + x + '" data-b="' + y + '">' + bdi(zp(x) + " " + opZ(op) + " " + zkp(y) + (isFinite(r) ? (ex ? " ≈ " : " = ") + "<b>" + zp(r) + "</b>" : " = –")) + "</button>";
-        }
+        var inhalt = vZeile(x, op, y, r, ex);
+        if(VMOD === "zeigen") h += '<button type="button" dir="ltr" class="vzeile mitm' + (an ? " an" : "") + '" data-a="' + x + '" data-b="' + y + '">' + inhalt + "</button>";
+        else h += '<div dir="ltr" class="vzeile vselbst' + (an ? " an" : "") + '">' + inhalt + "</div>";
       });
       h += "</div>";
     });
-    tb.innerHTML = h; tb.classList.toggle("selbst", VSELBST);
+    tb.innerHTML = h; tb.classList.toggle("selbst", VMOD !== "zeigen");
     tb.querySelectorAll("button.vzeile").forEach(function(z1){ z1.addEventListener("click", function(){ $("ra").value = z(Number(z1.dataset.a)).replace("−", "-"); $("rb").value = z(Number(z1.dataset.b)).replace("−", "-"); rechnen(); $("tVier").scrollIntoView({ behavior: "smooth", block: "start" }); }); });
+    tb.querySelectorAll(".vsb").forEach(function(bt){ bt.addEventListener("click", function(){
+      var sl = bt.parentNode; VS[sl.dataset.k] = bt.dataset.s; varianten();
+      var neu = document.querySelector('#varianten .vslot[data-k="' + sl.dataset.k + '"]');
+      if(neu && neu.classList.contains("richtig")){ var nx = document.querySelector("#varianten .vslot:not(.richtig):not(.zeig) .vsb"); if(nx) nx.focus({ preventScroll: true }); }
+      else if(neu){ var f = neu.querySelector(".vsb:not(.weg)"); if(f) f.focus({ preventScroll: true }); }
+    }); });
     var ins = Array.prototype.slice.call(tb.querySelectorAll(".vein"));
     ins.forEach(function(inp, i){
       if(VE[inp.dataset.k]) vPruefe(inp);
@@ -286,13 +331,16 @@
     vStand();
     $("varMerk").textContent = t("varMerk");
   }
-  $("varSelbst").addEventListener("change", function(){
-    VSELBST = this.checked; VZEIG = false;
-    try { localStorage.setItem("msNegSelbst", VSELBST ? "1" : "0"); } catch(e){}
+  document.querySelectorAll("#varModus button").forEach(function(bt){ bt.addEventListener("click", function(){
+    VMOD = bt.dataset.m; VZEIG = false;
+    try { localStorage.setItem("msNegVarModus", VMOD); } catch(e){}
     varianten();
-  });
+  }); });
   $("varLoes").addEventListener("click", function(){ VZEIG = !VZEIG; varianten(); });
-  $("varNeu").addEventListener("click", function(){ VE = {}; VZEIG = false; $("neuesBsp").click(); });
+  $("varNeu").addEventListener("click", function(){
+    var p; do { p = VPAARE[zuf(0, VPAARE.length - 1)]; } while(p[0] === VA && p[1] === VB);
+    VA = p[0]; VB = p[1]; VE = {}; VS = {}; VZEIG = false; varianten();
+  });
   $("neuesBsp").addEventListener("click", function(){
     var b, q, a;
     do { b = zuf(-9, 9); q = zuf(-9, 9); } while(!b || !q || Math.abs(b) === 1 || Math.abs(q) === 1 || (b > 0 && q > 0));
