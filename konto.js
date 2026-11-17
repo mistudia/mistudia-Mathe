@@ -45,6 +45,17 @@
   function fmtCode(c){ return c.slice(0, 4) + "-" + c.slice(4); }
   function meinCode(){ return normCode(ls(CODE)); }
   function codeWeg(){ try { localStorage.removeItem(CODE); } catch(e){} ls("msMathDogTag", ""); }
+  // Android-App (Google Play, TWA): Chrome meldet beim Start den Referrer
+  // „android-app://<paket>“. Wir merken uns das für die Sitzung (sessionStorage,
+  // nicht localStorage – Chrome und App teilen sich den Speicher der Seite).
+  // In der App gibt es nur die Kopplung per Code, keine E-Mail-Anmeldung
+  // (Kinderschutz: keine E-Mail-Adressen von Kindern über die App).
+  var IST_APP = (function(){
+    try {
+      if(/^android-app:\/\//.test(document.referrer || "")) sessionStorage.setItem("msMathApp", "1");
+      return sessionStorage.getItem("msMathApp") === "1";
+    } catch(e){ return /^android-app:\/\//.test(document.referrer || ""); }
+  })();
   function hatSitzung(){ var v = ls(TOKEN); return !!v && v.indexOf("access_token") >= 0; }
 
   // ---- Supabase nur bei Bedarf laden ----
@@ -158,12 +169,12 @@
         '<form class="msk-form" data-code autocomplete="off"><input name="code" required autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="' + esc(tx("code")) + '" value="' + esc(letzterCode) + '" style="text-transform:uppercase;letter-spacing:1px">' +
         '<button class="msk-btn" type="submit">' + esc(tx("koppeln")) + "</button></form>" +
         (codeMeldung ? '<p class="msk-err">' + esc(codeMeldung) + "</p>" : "") +
-        '<details class="msk-mail"' + (meldung ? " open" : "") + "><summary>" + esc(tx("oderMail")) + "</summary>" +
+        (IST_APP ? "" : '<details class="msk-mail"' + (meldung ? " open" : "") + "><summary>" + esc(tx("oderMail")) + "</summary>" +
         '<form class="msk-form" data-mail autocomplete="on"><input type="email" name="email" autocomplete="username" required placeholder="' + esc(tx("mail")) + '" value="' + esc(letzteMail) + '">' +
         '<input type="password" name="password" autocomplete="current-password" required placeholder="' + esc(tx("pw")) + '">' +
         '<button class="msk-btn" type="submit">' + esc(tx("login")) + "</button></form>" +
         (meldung ? '<p class="msk-err">' + esc(meldung) + "</p>" : "") +
-        '<p><a href="' + VB + '" target="_blank" rel="noopener">' + esc(tx("neu")) + "</a></p></details>";
+        '<p><a href="' + VB + '" target="_blank" rel="noopener">' + esc(tx("neu")) + "</a></p></details>");
     } else {
       var mail = ""; try { mail = JSON.parse(ls(TOKEN)).user.email || ""; } catch(e){}
       h += "<p>" + esc(tx("als", { m: mail })) + "</p>";
@@ -237,6 +248,7 @@
     if(document.body) setTimeout(zeig, 300); else document.addEventListener("DOMContentLoaded", function(){ setTimeout(zeig, 300); });
   })();
   window.MS_KONTO = {
+    istApp: IST_APP,
     box: function(el){ var neu = el !== boxEl; boxEl = el; if(neu) laden(); else zeichne(); },
     richtig: richtig
   };
