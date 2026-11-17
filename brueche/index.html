@@ -586,6 +586,16 @@ main.drei .schritt{width:108px;font-size:16px;}
 main.drei #plus,main.drei #minus,main.drei #mal,main.drei #geteilt{width:74px;}
 main.drei .rechnung{gap:4px;}
 main.drei .op{margin:0 2px;}
+/* Handy: Rechenzeilen umbrechen statt über den Rand laufen – „=“ bleibt
+   immer mit seinem Eingabefeld zusammen (.paar) */
+.paar{display:inline-flex;align-items:center;white-space:nowrap;}
+@media (max-width:900px){
+  .aufgabe{grid-template-columns:1fr;gap:6px;margin:14px 0;}
+  .art{width:auto;}
+  .rechnung,main.drei .rechnung{flex-wrap:wrap;white-space:normal;row-gap:10px;column-gap:4px;}
+  .op,main.drei .op{margin:0 4px;}
+  .schritt,main.drei .schritt{width:118px;font-size:16px;}
+}
 </style>
 <link rel="icon" type="image/png" href="/icons/favicon-32.png">
 
@@ -665,12 +675,12 @@ main.drei .op{margin:0 2px;}
     <div class="art" id="txtMul">Multiplikation</div>
     <div class="rechnung">
         <span id="malText"></span>
-        <span class="op">=</span>
-        <input class="schritt" id="mal1">
-        <span class="op">=</span>
-        <input class="schritt" id="mal2">
-        <span class="op">=</span>
-        <input id="mal">
+        <span class="paar"><span class="op">=</span>
+        <input class="schritt" id="mal1"></span>
+        <span class="paar"><span class="op">=</span>
+        <input class="schritt" id="mal2"></span>
+        <span class="paar"><span class="op">=</span>
+        <input id="mal"></span>
     </div>
 </div>
 
@@ -678,12 +688,12 @@ main.drei .op{margin:0 2px;}
     <div class="art" id="txtDiv">Division</div>
     <div class="rechnung">
         <span id="geteiltText"></span>
-        <span class="op">=</span>
-        <input class="schritt" id="geteilt1">
-        <span class="op">=</span>
-        <input class="schritt" id="geteilt2">
-        <span class="op">=</span>
-        <input id="geteilt">
+        <span class="paar"><span class="op">=</span>
+        <input class="schritt" id="geteilt1"></span>
+        <span class="paar"><span class="op">=</span>
+        <input class="schritt" id="geteilt2"></span>
+        <span class="paar"><span class="op">=</span>
+        <input id="geteilt"></span>
     </div>
 </div>
 
@@ -691,12 +701,12 @@ main.drei .op{margin:0 2px;}
     <div class="art" id="txtAdd">Addition</div>
     <div class="rechnung">
         <span id="plusText"></span>
-        <span class="op">=</span>
-        <input class="schritt" id="plus1">
-        <span class="op">=</span>
-        <input class="schritt" id="plus2">
-        <span class="op">=</span>
-        <input id="plus">
+        <span class="paar"><span class="op">=</span>
+        <input class="schritt" id="plus1"></span>
+        <span class="paar"><span class="op">=</span>
+        <input class="schritt" id="plus2"></span>
+        <span class="paar"><span class="op">=</span>
+        <input id="plus"></span>
     </div>
 </div>
 
@@ -704,12 +714,12 @@ main.drei .op{margin:0 2px;}
     <div class="art" id="txtSub">Subtraktion</div>
     <div class="rechnung">
         <span id="minusText"></span>
-        <span class="op">=</span>
-        <input class="schritt" id="minus1">
-        <span class="op">=</span>
-        <input class="schritt" id="minus2">
-        <span class="op">=</span>
-        <input id="minus">
+        <span class="paar"><span class="op">=</span>
+        <input class="schritt" id="minus1"></span>
+        <span class="paar"><span class="op">=</span>
+        <input class="schritt" id="minus2"></span>
+        <span class="paar"><span class="op">=</span>
+        <input id="minus"></span>
     </div>
 </div>
 
