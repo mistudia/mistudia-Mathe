@@ -1721,8 +1721,10 @@ function antwortPruefen(){
 
     const korrekt = !isNaN(wert) && wert === auf.ergebnis;
 
-    if(korrekt)
+    if(korrekt){
         richtigCount++;
+        if(window.msRichtig) window.msRichtig();   // VocabBoss-Konto: Dogdex-Karte für heute
+    }
 
     eingabe.style.background = korrekt ? "#2e7d32" : "#c62828";
     eingabe.style.color = "#ffffff";

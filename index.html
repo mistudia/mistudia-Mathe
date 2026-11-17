@@ -126,12 +126,14 @@
   <p class="treffer-info" id="trefferInfo" hidden></p>
   <nav class="grid" id="treffer" hidden></nav>
   <div id="stufen"></div>
+  <div id="konto"></div>
   <footer>
     <a id="privacy" href="/privacy.html">Datenschutz</a> ·
     <a id="imprint" href="https://mistudia.com/impressum" target="_blank" rel="noopener">Impressum</a> ·
     <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a>
   </footer>
 </main>
+<script src="/konto.js"></script>
 <script src="/suchindex.js" defer></script>
 <script>
 var APPS = [
@@ -307,6 +309,8 @@ function render(){
   document.getElementById("sub").textContent = u.sub;
   document.getElementById("privacy").textContent = u.privacy;
   document.getElementById("imprint").textContent = u.imprint;
+  window.MS_MATH_LANG = lang;
+  if(window.MS_KONTO) MS_KONTO.box(document.getElementById("konto"));
   document.querySelectorAll(".langs button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.l === lang ? "true" : "false"); });
   document.getElementById("suche").placeholder = u.such; document.getElementById("suche").setAttribute("aria-label", u.such);
   stufenZeichnen(); suchen();
