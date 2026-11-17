@@ -136,11 +136,19 @@
     $("alpha").value = alpha; if(document.activeElement !== $("alphaZ")) $("alphaZ").value = alpha;
     var w = alpha * GRAD, s = Math.sin(w), c = Math.cos(w);
     var ex = function(fn){ var e = exakt(fn, alpha); return e ? '<small>' + t("genau", { e: bdi(e) }) + "</small>" : ""; };
+    // Bruch: Wortbruch (Gegenkathete : Hypotenuse …) und Zahlenbruch; Hypotenuse = Radius = 1
+    var br = function(z, n){ return '<span class="tbr"><span>' + z + "</span><span>" + n + "</span></span>"; };
+    var bruchZ = function(fn){
+      var g = '<span class="c-sin">' + t("gk") + "</span>", an = '<span class="c-cos">' + t("ak") + "</span>", h = t("hyp");
+      if(fn === "sin") return '<span class="tbz">= ' + br(g, h) + " = " + br(bdi(zf(s, 3)), "1") + "</span>";
+      if(fn === "cos") return '<span class="tbz">= ' + br(an, h) + " = " + br(bdi(zf(c, 3)), "1") + "</span>";
+      return '<span class="tbz">= ' + br(g, an) + " = " + br('<span class="c-sin">' + bdi(zf(s, 3)) + "</span>", '<span class="c-cos">' + bdi(zf(c, 3)) + "</span>") + "</span>";
+    };
     $("werte").innerHTML =
       "<div>α = <b>" + bdi(alpha + "°") + "</b><small>" + t("bogen") + ": " + bdi(bogen(alpha)) + "</small></div>" +
-      '<div><span class="c-sin">sin α</span> = <b>' + bdi(zf(s, 3)) + "</b>" + ex("sin") + "</div>" +
-      '<div><span class="c-cos">cos α</span> = <b>' + bdi(zf(c, 3)) + "</b>" + ex("cos") + "</div>" +
-      '<div><span class="c-tan">tan α</span> = <b>' + (tanDef(alpha) ? bdi(zf(Math.tan(w), 3)) : t("nd")) + "</b>" + (tanDef(alpha) ? ex("tan") : "") + "</div>";
+      '<div><span class="c-sin">sin α</span> = <b>' + bdi(zf(s, 3)) + "</b>" + bruchZ("sin") + ex("sin") + "</div>" +
+      '<div><span class="c-cos">cos α</span> = <b>' + bdi(zf(c, 3)) + "</b>" + bruchZ("cos") + ex("cos") + "</div>" +
+      '<div><span class="c-tan">tan α</span> = <b>' + (tanDef(alpha) ? bdi(zf(Math.tan(w), 3)) : t("nd")) + "</b>" + bruchZ("tan") + (tanDef(alpha) ? ex("tan") : "") + "</div>";
     var q = alpha === 0 || alpha === 360 || alpha % 90 === 0 ? 0 : Math.floor(alpha / 90) + 1;
     var vz = function(v){ return Math.abs(v) < 1e-9 ? "0" : t(v > 0 ? "pos" : "neg"); };
     $("quadrant").innerHTML = q ? t("quad", { q: ["I", "II", "III", "IV"][q - 1], s: vz(s), c: vz(c), t: vz(Math.tan(w)) }) : t("aufAchse");
