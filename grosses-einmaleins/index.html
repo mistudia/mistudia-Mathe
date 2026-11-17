@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     grosses-einmaleins/index.html – Großes Einmaleins (11 bis 20): Tabelle mit Rechenwegen, Tricks, Üben. Logik: app.js, Texte: texte.js (9 Sprachen).
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Großes Einmaleins</title>
+<!-- SEO -->
+<meta name="description" content="11 bis 20: Tabelle mit Rechenwegen, Tricks und Üben – Klasse 4–6. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<link rel="alternate" hreflang="de" href="https://math.mistudia.com/grosses-einmaleins/?lang=de">
+<link rel="alternate" hreflang="en" href="https://math.mistudia.com/grosses-einmaleins/?lang=en">
+<link rel="alternate" hreflang="es" href="https://math.mistudia.com/grosses-einmaleins/?lang=es">
+<link rel="alternate" hreflang="zh" href="https://math.mistudia.com/grosses-einmaleins/?lang=zh">
+<link rel="alternate" hreflang="fr" href="https://math.mistudia.com/grosses-einmaleins/?lang=fr">
+<link rel="alternate" hreflang="ru" href="https://math.mistudia.com/grosses-einmaleins/?lang=ru">
+<link rel="alternate" hreflang="ar" href="https://math.mistudia.com/grosses-einmaleins/?lang=ar">
+<link rel="alternate" hreflang="ja" href="https://math.mistudia.com/grosses-einmaleins/?lang=ja">
+<link rel="alternate" hreflang="pt" href="https://math.mistudia.com/grosses-einmaleins/?lang=pt">
+<link rel="alternate" hreflang="x-default" href="https://math.mistudia.com/grosses-einmaleins/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="miStudia Mathe">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Großes Einmaleins – miStudia Mathe">
+<meta property="og:description" content="11 bis 20: Tabelle mit Rechenwegen, Tricks und Üben – Klasse 4–6. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<meta property="og:url" content="https://math.mistudia.com/grosses-einmaleins/">
+<meta property="og:image" content="https://math.mistudia.com/icons/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<script>var MS_SEO = {"de":["Großes Einmaleins – miStudia Mathe","11 bis 20: Tabelle mit Rechenwegen, Tricks und Üben – Klasse 4–6. Kostenlos üben mit miStudia, in 9 Sprachen."],"en":["Big Times Tables – miStudia Mathe","11 to 20: table with worked steps, tricks and practice – Grade 4–6. Free practice with miStudia, in 9 languages."],"es":["Tablas grandes – miStudia Mathe","Del 11 al 20: tabla con cálculos, trucos y práctica – Curso 4–6. Practica gratis con miStudia, en 9 idiomas."],"zh":["大乘法表 – miStudia Mathe","11 到 20：带算法的表格、技巧和练习 – 4–6年级. 用 miStudia 免费练习，支持 9 种语言。"],"fr":["Grandes tables de multiplication – miStudia Mathe","De 11 à 20 : tableau avec calculs, astuces et exercices – CM1–6e. S’entraîner gratuitement avec miStudia, en 9 langues."],"ru":["Большая таблица умножения – miStudia Mathe","От 11 до 20: таблица с решениями, приёмы и тренировка – 4–6 класс. Бесплатные упражнения с miStudia на 9 языках."],"ar":["جدول الضرب الكبير – miStudia Mathe","من 11 إلى 20: جدول بطرق الحساب وحيل وتمارين – الصف 4–6. تدرّب مجانًا مع miStudia بتسع لغات."],"ja":["大きなかけ算 – miStudia Mathe","11〜20：計算のしかた付きの表、コツ、練習 – 4〜6年生. miStudia で無料練習（9か国語）。"],"pt":["Tabuada grande – miStudia Mathe","De 11 a 20: tabela com cálculos, truques e prática – 4º–6º ano. Pratique grátis com o miStudia, em 9 idiomas."]};</script>
+<script src="/sprache-url.js"></script>
+<!-- /SEO -->
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 19px; margin: 4px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  .reihe label { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; max-width: 100%; }
+  input.zahl { width: 180px; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; font-variant-numeric: tabular-nums; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .knopf:disabled { opacity: 0.5; cursor: default; }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; margin: 8px 0; }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .fehler { color: var(--schlecht); font-weight: 700; }
+  /* Tabelle 11–20 */
+  .tabwrap { overflow-x: auto; max-width: 100%; }
+  table.tab { border-collapse: separate; border-spacing: 3px; margin: 6px auto; direction: ltr; font-variant-numeric: tabular-nums; }
+  table.tab th { font: 800 15px system-ui, sans-serif; color: var(--blue); padding: 4px; min-width: 34px; }
+  table.tab td { padding: 0; }
+  table.tab button.z { width: 52px; height: 38px; font: 700 15px system-ui, sans-serif; border: 2px solid #b0b0b8; border-radius: 8px; background: #ffffff; color: var(--text); cursor: pointer; padding: 0; }
+  table.tab button.z:hover { border-color: var(--blue); background: #eef5ff; }
+  table.tab button.z.quad { background: #fef3c7; border-color: #d97706; }
+  table.tab button.z.an { background: var(--blue); border-color: var(--blue); color: #ffffff; }
+  .trick { margin: 6px 0; padding-inline-start: 22px; font-size: 16px; line-height: 1.55; color: #7c2d12; }
+  .tricks { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
+  .qliste { display: flex; flex-wrap: wrap; gap: 6px; }
+  .qz { font: 700 16px system-ui, sans-serif; background: #fef3c7; border: 2px solid #d97706; border-radius: 999px; padding: 4px 10px; color: #78350f; }
+  .chips { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+  .chip { font: 700 15px system-ui, sans-serif; padding: 6px 11px; border-radius: 999px; border: 2px solid #b0b0b8; background: #ffffff; color: var(--text); cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #ffffff; }
+  #auftrag { font-size: 30px; font-weight: 800; }
+  input.zahl.richtig { border-color: #16a34a; background: #dcfce7; } input.zahl.falsch { border-color: #dc2626; background: #fee2e2; }
+  /* Üben */
+  .auftrag { font-size: 20px; line-height: 1.5; margin: 4px 0 10px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  .lauf { font-size: 17px; line-height: 1.6; margin: 6px 0; padding-inline-start: 22px; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .tabs button { padding: 8px 12px; font-size: 14px; }
+    .regeln { grid-template-columns: 1fr; }
+    .sieb button { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Großes Einmaleins</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="tabelle" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="tricks" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+  <section id="s_tabelle">
+    <div class="karte">
+      <p class="zeile" id="tabIntro"></p>
+      <div class="tabwrap" id="tabelle"></div>
+      <div id="tabWeg"></div>
+    </div>
+  </section>
+  <section id="s_tricks" hidden>
+    <div class="tricks" id="tricks"></div>
+  </section>
+  <section id="s_ueben" hidden>
+    <div class="karte" id="einst"></div>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <p class="auftrag" id="auftrag"></p>
+      <div class="antwortzeile"><input class="zahl" id="uAntwort" inputmode="numeric" autocomplete="off" aria-label="="><button type="button" class="knopf" id="pruefen"></button></div>
+      <p class="meldung" id="meldung"></p>
+      <div id="uWeg" hidden></div>
+      <p><button type="button" class="knopf hell" id="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>

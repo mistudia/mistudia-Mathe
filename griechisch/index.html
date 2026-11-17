@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     griechisch/index.html – Griechisches Alphabet: 24 Buchstaben mit Namen (9 Sprachen) und Bedeutung in Mathe/Physik, Üben.
+     Logik: app.js, Daten/Texte: texte.js.
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Griechisches Alphabet</title>
+<!-- SEO -->
+<meta name="description" content="Alle 24 Buchstaben mit Namen und Bedeutung in Mathe und Physik – Klasse 7–13. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<link rel="alternate" hreflang="de" href="https://math.mistudia.com/griechisch/?lang=de">
+<link rel="alternate" hreflang="en" href="https://math.mistudia.com/griechisch/?lang=en">
+<link rel="alternate" hreflang="es" href="https://math.mistudia.com/griechisch/?lang=es">
+<link rel="alternate" hreflang="zh" href="https://math.mistudia.com/griechisch/?lang=zh">
+<link rel="alternate" hreflang="fr" href="https://math.mistudia.com/griechisch/?lang=fr">
+<link rel="alternate" hreflang="ru" href="https://math.mistudia.com/griechisch/?lang=ru">
+<link rel="alternate" hreflang="ar" href="https://math.mistudia.com/griechisch/?lang=ar">
+<link rel="alternate" hreflang="ja" href="https://math.mistudia.com/griechisch/?lang=ja">
+<link rel="alternate" hreflang="pt" href="https://math.mistudia.com/griechisch/?lang=pt">
+<link rel="alternate" hreflang="x-default" href="https://math.mistudia.com/griechisch/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="miStudia Mathe">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Griechisches Alphabet – miStudia Mathe">
+<meta property="og:description" content="Alle 24 Buchstaben mit Namen und Bedeutung in Mathe und Physik – Klasse 7–13. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<meta property="og:url" content="https://math.mistudia.com/griechisch/">
+<meta property="og:image" content="https://math.mistudia.com/icons/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<script>var MS_SEO = {"de":["Griechisches Alphabet – miStudia Mathe","Alle 24 Buchstaben mit Namen und Bedeutung in Mathe und Physik – Klasse 7–13. Kostenlos üben mit miStudia, in 9 Sprachen."],"en":["Greek Alphabet – miStudia Mathe","All 24 letters with names and meaning in maths and physics – Grade 7–13. Free practice with miStudia, in 9 languages."],"es":["Alfabeto griego – miStudia Mathe","Las 24 letras con su nombre y su uso en matemáticas y física – Curso 7–13. Practica gratis con miStudia, en 9 idiomas."],"zh":["希腊字母 – miStudia Mathe","全部 24 个字母：名称及其在数学和物理中的含义 – 7–13年级. 用 miStudia 免费练习，支持 9 种语言。"],"fr":["Alphabet grec – miStudia Mathe","Les 24 lettres avec leur nom et leur sens en maths et physique – 5e–Terminale. S’entraîner gratuitement avec miStudia, en 9 langues."],"ru":["Греческий алфавит – miStudia Mathe","Все 24 буквы с названиями и значением в математике и физике – 7–11 класс. Бесплатные упражнения с miStudia на 9 языках."],"ar":["الأبجدية اليونانية – miStudia Mathe","الحروف الـ24 بأسمائها ومعانيها في الرياضيات والفيزياء – الصف 7–12. تدرّب مجانًا مع miStudia بتسع لغات."],"ja":["ギリシャ文字 – miStudia Mathe","24 文字の名前と、数学・物理での意味 – 中1〜高3. miStudia で無料練習（9か国語）。"],"pt":["Alfabeto grego – miStudia Mathe","As 24 letras com nome e significado em matemática e física – 7º–12º ano. Pratique grátis com o miStudia, em 9 idiomas."]};</script>
+<script src="/sprache-url.js"></script>
+<!-- /SEO -->
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 19px; margin: 4px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  .reihe label { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; max-width: 100%; }
+  input.zahl { width: 180px; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; font-variant-numeric: tabular-nums; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .knopf:disabled { opacity: 0.5; cursor: default; }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; margin: 8px 0; }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .fehler { color: var(--schlecht); font-weight: 700; }
+  /* Alphabet */
+  .grossbox { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; border: 2px solid #c9dcf2; border-radius: 14px; padding: 10px 14px; margin: 8px 0 12px; background: #f4f8ff; }
+  .gg { font: 700 64px/1.1 "Times New Roman", "Cambria", serif; color: var(--blue); }
+  .gg .neben { font-size: 40px; color: #6d28d9; }
+  .ggn { font-size: 24px; font-weight: 800; }
+  .ggb { flex-basis: 100%; font-size: 16px; line-height: 1.45; }
+  .karten { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .gk { display: flex; flex-direction: column; align-items: center; gap: 2px; border: 2px solid #b0b0b8; border-radius: 12px; background: #ffffff; color: var(--text); padding: 8px 6px; cursor: pointer; font: inherit; text-align: center; }
+  .gk:hover { border-color: var(--blue); }
+  .gk.an { border-color: var(--blue); background: #eef5ff; }
+  .gz { font: 700 34px/1.15 "Times New Roman", "Cambria", serif; color: var(--blue); }
+  .gz small { font-size: 24px; color: #6d28d9; }
+  .gn { font-weight: 800; font-size: 16px; }
+  .gb { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+  /* Üben */
+  .chip { font: 700 15px system-ui, sans-serif; padding: 6px 11px; border-radius: 999px; border: 2px solid #b0b0b8; background: #ffffff; color: var(--text); cursor: pointer; margin: 2px; }
+  .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #ffffff; }
+  #frage { font-size: 21px; font-weight: 800; margin: 4px 0 6px; }
+  #fzeichen { font: 700 80px/1.1 "Times New Roman", "Cambria", serif; color: var(--blue); text-align: center; margin: 4px 0 10px; }
+  .optionen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .opt { font: 700 18px system-ui, sans-serif; padding: 12px 10px; border-radius: 12px; border: 2px solid #b0b0b8; background: #ffffff; color: var(--text); cursor: pointer; min-height: 52px; overflow-wrap: anywhere; }
+  .opt.gr { font: 700 34px/1 "Times New Roman", "Cambria", serif; }
+  .opt:hover:not(:disabled) { border-color: var(--blue); background: #eef5ff; }
+  .opt.richtig { border-color: #16a34a; background: #dcfce7; color: #14532d; }
+  .opt.falsch { border-color: #dc2626; background: #fee2e2; color: #7f1d1d; }
+  .opt:disabled { cursor: default; }
+  /* Üben */
+  .auftrag { font-size: 20px; line-height: 1.5; margin: 4px 0 10px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  .lauf { font-size: 17px; line-height: 1.6; margin: 6px 0; padding-inline-start: 22px; }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .tabs button { padding: 8px 12px; font-size: 14px; }
+    .regeln { grid-template-columns: 1fr; }
+    .sieb button { font-size: 13px; }
+  }
+  @media (max-width: 600px) { .karten { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); } .gz { font-size: 28px; } .gg { font-size: 52px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Griechisches Alphabet</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="alpha" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+  <section id="s_alpha">
+    <div class="karte">
+      <p class="zeile" id="intro"></p>
+      <div class="grossbox" id="gross"></div>
+      <div class="karten" id="karten"></div>
+    </div>
+  </section>
+  <section id="s_ueben" hidden>
+    <div class="karte"><div id="arten"></div></div>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <p id="frage"></p>
+      <div id="fzeichen"></div>
+      <div class="optionen" id="optionen"></div>
+      <p class="meldung" id="meldung"></p>
+      <p><button type="button" class="knopf hell" id="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>

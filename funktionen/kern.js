@@ -514,6 +514,14 @@ var FK = (function(){
     this.inhalt.appendChild(E("circle", { cx: px, cy: py, r: 6, fill: "#fff", stroke: farbe, "stroke-width": 3 }));
     if(label) this.inhalt.appendChild(E("text", { x: px, y: py - 16, fill: farbe, "font-size": 13, "font-weight": 700, "font-family": "system-ui, sans-serif", "text-anchor": "middle", "dominant-baseline": "middle", "paint-order": "stroke", stroke: "#fff", "stroke-width": 4, direction: "ltr", "unicode-bidi": "embed" }, label));
   };
+  // Rechter Winkel bei (x, y) zwischen den Richtungen zu (ax, ay) und (bx, by): Bogen mit Punkt (Bildschirmmaße)
+  Graph.prototype.rechterWinkel = function(x, y, ax, ay, bx, by, farbe){
+    var px = this.X(x), py = this.Y(y), A = [this.X(ax) - px, this.Y(ay) - py], B = [this.X(bx) - px, this.Y(by) - py];
+    var la = Math.hypot(A[0], A[1]), lb = Math.hypot(B[0], B[1]); if(la < 16 || lb < 16) return;
+    var r = Math.min(12, la * 0.4, lb * 0.4), u = [A[0] / la, A[1] / la], v = [B[0] / lb, B[1] / lb], sw = (u[0] * v[1] - u[1] * v[0]) > 0 ? 1 : 0;
+    this.inhalt.appendChild(E("path", { d: "M" + (px + u[0] * r) + " " + (py + u[1] * r) + " A" + r + " " + r + " 0 0 " + sw + " " + (px + v[0] * r) + " " + (py + v[1] * r), fill: "none", stroke: farbe || "#1a2233", "stroke-width": 1.6 }));
+    this.inhalt.appendChild(E("circle", { cx: px + (u[0] + v[0]) * r * 0.36, cy: py + (u[1] + v[1]) * r * 0.36, r: 1.7, fill: farbe || "#1a2233" }));
+  };
   Graph.prototype.polygon = function(pts, fuell, rand){
     var self = this;
     this.inhalt.appendChild(E("polygon", { points: pts.map(function(p){ return self.X(p[0]).toFixed(1) + "," + self.Y(p[1]).toFixed(1); }).join(" "), fill: fuell, stroke: rand || "none", "stroke-width": 2 }));

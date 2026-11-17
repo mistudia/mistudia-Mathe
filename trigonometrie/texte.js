@@ -181,3 +181,5 @@ pt: {
   eingabe: "Resposta", pruefen: "Verificar", weiter: "Próximo exercício", richtig: "Certo!", falsch: "Não está certo. A resposta é: {l}", punkte: "{p} de {n} certas", vorzeichen: "Trocar o sinal"
 }
 };
+// Ergänzung: Titel im Einheitskreis
+(function(){ var X = {"de": "Einheitskreis (r = 1)", "en": "Unit circle (r = 1)", "es": "Circunferencia unidad (r = 1)", "zh": "单位圆（r = 1）", "fr": "Cercle trigonométrique (r = 1)", "ru": "Единичная окружность (r = 1)", "ar": "دائرة الوحدة (r = 1)", "ja": "単位円（r = 1）", "pt": "Círculo trigonométrico (r = 1)"}; for(var l in X) if(TG[l]) TG[l].ekTitel = X[l]; })();

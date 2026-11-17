@@ -185,5 +185,42 @@ var MS_F = (function(){
     ".msf-w{display:inline-flex;align-items:stretch;white-space:nowrap;vertical-align:middle}.msf-wz{font-size:1.2em;line-height:1;margin-right:-.06em;align-self:center}" +
     ".msf-wi{border-top:1.6px solid currentColor;padding:2px .15em 0;margin-top:.12em;line-height:1.25}";
   document.head.appendChild(css);
+  // ---------- global: jede „√“ im Seitentext bekommt einen Wurzelstrich über den ganzen Radikanden ----------
+  // (auch für Texte, die Kacheln selbst setzen, und für künftige Kacheln). Nicht in SVG/Canvas, Eingabefeldern,
+  // Skripten, schon umgewandelten Wurzeln oder Elementen mit class="msf-roh".
+  var WZ_NIE = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1, OPTION: 1, SELECT: 1, TITLE: 1, NOSCRIPT: 1 };
+  function wzAusgenommen(n){
+    for(var e = n.parentNode; e && e.nodeType === 1; e = e.parentNode){
+      if(WZ_NIE[e.tagName] || e.namespaceURI === "http://www.w3.org/2000/svg" || e.isContentEditable) return true;
+      if(e.classList && (e.classList.contains("msf-w") || e.classList.contains("msf-roh"))) return true;
+    }
+    return false;
+  }
+  function wurzelText(n){
+    var t = n.nodeValue; if(!t || t.indexOf("√") < 0 || wzAusgenommen(n)) return;
+    // offene Klammer nach √ ohne Gegenstück im selben Text: unverändert lassen (Radikand über mehrere Elemente)
+    var i = -1; while((i = t.indexOf("√(", i + 1)) >= 0){ var tf = 0, j = i + 1; for(; j < t.length; j++){ if(t.charAt(j) === "(") tf++; else if(t.charAt(j) === ")"){ tf--; if(tf === 0) break; } } if(j >= t.length) return; }
+    var tpl = document.createElement("template"); tpl.innerHTML = wurzelnHtml(esc(t));
+    if(n.parentNode) n.parentNode.replaceChild(tpl.content, n);
+  }
+  function wurzelnIn(root){
+    if(!root) return;
+    if(root.nodeType === 3){ wurzelText(root); return; }
+    if(root.nodeType !== 1 || WZ_NIE[root.tagName] || root.namespaceURI === "http://www.w3.org/2000/svg") return;
+    if((root.textContent || "").indexOf("√") < 0) return;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), L = [], x;
+    while((x = w.nextNode())) if(x.nodeValue.indexOf("√") >= 0) L.push(x);
+    L.forEach(wurzelText);
+  }
+  var wzOffen = [], wzGeplant = false;
+  function wzAbarbeiten(){ wzGeplant = false; var L = wzOffen; wzOffen = []; L.forEach(function(n){ if(n.isConnected) wurzelnIn(n); }); }
+  function wzMerken(n){ wzOffen.push(n); if(!wzGeplant){ wzGeplant = true; if(window.requestAnimationFrame) window.requestAnimationFrame(wzAbarbeiten); else setTimeout(wzAbarbeiten, 16); } }
+  function wzStart(){
+    wzMerken(document.body);
+    if(window.MutationObserver) new MutationObserver(function(rec){
+      rec.forEach(function(r){ if(r.type === "characterData") wzMerken(r.target); else r.addedNodes.forEach(wzMerken); });
+    }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if(document.body) wzStart(); else document.addEventListener("DOMContentLoaded", wzStart);
   return { bruch: bruch, wurzel: wurzel, c: c, zeilen: zeilen, kette: kette, mnf: mnf, esc: esc, FARBE: FARBE };
 })();

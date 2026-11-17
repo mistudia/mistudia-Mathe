@@ -108,6 +108,21 @@
       sv.appendChild(el("circle", { cx: hx + q * 0.36, cy: hy - q * 0.36, r: 1.8, fill: "#dc2626" }));
     }
     G.diag.forEach(function(d){ sv.appendChild(el("line", { x1: X(d[0][0]), y1: Y(d[0][1]), x2: X(d[1][0]), y2: Y(d[1][1]), "class": "diag" })); });
+    // rechte Winkel: Ecken von Quadrat/Rechteck, Schnittpunkt der Diagonalen bei Raute/Drachen (Bogen mit Punkt)
+    function rwS(px, py, ax, ay, bx, by, col){
+      var lu = Math.hypot(ax - px, ay - py) || 1, lv = Math.hypot(bx - px, by - py) || 1, ux = (ax - px) / lu, uy = (ay - py) / lu, vx = (bx - px) / lv, vy = (by - py) / lv, r = 11;
+      var sw = (ux * vy - uy * vx) > 0 ? 1 : 0;
+      sv.appendChild(el("path", { d: "M" + (px + ux * r) + " " + (py + uy * r) + " A" + r + " " + r + " 0 0 " + sw + " " + (px + vx * r) + " " + (py + vy * r), fill: "none", stroke: col || "#1a2233", "stroke-width": 1.6 }));
+      sv.appendChild(el("circle", { cx: px + (ux + vx) * r * 0.36, cy: py + (uy + vy) * r * 0.36, r: 1.7, fill: col || "#1a2233" }));
+    }
+    if(!stuecke.ersetzt && !stuecke.basis && (typ === "quadrat" || typ === "rechteck") && G.pts){
+      var Pq = G.pts.map(function(p){ return [X(p[0]), Y(p[1])]; });
+      for(var iq = 0; iq < 4; iq++){ var A0 = Pq[iq], A1 = Pq[(iq + 1) % 4], A3 = Pq[(iq + 3) % 4]; rwS(A0[0], A0[1], A1[0], A1[1], A3[0], A3[1]); }
+    }
+    if(G.diag.length === 2){
+      var d0 = G.diag[0], d1 = G.diag[1], mx = typ === "drachen" ? 0 : 0, my = typ === "drachen" ? d1[0][1] : 0;
+      rwS(X(mx), Y(my), X(d0[1][0]), Y(d0[1][1]), X(d1[1][0]), Y(d1[1][1]), "#1a2233");
+    }
     if(G.radius && !stuecke.sektoren){ sv.appendChild(el("line", { x1: X(0), y1: Y(0), x2: X(G.kreis), y2: Y(0), "class": "hoehe", style: "stroke:#1d4ed8;stroke-dasharray:none" })); sv.appendChild(el("circle", { cx: X(0), cy: Y(0), r: 4, fill: "#1d4ed8" })); }
     if(!stuecke.ohneLab) G.lab.forEach(function(l){
       var x = X(l[0]), y = Y(l[1]), d = l[3], txt = o.werte ? o.werte[l[2]] : l[2];

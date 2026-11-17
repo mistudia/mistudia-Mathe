@@ -170,6 +170,7 @@
     // Steigungsdreieck ab dem y-Achsenabschnitt
     if(mv !== 0){
       g.polygon([[0, bv], [1, bv], [1, bv + mv]], "rgba(234,88,12,0.15)", "#ea580c");
+      if(g.rechterWinkel) g.rechterWinkel(1, bv, 0, bv, 1, bv + mv, "#ea580c");
       g.text(0.5, bv, "1", "#ea580c", { anker: "middle", dy: mv > 0 ? 13 : -13 });
       g.text(1, bv + mv / 2, FK.btxt(M), "#ea580c", { dx: 8 });
     }

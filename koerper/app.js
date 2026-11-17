@@ -169,6 +169,26 @@
       });
       sv.appendChild(el("path", { d: zug.map(function(p, i){ var q = P(p); return (i ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }).join(""), "class": "kv", fill: "none" }));
     });
+    // Rechte Winkel: zwei Maßlinien (nicht nur Kanten) mit gemeinsamem Punkt, die im Raum senkrecht stehen
+    // → Viertelkreis im Raum (dreht sich mit) + Punkt, ca. 12 px groß
+    (function(){
+      var gleich = function(p, q){ return Math.abs(p[0] - q[0]) + Math.abs(p[1] - q[1]) + Math.abs(p[2] - q[2]) < 1e-6; };
+      var gesehen = {};
+      for(var i = 0; i < S.L.length; i++) for(var j = i + 1; j < S.L.length; j++){
+        var A = S.L[i], B = S.L[j]; if(A.art === "kante" && B.art === "kante") continue;
+        [[A.a, A.b], [A.b, A.a]].forEach(function(ea){ [[B.a, B.b], [B.b, B.a]].forEach(function(eb){
+          if(!gleich(ea[0], eb[0])) return;
+          var c = ea[0], u = sub(ea[1], c), v = sub(eb[1], c), lu = Math.hypot(u[0], u[1], u[2]), lv = Math.hypot(v[0], v[1], v[2]);
+          if(lu < 1e-9 || lv < 1e-9 || Math.abs(dot(u, v)) > 1e-6 * lu * lv) return;
+          var key = schluessel(c) + "|" + schluessel(norm(u)) + "|" + schluessel(norm(v)); if(gesehen[key]) return; gesehen[key] = 1;
+          var r3 = Math.min(13 / k, lu * 0.3, lv * 0.3), un = norm(u), vn = norm(v), d = "";
+          for(var n = 0; n <= 10; n++){ var w = n / 10 * Math.PI / 2, q = P([c[0] + r3 * (Math.cos(w) * un[0] + Math.sin(w) * vn[0]), c[1] + r3 * (Math.cos(w) * un[1] + Math.sin(w) * vn[1]), c[2] + r3 * (Math.cos(w) * un[2] + Math.sin(w) * vn[2])]); d += (n ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }
+          sv.appendChild(el("path", { d: d, fill: "none", stroke: "#1a2233", "stroke-width": 1.6 }));
+          var pk = P([c[0] + r3 * 0.38 * (un[0] + vn[0]), c[1] + r3 * 0.38 * (un[1] + vn[1]), c[2] + r3 * 0.38 * (un[2] + vn[2])]);
+          sv.appendChild(el("circle", { cx: pk[0].toFixed(1), cy: pk[1].toFixed(1), r: 1.7, fill: "#1a2233" }));
+        }); });
+      }
+    })();
     S.L.forEach(function(L){
       var a = P(L.a), b = P(L.b), mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
       if(L.art !== "kante"){ sv.appendChild(el("line", { x1: a[0].toFixed(1), y1: a[1].toFixed(1), x2: b[0].toFixed(1), y2: b[1].toFixed(1), "class": "ml " + L.art })); if(L.art === "r") sv.appendChild(el("circle", { cx: a[0].toFixed(1), cy: a[1].toFixed(1), r: 3.5, "class": "mp" })); }
@@ -204,7 +224,7 @@
         o: { t: [T("2 · a · b", "2 · " + z(d.a) + " · " + z(d.b), 2 * d.a * d.b), T("2 · a · h", "2 · " + z(d.a) + " · " + z(d.h), 2 * d.a * d.h), T("2 · b · h", "2 · " + z(d.b) + " · " + z(d.h), 2 * d.b * d.h)] } }; } },
     prisma: { ein: [["g", "e_g", 4, 2, 8], ["hd", "e_hd", 3, 2, 6], ["h", "e_h", 7, 4, 12]],
       netz: function(d, F){ prisma(F, d.g, d.hd, d.h, 0, 0); },
-      lab: function(d){ var x = d.g / 2, L = d.h / 2; return [lab([-x, 0, L], [x, 0, L], "g = " + z(d.g)), lab([0, 0, L], [0, d.hd, L], "h_d = " + z(d.hd), "h", "h"), lab([x, 0, L], [x, 0, -L], "h = " + z(d.h)), lab([x, 0, L], [0, d.hd, L], "s", "kante", "s")]; },
+      lab: function(d){ var x = d.g / 2, L = d.h / 2; return [lab([-x, 0, L], [x, 0, L], "g = " + z(d.g)), lab([0, 0, L], [0, d.hd, L], "h_d = " + z(d.hd), "h", "h"), lab([x, 0, L], [x, 0, -L], "h = " + z(d.h)), lab([x, 0, L], [0, d.hd, L], "s", "kante", "s"), lab([0, 0, L], [x, 0, L], "g : 2", "r", "d")]; },
       rechne: function(d){ var P = pyWurzel("s", d.hd, d.g / 2, "h_d", "(g : 2)"), s = P.v;
         return { py: P.zeilen, v: { t: [T("½ · g · h_d · h", "½ · " + z(d.g) + " · " + z(d.hd) + " · " + z(d.h), d.g * d.hd * d.h / 2)] },
           o: { n: [t("f_grund"), t("f_seiten")], t: [T("2 · ½ · g · h_d", "2 · ½ · " + z(d.g) + " · " + z(d.hd), d.g * d.hd), T("(g + 2 · s) · h", "(" + z(d.g) + " + 2 · " + z(s) + ") · " + z(d.h), (d.g + 2 * s) * d.h)] } }; } },
@@ -216,7 +236,7 @@
           o: { n: [t("f_boden"), t("f_deckel"), t("f_mantel")], t: [T("π · r²", "π · " + q(r), Math.PI * r * r), T("π · r²", "π · " + q(r), Math.PI * r * r), T("2 · π · r · h", "2 · π · " + z(r) + " · " + z(h), 2 * Math.PI * r * h)] } }; } },
     pyramide: { ein: [["a", "e_a", 6, 2, 10], ["h", "e_h", 4, 2, 10]],
       netz: function(d, F){ pyramide(F, d.a, 0, d.h, 0); },
-      lab: function(d){ var x = d.a / 2; return [lab([-x, 0, x], [x, 0, x], "a = " + z(d.a)), lab([0, 0, 0], [0, d.h, 0], "h = " + z(d.h), "h", "h"), lab([0, 0, x], [0, d.h, 0], "h_s", "s", "s")]; },
+      lab: function(d){ var x = d.a / 2; return [lab([-x, 0, x], [x, 0, x], "a = " + z(d.a)), lab([0, 0, 0], [0, d.h, 0], "h = " + z(d.h), "h", "h"), lab([0, 0, x], [0, d.h, 0], "h_s", "s", "s"), lab([0, 0, 0], [0, 0, x], "a : 2", "r", "d")]; },
       rechne: function(d){ var P = pyWurzel("h_s", d.h, d.a / 2, "h", "(a : 2)"), hs = P.v;
         return { py: P.zeilen, v: { t: [T("⅓ · a² · h", "⅓ · " + q(d.a) + " · " + z(d.h), d.a * d.a * d.h / 3)] },
           o: { n: [t("f_grund"), t("f_seiten")], t: [T("a²", q(d.a), d.a * d.a), T("4 · ½ · a · h_s", "4 · ½ · " + z(d.a) + " · " + z(hs), 2 * d.a * hs)] } }; } },
@@ -246,7 +266,7 @@
           weg: [nm("f_deckel", "k_zylinder"), nm("f_grund", "k_halbkugel")] }; } },
     haus: { add: true, ein: [["a", "e_a", 6, 2, 8], ["h1", "e_h1", 5, 2, 10], ["h2", "e_h2", 4, 2, 6]],
       netz: function(d, F){ var x = d.a / 2; quader(F, [-x, x, 0, d.h1, -x, x], 0, "oben"); pyramide(F, d.a, d.h1, d.h1 + d.h2, 1, { boden: false }); },
-      lab: function(d){ var x = d.a / 2; return [lab([-x, 0, x], [x, 0, x], "a = " + z(d.a)), lab([x, 0, x], [x, d.h1, x], "h₁ = " + z(d.h1)), lab([0, d.h1, 0], [0, d.h1 + d.h2, 0], "h₂ = " + z(d.h2), "h", "h"), lab([0, d.h1, x], [0, d.h1 + d.h2, 0], "h_s", "s", "s")]; },
+      lab: function(d){ var x = d.a / 2; return [lab([-x, 0, x], [x, 0, x], "a = " + z(d.a)), lab([x, 0, x], [x, d.h1, x], "h₁ = " + z(d.h1)), lab([0, d.h1, 0], [0, d.h1 + d.h2, 0], "h₂ = " + z(d.h2), "h", "h"), lab([0, d.h1, x], [0, d.h1 + d.h2, 0], "h_s", "s", "s"), lab([0, d.h1, 0], [0, d.h1, x], "a : 2", "r", "d")]; },
       rechne: function(d){ var a = d.a, P = pyWurzel("h_s", d.h2, a / 2, "h₂", "(a : 2)"), hs = P.v;
         return { py: P.zeilen, v: { n: [t("k_quader"), t("k_pyramide")], t: [T("a² · h₁", q(a) + " · " + z(d.h1), a * a * d.h1), T("⅓ · a² · h₂", "⅓ · " + q(a) + " · " + z(d.h2), a * a * d.h2 / 3)] },
           o: { n: [t("f_boden"), t("f_waende"), t("f_dach")], t: [T("a²", q(a), a * a), T("4 · a · h₁", "4 · " + z(a) + " · " + z(d.h1), 4 * a * d.h1), T("4 · ½ · a · h_s", "4 · ½ · " + z(a) + " · " + z(hs), 2 * a * hs)] },
@@ -288,7 +308,7 @@
           weg: [nm("f_klebe", "k_quader"), nm("f_klebe", "k_halbzyl")] }; } },
     wpyr: { sub: true, ein: [["a", "e_a", 6, 3, 10], ["t", "e_t", 4, 2, 10]], passt: function(d){ return d.t <= d.a; },
       netz: function(d, F){ var x = d.a / 2; quader(F, [-x, x, 0, d.a, -x, x], 0, "oben"); pyramide(F, d.a, d.a, d.a - d.t, 2, { boden: false, inv: true }); },
-      lab: function(d){ var x = d.a / 2; return [lab([-x, 0, x], [x, 0, x], "a = " + z(d.a)), lab([0, d.a, 0], [0, d.a - d.t, 0], "t = " + z(d.t), "h", "h"), lab([0, d.a, x], [0, d.a - d.t, 0], "h_s", "s", "s")]; },
+      lab: function(d){ var x = d.a / 2; return [lab([-x, 0, x], [x, 0, x], "a = " + z(d.a)), lab([0, d.a, 0], [0, d.a - d.t, 0], "t = " + z(d.t), "h", "h"), lab([0, d.a, x], [0, d.a - d.t, 0], "h_s", "s", "s"), lab([0, d.a, 0], [0, d.a, x], "a : 2", "r", "d")]; },
       rechne: function(d){ var a = d.a, P = pyWurzel("h_s", d.t, a / 2, "t", "(a : 2)"), hs = P.v;
         return { py: P.zeilen, v: { n: [t("k_wuerfel"), t("k_pyramide")], t: [T("a³", k3(a), a * a * a), T("⅓ · a² · t", "⅓ · " + q(a) + " · " + z(d.t), a * a * d.t / 3, true)] },
           o: { n: [t("f_aussen"), t("f_innen")], t: [T("5 · a²", "5 · " + q(a), 5 * a * a), T("4 · ½ · a · h_s", "4 · ½ · " + z(a) + " · " + z(hs), 2 * a * hs)] },
@@ -365,13 +385,23 @@
       b.addEventListener("click", function(){ EINH[p] = x; felder(p); rechne(p, false); $(p + "Masse").textContent = t("masse", { e: x }); }); w.appendChild(b); });
     l2.appendChild(s2); l2.appendChild(w); box.appendChild(l2);
   }
+  // Legende der Formelzeichen unter dem Bild (aus den Beschriftungen + V, O, π)
+  var SYM = {"de": {"_": "Bezeichnungen", "a": "Kante (Seite)", "b": "Kante", "g": "Grundseite des Dreiecks", "h": "Höhe", "h_d": "Höhe des Dreiecks", "h_s": "Seitenhöhe (Höhe einer Seitenfläche, Mitte der Kante bis zur Spitze)", "s_kegel": "Mantellinie (vom Rand der Grundfläche zur Spitze)", "s": "schräge Seite", "r": "Radius", "k": "Würfelkante", "t": "Tiefe der Aussparung", "d": "Höhe des Dachs", "h₁": "Höhe des unteren Teils", "h₂": "Höhe des oberen Teils", "a : 2": "halbe Kante (Mitte bis Kante)", "g : 2": "halbe Grundseite", "V": "Volumen", "O": "Oberfläche", "π": "Kreiszahl ≈ 3,14"}, "en": {"_": "Symbols", "a": "edge (side)", "b": "edge", "g": "base of the triangle", "h": "height", "h_d": "height of the triangle", "h_s": "slant height (height of a side face, from the middle of an edge to the apex)", "s_kegel": "slant height (from the edge of the base to the apex)", "s": "slanted side", "r": "radius", "k": "cube edge", "t": "depth of the cut-out", "d": "height of the roof", "h₁": "height of the lower part", "h₂": "height of the upper part", "a : 2": "half edge (centre to edge)", "g : 2": "half base", "V": "volume", "O": "surface area", "π": "pi ≈ 3.14"}, "es": {"_": "Símbolos", "a": "arista (lado)", "b": "arista", "g": "base del triángulo", "h": "altura", "h_d": "altura del triángulo", "h_s": "apotema (altura de una cara lateral, del medio de la arista a la cúspide)", "s_kegel": "generatriz (del borde de la base a la cúspide)", "s": "lado inclinado", "r": "radio", "k": "arista del cubo", "t": "profundidad del hueco", "d": "altura del tejado", "h₁": "altura de la parte inferior", "h₂": "altura de la parte superior", "a : 2": "media arista (centro hasta la arista)", "g : 2": "media base", "V": "volumen", "O": "área total", "π": "pi ≈ 3,14"}, "zh": {"_": "符号", "a": "棱（边）", "b": "棱", "g": "三角形的底边", "h": "高", "h_d": "三角形的高", "h_s": "斜高（侧面的高，从棱中点到顶点）", "s_kegel": "母线（从底面边缘到顶点）", "s": "斜边", "r": "半径", "k": "正方体的棱", "t": "挖去部分的深度", "d": "屋顶的高", "h₁": "下部的高", "h₂": "上部的高", "a : 2": "半条棱（中心到棱）", "g : 2": "底边的一半", "V": "体积", "O": "表面积", "π": "圆周率 ≈ 3.14"}, "fr": {"_": "Notations", "a": "arête (côté)", "b": "arête", "g": "base du triangle", "h": "hauteur", "h_d": "hauteur du triangle", "h_s": "apothème (hauteur d’une face latérale, du milieu de l’arête au sommet)", "s_kegel": "génératrice (du bord de la base au sommet)", "s": "côté oblique", "r": "rayon", "k": "arête du cube", "t": "profondeur de l’évidement", "d": "hauteur du toit", "h₁": "hauteur de la partie basse", "h₂": "hauteur de la partie haute", "a : 2": "demi-arête (centre jusqu’à l’arête)", "g : 2": "demi-base", "V": "volume", "O": "aire totale", "π": "pi ≈ 3,14"}, "ru": {"_": "Обозначения", "a": "ребро (сторона)", "b": "ребро", "g": "основание треугольника", "h": "высота", "h_d": "высота треугольника", "h_s": "апофема (высота боковой грани, от середины ребра до вершины)", "s_kegel": "образующая (от края основания до вершины)", "s": "наклонная сторона", "r": "радиус", "k": "ребро куба", "t": "глубина выемки", "d": "высота крыши", "h₁": "высота нижней части", "h₂": "высота верхней части", "a : 2": "половина ребра (от центра до ребра)", "g : 2": "половина основания", "V": "объём", "O": "площадь поверхности", "π": "число пи ≈ 3,14"}, "ar": {"_": "الرموز", "a": "الحرف (الضلع)", "b": "الحرف", "g": "قاعدة المثلث", "h": "الارتفاع", "h_d": "ارتفاع المثلث", "h_s": "الارتفاع الجانبي (ارتفاع وجه جانبي، من منتصف الحرف إلى الرأس)", "s_kegel": "الراسم (من حافة القاعدة إلى الرأس)", "s": "ضلع مائل", "r": "نصف القطر", "k": "حرف المكعب", "t": "عمق التجويف", "d": "ارتفاع السقف", "h₁": "ارتفاع الجزء السفلي", "h₂": "ارتفاع الجزء العلوي", "a : 2": "نصف الحرف (من المركز إلى الحرف)", "g : 2": "نصف القاعدة", "V": "الحجم", "O": "المساحة الكلية", "π": "باي ≈ 3.14"}, "ja": {"_": "記号", "a": "辺", "b": "辺", "g": "三角形の底辺", "h": "高さ", "h_d": "三角形の高さ", "h_s": "側面の高さ（辺の中点から頂点まで）", "s_kegel": "母線（底面のふちから頂点まで）", "s": "ななめの辺", "r": "半径", "k": "立方体の辺", "t": "くりぬいた部分の深さ", "d": "屋根の高さ", "h₁": "下の部分の高さ", "h₂": "上の部分の高さ", "a : 2": "辺の半分（中心から辺まで）", "g : 2": "底辺の半分", "V": "体積", "O": "表面積", "π": "円周率 ≈ 3.14"}, "pt": {"_": "Símbolos", "a": "aresta (lado)", "b": "aresta", "g": "base do triângulo", "h": "altura", "h_d": "altura do triângulo", "h_s": "apótema (altura de uma face lateral, do meio da aresta ao vértice)", "s_kegel": "geratriz (da borda da base ao vértice)", "s": "lado inclinado", "r": "raio", "k": "aresta do cubo", "t": "profundidade do recorte", "d": "altura do telhado", "h₁": "altura da parte de baixo", "h₂": "altura da parte de cima", "a : 2": "meia aresta (centro até a aresta)", "g : 2": "meia base", "V": "volume", "O": "área total", "π": "pi ≈ 3,14"}};
+  function legende(k, L){
+    var S0 = SYM[lang] || SYM.de, kegelig = /kegel|rakete|eis|wkeg|kwue/.test(k), seen = {}, teile = [];
+    L.forEach(function(x){ var sym = String(x.txt || "").split(" = ")[0].trim(); if(!sym || seen[sym]) return; seen[sym] = 1;
+      var e = sym === "s" && kegelig ? S0.s_kegel : S0[sym]; if(e) teile.push(sym + " = " + e); });
+    ["V", "O", "π"].forEach(function(x){ teile.push(x + " = " + S0[x]); });
+    return S0._ + ": " + teile.join(" · ");
+  }
+  function legSetzen(id, k, L){ var e = $(id); if(e) e.textContent = legende(k, L); }
   function rechne(p, neuBild){
     var k = ART[p === "g" ? "grund" : "zus"], K = KOERPER[k], d = werte(k, roh(k)), fe = "";
     if(!d) fe = t("fehler"); else if(K.passt && !K.passt(d)) fe = t("fehlerPasst");
     $(p + "Fehler").textContent = fe;
     if(!SZ[p]) SZ[p] = new Szene($(p + "Svg"));
     if(fe){ $(p + "Rechnung").innerHTML = ""; SZ[p].F = []; SZ[p].zeichne(); return; }
-    var F = []; K.netz(d, F); SZ[p].setze(F, K.lab(d));
+    var F = []; K.netz(d, F); SZ[p].setze(F, K.lab(d)); legSetzen(p + "Leg", k, K.lab(d));
     $(p + "Rechnung").innerHTML = wegHtml(k, K.rechne(d), null, EINH[p]);
     $(p + "Merke").textContent = t(p === "g" ? "merkeGrund" : K.sub ? "merkeSub" : "merkeAdd");
   }
@@ -383,7 +413,7 @@
     do { d = {}; K.ein.forEach(function(e){ d[e[0]] = zuf(e[3], e[4]); }); } while(K.passt && !K.passt(d));
     auf = { k: k, d: d, was: Math.random() < 0.5 ? "v" : "o" }; versuche = 0; fertig = false; letzte = null;
     if(!uSz) uSz = new Szene($("uSvg"));
-    var F = []; K.netz(d, F); uSz.setze(F, K.lab(d)); zeige();
+    var F = []; K.netz(d, F); uSz.setze(F, K.lab(d)); legSetzen("uLeg", k, K.lab(d)); zeige();
   }
   function loesung(){ var R = KOERPER[auf.k].rechne(auf.d), Y = zeilen(auf.was === "v" ? "V" : "O", R[auf.was], ""); return { R: R, l: Y.wert }; }
   function zeige(){
@@ -429,6 +459,7 @@
     document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
     ["g", "z"].forEach(function(p){ wahlKnoepfe(p); felder(p); $(p + "Drehen").textContent = t("drehen"); $(p + "Masse").textContent = t("masse", { e: EINH[p] }); });
     if(tab === "grund") rechne("g", true); else if(tab === "zus") rechne("z", true);
+    if(auf) legSetzen("uLeg", auf.k, KOERPER[auf.k].lab(auf.d));
     if(auf){ var war = fertig, e = letzte, gut = $("meldung").classList.contains("gut"), vs = versuche; zeige();
       if(war){ $("uAntwort").value = e; abschluss(gut); } else if(vs && e != null){ $("uAntwort").value = e; var m = $("meldung"); m.className = "meldung schlecht"; m.textContent = t("nochmal"); } }
   }

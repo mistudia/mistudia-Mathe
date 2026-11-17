@@ -116,6 +116,9 @@
     G.forEach(function(g){
       if(g.fertig && g.typ === "lin"){ var D = g.dreieck, x2 = D.x + D.dx, y2 = D.y + D.dy;
         gC.appendChild(el("path", { d: "M" + X(D.x) + " " + Y(D.y) + " L" + X(x2) + " " + Y(D.y) + " L" + X(x2) + " " + Y(y2), fill: "none", stroke: g.farbe, "stroke-width": 2.5, "stroke-dasharray": "7 5" }));
+        (function(){ var px = X(x2), py = Y(D.y), ux = X(D.x) - px, vy = Y(y2) - py, lu = Math.abs(ux), lv = Math.abs(vy); if(lu < 16 || lv < 16) return; var r = Math.min(12, lu * 0.4, lv * 0.4), sx = Math.sign(ux), sy = Math.sign(vy);
+          gC.appendChild(el("path", { d: "M" + (px + sx * r) + " " + py + " A" + r + " " + r + " 0 0 " + (sx * sy > 0 ? 1 : 0) + " " + px + " " + (py + sy * r), fill: "none", stroke: g.farbe, "stroke-width": 1.6 }));
+          gC.appendChild(el("circle", { cx: px + sx * r * 0.36, cy: py + sy * r * 0.36, r: 1.7, fill: g.farbe })); })(); // rechter Winkel im Steigungsdreieck
         gC.appendChild(el("text", { x: (X(D.x) + X(x2)) / 2, y: Y(D.y) + (D.dy > 0 ? 18 : -8), "class": "mk", fill: g.farbe }, "Δx = " + bt(D.dx)));
         gC.appendChild(el("text", { x: X(x2) + (D.dx > 0 ? 6 : -6), y: (Y(D.y) + Y(y2)) / 2 + 5, "class": "mk", fill: g.farbe, style: "text-anchor:" + (D.dx > 0 ? "start" : "end") }, "Δy = " + bt(D.dy))); }
       if(g.fertig || g.tipp) g.pkt.forEach(function(q){ gC.appendChild(el("circle", { cx: X(q[0]), cy: Y(q[1]), r: 6, fill: g.farbe, stroke: "#ffffff", "stroke-width": 2 })); });

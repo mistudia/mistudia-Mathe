@@ -51,7 +51,7 @@
   function tanDef(deg){ return Math.abs(Math.cos(deg * GRAD)) > 1e-9; }
 
   // ---------- Einheitskreis mit Graph ----------
-  var CX = 190, CY = 190, R = 140, GX0 = 410, GX1 = 765;
+  var CX = 190, CY = 190, R = 140, GX0 = 480, GX1 = 835; // Graph weiter rechts: Platz für „Gegenkathete = …“
   function gx(deg){ return GX0 + deg / 360 * (GX1 - GX0); }
   function kreisZeichnen(svg, deg, o){
     leer(svg);
@@ -68,6 +68,7 @@
     [["1", CX + R + 4, CY + 16], ["−1", CX - R - 20, CY + 16], ["1", CX + 6, CY - R - 4], ["−1", CX + 6, CY + R + 16]].forEach(function(q){ svg.appendChild(el("text", { x: q[1], y: q[2], "class": "k-klein" }, q[0])); });
     [["I", 1, -1], ["II", -1, -1], ["III", -1, 1], ["IV", 1, 1]].forEach(function(q){ svg.appendChild(el("text", { x: CX + q[1] * R * 0.5 - 6, y: CY + q[2] * R * 0.5 + 6, "class": "k-quad" }, q[0])); });
     svg.appendChild(el("circle", { cx: CX, cy: CY, r: R, "class": "k-kreis" }));
+    svg.appendChild(el("text", { x: 10, y: 24, "class": "k-text", fill: "#1565c0" }, t("ekTitel")));
     // Tangente bei x = 1
     svg.appendChild(el("line", { x1: CX + R, y1: CY - R * 1.3, x2: CX + R, y2: CY + R * 1.3, "class": "k-hilf" }));
     // Winkelbogen
@@ -85,8 +86,20 @@
     svg.appendChild(el("line", { x1: CX, y1: CY, x2: Px, y2: CY, "class": "k-cos" }));
     svg.appendChild(el("line", { x1: Px, y1: CY, x2: Px, y2: Py, "class": "k-sin" }));
     svg.appendChild(el("line", { x1: CX, y1: CY, x2: Px, y2: Py, "class": "k-radius" }));
-    svg.appendChild(el("text", { x: (CX + Px) / 2 - 14, y: CY + (s >= 0 ? 22 : -10), "class": "k-text", fill: "var(--cos)" }, "cos"));
-    svg.appendChild(el("text", { x: Px + (c >= 0 ? 8 : -36), y: (CY + Py) / 2 + 5, "class": "k-text", fill: "var(--sin)" }, "sin"));
+    // Beschriftung mit Namen und Länge: Ankathete = |cos α|, Gegenkathete = |sin α| (Hypotenuse = Radius = 1)
+    var lang_ = Math.abs(c) * R > 70, hoch_ = Math.abs(s) * R > 56;
+    var cy1 = CY + (s >= 0 ? 20 : -26);
+    svg.appendChild(el("text", { x: (CX + Px) / 2, y: cy1, "class": "k-text", fill: "var(--cos)", "text-anchor": "middle" }, lang_ ? t("ak") + " = " + z(Math.abs(c), 2) : z(Math.abs(c), 2)));
+    svg.appendChild(el("text", { x: (CX + Px) / 2, y: cy1 + (s >= 0 ? 18 : -18), "class": "k-klein", fill: "var(--cos)", "text-anchor": "middle" }, "cos α = " + z(c, 2)));
+    var sx_ = Px + (c >= 0 ? 10 : -10), sa_ = c >= 0 ? "start" : "end";
+    svg.appendChild(el("text", { x: sx_, y: (CY + Py) / 2 - 4, "class": "k-text", fill: "var(--sin)", "text-anchor": sa_ }, hoch_ ? t("gk") + " = " + z(Math.abs(s), 2) : z(Math.abs(s), 2)));
+    svg.appendChild(el("text", { x: sx_, y: (CY + Py) / 2 + 14, "class": "k-klein", fill: "var(--sin)", "text-anchor": sa_ }, "sin α = " + z(s, 2)));
+    // rechter Winkel am Fußpunkt (zwischen Ankathete und Gegenkathete)
+    if(Math.abs(c) * R > 18 && Math.abs(s) * R > 18){
+      var rr_ = 13, ux_ = c >= 0 ? -1 : 1, vy_ = s >= 0 ? -1 : 1;
+      svg.appendChild(el("path", { d: "M" + (Px + ux_ * rr_) + " " + CY + " A" + rr_ + " " + rr_ + " 0 0 " + ((ux_ * vy_) > 0 ? 1 : 0) + " " + Px + " " + (CY + vy_ * rr_), fill: "none", stroke: "#1a2233", "stroke-width": 1.6 }));
+      svg.appendChild(el("circle", { cx: Px + ux_ * rr_ * 0.38, cy: CY + vy_ * rr_ * 0.38, r: 1.8, fill: "#1a2233" }));
+    }
     svg.appendChild(el("text", { x: (CX + Px) / 2 + (s >= 0 ? -16 : 6) * (c >= 0 ? 1 : -1) - 4, y: (CY + Py) / 2 - 6, "class": "k-text", fill: "#1a2233" }, "1"));
     svg.appendChild(el("circle", { cx: Px, cy: Py, r: 10, "class": "k-punkt" }));
     svg.appendChild(el("text", { x: Px + (c >= 0 ? 12 : -26), y: Py + (s >= 0 ? -12 : 26), "class": "k-text", fill: "#b45309" }, "P"));
@@ -136,7 +149,7 @@
   (function(){
     var s = $("kreis"), aktiv = false;
     function setze(ev){
-      var r = s.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * 780, y = (ev.clientY - r.top) / r.height * 380, d;
+      var r = s.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * 850, y = (ev.clientY - r.top) / r.height * 380, d;
       if(x > GX0 - 10){ d = (x - GX0) / (GX1 - GX0) * 360; }
       else { d = Math.atan2(CY - y, x - CX) / GRAD; if(d < 0) d += 360; }
       d = Math.max(0, Math.min(360, Math.round(d)));

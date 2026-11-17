@@ -1,16 +1,16 @@
 // ============================================================
 // /verschieben.js – Popups mit der Maus verschieben
 // Wird von /home-button.js in jede Unter-App geladen.
-// Greift man eine Popup-Karte an einer freien Stelle (nicht an Knöpfen,
-// Links, Eingabefeldern, Aufklappern), lässt sie sich mit gedrückter
-// Maustaste verschieben. Nur Maus – auf Touch bleibt normales Scrollen.
+// Gezogen wird nur an der Kopfzeile/Überschrift der Karte oder an ihrem
+// leeren Rand – im Inhalt lässt sich Text ganz normal markieren und
+// kopieren. Nur Maus – auf Touch bleibt normales Scrollen.
 // Neue Popups: Selektor der Karte in KARTEN eintragen.
 // ============================================================
 (function(){
   "use strict";
   if(window.MS_VERSCHIEBEN) return; window.MS_VERSCHIEBEN = true;
   var KARTEN = ".msa-karte, .b-karte, #probeCard, #pizzaFenster";
-  var GRIFF = ".msa-kopf, .msa-kopf h2, .b-karte > h2";
+  var GRIFF = ".msa-kopf, .msa-kopf *, .b-karte > h2, .b-karte > h3, .b-kopf, .b-kopf *, #probeCard > h2, #probeCard > h3, #pizzaFenster > h2, #pizzaFenster > h3";
   var NICHT = "button, a, input, select, textarea, summary, label, option, [contenteditable], .ms-tipp, .sym";
   var zug = null, unterdruecken = false;
 
@@ -21,6 +21,9 @@
     if(e.pointerType !== "mouse" || e.button !== 0) return;
     var k = e.target.closest && e.target.closest(KARTEN);
     if(!k || e.target.closest(NICHT)) return;
+    // nur Kopfzeile/Überschrift oder leerer Rand der Karte – sonst Text markieren
+    var griff = e.target.closest(GRIFF);
+    if(!(griff && k.contains(griff)) && e.target !== k) return;
     // Bildlaufleiste der Karte selbst nicht als Griff werten
     if(e.target === k && e.offsetX > k.clientWidth) return;
     var v = verschiebung(k);
