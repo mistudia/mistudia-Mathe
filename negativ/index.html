@@ -108,7 +108,8 @@
   .vbox { border: 1px solid #c9dcf2; border-radius: 12px; overflow: hidden; background: #ffffff; min-width: 0; }
   .vkopf { background: #e3eefc; color: var(--blue); font: 800 22px system-ui, sans-serif; text-align: center; padding: 4px; }
   .vzeile { display: block; width: 100%; border: 0; border-top: 1px solid #e3eefc; background: #ffffff; color: var(--text); font: 17px system-ui, sans-serif; padding: 7px 6px; text-align: center; cursor: pointer; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .vbox.punkt .vkopf { background: #e3f6e9; color: #0b8a3e; }
+  .vbox.strich .vkopf { background: #f3edff; color: #7c3aed; }
+  .vbox.punkt .vkopf { background: #fff1db; color: #e67700; }
   .vzeile:hover { background: #f4f8ff; } .vzeile.an { background: #fef3c7; }
   @media (max-width: 860px) { .varianten { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 600px) { .varianten { grid-template-columns: 1fr; } .vzeile { font-size: 17px; padding-bottom: 6px; } }
@@ -117,8 +118,8 @@
   .vmodus button[aria-pressed="true"] { background: #1565c0; color: #ffffff; }
   .vleg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 8px; }
   .vleg p { margin: 0; padding: 6px 10px; border-radius: 8px; font-size: 15px; line-height: 1.4; color: #1a2233; }
-  .vleg .s { border-inline-start: 5px solid #1565c0; background: #eef5ff; }
-  .vleg .p { border-inline-start: 5px solid #0b8a3e; background: #e3f6e9; }
+  .vleg .s { border-inline-start: 5px solid #7c3aed; background: #f3edff; }
+  .vleg .p { border-inline-start: 5px solid #e67700; background: #fff1db; }
   @media (max-width: 700px) { .vleg { grid-template-columns: 1fr; } }
   .vleiste { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 6px; font-size: 15px; }
   .vleiste .knopf { padding: 7px 14px; font-size: 15px; }
@@ -126,25 +127,23 @@
   .vzeile { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; column-gap: 0.3em; row-gap: 2px; white-space: normal; }
   .vzeile { position: relative; padding-top: 18px; }
   .vzeile.mitm { padding-top: 26px; }
+  .vsein { width: 1.7em; box-sizing: border-box; font: 800 17px system-ui, sans-serif; text-align: center; padding: 2px 0; border: 2px solid #b0b0b8; border-radius: 8px; background: #ffffff; color: #1a2233; }
+  .vsein:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 3px #bbdefb; }
+  .vsein.richtig { border-color: #16a34a; background: #dcfce7; color: #14532d; }
+  .vsein.falsch { border-color: #dc2626; background: #fee2e2; color: #7f1d1d; }
+  .vsein.zeig { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
   .vpfeile { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
   .vpfeile path { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .vpfeile.s path { stroke: #1565c0; } .vpfeile.p path { stroke: #0b8a3e; }
+  .vpfeile.s path { stroke: #7c3aed; } .vpfeile.p path { stroke: #e67700; }
   .vzeile.vselbst { cursor: default; }
   .vseg { white-space: nowrap; }
-  .vpaar { position: relative; border: 2px solid #1565c0; border-radius: 999px; padding: 0 3px; }
-  .vmk { position: absolute; left: 50%; transform: translateX(-50%); bottom: 100%; margin-bottom: 1px; color: #1565c0; font-weight: 800; font-size: 0.95em; line-height: 1.1; border: 2px solid #1565c0; border-radius: 999px; padding: 0 3px; background: #ffffff; }
-  .vsm { color: #1565c0; font-weight: 800; }
-  b.vsm.vziel { border: 2px solid #1565c0; border-radius: 999px; padding: 0 3px; }
-  .vpz { color: #0b8a3e; font-weight: 800; border: 2px solid #0b8a3e; border-radius: 999px; padding: 0 2px; }
-  .vpm { color: #0b8a3e; font-weight: 800; }
-  .vpm.vziel { border: 2px solid #0b8a3e; border-radius: 999px; padding: 0 3px; }
-  .vslot { display: inline-flex; gap: 2px; vertical-align: middle; }
-  .vsb { font: 800 17px system-ui, sans-serif; width: 1.7em; padding: 2px 0; border: 2px solid #b0b0b8; border-radius: 8px; background: #ffffff; color: #1a2233; cursor: pointer; line-height: 1.1; }
-  .vsb:hover, .vsb:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 3px #bbdefb; }
-  .vsb.weg { border-color: #dc2626; background: #fee2e2; color: #7f1d1d; }
-  .vslot.richtig b, .vslot.zeig b { display: inline-block; min-width: 1.1em; text-align: center; border-radius: 6px; padding: 0 3px; }
-  .vslot.richtig b { background: #dcfce7; }
-  .vslot.zeig b { background: #f1f5f9; color: #475569; }
+  .vpaar { position: relative; border: 2px solid #7c3aed; border-radius: 999px; padding: 0 3px; }
+  .vmk { position: absolute; left: 50%; transform: translateX(-50%); bottom: 100%; margin-bottom: 1px; color: #7c3aed; font-weight: 800; font-size: 0.95em; line-height: 1.1; border: 2px solid #7c3aed; border-radius: 999px; padding: 0 3px; background: #ffffff; }
+  .vsm { color: #7c3aed; font-weight: 800; }
+  b.vsm.vziel { border: 2px solid #7c3aed; border-radius: 999px; padding: 0 3px; }
+  .vpz { color: #e67700; font-weight: 800; border: 2px solid #e67700; border-radius: 999px; padding: 0 2px; }
+  .vpm { color: #e67700; font-weight: 800; }
+  .vpm.vziel { border: 2px solid #e67700; border-radius: 999px; padding: 0 3px; }
   .vein { width: 4.2em; box-sizing: border-box; font: 700 17px system-ui, sans-serif; text-align: center; padding: 3px 4px; border: 2px solid #b0b0b8; border-radius: 8px; background: #ffffff; color: #1a2233; font-variant-numeric: tabular-nums; }
   .vein:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 3px #bbdefb; }
   .vein.richtig { border-color: #16a34a; background: #dcfce7; color: #14532d; }

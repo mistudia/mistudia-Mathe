@@ -246,7 +246,7 @@
   function vStand(){
     var st = $("varStand"); if(!st) return;
     if(VMOD === "zeigen"){ st.textContent = ""; return; }
-    var alle = document.querySelectorAll(VMOD === "selbst" ? "#varianten .vein" : "#varianten .vslot"), n = 0;
+    var alle = document.querySelectorAll(VMOD === "selbst" ? "#varianten .vein" : "#varianten .vsein"), n = 0;
     alle.forEach(function(i){ if(i.classList.contains("richtig")) n++; });
     st.textContent = n === alle.length && n ? t("selbstAlle") : t("selbstStand", { r: n, n: alle.length });
     st.className = "vstand" + (n === alle.length && n ? " gut" : "");
@@ -264,10 +264,10 @@
     teile.push(auf);
     var slot = function(){
       var g = VS[k];
-      if(g === m) return '<span class="vslot vziel richtig" data-k="' + k + '"><b class="' + (strich ? "vsm" : "vpm") + '">' + m + "</b></span>";
-      if(VZEIG && !g) return '<span class="vslot vziel zeig" data-k="' + k + '"><b>' + m + "</b></span>";
-      return '<span class="vslot vziel' + (g ? " falsch" : "") + '" data-k="' + k + '" data-m="' + m + '">' +
-        '<button type="button" class="vsb' + (g === "+" ? " weg" : "") + '" data-s="+">+</button><button type="button" class="vsb' + (g === "−" ? " weg" : "") + '" data-s="−">−</button></span>';
+      var cls = g ? (g === m ? " richtig" : " falsch") : (VZEIG ? " zeig" : "");
+      var val = g || (VZEIG ? m : "");
+      return '<input class="vsein vziel' + (strich ? " s" : " p") + cls + '" maxlength="1" autocomplete="off" spellcheck="false" inputmode="text" dir="ltr" aria-label="+ / −" data-k="' + k + '" data-m="' + m + '"' +
+        (strich ? ' data-e="' + (gl.trim() + " " + zp(r)).replace(/"/g, "") + '"' : "") + ' value="' + val + '"' + (g === m || (VZEIG && !g) ? " readonly" : "") + ">";
     };
     if(VMOD === "zeigen"){
       if(strich) teile.push("= " + zp(x) + ' <b class="vsm vziel">' + m + "</b> " + z(Math.abs(y)));
@@ -343,12 +343,31 @@
     });
     tb.innerHTML = h; tb.classList.toggle("selbst", VMOD !== "zeigen");
     tb.querySelectorAll("button.vzeile").forEach(function(z1){ z1.addEventListener("click", function(){ $("ra").value = z(Number(z1.dataset.a)).replace("−", "-"); $("rb").value = z(Number(z1.dataset.b)).replace("−", "-"); rechnen(); $("tVier").scrollIntoView({ behavior: "smooth", block: "start" }); }); });
-    tb.querySelectorAll(".vsb").forEach(function(bt){ bt.addEventListener("click", function(){
-      var sl = bt.parentNode; VS[sl.dataset.k] = bt.dataset.s; varianten();
-      var neu = document.querySelector('#varianten .vslot[data-k="' + sl.dataset.k + '"]');
-      if(neu && neu.classList.contains("richtig")){ var nx = document.querySelector("#varianten .vslot:not(.richtig):not(.zeig) .vsb"); if(nx) nx.focus({ preventScroll: true }); }
-      else if(neu){ var f = neu.querySelector(".vsb:not(.weg)"); if(f) f.focus({ preventScroll: true }); }
-    }); });
+    // Vorzeichen zusammenfassen: ein Zeichen eintippen (+ oder −/-), wird sofort geprüft
+    var vsIns = Array.prototype.slice.call(tb.querySelectorAll(".vsein"));
+    function vsWeiter(inp){
+      var i = vsIns.indexOf(inp);
+      for(var j = 1; j <= vsIns.length; j++){ var n = vsIns[(i + j) % vsIns.length]; if(!n.readOnly){ n.focus(); n.select(); return; } }
+      inp.blur();
+    }
+    function vsPruefe(inp, springen){
+      var v = inp.value.trim().replace(/[-–−]/g, "−");
+      inp.classList.remove("richtig", "falsch");
+      if(!v){ delete VS[inp.dataset.k]; vStand(); return; }
+      if(v !== "+" && v !== "−"){ inp.value = ""; delete VS[inp.dataset.k]; vStand(); return; }
+      inp.value = v; VS[inp.dataset.k] = v;
+      if(v === inp.dataset.m){
+        inp.classList.add("richtig"); inp.readOnly = true;
+        if(inp.dataset.e && !inp.parentNode.parentNode.querySelector(".verg")){ var sp = document.createElement("span"); sp.className = "vseg verg"; sp.innerHTML = inp.dataset.e.replace(/(\S+)$/, "<b>$1</b>"); inp.parentNode.parentNode.insertBefore(sp, inp.parentNode.nextSibling); }
+        vStand(); requestAnimationFrame(vPfeile);
+        if(springen) vsWeiter(inp);
+      } else { inp.classList.add("falsch"); vStand(); inp.select(); }
+    }
+    vsIns.forEach(function(inp){
+      inp.addEventListener("input", function(){ vsPruefe(inp, true); });
+      inp.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(inp.value) vsPruefe(inp, false); vsWeiter(inp); } });
+      inp.addEventListener("focus", function(){ try { inp.select(); } catch(x){} });
+    });
     var ins = Array.prototype.slice.call(tb.querySelectorAll(".vein"));
     ins.forEach(function(inp, i){
       if(VE[inp.dataset.k]) vPruefe(inp);

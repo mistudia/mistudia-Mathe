@@ -1717,47 +1717,7 @@ document.getElementById("eigeneRechnen").onclick = function(){ neueBrueche(); };
     });
 });
 
-// ------------------------------
-// Pfeiltasten-Navigation zwischen allen Eingabefeldern
-// ------------------------------
-
-document.addEventListener("keydown", function(e){
-
-    const el = e.target;
-    if (!el || el.tagName !== "INPUT") return;
-    if (!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key)) return;
-
-    // Links/Rechts nur am Textrand wechseln, sonst Cursor normal bewegen
-    if (e.key === "ArrowLeft" && el.selectionStart !== 0) return;
-    if (e.key === "ArrowRight" && el.selectionEnd !== el.value.length) return;
-
-    const r0 = el.getBoundingClientRect();
-    const cx = r0.left + r0.width/2, cy = r0.top + r0.height/2;
-
-    let bester = null, besterWert = Infinity;
-
-    document.querySelectorAll("input").forEach(function(c){
-        if (c === el || c.offsetParent === null) return;
-        const r = c.getBoundingClientRect();
-        const dx = (r.left + r.width/2) - cx;
-        const dy = (r.top + r.height/2) - cy;
-
-        let haupt, quer;
-        if (e.key === "ArrowRight") { if (dx <= 5) return; haupt = dx; quer = Math.abs(dy); }
-        if (e.key === "ArrowLeft")  { if (dx >= -5) return; haupt = -dx; quer = Math.abs(dy); }
-        if (e.key === "ArrowDown")  { if (dy <= 5) return; haupt = dy; quer = Math.abs(dx); }
-        if (e.key === "ArrowUp")    { if (dy >= -5) return; haupt = -dy; quer = Math.abs(dx); }
-
-        const wert = haupt + 3*quer;
-        if (wert < besterWert) { besterWert = wert; bester = c; }
-    });
-
-    if (bester) {
-        e.preventDefault();
-        bester.focus();
-        bester.select();
-    }
-});
+// Pfeiltasten-Navigation zwischen Eingabefeldern: zentral in /home-button.js
 
 // ------------------------------
 // Kurzes Aufblinken beim Verlassen der Ergebnisfelder

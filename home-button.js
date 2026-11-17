@@ -111,3 +111,37 @@
   a.onload = function(){ var k = location.pathname.split("/").filter(Boolean)[0]; if(!window.MS_BB || !MS_BB[k]) return; var b = document.createElement("script"); b.src = "/beispiel-galerie.js"; document.head.appendChild(b); };
   document.head.appendChild(a);
 })();
+
+// ---------- Pfeiltasten springen zwischen Eingabefeldern (alle Unter-Apps) ----------
+// ↑/↓ zum nächsten Feld darüber/darunter, ←/→ erst am Textanfang/-ende zum Nachbarfeld
+// (nach Bildschirmposition, wie in Bruchrechnen). Eigene Pfeil-Logik einer App hat Vorrang
+// (preventDefault). Nicht in Reglern, Häkchen, Auswahllisten, Textbereichen; data-nonav schaltet ab.
+(function(){
+  "use strict";
+  var TYP = /^(text|number|search|tel|email|url|)$/i;
+  function passt(c){
+    return c.tagName === "INPUT" && TYP.test(c.type || "") && !c.disabled && !c.readOnly && !c.hasAttribute("data-nonav") && c.offsetParent !== null;
+  }
+  document.addEventListener("keydown", function(e){
+    if(e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    var k = e.key; if(k !== "ArrowLeft" && k !== "ArrowRight" && k !== "ArrowUp" && k !== "ArrowDown") return;
+    var el = e.target; if(!el || !passt(el)) return;
+    var s = null, en = null; try { s = el.selectionStart; en = el.selectionEnd; } catch(x){}
+    if(s !== null && en !== null){
+      if(k === "ArrowLeft" && (s !== 0 || en !== 0)) return;
+      if(k === "ArrowRight" && (s !== el.value.length || en !== el.value.length)) return;
+    }
+    var r0 = el.getBoundingClientRect(), cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
+    var best = null, bw = Infinity;
+    document.querySelectorAll("input").forEach(function(c){
+      if(c === el || !passt(c)) return;
+      var r = c.getBoundingClientRect(), dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy, h, q;
+      if(k === "ArrowRight"){ if(dx <= 5 || Math.abs(dy) > r0.height) return; h = dx; q = Math.abs(dy); }
+      if(k === "ArrowLeft"){ if(dx >= -5 || Math.abs(dy) > r0.height) return; h = -dx; q = Math.abs(dy); }
+      if(k === "ArrowDown"){ if(dy <= 5) return; h = dy; q = Math.abs(dx); }
+      if(k === "ArrowUp"){ if(dy >= -5) return; h = -dy; q = Math.abs(dx); }
+      var w = h + 3 * q; if(w < bw){ bw = w; best = c; }
+    });
+    if(best){ e.preventDefault(); best.focus(); try { best.select(); } catch(x){} }
+  });
+})();
