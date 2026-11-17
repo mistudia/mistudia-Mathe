@@ -111,6 +111,12 @@
   .fKarte { max-width: 560px; } .fKarte .fZelle { cursor: pointer; }
   .zeile.gut { color: var(--gut); font-weight: 700; } .zeile.schlecht { color: var(--schlecht); font-weight: 700; }
   .tabWrap { overflow-x: auto; } .tab th { hyphens: auto; -webkit-hyphens: auto; overflow-wrap: anywhere; } @media (max-width: 600px) { .tab { font-size: 13.5px; } .tab th { font-size: 12px; } .tab th, .tab td { padding: 4px 5px; } }
+  .fiFolge { font: 700 17px ui-monospace, monospace; line-height: 1.5; word-break: break-word; }
+  .euKarte .euLand, .euKarte .euBr { cursor: pointer; }
+  .pfStep { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; margin-inline-end: 10px; }
+  .pfFolgen { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; } .pfF { font: 700 15px ui-monospace, monospace; padding: 3px 7px; border-radius: 7px; border: 1.5px solid #b0b0b8; background: #ffffff; }
+  .pfF.an { background: #ede9fe; border-color: #7c3aed; }
+  ol.weg { direction: ltr; } [dir="rtl"] ol.weg li.wl { direction: rtl; text-align: right; }
 </style>
 </head>
 <body>
@@ -138,6 +144,7 @@
 </div>
 <script src="texte.js"></script>
 <script src="texte2.js"></script>
+<script src="texte3.js"></script>
 <script src="app.js"></script>
 <script src="/home-button.js"></script>
 </body>

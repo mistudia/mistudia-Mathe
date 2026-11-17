@@ -32,15 +32,22 @@
     { k: "tesla", p: "te", sym: "U", col: "#1d4ed8", leg: "tU tN tV", link: [["dreisatz", "link_dreisatz"]] },
     { k: "einstein", p: "ei", sym: "c", col: "#6d28d9", leg: "cLicht sKm tSek", link: [["groessen", "link_groessen"]] },
     { k: "turing", p: "tu", sym: "01", col: "#334155", leg: "bin", link: [] },
-    { k: "vierfarben", p: "f", sym: "4", col: "#c2410c", leg: "", link: [], ohneAufgabe: true }
+    { k: "vierfarben", p: "f", sym: "4", col: "#c2410c", leg: "", link: [], ohneAufgabe: true },
+    { k: "fibonacci", p: "fi", sym: "Fₙ", col: "#a16207", leg: "", link: [] },
+    { k: "euler", p: "eu", sym: "7", col: "#0369a1", leg: "euE euK euF", link: [["koerper", "link_koerper"]] },
+    { k: "pascal", p: "pf", sym: "A:B", col: "#9333ea", leg: "", link: [["wahrscheinlichkeit", "link_wk"]] },
+    { k: "buffon", p: "bu", sym: "π?", col: "#be123c", leg: "buN buK pi approx", link: [["wahrscheinlichkeit", "link_wk"]] },
+    { k: "heron", p: "he", sym: "√", col: "#15803d", leg: "heA heX wurzel", link: [["pythagoras", "link_wurzel"]] },
+    { k: "chwarizmi", p: "ch", sym: "x²", col: "#0e7490", leg: "xUnb wurzel", link: [["quadratisch", "link_quad"]] }
   ];
+  function symGr(s){ return s.length > 3 ? 15 : s.length > 2 ? 18 : 24; }
   function finde(k){ for(var i = 0; i < P.length; i++) if(P[i].k === k) return P[i]; return null; }
   var akt = null;
 
   // ---------- Übersicht ----------
   function uebersicht(){
     $("karten").innerHTML = P.map(function(p){
-      return '<a class="bk" href="#' + p.k + '"><span class="bk-sym" style="background:' + p.col + '">' + esc(p.sym) + '</span><span class="bk-txt"><b>' + esc(t(p.p + "_name")) + '</b><span class="bk-zeit">' + esc(t(p.p + "_zeit")) + '</span><span class="bk-kurz">' + esc(t(p.p + "_kurz")) + "</span></span></a>";
+      return '<a class="bk" href="#' + p.k + '"><span class="bk-sym" style="background:' + p.col + ";font-size:" + symGr(p.sym) + 'px">' + esc(p.sym) + '</span><span class="bk-txt"><b>' + esc(t(p.p + "_name")) + '</b><span class="bk-zeit">' + esc(t(p.p + "_zeit")) + '</span><span class="bk-kurz">' + esc(t(p.p + "_kurz")) + "</span></span></a>";
     }).join("");
   }
 
@@ -48,7 +55,7 @@
   function detail(){
     var p = akt;
     $("dName").textContent = t(p.p + "_name"); $("dZeit").textContent = t(p.p + "_zeit");
-    $("dSym").textContent = p.sym; $("dSym").style.background = p.col;
+    $("dSym").textContent = p.sym; $("dSym").style.background = p.col; $("dSym").style.fontSize = symGr(p.sym) + "px";
     $("hGesch").textContent = t("geschichte"); $("dStory").textContent = t(p.p + "_story");
     $("hProbe").textContent = t("probieren"); $("hAuf").textContent = t("aufgabe");
     $("zurueck").textContent = t("alle"); $("mehrT").textContent = t("mehr");
@@ -497,6 +504,224 @@
     if(Math.random() < 0.5) return { q: t("tu_q1", { b: b }), w: v, tol: 0, l: String(v), weg: L };
     return { q: t("tu_q2", { b: b }), w: v + 1, tol: 0, l: String(v + 1), weg: L.concat([v + " + 1 = " + (v + 1)]) };
   };
+  // ---------- Runde 3: Fibonacci, Euler, Pascal & Fermat, Buffon, Heron, al-Chwarizmi ----------
+  function fib(n){ var a = 1, b = 1; for(var i = 2; i < n; i++){ var c = a + b; a = b; b = c; } return n <= 2 ? 1 : b; }
+  var fiN = 8;
+  PROBE.fibonacci = function(){
+    var b = $("probe");
+    b.innerHTML = '<label class="reglerZ"><span>' + esc(t("fi_n")) + ' <b id="fiNz"></b></span><input type="range" id="fiN" min="3" max="11" step="1"></label><p class="fiFolge" id="fiFolge" dir="ltr"></p><div id="fiSvg"></div><p class="zeile muted">' + esc(t("fi_spirale")) + '</p><p class="zeile">' + esc(t("fi_quot")) + '</p><p class="fiFolge" id="fiQ" dir="ltr"></p>';
+    $("fiN").value = fiN; $("fiN").addEventListener("input", function(){ fiN = +this.value; fiZeichnen(); });
+    fiZeichnen();
+  };
+  function fiZeichnen(){
+    $("fiNz").textContent = fiN;
+    var F = []; for(var i = 1; i <= fiN; i++) F.push(fib(i));
+    $("fiFolge").textContent = F.join(", ");
+    var Q = []; for(var j = 1; j < fiN; j++) Q.push(F[j] + " : " + F[j - 1] + " = " + z(F[j] / F[j - 1], 3));
+    $("fiQ").innerHTML = Q.slice(-4).map(esc).join("<br>");
+    // Quadrate anlegen (mathematische Koordinaten, y nach oben)
+    var R = { x: 0, y: 0, w: 1, h: 1 }, Q2 = [{ x: 0, y: 0, s: 1 }], P = [1, 0], arcs = [{ c: [0, 0], a: [0, 1], e: [1, 0], r: 1 }];
+    for(var k = 2; k <= fiN; k++){
+      var s = F[k - 1], d = (k - 2) % 4, q, e1, e2;
+      if(d === 0){ q = { x: R.x + R.w, y: R.y, s: s }; e1 = [q.x, q.y]; e2 = [q.x, q.y + s]; R = { x: R.x, y: R.y, w: R.w + s, h: R.h }; }
+      else if(d === 1){ q = { x: R.x, y: R.y + R.h, s: s }; e1 = [q.x, q.y]; e2 = [q.x + s, q.y]; R = { x: R.x, y: R.y, w: R.w, h: R.h + s }; }
+      else if(d === 2){ q = { x: R.x - s, y: R.y, s: s }; e1 = [R.x, q.y]; e2 = [R.x, q.y + s]; R = { x: R.x - s, y: R.y, w: R.w + s, h: R.h }; }
+      else { q = { x: R.x, y: R.y - s, s: s }; e1 = [q.x, R.y]; e2 = [q.x + s, R.y]; R = { x: R.x, y: R.y - s, w: R.w, h: R.h + s }; }
+      Q2.push(q);
+      var c = (Math.abs(e1[0] - P[0]) + Math.abs(e1[1] - P[1]) < 1e-9) ? e2 : e1;
+      // Endpunkt: diagonal gegenüber von P im neuen Quadrat
+      var ex = P[0] === q.x ? q.x + s : q.x, ey = P[1] === q.y ? q.y + s : q.y, ende = [ex, ey];
+      arcs.push({ c: c, a: P, e: ende, r: s }); P = ende;
+    }
+    var W = 560, H = 360, sk = Math.min((W - 20) / R.w, (H - 20) / R.h), ox = (W - R.w * sk) / 2 - R.x * sk, oy = (H + R.h * sk) / 2 + R.y * sk;
+    function X(x){ return ox + x * sk; } function Y(y){ return oy - y * sk; }
+    var sv = svgNeu(W, H), farben = ["#dbeafe", "#fdf3d8", "#ede9fe", "#ccfbf1"];
+    Q2.forEach(function(q, i){
+      sv.appendChild(el("rect", { x: X(q.x), y: Y(q.y + q.s), width: q.s * sk, height: q.s * sk, fill: farben[i % 4], stroke: "#4f5b6e", "stroke-width": 1.5 }));
+      if(q.s * sk > 16) sv.appendChild(el("text", { x: X(q.x + q.s / 2), y: Y(q.y + q.s / 2) + 5, "text-anchor": "middle", "class": "bz", "font-size": Math.min(22, 8 + q.s * sk / 8) }, String(q.s)));
+    });
+    var d = "M" + X(arcs[0].a[0]) + " " + Y(arcs[0].a[1]);
+    arcs.forEach(function(a){
+      var ax = X(a.a[0]) - X(a.c[0]), ay = Y(a.a[1]) - Y(a.c[1]), bx = X(a.e[0]) - X(a.c[0]), by = Y(a.e[1]) - Y(a.c[1]);
+      d += " A" + (a.r * sk) + " " + (a.r * sk) + " 0 0 " + (ax * by - ay * bx > 0 ? 1 : 0) + " " + X(a.e[0]).toFixed(1) + " " + Y(a.e[1]).toFixed(1);
+    });
+    sv.appendChild(el("path", { d: d, fill: "none", stroke: "#7c3aed", "stroke-width": 3 }));
+    $("fiSvg").innerHTML = ""; $("fiSvg").appendChild(sv);
+  }
+  GEN.fibonacci = function(){
+    if(Math.random() < 0.5){ var a = zuf(1, 9), b = zuf(1, 9), L = [a, b]; while(L.length < 6) L.push(L[L.length - 1] + L[L.length - 2]);
+      return { q: t("fi_q1", { f: L.slice(0, 5).join(", ") }), w: L[5], tol: 0, l: String(L[5]), weg: [L[3] + " + " + L[4] + " = " + L[5]] }; }
+    var n = zuf(6, 15), F = []; for(var i = 1; i <= n; i++) F.push(fib(i));
+    return { q: t("fi_q2", { n: n }), w: F[n - 1], tol: 0, l: String(F[n - 1]), weg: [F.join(", "), F[n - 3] + " + " + F[n - 2] + " = " + F[n - 1]] };
+  };
+
+  // Euler: Königsberger Brücken
+  var EU_BR = [[0, 1, 130, 98, 22, 40], [0, 1, 280, 98, 22, 40], [0, 2, 130, 192, 22, 40], [0, 2, 280, 192, 22, 40], [0, 3, 366, 154, 58, 22], [1, 3, 500, 98, 22, 40], [2, 3, 500, 192, 22, 40], [1, 3, 565, 98, 22, 40]];
+  var EU_LAND = [[70, 135, 300, 60], [0, 0, 620, 100], [0, 230, 620, 100], [420, 135, 190, 60]];
+  var eu = { extra: false, cur: -1, used: [], weg: [] };
+  PROBE.euler = function(){
+    var b = $("probe");
+    b.innerHTML = '<p class="zeile">' + esc(t("eu_anl")) + '</p><div id="euSvg"></div><p class="zeile" id="euStand"></p><p class="zeile" id="euWeg"></p>' +
+      '<p><button type="button" class="knopf hell" id="euNeu">' + esc(t("eu_neu")) + '</button> <button type="button" class="knopf hell" id="euBau"></button></p><p class="merke">' + esc(t("eu_regel")) + "</p>";
+    $("euNeu").addEventListener("click", function(){ eu.cur = -1; eu.used = []; eu.weg = []; euZeichnen(); });
+    $("euBau").addEventListener("click", function(){ eu.extra = !eu.extra; eu.cur = -1; eu.used = []; eu.weg = []; euZeichnen(); });
+    euZeichnen();
+  };
+  function euBruecken(){ return EU_BR.slice(0, eu.extra ? 8 : 7); }
+  function euZeichnen(){
+    var BR = euBruecken(), L = tA("eu_L"), s = svgNeu(620, 330, "bsvg euKarte");
+    s.appendChild(el("rect", { x: 0, y: 95, width: 620, height: 140, fill: "#93c5fd" }));
+    EU_LAND.forEach(function(r, i){
+      var g = el("rect", { x: r[0], y: r[1], width: r[2], height: r[3], rx: i === 0 || i === 3 ? 28 : 0, fill: i === eu.cur ? "#ede9fe" : "#f1e7c8", stroke: i === eu.cur ? "#7c3aed" : "#8a6d3b", "stroke-width": i === eu.cur ? 4 : 1.5, "class": "euLand" });
+      g.addEventListener("click", function(){ if(eu.cur < 0){ eu.cur = i; eu.weg = [i]; euZeichnen(); } });
+      s.appendChild(g);
+      var grad = BR.filter(function(bb){ return bb[0] === i || bb[1] === i; }).length;
+      var tx = r[0] + r[2] / 2, ty = i === 1 ? 52 : i === 2 ? 285 : r[1] + 36;
+      s.appendChild(el("text", { x: tx, y: ty, "text-anchor": "middle", "class": "bt", "pointer-events": "none", fill: grad % 2 ? "#b8860b" : "#1a2233" }, L[i] + " · " + t("eu_brk", { n: grad })));
+    });
+    BR.forEach(function(bb, j){
+      var nr = eu.used.indexOf(j), g = el("rect", { x: bb[2], y: bb[3], width: bb[4], height: bb[5], rx: 4, fill: nr >= 0 ? "#7c3aed" : "#8b5e3c", stroke: "#1a2233", "stroke-width": 1.5, "class": "euBr" });
+      g.addEventListener("click", function(){
+        if(eu.cur < 0 || nr >= 0 || (bb[0] !== eu.cur && bb[1] !== eu.cur)) return;
+        eu.used.push(j); eu.cur = bb[0] === eu.cur ? bb[1] : bb[0]; eu.weg.push(eu.cur); euZeichnen();
+      });
+      s.appendChild(g);
+      if(nr >= 0) s.appendChild(el("text", { x: bb[2] + bb[4] / 2, y: bb[3] + bb[5] / 2 + 5, "text-anchor": "middle", fill: "#ffffff", "font-weight": 800, "font-size": 14, "pointer-events": "none" }, String(nr + 1)));
+    });
+    $("euSvg").innerHTML = ""; $("euSvg").appendChild(s);
+    $("euBau").textContent = t(eu.extra ? "eu_abriss" : "eu_bau");
+    var st = $("euStand"), offen = BR.filter(function(bb, j){ return eu.used.indexOf(j) < 0 && (bb[0] === eu.cur || bb[1] === eu.cur); }).length;
+    if(eu.used.length === BR.length){ st.className = "zeile gut"; st.textContent = t("eu_ok"); if(typeof msRichtig === "function") try { msRichtig(); } catch(x){} }
+    else if(eu.cur >= 0 && !offen){ st.className = "zeile schlecht"; st.textContent = t("eu_benutzt", { k: eu.used.length, n: BR.length }) + " – " + t("eu_fest"); }
+    else { st.className = "zeile"; st.textContent = t("eu_benutzt", { k: eu.used.length, n: BR.length }); }
+    $("euWeg").textContent = eu.weg.length ? t("eu_weg") + " " + eu.weg.map(function(i){ return L[i]; }).join(" → ") : "";
+  }
+  var EU_P = [[8, 12, 6], [4, 6, 4], [6, 12, 8], [20, 30, 12], [12, 30, 20], [12, 18, 8], [6, 10, 6]];
+  GEN.euler = function(){
+    var i = zuf(0, 6), P = EU_P[i], E = P[0], K = P[1], F = P[2], art = wahl(["E", "K", "F"]), nm = tA("eu_KP")[i];
+    if(art === "E") return { q: t("eu_qE", { K: nm, Ka: K, F: F }), w: E, tol: 0, l: String(E), weg: ["E − K + F = 2", "E = 2 + K − F = 2 + " + K + " − " + F + " = " + E] };
+    if(art === "K") return { q: t("eu_qK", { K: nm, E: E, F: F }), w: K, tol: 0, l: String(K), weg: ["E − K + F = 2", "K = E + F − 2 = " + E + " + " + F + " − 2 = " + K] };
+    return { q: t("eu_qF", { K: nm, E: E, Ka: K }), w: F, tol: 0, l: String(F), weg: ["E − K + F = 2", "F = 2 − E + K = 2 − " + E + " + " + K + " = " + F] };
+  };
+
+  // Pascal & Fermat: geteilter Einsatz
+  var pf = { n: 3, a: 2, b: 1 };
+  function pfRechne(n, a, b){
+    var na = n - a, nb = n - b, r = na + nb - 1, m = Math.pow(2, r), g = 0, L = [];
+    for(var i = 0; i < m; i++){ var s = "", cA = 0; for(var j = r - 1; j >= 0; j--){ var x = (i >> j) & 1; s += x ? "B" : "A"; if(!x) cA++; } var win = cA >= na; if(win) g++; L.push([s, win]); }
+    return { r: r, m: m, g: g, L: L };
+  }
+  PROBE.pascal = function(){
+    var b = $("probe");
+    b.innerHTML = '<div class="chips" id="pfZiel"><b>' + esc(t("pf_ziel")) + "</b> " + [2, 3, 4, 5].map(function(n){ return '<button type="button" class="chip" data-n="' + n + '">' + n + "</button>"; }).join("") + "</div>" +
+      '<div class="chips"><b>' + esc(t("pf_stand")) + '</b> <span class="pfStep">A <button type="button" class="chip" data-p="a-">−</button><b id="pfA"></b><button type="button" class="chip" data-p="a+">+</button></span> <span class="pfStep">B <button type="button" class="chip" data-p="b-">−</button><b id="pfB"></b><button type="button" class="chip" data-p="b+">+</button></span> <span class="muted">' + esc(t("pf_einsatz")) + "</span></div>" +
+      '<p class="zeile" id="pfRest"></p><div class="pfFolgen" id="pfL" dir="ltr"></div><p class="zeile" id="pfErg"></p>';
+    b.querySelectorAll("#pfZiel [data-n]").forEach(function(c){ c.addEventListener("click", function(){ pf.n = +c.dataset.n; pf.a = Math.min(pf.a, pf.n - 1); pf.b = Math.min(pf.b, pf.n - 1); pfZeichnen(); }); });
+    b.querySelectorAll("[data-p]").forEach(function(c){ c.addEventListener("click", function(){ var k = c.dataset.p[0], d = c.dataset.p[1] === "+" ? 1 : -1; pf[k] = Math.max(0, Math.min(pf.n - 1, pf[k] + d)); pfZeichnen(); }); });
+    pfZeichnen();
+  };
+  function pfZeichnen(){
+    document.querySelectorAll("#pfZiel [data-n]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.n === pf.n ? "true" : "false"); });
+    $("pfA").textContent = " " + pf.a + " "; $("pfB").textContent = " " + pf.b + " ";
+    var R = pfRechne(pf.n, pf.a, pf.b);
+    $("pfRest").textContent = t("pf_rest", { r: R.r, m: R.m });
+    $("pfL").innerHTML = R.m <= 64 ? R.L.map(function(x){ return '<span class="pfF' + (x[1] ? " an" : "") + '">' + x[0] + "</span>"; }).join("") : "";
+    var A = 100 * R.g / R.m;
+    $("pfErg").innerHTML = "<b>" + esc(t("pf_chance", { g: R.g, m: R.m })) + "</b><br>" + esc(t("pf_teil", { a: z(A, 2) + " €", b: z(100 - A, 2) + " €" }));
+  }
+  GEN.pascal = function(){
+    var L = [];
+    [3, 4].forEach(function(n){ for(var a = 0; a < n; a++) for(var b = 0; b < n; b++){ var r = 2 * n - a - b - 1; if(r >= 2 && r <= 4 && a + b > 0) L.push([n, a, b]); } });
+    var c = wahl(L), R = pfRechne(c[0], c[1], c[2]), E = R.m * wahl([5, 10, 20]), A = E * R.g / R.m;
+    return { q: t("pf_q", { n: c[0], a: c[1], b: c[2], E: E }), w: A, tol: 0.01, l: z(A, 2) + " €", weg: [{ lbl: t("pf_w1", { r: R.r, m: R.m }) }, { lbl: t("pf_w2", { g: R.g }) }, "A = " + R.g + "/" + R.m + " · " + E + " € = " + z(A, 2) + " €"] };
+  };
+
+  // Buffon: Nadeln werfen
+  var bu = { n: 0, k: 0, N: [] }, BU_D = 50;
+  function buWerfen(anz){
+    for(var i = 0; i < anz; i++){
+      var x = Math.random() * 600, y = Math.random() * 280 + 10, w = Math.random() * Math.PI, dx = Math.cos(w) * BU_D / 2, dy = Math.sin(w) * BU_D / 2;
+      var hit = Math.floor((x - dx) / BU_D) !== Math.floor((x + dx) / BU_D);
+      bu.n++; if(hit) bu.k++; bu.N.push([x - dx, y - dy, x + dx, y + dy, hit]); if(bu.N.length > 250) bu.N.shift();
+    }
+    buZeichnen();
+  }
+  PROBE.buffon = function(){
+    var b = $("probe");
+    b.innerHTML = '<p class="zeile">' + esc(t("bu_werfen")) + " " + [1, 10, 100, 1000].map(function(n){ return '<button type="button" class="chip" data-n="' + n + '">+' + n + "</button>"; }).join("") + ' <button type="button" class="knopf hell" id="buR">' + esc(t("bu_reset")) + '</button></p><div id="buSvg"></div><p class="zeile" id="buStand"></p><ol class="weg" id="buWeg"></ol><p class="zeile muted">' + esc(t("bu_echt")) + " " + esc(t("bu_zufall")) + "</p>";
+    b.querySelectorAll("[data-n]").forEach(function(c){ c.addEventListener("click", function(){ buWerfen(+c.dataset.n); }); });
+    $("buR").addEventListener("click", function(){ bu = { n: 0, k: 0, N: [] }; buZeichnen(); });
+    buZeichnen();
+  };
+  function buZeichnen(){
+    var s = svgNeu(600, 300);
+    s.appendChild(el("rect", { x: 0, y: 0, width: 600, height: 300, fill: "#fbf6ea" }));
+    for(var x = 0; x <= 600; x += BU_D) s.appendChild(el("line", { x1: x, y1: 0, x2: x, y2: 300, stroke: "#8a6d3b", "stroke-width": 2 }));
+    bu.N.forEach(function(nd){ s.appendChild(el("line", { x1: nd[0], y1: nd[1], x2: nd[2], y2: nd[3], stroke: nd[4] ? "#dc2626" : "#1565c0", "stroke-width": 2.2, "stroke-linecap": "round" })); });
+    $("buSvg").innerHTML = ""; $("buSvg").appendChild(s);
+    $("buStand").textContent = t("bu_stand", { n: bu.n, k: bu.k });
+    $("buWeg").innerHTML = bu.k ? weg(["π ≈ 2 · n : k = 2 · " + bu.n + " : " + bu.k + " ≈ " + z(2 * bu.n / bu.k, 4)]) : "";
+  }
+  GEN.buffon = function(){
+    var n = zuf(10, 200) * 10, k = Math.round(2 * n / Math.PI * (1 + (Math.random() - 0.5) * 0.06)), p = Math.round(2 * n / k * 100) / 100;
+    return { q: t("bu_q", { n: n, k: k }), w: p, tol: 0.011, l: z(p, 2), weg: ["π ≈ 2 · n : k", "π ≈ 2 · " + n + " : " + k + " ≈ " + z(p, 2)] };
+  };
+
+  // Heron: Wurzel ziehen
+  var he = { a: 10, L: [10] };
+  PROBE.heron = function(){
+    var b = $("probe");
+    b.innerHTML = '<label class="reglerZ"><span>' + esc(t("he_a")) + '</span><input class="zahl" id="heA" inputmode="decimal" value="' + he.a + '"></label><p class="merke">' + esc(t("he_regel")) + '</p><div class="zwei"><div id="heSvg"></div><div><table class="tab" id="heTab"></table></div></div>' +
+      '<p><button type="button" class="knopf" id="heS">' + esc(t("he_schritt")) + '</button> <button type="button" class="knopf hell" id="heR">' + esc(t("he_reset")) + "</button></p>";
+    $("heA").addEventListener("input", function(){ var v = lies(this.value); if(v > 0 && v <= 10000){ he.a = v; he.L = [v]; heZeichnen(); } });
+    $("heS").addEventListener("click", function(){ if(he.L.length > 7) return; var x = he.L[he.L.length - 1]; he.L.push((x + he.a / x) / 2); heZeichnen(); });
+    $("heR").addEventListener("click", function(){ he.L = [he.a]; heZeichnen(); });
+    heZeichnen();
+  };
+  function heZeichnen(){
+    var a = he.a, x = he.L[he.L.length - 1], y = a / x, M = Math.max(x, y, Math.sqrt(a)), sk = 220 / M, s = svgNeu(260, 260), w = Math.sqrt(a);
+    s.appendChild(el("rect", { x: 20, y: 240 - w * sk, width: w * sk, height: w * sk, fill: "none", stroke: "#b8860b", "stroke-width": 2, "stroke-dasharray": "6 4" }));
+    s.appendChild(el("rect", { x: 20, y: 240 - y * sk, width: x * sk, height: y * sk, fill: "rgba(124,58,237,0.15)", stroke: "#7c3aed", "stroke-width": 2.5 }));
+    s.appendChild(el("text", { x: 20 + Math.min(x * sk, 230) / 2, y: 255, "text-anchor": "middle", "class": "bk-klein" }, "x = " + z(x, 3)));
+    $("heSvg").innerHTML = ""; $("heSvg").appendChild(s);
+    var h = "<tr><th>" + esc(t("he_tab")) + "</th><th>x</th><th>" + esc(t("he_seite2")) + "</th></tr>";
+    he.L.forEach(function(v, i){ h += "<tr" + (i === he.L.length - 1 ? ' class="an"' : "") + "><td>x" + "₀₁₂₃₄₅₆₇₈"[i] + "</td><td>" + bdi(z(v, 6)) + "</td><td>" + bdi(z(a / v, 6)) + "</td></tr>"; });
+    h += "<tr><td>√a</td><td colspan=\"2\">" + bdi(z(w, 6)) + "</td></tr>";
+    $("heTab").innerHTML = h; $("heS").disabled = he.L.length > 7;
+  }
+  GEN.heron = function(){
+    var a; do { a = zuf(2, 99); } while(Math.sqrt(a) % 1 === 0);
+    var x0 = Math.max(1, Math.round(Math.sqrt(a)) + wahl([-1, 0, 1])), q = a / x0, x1 = (x0 + q) / 2;
+    return { q: t("he_q", { a: a, x0: x0 }), w: Math.round(x1 * 100) / 100, tol: 0.006, l: z(x1, 2), weg: ["x₁ = (x₀ + a : x₀) : 2", "x₁ = (" + x0 + " + " + a + " : " + x0 + ") : 2", "x₁ ≈ (" + x0 + " + " + z(q, 4) + ") : 2", "x₁ ≈ " + z(x1, 4)] };
+  };
+
+  // al-Chwarizmi: quadratische Ergänzung
+  var CH_B = [[10, 39], [6, 16], [8, 20], [4, 21], [12, 28], [14, 15]], chI = 0;
+  function chWeg(b, c){ var h = b / 2, S = c + h * h, r = Math.sqrt(S), x = r - h; return ["x² + " + b + "x = " + c, "x² + " + b + "x + " + h + "² = " + c + " + " + (h * h), "(x + " + h + ")² = " + S, "x + " + h + " = √" + S + " = " + r, "x = " + r + " − " + h + " = " + x]; }
+  PROBE.chwarizmi = function(){
+    var b = $("probe");
+    b.innerHTML = '<div class="chips" id="chChips"><b>' + esc(t("ch_bsp")) + "</b> " + CH_B.map(function(e, i){ return '<button type="button" class="chip" data-i="' + i + '" dir="ltr">x² + ' + e[0] + "x = " + e[1] + "</button>"; }).join("") + '</div><div class="zwei"><div id="chSvg"></div><ol class="weg" id="chWeg"></ol></div>';
+    b.querySelectorAll("#chChips [data-i]").forEach(function(c){ c.addEventListener("click", function(){ chI = +c.dataset.i; chZeichnen(); }); });
+    chZeichnen();
+  };
+  function chZeichnen(){
+    document.querySelectorAll("#chChips [data-i]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.i === chI ? "true" : "false"); });
+    var b = CH_B[chI][0], c = CH_B[chI][1], h = b / 2, x = Math.sqrt(c + h * h) - h, sk = 230 / (x + h), X = x * sk, Hh = h * sk, s = svgNeu(280, 280), o = 24;
+    s.appendChild(el("rect", { x: o, y: o, width: X, height: X, fill: "#dbeafe", stroke: "#1565c0", "stroke-width": 2 }));
+    s.appendChild(el("rect", { x: o + X, y: o, width: Hh, height: X, fill: "#ede9fe", stroke: "#7c3aed", "stroke-width": 2 }));
+    s.appendChild(el("rect", { x: o, y: o + X, width: X, height: Hh, fill: "#ede9fe", stroke: "#7c3aed", "stroke-width": 2 }));
+    s.appendChild(el("rect", { x: o + X, y: o + X, width: Hh, height: Hh, fill: "#fdf3d8", stroke: "#b8860b", "stroke-width": 2, "stroke-dasharray": "6 4" }));
+    s.appendChild(el("text", { x: o + X / 2, y: o + X / 2 + 5, "text-anchor": "middle", "class": "bt" }, "x²"));
+    s.appendChild(el("text", { x: o + X + Hh / 2, y: o + X / 2 + 5, "text-anchor": "middle", "class": "bk-klein" }, h + "x"));
+    s.appendChild(el("text", { x: o + X / 2, y: o + X + Hh / 2 + 5, "text-anchor": "middle", "class": "bk-klein" }, h + "x"));
+    s.appendChild(el("text", { x: o + X + Hh / 2, y: o + X + Hh / 2 + 5, "text-anchor": "middle", "class": "bk-klein" }, h + "² = " + (h * h)));
+    s.appendChild(el("text", { x: o + X / 2, y: o - 6, "text-anchor": "middle", "class": "bk-klein" }, "x"));
+    s.appendChild(el("text", { x: o + X + Hh / 2, y: o - 6, "text-anchor": "middle", "class": "bk-klein" }, String(h)));
+    $("chSvg").innerHTML = ""; $("chSvg").appendChild(s);
+    $("chSvg").insertAdjacentHTML("beforeend", '<p class="leg"><span style="color:#b8860b">▣ ' + esc(t("ch_fehlt")) + "</span></p>");
+    $("chWeg").innerHTML = weg(chWeg(b, c));
+  }
+  GEN.chwarizmi = function(){ var x = zuf(1, 9), b = 2 * zuf(1, 8), c = x * x + b * x; return { q: t("ch_q", { b: b, c: c }), w: x, tol: 0, l: String(x), weg: chWeg(b, c) }; };
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){
     $("frage").textContent = auf.q;
