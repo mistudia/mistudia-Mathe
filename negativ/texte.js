@@ -349,3 +349,19 @@ pt: {
   };
   for(var l in X) for(var k in X[l]) NT[l][k] = X[l][k];
 })();
+
+// Ergänzung: Vorzeichen-Varianten selbst ausrechnen
+(function(){
+  var X = {
+  de: { selbst: "Selbst ausrechnen", selbstH: "Ergebnis eintippen, Enter prüft und springt weiter.", selbstStand: "{r} von {n} richtig", selbstAlle: "✓ Alle richtig!", selbstLoes: "Lösungen zeigen", selbstVerbergen: "Lösungen verbergen" },
+  en: { selbst: "Work it out yourself", selbstH: "Type each result, Enter checks and moves on.", selbstStand: "{r} of {n} correct", selbstAlle: "✓ All correct!", selbstLoes: "Show solutions", selbstVerbergen: "Hide solutions" },
+  es: { selbst: "Calcúlalo tú", selbstH: "Escribe cada resultado; Intro comprueba y pasa al siguiente.", selbstStand: "{r} de {n} correctas", selbstAlle: "✓ ¡Todas correctas!", selbstLoes: "Mostrar soluciones", selbstVerbergen: "Ocultar soluciones" },
+  zh: { selbst: "自己算", selbstH: "输入每个结果，按回车检查并跳到下一个。", selbstStand: "答对 {r} / {n}", selbstAlle: "✓ 全部正确！", selbstLoes: "显示答案", selbstVerbergen: "隐藏答案" },
+  fr: { selbst: "Calcule toi-même", selbstH: "Tape chaque résultat ; Entrée vérifie et passe au suivant.", selbstStand: "{r} sur {n} justes", selbstAlle: "✓ Tout est juste !", selbstLoes: "Afficher les solutions", selbstVerbergen: "Masquer les solutions" },
+  ru: { selbst: "Посчитай сам", selbstH: "Введи каждый результат, Enter проверяет и переходит дальше.", selbstStand: "Верно: {r} из {n}", selbstAlle: "✓ Всё верно!", selbstLoes: "Показать ответы", selbstVerbergen: "Скрыть ответы" },
+  ar: { selbst: "احسبها بنفسك", selbstH: "اكتب كل ناتج، ومفتاح الإدخال يتحقق وينتقل إلى التالي.", selbstStand: "{r} من {n} صحيحة", selbstAlle: "✓ كلها صحيحة!", selbstLoes: "إظهار الحلول", selbstVerbergen: "إخفاء الحلول" },
+  ja: { selbst: "自分で計算する", selbstH: "答えを入力して Enter で確認、次へ進みます。", selbstStand: "{n} 問中 {r} 問正解", selbstAlle: "✓ 全問正解！", selbstLoes: "答えを見る", selbstVerbergen: "答えをかくす" },
+  pt: { selbst: "Calcula tu", selbstH: "Escreve cada resultado; Enter verifica e passa ao seguinte.", selbstStand: "{r} de {n} certas", selbstAlle: "✓ Tudo certo!", selbstLoes: "Mostrar soluções", selbstVerbergen: "Esconder soluções" }
+  };
+  for(var l in X) for(var k in X[l]) NT[l][k] = X[l][k];
+})();

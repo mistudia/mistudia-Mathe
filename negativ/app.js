@@ -223,25 +223,74 @@
     });
   }
   // Alle Vorzeichen-Varianten: gleiche Beträge, vier Vorzeichenpaare × vier Rechenarten
+  // Selbst ausrechnen (optional, Schalter gemerkt): Ergebnisse als Eingabefelder,
+  // Eingaben bleiben bei Sprachwechsel/Neuzeichnen erhalten (VE, Schlüssel „x op y“).
+  var VSELBST = (function(){ try { return localStorage.getItem("msNegSelbst") === "1"; } catch(e){ return false; } })();
+  var VE = {}, VZEIG = false;
+  function vRund(r){ return Math.round(r * 100) / 100; }
+  function vPruefe(inp){
+    var r = Number(inp.dataset.r), v = lies(inp.value);
+    inp.classList.remove("richtig", "falsch", "zeig");
+    if(inp.value.trim() === ""){ VE[inp.dataset.k] = ""; vStand(); return; }
+    VE[inp.dataset.k] = inp.value;
+    inp.classList.add(isFinite(v) && Math.abs(v - vRund(r)) < 0.006 ? "richtig" : "falsch");
+    vStand();
+  }
+  function vStand(){
+    var alle = document.querySelectorAll("#varianten .vein"), n = 0;
+    alle.forEach(function(i){ if(i.classList.contains("richtig")) n++; });
+    var st = $("varStand"); if(!st) return;
+    st.textContent = n === alle.length && n ? t("selbstAlle") : t("selbstStand", { r: n, n: alle.length });
+    st.className = "vstand" + (n === alle.length && n ? " gut" : "");
+  }
   function varianten(){
     var a = lies($("ra").value), b = lies($("rb").value), tb = $("varianten");
     if(!isFinite(a) || !isFinite(b)){ tb.innerHTML = ""; return; }
     var A = Math.abs(a), B = Math.abs(b);
     $("varH").innerHTML = t("varH", { a: "<b>" + bdi(z(A)) + "</b>", b: "<b>" + bdi(z(B)) + "</b>" });
+    $("varSelbstTxt").textContent = t("selbst"); $("varSelbst").checked = VSELBST;
+    $("varSelbstLeiste").hidden = !VSELBST; $("varSelbstH").textContent = t("selbstH");
+    $("varLoes").textContent = VZEIG ? t("selbstVerbergen") : t("selbstLoes"); $("varNeu").textContent = t("neuesBsp");
     var paare = [[A, B], [A, -B], [-A, B], [-A, -B]], h = "";
     [["+", "regelPlus"], ["-", "regelMinus"], ["*", "regelMal"], [":", "regelGeteilt"]].forEach(function(o){
       var op = o[0];
       h += '<div class="vbox"><div class="vkopf">' + opZ(op) + "</div>";
       paare.forEach(function(p){
         var x = p[0], y = p[1], r = rechne(x, op, y), ex = isFinite(r) && Math.abs(r * 100 - Math.round(r * 100)) > 1e-9, an = x === a && y === b;
-        h += '<button type="button" class="vzeile' + (an ? " an" : "") + '" data-a="' + x + '" data-b="' + y + '">' + bdi(z(x) + " " + opZ(op) + " " + zk(y) + (isFinite(r) ? (ex ? " ≈ " : " = ") + "<b>" + z(r) + "</b>" : " = –")) + "</button>";
+        if(VSELBST && isFinite(r)){
+          var k = z(x) + op + z(y), wert = VE[k] || "";
+          if(VZEIG && !wert) wert = z(vRund(r));
+          h += '<div class="vzeile vselbst' + (an ? " an" : "") + '">' + bdi(z(x) + " " + opZ(op) + " " + zk(y) + (ex ? " ≈ " : " = ")) +
+            '<input class="vein' + (VZEIG && !VE[k] ? " zeig" : "") + '" autocomplete="off" spellcheck="false" dir="ltr" data-k="' + k + '" data-r="' + r + '" value="' + wert.replace(/"/g, "") + '"' + (VZEIG && !VE[k] ? " readonly" : "") + "></div>";
+        } else {
+          h += '<button type="button" class="vzeile' + (an ? " an" : "") + '" data-a="' + x + '" data-b="' + y + '">' + bdi(z(x) + " " + opZ(op) + " " + zk(y) + (isFinite(r) ? (ex ? " ≈ " : " = ") + "<b>" + z(r) + "</b>" : " = –")) + "</button>";
+        }
       });
       h += "</div>";
     });
-    tb.innerHTML = h;
-    tb.querySelectorAll(".vzeile").forEach(function(z1){ z1.addEventListener("click", function(){ $("ra").value = z(Number(z1.dataset.a)).replace("−", "-"); $("rb").value = z(Number(z1.dataset.b)).replace("−", "-"); rechnen(); $("tVier").scrollIntoView({ behavior: "smooth", block: "start" }); }); });
+    tb.innerHTML = h; tb.classList.toggle("selbst", VSELBST);
+    tb.querySelectorAll("button.vzeile").forEach(function(z1){ z1.addEventListener("click", function(){ $("ra").value = z(Number(z1.dataset.a)).replace("−", "-"); $("rb").value = z(Number(z1.dataset.b)).replace("−", "-"); rechnen(); $("tVier").scrollIntoView({ behavior: "smooth", block: "start" }); }); });
+    var ins = Array.prototype.slice.call(tb.querySelectorAll(".vein"));
+    ins.forEach(function(inp, i){
+      if(VE[inp.dataset.k]) vPruefe(inp);
+      inp.addEventListener("change", function(){ vPruefe(inp); });
+      inp.addEventListener("keydown", function(e){
+        if(e.key !== "Enter") return;
+        e.preventDefault(); vPruefe(inp);
+        for(var j = 1; j <= ins.length; j++){ var n = ins[(i + j) % ins.length]; if(!n.classList.contains("richtig") && !n.readOnly){ n.focus(); return; } }
+        inp.blur();
+      });
+    });
+    vStand();
     $("varMerk").textContent = t("varMerk");
   }
+  $("varSelbst").addEventListener("change", function(){
+    VSELBST = this.checked; VZEIG = false;
+    try { localStorage.setItem("msNegSelbst", VSELBST ? "1" : "0"); } catch(e){}
+    varianten();
+  });
+  $("varLoes").addEventListener("click", function(){ VZEIG = !VZEIG; varianten(); });
+  $("varNeu").addEventListener("click", function(){ VE = {}; VZEIG = false; $("neuesBsp").click(); });
   $("neuesBsp").addEventListener("click", function(){
     var b, q, a;
     do { b = zuf(-9, 9); q = zuf(-9, 9); } while(!b || !q || Math.abs(b) === 1 || Math.abs(q) === 1 || (b > 0 && q > 0));

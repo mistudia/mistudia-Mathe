@@ -111,6 +111,19 @@
   .vzeile:hover { background: #f4f8ff; } .vzeile.an { background: #fef3c7; }
   @media (max-width: 860px) { .varianten { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 600px) { .vzeile { font-size: 15px; padding: 6px 2px; } }
+  .vschalter { display: inline-flex; align-items: center; gap: 8px; font: 700 17px system-ui, sans-serif; color: var(--blue); cursor: pointer; margin: 2px 0 6px; }
+  .vschalter input { width: 20px; height: 20px; accent-color: #1565c0; }
+  .vleiste { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 6px; font-size: 15px; }
+  .vleiste .knopf { padding: 7px 14px; font-size: 15px; }
+  .vstand { font-weight: 800; color: var(--blue); } .vstand.gut { color: #15803d; }
+  .vzeile.vselbst { cursor: default; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .vein { width: 4.2em; box-sizing: border-box; font: 700 17px system-ui, sans-serif; text-align: center; padding: 3px 4px; border: 2px solid #b0b0b8; border-radius: 8px; background: #ffffff; color: #1a2233; font-variant-numeric: tabular-nums; }
+  .vein:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 3px #bbdefb; }
+  .vein.richtig { border-color: #16a34a; background: #dcfce7; color: #14532d; }
+  .vein.falsch { border-color: #dc2626; background: #fee2e2; color: #7f1d1d; }
+  .vein.zeig { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
+  @media (max-width: 600px) { .vein { font-size: 15px; width: 3.6em; } }
+  @media (max-width: 480px) { .varianten.selbst { grid-template-columns: 1fr; } .varianten.selbst .vzeile { font-size: 17px; padding: 6px 4px; } }
   .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; }
   .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
   @media (max-width: 600px) {
@@ -179,6 +192,13 @@
     <div class="karte">
       <h2 id="tVarianten"></h2>
       <p class="zeile" id="varH"></p>
+      <label class="vschalter"><input type="checkbox" id="varSelbst"> <span id="varSelbstTxt"></span></label>
+      <div class="vleiste" id="varSelbstLeiste" hidden>
+        <span class="muted" id="varSelbstH"></span>
+        <span class="vstand" id="varStand"></span>
+        <button type="button" class="knopf hell" id="varLoes"></button>
+        <button type="button" class="knopf hell" id="varNeu"></button>
+      </div>
       <div class="varianten" id="varianten"></div>
       <p class="merke" id="varMerk"></p>
     </div>
