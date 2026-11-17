@@ -257,21 +257,21 @@
     var m = strich ? ((op === "+") === (y > 0) ? "+" : "−") : vzc(r);
     var auf, teile = [];
     if(strich){
-      auf = zp(x) + ' <span class="vpaar' + (VMOD === "zeigen" ? " mit" : "") + '" data-m="' + m + '">' + opZ(op) + " (" + vzc(y) + "</span>" + z(Math.abs(y)) + ")";
+      auf = zp(x) + ' <span class="vpaar">' + (VMOD === "zeigen" ? '<span class="vmk">' + m + "</span>" : "") + opZ(op) + " (" + vzc(y) + "</span>" + z(Math.abs(y)) + ")";
     } else {
       auf = '<span class="vpz">' + vzc(x) + "</span>" + z(Math.abs(x)) + " " + opZ(op) + ' (<span class="vpz">' + vzc(y) + "</span>" + z(Math.abs(y)) + ")";
     }
     teile.push(auf);
     var slot = function(){
       var g = VS[k];
-      if(g === m) return '<span class="vslot richtig" data-k="' + k + '"><b class="' + (strich ? "vsm" : "vpm") + '">' + m + "</b></span>";
-      if(VZEIG && !g) return '<span class="vslot zeig" data-k="' + k + '"><b>' + m + "</b></span>";
-      return '<span class="vslot' + (g ? " falsch" : "") + '" data-k="' + k + '" data-m="' + m + '">' +
+      if(g === m) return '<span class="vslot vziel richtig" data-k="' + k + '"><b class="' + (strich ? "vsm" : "vpm") + '">' + m + "</b></span>";
+      if(VZEIG && !g) return '<span class="vslot vziel zeig" data-k="' + k + '"><b>' + m + "</b></span>";
+      return '<span class="vslot vziel' + (g ? " falsch" : "") + '" data-k="' + k + '" data-m="' + m + '">' +
         '<button type="button" class="vsb' + (g === "+" ? " weg" : "") + '" data-s="+">+</button><button type="button" class="vsb' + (g === "−" ? " weg" : "") + '" data-s="−">−</button></span>';
     };
     if(VMOD === "zeigen"){
-      if(strich) teile.push("= " + zp(x) + ' <b class="vsm">' + m + "</b> " + z(Math.abs(y)));
-      teile.push(gl.trim() + " <b>" + (strich ? zp(r) : '<span class="vpm">' + vzc(r) + "</span>" + z(Math.abs(vRund(r)))) + "</b>");
+      if(strich) teile.push("= " + zp(x) + ' <b class="vsm vziel">' + m + "</b> " + z(Math.abs(y)));
+      teile.push(gl.trim() + " <b>" + (strich ? zp(r) : '<span class="vpm vziel">' + vzc(r) + "</span>" + z(Math.abs(vRund(r)))) + "</b>");
     } else if(VMOD === "vz"){
       if(strich){
         teile.push("= " + zp(x) + " " + slot() + " " + z(Math.abs(y)));
@@ -280,10 +280,42 @@
     } else {
       var wert = VE[k] || "";
       if(VZEIG && !wert) wert = zp(vRund(r));
-      teile.push(gl.trim() + ' <input class="vein' + (VZEIG && !VE[k] ? " zeig" : "") + '" autocomplete="off" spellcheck="false" dir="ltr" data-k="' + k + '" data-r="' + r + '" value="' + wert.replace(/"/g, "") + '"' + (VZEIG && !VE[k] ? " readonly" : "") + ">");
+      teile.push(gl.trim() + ' <input class="vein vziel' + (VZEIG && !VE[k] ? " zeig" : "") + '" autocomplete="off" spellcheck="false" dir="ltr" data-k="' + k + '" data-r="' + r + '" value="' + wert.replace(/"/g, "") + '"' + (VZEIG && !VE[k] ? " readonly" : "") + ">");
     }
     return teile.map(function(s){ return '<span class="vseg">' + s + "</span>"; }).join(" ");
   }
+  // Pfeile wie von Hand: Plus/Minus – vom zusammengefassten Zeichen (bzw. eingekreisten Zeichenpaar) zum Zeichen in der Rechnung;
+  // Mal/Geteilt – Vorzeichen 1 → Vorzeichen 2 → Vorzeichen des Ergebnisses. SVG über jeder Zeile, nach jedem Zeichnen/Größenwechsel neu.
+  var VNS = "http://www.w3.org/2000/svg";
+  function vPfeile(){
+    document.querySelectorAll("#varianten .vzeile").forEach(function(row){
+      var alt = row.querySelector("svg.vpfeile"); if(alt) alt.remove();
+      var R = row.getBoundingClientRect(); if(!R.width) return;
+      var strich = !!row.querySelector(".vpaar"), ziel = row.querySelector(".vziel"); if(!ziel || (strich && ziel.tagName === "INPUT")) return;
+      var mk = row.querySelector(".vmk");
+      var quellen = strich ? [mk || row.querySelector(".vpaar")] : Array.prototype.slice.call(row.querySelectorAll(".vpz"));
+      var pts = quellen.concat([ziel]).map(function(e){ var b = e.getBoundingClientRect(); return { x: b.left - R.left + b.width / 2, y: b.top - R.top, r: b.right - R.left, m: b.top - R.top + b.height / 2, u: b.bottom - R.top }; });
+      var svg = document.createElementNS(VNS, "svg"); svg.setAttribute("class", "vpfeile " + (strich ? "s" : "p"));
+      svg.setAttribute("width", R.width); svg.setAttribute("height", R.height); svg.setAttribute("aria-hidden", "true");
+      var d = "";
+      for(var i = 0; i + 1 < pts.length; i++){
+        var a = pts[i], b = pts[i + 1], x1, y1, x2 = b.x, y2 = b.y - 1;
+        if(strich && mk){ x1 = a.r + 1; y1 = a.m; } else { x1 = a.x + 3; y1 = a.y - 1; }
+        if(y2 > a.u + 4){ // Zeile umgebrochen: Bogen von unten nach unten
+          x1 = a.x; y1 = a.u + 1;
+          d += "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " C" + x1.toFixed(1) + " " + (y1 + 10).toFixed(1) + " " + x2.toFixed(1) + " " + (y2 - 10).toFixed(1) + " " + x2.toFixed(1) + " " + y2.toFixed(1) + " ";
+        } else {
+        var top = Math.max(2, Math.min(y1, y2) - 12);
+        d += "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " C" + (x1 + (x2 - x1) * 0.3).toFixed(1) + " " + top.toFixed(1) + " " + (x1 + (x2 - x1) * 0.8).toFixed(1) + " " + top.toFixed(1) + " " + x2.toFixed(1) + " " + y2.toFixed(1) + " ";
+        }
+        d += "M" + (x2 - 4.5).toFixed(1) + " " + (y2 - 6).toFixed(1) + " L" + x2.toFixed(1) + " " + y2.toFixed(1) + " L" + (x2 + 4.5).toFixed(1) + " " + (y2 - 6).toFixed(1) + " ";
+      }
+      var pa = document.createElementNS(VNS, "path"); pa.setAttribute("d", d); svg.appendChild(pa);
+      row.appendChild(svg);
+    });
+  }
+  if(window.ResizeObserver){ var vRO = new ResizeObserver(function(){ requestAnimationFrame(vPfeile); }); vRO.observe(document.getElementById("varianten")); }
+  else window.addEventListener("resize", vPfeile);
   function varianten(){
     var a = lies($("ra").value), b = lies($("rb").value), tb = $("varianten");
     var A = VA, B = VB;
@@ -330,6 +362,7 @@
     });
     vStand();
     $("varMerk").textContent = t("varMerk");
+    requestAnimationFrame(vPfeile);
   }
   document.querySelectorAll("#varModus button").forEach(function(bt){ bt.addEventListener("click", function(){
     VMOD = bt.dataset.m; VZEIG = false;

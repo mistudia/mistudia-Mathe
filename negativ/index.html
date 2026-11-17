@@ -108,30 +108,36 @@
   .vbox { border: 1px solid #c9dcf2; border-radius: 12px; overflow: hidden; background: #ffffff; min-width: 0; }
   .vkopf { background: #e3eefc; color: var(--blue); font: 800 22px system-ui, sans-serif; text-align: center; padding: 4px; }
   .vzeile { display: block; width: 100%; border: 0; border-top: 1px solid #e3eefc; background: #ffffff; color: var(--text); font: 17px system-ui, sans-serif; padding: 7px 6px; text-align: center; cursor: pointer; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .vbox.punkt .vkopf { background: #fdeef4; color: #c2185b; }
+  .vbox.punkt .vkopf { background: #e3f6e9; color: #0b8a3e; }
   .vzeile:hover { background: #f4f8ff; } .vzeile.an { background: #fef3c7; }
   @media (max-width: 860px) { .varianten { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 600px) { .vzeile { font-size: 15px; padding: 6px 2px; } }
+  @media (max-width: 600px) { .varianten { grid-template-columns: 1fr; } .vzeile { font-size: 17px; padding-bottom: 6px; } }
   .vmodus { display: inline-flex; flex-wrap: wrap; gap: 4px; background: #e3eefc; border-radius: 14px; padding: 4px; margin: 2px 0 8px; }
   .vmodus button { font: 700 15px system-ui, sans-serif; padding: 7px 14px; border-radius: 10px; border: 0; background: transparent; color: #1565c0; cursor: pointer; }
   .vmodus button[aria-pressed="true"] { background: #1565c0; color: #ffffff; }
   .vleg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 8px; }
   .vleg p { margin: 0; padding: 6px 10px; border-radius: 8px; font-size: 15px; line-height: 1.4; color: #1a2233; }
   .vleg .s { border-inline-start: 5px solid #1565c0; background: #eef5ff; }
-  .vleg .p { border-inline-start: 5px solid #c2185b; background: #fdeef4; }
+  .vleg .p { border-inline-start: 5px solid #0b8a3e; background: #e3f6e9; }
   @media (max-width: 700px) { .vleg { grid-template-columns: 1fr; } }
   .vleiste { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 6px; font-size: 15px; }
   .vleiste .knopf { padding: 7px 14px; font-size: 15px; }
   .vstand { font-weight: 800; color: var(--blue); } .vstand.gut { color: #15803d; }
   .vzeile { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; column-gap: 0.3em; row-gap: 2px; white-space: normal; }
-  .vzeile.mitm { padding-top: 15px; }
+  .vzeile { position: relative; padding-top: 18px; }
+  .vzeile.mitm { padding-top: 26px; }
+  .vpfeile { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+  .vpfeile path { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .vpfeile.s path { stroke: #1565c0; } .vpfeile.p path { stroke: #0b8a3e; }
   .vzeile.vselbst { cursor: default; }
   .vseg { white-space: nowrap; }
-  .vpaar { position: relative; border-bottom: 2px solid #1565c0; padding: 0 1px; }
-  .vpaar.mit::before { content: attr(data-m); position: absolute; left: 50%; transform: translateX(-50%); top: -0.95em; color: #1565c0; font-weight: 800; font-size: 0.95em; line-height: 1; }
+  .vpaar { position: relative; border: 2px solid #1565c0; border-radius: 999px; padding: 0 3px; }
+  .vmk { position: absolute; left: 50%; transform: translateX(-50%); bottom: 100%; margin-bottom: 1px; color: #1565c0; font-weight: 800; font-size: 0.95em; line-height: 1.1; border: 2px solid #1565c0; border-radius: 999px; padding: 0 3px; background: #ffffff; }
   .vsm { color: #1565c0; font-weight: 800; }
-  .vpz { color: #c2185b; font-weight: 800; border-bottom: 2px solid #c2185b; }
-  .vpm { color: #c2185b; font-weight: 800; }
+  b.vsm.vziel { border: 2px solid #1565c0; border-radius: 999px; padding: 0 3px; }
+  .vpz { color: #0b8a3e; font-weight: 800; border: 2px solid #0b8a3e; border-radius: 999px; padding: 0 2px; }
+  .vpm { color: #0b8a3e; font-weight: 800; }
+  .vpm.vziel { border: 2px solid #0b8a3e; border-radius: 999px; padding: 0 3px; }
   .vslot { display: inline-flex; gap: 2px; vertical-align: middle; }
   .vsb { font: 800 17px system-ui, sans-serif; width: 1.7em; padding: 2px 0; border: 2px solid #b0b0b8; border-radius: 8px; background: #ffffff; color: #1a2233; cursor: pointer; line-height: 1.1; }
   .vsb:hover, .vsb:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 3px #bbdefb; }
