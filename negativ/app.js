@@ -293,24 +293,37 @@
       var R = row.getBoundingClientRect(); if(!R.width) return;
       var strich = !!row.querySelector(".vpaar"), ziel = row.querySelector(".vziel"); if(!ziel || (strich && ziel.tagName === "INPUT")) return;
       var mk = row.querySelector(".vmk");
-      var quellen = strich ? [mk || row.querySelector(".vpaar")] : Array.prototype.slice.call(row.querySelectorAll(".vpz"));
-      var pts = quellen.concat([ziel]).map(function(e){ var b = e.getBoundingClientRect(); return { x: b.left - R.left + b.width / 2, y: b.top - R.top, r: b.right - R.left, m: b.top - R.top + b.height / 2, u: b.bottom - R.top }; });
+      function box(e){ var b = e.getBoundingClientRect(); return { x: b.left - R.left + b.width / 2, y: b.top - R.top, r: b.right - R.left, m: b.top - R.top + b.height / 2, u: b.bottom - R.top }; }
+      var Z = box(ziel), quellen = strich ? [mk || row.querySelector(".vpaar")] : Array.prototype.slice.call(row.querySelectorAll(".vpz"));
       var svg = document.createElementNS(VNS, "svg"); svg.setAttribute("class", "vpfeile " + (strich ? "s" : "p"));
       svg.setAttribute("width", R.width); svg.setAttribute("height", R.height); svg.setAttribute("aria-hidden", "true");
-      var d = "";
-      for(var i = 0; i + 1 < pts.length; i++){
-        var a = pts[i], b = pts[i + 1], x1, y1, x2 = b.x, y2 = b.y - 1;
-        if(strich && mk){ x1 = a.r + 1; y1 = a.m; } else { x1 = a.x + 3; y1 = a.y - 1; }
-        if(y2 > a.u + 4){ // Zeile umgebrochen: Bogen von unten nach unten
-          x1 = a.x; y1 = a.u + 1;
-          d += "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " C" + x1.toFixed(1) + " " + (y1 + 10).toFixed(1) + " " + x2.toFixed(1) + " " + (y2 - 10).toFixed(1) + " " + x2.toFixed(1) + " " + y2.toFixed(1) + " ";
-        } else {
-        var top = Math.max(2, Math.min(y1, y2) - 12);
-        d += "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " C" + (x1 + (x2 - x1) * 0.3).toFixed(1) + " " + top.toFixed(1) + " " + (x1 + (x2 - x1) * 0.8).toFixed(1) + " " + top.toFixed(1) + " " + x2.toFixed(1) + " " + y2.toFixed(1) + " ";
-        }
-        d += "M" + (x2 - 4.5).toFixed(1) + " " + (y2 - 6).toFixed(1) + " L" + x2.toFixed(1) + " " + y2.toFixed(1) + " L" + (x2 + 4.5).toFixed(1) + " " + (y2 - 6).toFixed(1) + " ";
+      var linie = "", spitzen = "";
+      // gefüllte Spitze in Richtung der Kurve am Ende (Tangente = Ende − letzter Kontrollpunkt)
+      function spitze(x, y, cx, cy){
+        var dx = x - cx, dy = y - cy, l = Math.sqrt(dx * dx + dy * dy) || 1, ux = dx / l, uy = dy / l, L = 7, B = 3.5;
+        var bx = x - ux * L, by = y - uy * L;
+        spitzen += "M" + x.toFixed(1) + " " + y.toFixed(1) + " L" + (bx - uy * B).toFixed(1) + " " + (by + ux * B).toFixed(1) + " L" + (bx + uy * B).toFixed(1) + " " + (by - ux * B).toFixed(1) + "Z ";
+        return { x: bx + ux * 1.5, y: by + uy * 1.5 }; // Linie endet in der Spitze
       }
-      var pa = document.createElementNS(VNS, "path"); pa.setAttribute("d", d); svg.appendChild(pa);
+      quellen.forEach(function(q, i){
+        var A = box(q), x1, y1, x2, y2 = Z.y - 1;
+        // Mal/Geteilt: beide Vorzeichen zeigen aufs Ergebnis; der weitere Bogen höher und etwas weiter links
+        var weit = !strich && quellen.length > 1 && i === 0;
+        x2 = Z.x;
+        if(!strich && quellen.length > 1 && !weit){ var rr = (Z.u - Z.y) / 2; x2 = Z.x - rr * 0.78; y2 = Z.m - rr * 0.78; } // kurzer Pfeil schräg von links oben
+        if(strich && mk){ x1 = A.r + 1; y1 = A.m; } else { x1 = A.x; y1 = A.y - 1; }
+        var c1x, c1y, c2x, c2y;
+        if(y2 > A.u + 4){ // Zeile umgebrochen: von unten nach unten
+          y1 = A.u + 1; x1 = A.x; c1x = x1; c1y = y1 + 12; c2x = x2; c2y = y2 - 12;
+        } else {
+          var top = Math.max(1, Math.min(y1, y2) - (weit ? 21 : 12));
+          c1x = x1 + (x2 - x1) * 0.15; c1y = top; c2x = x2 - (x2 - x1) * (weit ? 0.05 : 0.35); c2y = top + (weit ? 0 : 2);
+        }
+        var e = spitze(x2, y2, c2x, c2y);
+        linie += "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " C" + c1x.toFixed(1) + " " + c1y.toFixed(1) + " " + c2x.toFixed(1) + " " + c2y.toFixed(1) + " " + e.x.toFixed(1) + " " + e.y.toFixed(1) + " ";
+      });
+      var pa = document.createElementNS(VNS, "path"); pa.setAttribute("d", linie); svg.appendChild(pa);
+      var ps = document.createElementNS(VNS, "path"); ps.setAttribute("d", spitzen); ps.setAttribute("class", "spitze"); svg.appendChild(ps);
       row.appendChild(svg);
     });
   }

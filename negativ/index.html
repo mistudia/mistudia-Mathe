@@ -124,8 +124,9 @@
   .vleiste { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 6px; font-size: 15px; }
   .vleiste .knopf { padding: 7px 14px; font-size: 15px; }
   .vstand { font-weight: 800; color: var(--blue); } .vstand.gut { color: #15803d; }
-  .vzeile { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; column-gap: 0.3em; row-gap: 2px; white-space: normal; }
+  .vzeile { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; column-gap: 0.22em; row-gap: 2px; white-space: normal; }
   .vzeile { position: relative; padding-top: 18px; }
+  .vbox.punkt .vzeile { padding-top: 26px; }
   .vzeile.mitm { padding-top: 26px; }
   .vsein { width: 1.7em; box-sizing: border-box; font: 800 17px system-ui, sans-serif; text-align: center; padding: 2px 0; border: 2px solid #b0b0b8; border-radius: 8px; background: #ffffff; color: #1a2233; }
   .vsein:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 3px #bbdefb; }
@@ -134,16 +135,18 @@
   .vsein.zeig { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
   .vpfeile { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
   .vpfeile path { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .vpfeile path.spitze { stroke: none; }
+  .vpfeile.s path.spitze { fill: #7c3aed; } .vpfeile.p path.spitze { fill: #e67700; }
   .vpfeile.s path { stroke: #7c3aed; } .vpfeile.p path { stroke: #e67700; }
   .vzeile.vselbst { cursor: default; }
   .vseg { white-space: nowrap; }
   .vpaar { position: relative; border: 2px solid #7c3aed; border-radius: 999px; padding: 0 3px; }
-  .vmk { position: absolute; left: 50%; transform: translateX(-50%); bottom: 100%; margin-bottom: 1px; color: #7c3aed; font-weight: 800; font-size: 0.95em; line-height: 1.1; border: 2px solid #7c3aed; border-radius: 999px; padding: 0 3px; background: #ffffff; }
+  .vmk { position: absolute; left: 50%; transform: translateX(-50%); bottom: 100%; margin-bottom: 2px; color: #7c3aed; font-weight: 800; font-size: 0.95em; border: 2px solid #7c3aed; background: #ffffff; width: 1.3em; height: 1.3em; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; padding: 0 0 0.06em; line-height: 1; }
   .vsm { color: #7c3aed; font-weight: 800; }
-  b.vsm.vziel { border: 2px solid #7c3aed; border-radius: 999px; padding: 0 3px; }
-  .vpz { color: #e67700; font-weight: 800; border: 2px solid #e67700; border-radius: 999px; padding: 0 2px; }
+  b.vsm.vziel { border: 2px solid #7c3aed; width: 1.3em; height: 1.3em; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; padding: 0 0 0.06em; line-height: 1; }
+  .vpz { color: #e67700; font-weight: 800; border: 2px solid #e67700; margin-inline-end: 1px; width: 1.3em; height: 1.3em; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; padding: 0 0 0.06em; line-height: 1; }
   .vpm { color: #e67700; font-weight: 800; }
-  .vpm.vziel { border: 2px solid #e67700; border-radius: 999px; padding: 0 3px; }
+  .vpm.vziel { border: 2px solid #e67700; margin-inline-end: 1px; width: 1.3em; height: 1.3em; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; padding: 0 0 0.06em; line-height: 1; }
   .vein { width: 4.2em; box-sizing: border-box; font: 700 17px system-ui, sans-serif; text-align: center; padding: 3px 4px; border: 2px solid #b0b0b8; border-radius: 8px; background: #ffffff; color: #1a2233; font-variant-numeric: tabular-nums; }
   .vein:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 3px #bbdefb; }
   .vein.richtig { border-color: #16a34a; background: #dcfce7; color: #14532d; }
