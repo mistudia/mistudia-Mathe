@@ -285,7 +285,7 @@
     ".ne-schritte{list-style:none;padding:0;margin:10px 0}.ne-schritte>li{border-inline-start:4px solid var(--blue);padding:6px 12px;margin:10px 0;background:#f8fbff;border-radius:0 10px 10px 0}" +
     ".ne-schritte h3{margin:0 0 4px;font-size:17px;color:var(--blue)}.ne-schritte p{margin:4px 0;font-size:16.5px;line-height:1.55}.ne-formel{font-size:19px;font-weight:700;color:#1e3a8a}" +
     "#neBild{width:100%;height:auto;display:block;margin-top:6px}" +
-    "@media (max-width:560px){.ne-tab{grid-template-columns:minmax(0,40%) minmax(0,1fr)}.ne-tab .ne-sym,.ne-tab .ne-wert{white-space:normal;overflow-wrap:anywhere}.ne-tab .ne-kopf{display:none}.ne-tab .ne-wert{grid-column:2;text-align:start;padding-top:0}.ne-tab .ne-wert::before{content:attr(data-l) ': ';font-weight:400;color:var(--muted);font-size:14px}}";
+    "@media (max-width:560px){.ne-tab{grid-template-columns:minmax(0,40%) minmax(0,1fr)}.ne-tab .ne-sym,.ne-tab .ne-wert{white-space:normal;overflow-wrap:anywhere}.ne-tab>div{overflow-wrap:anywhere;hyphens:auto;-webkit-hyphens:auto}.ne-tab .ne-kopf{display:none}.ne-tab .ne-wert{grid-column:2;text-align:start;padding-top:0}.ne-tab .ne-wert::before{content:attr(data-l) ': ';font-weight:400;color:var(--muted);font-size:14px}}";
   document.head.appendChild(css);
 
   function bild(F, a, b){

@@ -126,7 +126,7 @@
     .kopf,
     .aufgabe {
       display: grid;
-      grid-template-columns: 1fr 35px 1fr 35px 1fr;
+      grid-template-columns: minmax(0, 1fr) 35px minmax(0, 1fr) 35px minmax(0, 1fr);
       align-items: center;
       gap: 8px;
     }
@@ -295,10 +295,11 @@
       h1 { font-size: 22px; }
 
       .kopf { font-size: 12px; }
+      .aufgabe input::placeholder { color: transparent; } /* Spaltenüberschrift steht darüber */
 
       .kopf,
       .aufgabe {
-        grid-template-columns: 1fr 18px 1fr 18px 1fr;
+        grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr) 18px minmax(0, 1fr);
         gap: 3px;
       }
 

@@ -66,7 +66,7 @@
   .werkzeuge { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 8px; }
   .wz { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border-radius: 12px; border: 2px solid var(--line); background: #ffffff; color: var(--text); cursor: pointer; font: 600 12px system-ui, sans-serif; min-width: 0; }
   .wz svg { width: 26px; height: 26px; }
-  .wz span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .wz span { max-width: 100%; white-space: normal; text-align: center; line-height: 1.15; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
   .wz[aria-pressed="true"] { border-color: var(--blue); background: #e3eefc; color: var(--blue); }
   .zeile2 { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 6px; min-height: 40px; }
   .feldbox { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }

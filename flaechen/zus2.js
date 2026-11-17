@@ -160,7 +160,7 @@
     ".z2-loch{fill:rgba(220,38,38,.12);stroke:#dc2626;stroke-width:2;stroke-dasharray:6 4}" +
     ".z2-r{stroke:#7c3aed;stroke-width:2.5}.z2-h{stroke:#dc2626;stroke-width:2.5;stroke-dasharray:6 4}" +
     ".z2-lab{font:700 17px system-ui,sans-serif;fill:#1a2233;paint-order:stroke;stroke:#ffffff;stroke-width:4px;stroke-linejoin:round}" +
-    ".z2-frage{border-top:1px solid #dbe5f3;padding-top:8px;margin-top:8px}.z2-ein{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.z2-inp{width:125px !important}" +
+    ".z2-frage{border-top:1px solid #dbe5f3;padding-top:8px;margin-top:8px}.z2-ein{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.z2-ein .z2-inp{width:125px}" +
     ".z2-m{font-weight:700}.z2-m.gut{color:#15803d}.z2-m.schlecht{color:#b91c1c}" +
     ".z2-tipp,.z2-weg{margin:6px 0}.z2-tipp summary,.z2-weg summary{cursor:pointer;font-weight:700;color:#1565c0;font-size:15px;padding:4px 0}" +
     ".z2-tipp p{background:#fff8e1;border-inline-start:4px solid #f59e0b;padding:6px 10px;border-radius:8px;margin:4px 0;font-size:15.5px;line-height:1.45;color:#1a2233}" +

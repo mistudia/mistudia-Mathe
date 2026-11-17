@@ -21,3 +21,9 @@
 .header:has(> .leftHeader > img.logo) { grid-template-columns: 1fr !important; row-gap: 6px; }
 .header:has(> .leftHeader > img.logo) > .leftHeader { justify-self: center; width: 100%; }
 .header:has(> .leftHeader > img.logo) > .rightHeader { display: none; }
+
+/* Auswahllisten nie breiter als der Bildschirm (lange Einträge, z. B. auf Russisch) */
+select { max-width: 100%; text-overflow: ellipsis; }
+
+/* Platzhalter, der nicht ins Feld passt, wird kleiner geschrieben (home-button.js setzt --msPhFs) */
+input::placeholder { font-size: var(--msPhFs, inherit); }

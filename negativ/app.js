@@ -233,6 +233,7 @@
   var VA = 3, VB = 4;
   var VMOD = (function(){ try { var m = localStorage.getItem("msNegVarModus"); if(m === "zeigen" || m === "vz" || m === "selbst") return m; return localStorage.getItem("msNegSelbst") === "1" ? "selbst" : "zeigen"; } catch(e){ return "zeigen"; } })();
   var VE = {}, VS = {}, VZEIG = false;
+  var VMARK = (function(){ try { return localStorage.getItem("msNegVarMark") !== "0"; } catch(e){ return true; } })();
   function vRund(r){ return Math.round(r * 100) / 100; }
   function vzc(v){ return v < 0 ? "−" : "+"; }
   function vPruefe(inp){
@@ -290,6 +291,7 @@
   function vPfeile(){
     document.querySelectorAll("#varianten .vzeile").forEach(function(row){
       var alt = row.querySelector("svg.vpfeile"); if(alt) alt.remove();
+      if(!VMARK) return;
       var R = row.getBoundingClientRect(); if(!R.width) return;
       var strich = !!row.querySelector(".vpaar"), ziel = row.querySelector(".vziel"); if(!ziel || (strich && ziel.tagName === "INPUT")) return;
       var mk = row.querySelector(".vmk");
@@ -305,23 +307,25 @@
         spitzen += "M" + x.toFixed(1) + " " + y.toFixed(1) + " L" + (bx - uy * B).toFixed(1) + " " + (by + ux * B).toFixed(1) + " L" + (bx + uy * B).toFixed(1) + " " + (by - ux * B).toFixed(1) + "Z ";
         return { x: bx + ux * 1.5, y: by + uy * 1.5 }; // Linie endet in der Spitze
       }
+      var zusammen = !strich && quellen.length > 1;
+      // Mal/Geteilt: beide Bögen treffen sich über dem Ergebnis-Vorzeichen, von dort EIN Pfeil nach unten
+      var J = { x: Z.x, y: Z.y - 11 };
       quellen.forEach(function(q, i){
-        var A = box(q), x1, y1, x2, y2 = Z.y - 1;
-        // Mal/Geteilt: beide Vorzeichen zeigen aufs Ergebnis; der weitere Bogen höher und etwas weiter links
-        var weit = !strich && quellen.length > 1 && i === 0;
-        x2 = Z.x;
-        if(!strich && quellen.length > 1 && !weit){ var rr = (Z.u - Z.y) / 2; x2 = Z.x - rr * 0.78; y2 = Z.m - rr * 0.78; } // kurzer Pfeil schräg von links oben
+        var A = box(q), x1, y1, x2 = Z.x, y2 = Z.y - 1;
         if(strich && mk){ x1 = A.r + 1; y1 = A.m; } else { x1 = A.x; y1 = A.y - 1; }
+        if(zusammen){ x2 = J.x; y2 = J.y; }
         var c1x, c1y, c2x, c2y;
-        if(y2 > A.u + 4){ // Zeile umgebrochen: von unten nach unten
+        if(Z.y - 1 > A.u + 4){ // Zeile umgebrochen: von unten nach unten
           y1 = A.u + 1; x1 = A.x; c1x = x1; c1y = y1 + 12; c2x = x2; c2y = y2 - 12;
         } else {
-          var top = Math.max(1, Math.min(y1, y2) - (weit ? 21 : 12));
-          c1x = x1 + (x2 - x1) * 0.15; c1y = top; c2x = x2 - (x2 - x1) * (weit ? 0.05 : 0.35); c2y = top + (weit ? 0 : 2);
+          var top = Math.max(1, Math.min(y1, y2) - (zusammen ? (i === 0 ? 10 : 4) : 12));
+          c1x = x1 + (x2 - x1) * 0.15; c1y = top; c2x = x2 - (x2 - x1) * 0.3; c2y = zusammen ? y2 - (i === 0 ? 4 : 1) : top;
         }
+        if(zusammen){ linie += "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " C" + c1x.toFixed(1) + " " + c1y.toFixed(1) + " " + c2x.toFixed(1) + " " + c2y.toFixed(1) + " " + x2.toFixed(1) + " " + y2.toFixed(1) + " "; return; }
         var e = spitze(x2, y2, c2x, c2y);
         linie += "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " C" + c1x.toFixed(1) + " " + c1y.toFixed(1) + " " + c2x.toFixed(1) + " " + c2y.toFixed(1) + " " + e.x.toFixed(1) + " " + e.y.toFixed(1) + " ";
       });
+      if(zusammen){ var e2 = spitze(Z.x, Z.y - 1, J.x, J.y - 6); linie += "M" + J.x.toFixed(1) + " " + J.y.toFixed(1) + " L" + e2.x.toFixed(1) + " " + e2.y.toFixed(1) + " "; }
       var pa = document.createElementNS(VNS, "path"); pa.setAttribute("d", linie); svg.appendChild(pa);
       var ps = document.createElementNS(VNS, "path"); ps.setAttribute("d", spitzen); ps.setAttribute("class", "spitze"); svg.appendChild(ps);
       row.appendChild(svg);
@@ -341,6 +345,8 @@
     $("varSelbstH").hidden = VMOD === "zeigen"; $("varStand").hidden = VMOD === "zeigen";
     $("varLoes").hidden = VMOD === "zeigen";
     $("varLoes").textContent = VZEIG ? t("selbstVerbergen") : t("selbstLoes"); $("varNeu").textContent = t("neuesBsp");
+    $("varMarkTxt").textContent = t("markZeigen"); $("varMark").checked = VMARK;
+    $("varianten").classList.toggle("ohneMark", !VMARK);
     $("varLegS").textContent = t("legS"); $("varLegP").textContent = t("legP");
     var paare = [[A, B], [A, -B], [-A, B], [-A, -B]], h = "";
     [["+", "regelPlus"], ["-", "regelMinus"], ["*", "regelMal"], [":", "regelGeteilt"]].forEach(function(o){
@@ -401,6 +407,10 @@
     try { localStorage.setItem("msNegVarModus", VMOD); } catch(e){}
     varianten();
   }); });
+  $("varMark").addEventListener("change", function(){
+    VMARK = this.checked; try { localStorage.setItem("msNegVarMark", VMARK ? "1" : "0"); } catch(e){}
+    varianten();
+  });
   $("varLoes").addEventListener("click", function(){ VZEIG = !VZEIG; varianten(); });
   $("varNeu").addEventListener("click", function(){
     var p; do { p = VPAARE[zuf(0, VPAARE.length - 1)]; } while(p[0] === VA && p[1] === VB);

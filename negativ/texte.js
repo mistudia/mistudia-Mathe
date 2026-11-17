@@ -381,3 +381,9 @@ pt: {
   };
   for(var l in X) for(var k in X[l]) NT[l][k] = X[l][k];
 })();
+
+// Ergänzung: Markierungen ein/aus
+(function(){
+  var X = {de: { markZeigen: "Markierungen zeigen" }, en: { markZeigen: "Show markings" }, es: { markZeigen: "Mostrar marcas" }, zh: { markZeigen: "显示标记" }, fr: { markZeigen: "Afficher les repères" }, ru: { markZeigen: "Показывать пометки" }, ar: { markZeigen: "إظهار العلامات" }, ja: { markZeigen: "印を表示" }, pt: { markZeigen: "Mostrar marcações" }};
+  for(var l in X) for(var k in X[l]) NT[l][k] = X[l][k];
+})();

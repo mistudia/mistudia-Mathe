@@ -145,3 +145,47 @@
     if(best){ e.preventDefault(); best.focus(); try { best.select(); } catch(x){} }
   });
 })();
+
+// ---------- Eingabefelder wachsen mit, damit Inhalt und Platzhalter lesbar bleiben ----------
+// Ist der eingetippte (oder per Programm gesetzte) Text oder der Platzhalter breiter als das Feld,
+// wird das Feld so breit wie nötig – höchstens so breit wie sein Elternelement. Wird der Text
+// wieder kürzer, schrumpft es bis zur ursprünglichen Breite zurück. Felder, in die alles passt,
+// bleiben unverändert. data-nofit schaltet ab.
+(function(){
+  "use strict";
+  var TYP = /^(text|number|search|tel|email|url|)$/i, cv = document.createElement("canvas").getContext("2d");
+  function breite(txt, cs){
+    cv.font = cs.fontStyle + " " + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+    var w = cv.measureText(txt).width, ls = parseFloat(cs.letterSpacing);
+    return w + (isFinite(ls) ? ls * txt.length : 0);
+  }
+  function passe(inp){
+    if(inp.tagName !== "INPUT" || !TYP.test(inp.type || "") || inp.hasAttribute("data-nofit") || inp.offsetParent === null) return;
+    var cs = getComputedStyle(inp);
+    var rand = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+    if(inp._msW == null){ if(inp.offsetWidth < 4) return; inp._msW = inp.offsetWidth; inp._msStil = inp.style.width; }
+    var txt = inp.value || inp.placeholder || "";
+    var noetig = Math.ceil(breite(txt, cs) + rand + (inp.type === "number" ? 22 : 6));
+    var p = inp.parentElement, max = p ? p.clientWidth : 0;
+    if(max > 0) noetig = Math.min(noetig, max);
+    if(noetig > inp._msW){ inp.style.width = noetig + "px"; inp.style.maxWidth = "100%"; inp._msGross = true; }
+    else if(inp._msGross){ inp.style.width = inp._msStil; inp._msGross = false; }
+    // Platzhalter passt auch nach dem Verbreitern nicht: Schrift des Platzhalters verkleinern (mind. 11 px)
+    if(!inp.value && inp.placeholder){
+      var frei = inp.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - (inp.type === "number" ? 18 : 2);
+      var fs = parseFloat(cs.fontSize), pw = breite(inp.placeholder, cs);
+      if(pw > frei && frei > 0) inp.style.setProperty("--msPhFs", Math.max(11, Math.floor(fs * frei / pw)) + "px");
+      else inp.style.removeProperty("--msPhFs");
+    }
+  }
+  var geplant = false;
+  function alle(){ geplant = false; var l = document.querySelectorAll("input"); for(var i = 0; i < l.length; i++) passe(l[i]); }
+  function spaeter(){ if(!geplant){ geplant = true; requestAnimationFrame(alle); } }
+  document.addEventListener("input", function(e){ passe(e.target); }, true);
+  document.addEventListener("focusin", function(e){ passe(e.target); }, true);
+  ["click", "keyup", "change"].forEach(function(t){ document.addEventListener(t, function(){ setTimeout(spaeter, 30); }, true); });
+  window.addEventListener("load", spaeter);
+  window.addEventListener("resize", function(){ var l = document.querySelectorAll("input"); for(var i = 0; i < l.length; i++){ if(l[i]._msGross){ l[i].style.width = l[i]._msStil; l[i]._msGross = false; } l[i]._msW = null; } spaeter(); });
+  if(window.MutationObserver) new MutationObserver(spaeter).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["placeholder", "value", "hidden", "class"] });
+  window.msFelderAnpassen = alle;
+})();

@@ -55,8 +55,8 @@
   .formel { font-size: 30px; border: 3px solid var(--blue); border-radius: 10px; padding: 6px 16px; background: #ffffff; white-space: nowrap; }
   .wolke { background: #fff6a8; border: 2px solid #e6c800; border-radius: 22px; padding: 6px 14px; font-size: 14px; text-align: center; color: #3a3200; }
   .wolke .m { color: #d4001a; font-size: 17px; }
-  .effekte { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
-  .eff { border-radius: 12px; padding: 8px 10px; font-size: 14px; text-align: center; background: #ffffff; border: 2px solid; }
+  .effekte { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .eff { border-radius: 12px; padding: 8px 10px; font-size: 14px; text-align: center; overflow-wrap: anywhere; hyphens: auto; -webkit-hyphens: auto; background: #ffffff; border: 2px solid; }
   .eff b.m { font-size: 20px; display: block; }
   .eff.a { border-color: var(--ca); color: #8a5d00; } .eff.b { border-color: var(--cb); color: #006b34; }
   .eff.c { border-color: var(--cc); color: #00648a; } .eff.d { border-color: var(--cd); color: #8f0f89; }
@@ -119,7 +119,7 @@
   @media (max-width: 760px) {
     body { padding: 8px; } .app { padding: 12px; border-radius: 16px; }
     h1 { font-size: 24px; } .formel { font-size: 22px; padding: 4px 10px; }
-    .effekte { grid-template-columns: repeat(2, 1fr); }
+    .effekte { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .haupt { grid-template-columns: 1fr; }
     .live { font-size: 18px; }
   }
