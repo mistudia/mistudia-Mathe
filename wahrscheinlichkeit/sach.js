@@ -218,7 +218,8 @@
       var g = zuf(3, 7), bl = zuf(2, 5), r = zuf(2, 5), n = g + bl + r, s = S(), k = function(x){ return s[x + "K"] + "\u200E"; };
       var pg = F(g * (g - 1), n * (n - 1)), pb = F(bl * (bl - 1), n * (n - 1)), pr = F(r * (r - 1), n * (n - 1)), p = plus(plus(pg, pb), pr);
       return { v: { g: g, b: bl, r: r }, f: [
-        { l: p, w: [["ohne", "n = " + g + " + " + bl + " + " + r + " = " + n],
+        { l: p, w: [["", k("grau") + " = " + s.grau + " · " + k("blau") + " = " + s.blau + " · " + k("rot") + " = " + s.rot],
+          ["ohne", "n = " + g + " + " + bl + " + " + r + " = " + n],
           ["pfad", "P(" + k("grau") + ", " + k("grau") + ") = " + b(g, n) + " · " + b(g - 1, n - 1) + " = " + b(g * (g - 1), n * (n - 1))],
           ["pfad", "P(" + k("blau") + ", " + k("blau") + ") = " + b(bl, n) + " · " + b(bl - 1, n - 1) + " = " + b(bl * (bl - 1), n * (n - 1))],
           ["pfad", "P(" + k("rot") + ", " + k("rot") + ") = " + b(r, n) + " · " + b(r - 1, n - 1) + " = " + b(r * (r - 1), n * (n - 1))],
@@ -355,7 +356,7 @@
         ' <span class="meldung sa-m ' + (z.ok === true ? "gut" : z.ok === false ? "schlecht" : "") + '">' + (z.ok === true ? esc(s.richtig) : z.ok === false ? esc(s.falsch) : "") + "</span></div>" +
         '<details class="sa-tipp"' + (z.ok === false ? " open" : "") + "><summary>" + esc(s.tipp) + "</summary><p>" + esc(s.T[akt]) + "</p></details>" +
         '<details class="sa-weg"' + (z.ok === true ? " open" : "") + "><summary>" + esc(s.weg) + '</summary><ol class="lauf">' +
-        q.w.map(function(w){ return "<li><span class=\"sa-l\">" + esc(s.L[w[0]] || "") + '</span><br><bdi dir="ltr">' + esc(w[1]) + "</bdi></li>"; }).join("") +
+        q.w.map(function(w){ return "<li>" + (s.L[w[0]] ? "<span class=\"sa-l\">" + esc(s.L[w[0]]) + "</span><br>" : "") + '<bdi dir="ltr">' + esc(w[1]) + "</bdi></li>"; }).join("") +
         '</ol><p class="sa-erg"><b>' + esc(s.loesung) + '</b> <bdi dir="ltr">' + esc(voll(q.l)) + "</bdi></p></details></div>";
     });
     h += '<p><button type="button" class="knopf hell" id="saNeu">↻ ' + esc(s.neu) + "</button></p></div>";

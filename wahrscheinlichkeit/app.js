@@ -134,6 +134,15 @@
       b.pfad.forEach(function(oo){ knotenZeichnen(svg, x, cy, oo, 9); x += 20; });
       svg.appendChild(el("text", { x: blattX + 20 * stufen, y: cy + 6, "class": "b-blatt" }, o.verdeckt && !aus[b.key] ? "= ?" : o.verdeckt && o.nurZiel ? "= ?" : ("= " + (o.f || fmt)(b.p, o.format)).replace("= ≈", "≈")));
     });
+    baumLegende(svg, B);
+  }
+  // Legende der Kürzel in den Kreisen (z. B. K = Kopf · Z = Zahl), direkt unter dem Baum
+  function baumLegende(svg, B){
+    var ks = [];
+    B.blaetter.forEach(function(b){ b.pfad.forEach(function(oo){ if(ks.indexOf(oo.k) < 0) ks.push(oo.k); }); });
+    var p = svg.nextElementSibling;
+    if(!p || !p.classList.contains("baum-leg")){ p = document.createElement("p"); p.className = "ms-zeichen baum-leg"; svg.parentNode.insertBefore(p, svg.nextSibling); }
+    p.innerHTML = ks.map(function(k){ return '<span class="msz-e"><bdi dir="ltr" class="msz-s">' + kurz(k) + "</bdi> = " + t(k) + "</span>"; }).join('<span class="msz-p"> · </span>');
   }
   function knotenZeichnen(svg, x, y, o, r){
     var g = el("g", { "class": "b-knoten" });

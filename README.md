@@ -65,3 +65,5 @@ Verschieben/Zoomen in Exponential, Logarithmus, Sinus, Integral, Differential: �
 
 
 Wurzeln: `formel.js` wandelt jeden Text mit „√“ global um (Strich über dem ganzen Radikanden), auch in künftigen Kacheln; ausgenommen SVG/Canvas. Popups (`verschieben.js`): nur an der Überschrift ziehen, Text bleibt markierbar.
+
+Formelzeichen/Abkürzungen: `/zeichen.js` (über home-button.js überall geladen) zeigt je Reiter eine Legende „Zeichen: A = Flächeninhalt · u = Umfang …“. Bedeutungen in `ZD` (9 Sprachen, Zeichen pro Sprache möglich, `{lblN}` usw. aus funktionen/texte.js), Zuordnung je Kachel in `KA`. **Neue Kachel mit Formelzeichen → Eintrag in `KA` ergänzen.** Baumdiagramme (wahrscheinlichkeit) haben eine eigene Kürzel-Legende (baumLegende).

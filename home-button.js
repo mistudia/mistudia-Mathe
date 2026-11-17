@@ -98,6 +98,11 @@
   var s = document.createElement("script"); s.src = "/verschieben.js"; document.head.appendChild(s);
 })();
 
+// ---------- Legende der Formelzeichen und Abkürzungen (/zeichen.js) ----------
+(function(){
+  if(window.MS_ZEICHEN || document.querySelector('script[src="/zeichen.js"]')) return;
+  var s = document.createElement("script"); s.src = "/zeichen.js"; document.head.appendChild(s);
+})();
 // ---------- Rechenwege Zeile für Zeile, Brüche, Wurzeln (/formel.js) ----------
 (function(){
   if(window.MS_F || document.querySelector('script[src="/formel.js"]')) return;
