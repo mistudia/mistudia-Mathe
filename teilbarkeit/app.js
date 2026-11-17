@@ -269,4 +269,11 @@
   } };
   window.MS_LANG = { apply: function(l){ if(TB[l]){ lang = l; alles(); } } };
   alles();
+  // Direktlinks: #regeln, #teiler, #sieb (Sieb des Eratosthenes), #ueben
+  function hashTab(){
+    var h = location.hash.slice(1);
+    if(h === "sieb"){ zeigeTab("teiler"); setTimeout(function(){ $("sieb").scrollIntoView({ block: "center" }); }, 50); }
+    else if(["regeln", "teiler", "ueben"].indexOf(h) >= 0) zeigeTab(h);
+  }
+  hashTab(); window.addEventListener("hashchange", hashTab);
 })();

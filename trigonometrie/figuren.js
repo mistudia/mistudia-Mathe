@@ -338,5 +338,5 @@
     ".sa-tipp p{background:#fff8e1;border-inline-start:4px solid #f59e0b;padding:6px 10px;border-radius:8px;margin:4px 0;font-size:15.5px;line-height:1.45;color:#1a2233}" +
     ".sa-weg .lauf{font-size:16.5px;line-height:1.5}.sa-weg .lauf li{margin:4px 0}.sa-l{color:#4f5b6e;font-size:14px}";
   document.head.appendChild(css);
-  window.MS_TRIG_FIG = { sprache: function(l){ if(FG[l]) lang = l; zeigen(); }, zeigen: zeigen };
+  window.MS_TRIG_FIG = { sprache: function(l){ if(FG[l]) lang = l; zeigen(); }, zeigen: zeigen, waehle: function(k){ if(FIG[k]){ akt = k; neu(); zeigen(); } } };
 })();

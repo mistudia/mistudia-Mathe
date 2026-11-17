@@ -162,6 +162,16 @@
     // ---------- Normalverteilung ----------
     Nmu: ["N(μ; σ²)", "Normalverteilung mit Erwartungswert μ und Standardabweichung σ", "normal distribution with mean μ and standard deviation σ", "distribución normal con media μ y desviación típica σ", "期望为 μ、标准差为 σ 的正态分布", "loi normale d’espérance μ et d’écart type σ", "нормальное распределение со средним μ и стандартным отклонением σ", "التوزيع الطبيعي بمتوسط μ وانحراف معياري σ", "平均 μ、標準偏差 σ の正規分布", "distribuição normal com média μ e desvio-padrão σ"],
     IQ: ["IQ", "Intelligenzquotient", "intelligence quotient", "cociente intelectual", "智商", "quotient intellectuel", "коэффициент интеллекта", "حاصل الذكاء", "知能指数", "quociente de inteligência"],
+    // ---------- Berühmte Aufgaben ----------
+    gS: ["S", "Summe aller Zahlen", "sum of all the numbers", "suma de todos los números", "所有数的和", "somme de tous les nombres", "сумма всех чисел", "مجموع كل الأعداد", "すべての数の和", "soma de todos os números"],
+    gn: ["n", "letzte (größte) Zahl der Summe", "last (largest) number of the sum", "último (mayor) número de la suma", "和中最后（最大）的数", "dernier (plus grand) nombre de la somme", "последнее (наибольшее) число суммы", "آخر (أكبر) عدد في المجموع", "和の最後の（いちばん大きい）数", "último (maior) número da soma"],
+    nEcken: ["n", "Anzahl der Ecken des Vielecks", "number of corners of the polygon", "número de lados del polígono", "多边形的边数", "nombre de côtés du polygone", "число сторон многоугольника", "عدد أضلاع المضلّع", "多角形の角の数", "número de lados do polígono"],
+    dKreis: ["d", "Durchmesser des Kreises", "diameter of the circle", "diámetro del círculo", "圆的直径", "diamètre du cercle", "диаметр круга", "قطر الدائرة", "円の直径", "diâmetro do círculo"],
+    thH: ["H", "Höhe der Pyramide", "height of the pyramid", "altura de la pirámide", "金字塔的高", "hauteur de la pyramide", "высота пирамиды", "ارتفاع الهرم", "ピラミッドの高さ", "altura da pirâmide"],
+    thS: ["S", "Schatten der Pyramide, ab ihrer Mitte gemessen", "shadow of the pyramid, measured from its centre", "sombra de la pirámide, medida desde su centro", "金字塔的影长（从中心量起）", "ombre de la pyramide, mesurée depuis son centre", "тень пирамиды от её центра", "ظل الهرم مقيسًا من مركزه", "ピラミッドの影（中心から）", "sombra da pirâmide, a partir do centro"],
+    thh: ["h", "Höhe des Stabs", "height of the stick", "altura del palo", "木杆的高", "hauteur du bâton", "высота палки", "ارتفاع العصا", "棒の高さ", "altura da vara"],
+    ths: ["s", "Schatten des Stabs", "shadow of the stick", "sombra del palo", "木杆的影长", "ombre du bâton", "тень палки", "ظل العصا", "棒の影", "sombra da vara"],
+    Pw: ["P( … )", "Wahrscheinlichkeit für das Ereignis in der Klammer", "probability of the event in brackets", "probabilidad del suceso entre paréntesis", "括号中事件的概率", "probabilité de l’événement entre parenthèses", "вероятность события в скобках", "احتمال الحدث بين القوسين", "かっこの中のことが起こる確率", "probabilidade do acontecimento entre parênteses"],
     // ---------- Einheiten (Größen) ----------
     u_km: ["km", "Kilometer", "kilometre", "kilómetro", "千米", "kilomètre", "километр", "كيلومتر", "キロメートル", "quilómetro"],
     u_m: ["m", "Meter", "metre", "metro", "米", "mètre", "метр", "متر", "メートル", "metro"],

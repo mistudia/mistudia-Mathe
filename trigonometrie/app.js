@@ -397,4 +397,12 @@
   } };
   window.MS_LANG = { apply: function(l){ if(TG[l]){ lang = l; alles(); if(window.MS_TRIG_FIG) MS_TRIG_FIG.sprache(l); } } };
   alles();
+  // Direktlink: #erdumfang (Eratosthenes, z. B. aus „Berühmte Aufgaben“), #figuren, #einheitskreis …
+  function hashTab(){
+    var h = location.hash.slice(1), M = { einheitskreis: "kreis", dreieck: "dreieck", figuren: "fig", erdumfang: "fig", rechner: "rechner", ueben: "ueben" };
+    if(!M[h]) return;
+    zeigeTab(M[h]);
+    if(h === "erdumfang") setTimeout(function(){ if(window.MS_TRIG_FIG && MS_TRIG_FIG.waehle) MS_TRIG_FIG.waehle("erat"); }, 0);
+  }
+  hashTab(); window.addEventListener("hashchange", hashTab);
 })();
