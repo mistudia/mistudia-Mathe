@@ -149,9 +149,9 @@
   $("modell").addEventListener("change", function(){ mod = $("modell").value; eingabenBauen(); wachstum(); });
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var typ = wahl(["wert", "faktor", "zweiP", "halb", "verdopp", "mono", "ablesen"]), A = { typ: typ };
     if(typ === "wert"){ A.a = wahl([1, 2, 3, 5, 0.5]); A.b = wahl([2, 3, 0.5, 1.5, 4]); A.x = wahl([-2, -1, 2, 3, 4]); A.l = A.a * Math.pow(A.b, A.x); }
     else if(typ === "faktor"){ A.p = wahl([2, 3, 5, 8, 12, 20, 25, 40]) * wahl([1, -1]); A.l = 1 + A.p / 100; }
@@ -197,7 +197,7 @@
       else if(A.typ === "verdopp") L.push(bdi(A.t + " : " + A.T + " = " + A.n) + " " + t("verdN", { n: A.n }) + " " + bdi(A.N0 + " · 2<sup>" + A.n + "</sup> = " + A.N0 + " · " + Math.pow(2, A.n) + " = " + zahl(A.l)));
       else L.push(t("ablesenWeg", { a: bdi(zahl(A.a)), y: bdi(zahl(A.a * A.b)), b: bdi(zahl(A.b)) }));
     }
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     if(A.typ === "mono") $("antwortzeile").querySelectorAll("button").forEach(function(b){ b.disabled = true; });
     $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);

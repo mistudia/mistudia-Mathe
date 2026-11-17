@@ -149,9 +149,9 @@
 
   // ---------- Reiter Üben ----------
   var TRIPEL = [[3, 4, 5], [5, 12, 13], [6, 8, 10], [8, 15, 17], [7, 24, 25], [9, 12, 15], [20, 21, 29], [12, 16, 20]];
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var typ = wahl(["hyp", "hyp", "kat", "kat", "umk", "leiter", "abstand", "bild"]), A2 = { typ: typ };
     if(typ === "hyp"){ if(Math.random() < 0.5){ var T = wahl(TRIPEL); A2.a = T[0]; A2.b = T[1]; } else { A2.a = zuf(2, 12); A2.b = zuf(2, 12); } A2.l = Math.hypot(A2.a, A2.b); }
     else if(typ === "kat"){ if(Math.random() < 0.5){ var T2 = wahl(TRIPEL); A2.b = T2[0]; A2.c = T2[2]; } else { A2.b = zuf(2, 10); A2.c = A2.b + zuf(1, 8); } A2.l = Math.sqrt(A2.c * A2.c - A2.b * A2.b); }
@@ -194,7 +194,7 @@
       else if(A2.typ === "kat" || A2.typ === "leiter") L.push(bdi((A2.typ === "kat" ? "a" : "h") + " = √(" + zahl(A2.c) + "² − " + zahl(A2.b) + "²) = √(" + zahl(A2.c * A2.c) + " − " + zahl(A2.b * A2.b) + ") = √" + zahl(A2.c * A2.c - A2.b * A2.b) + " " + (genau(A2.l) ? "=" : "≈") + " " + zahl(A2.l)));
       else { var dx = A2.Q[0] - A2.P[0], dy = A2.Q[1] - A2.P[1]; L.push(t("abstandWeg", { x: bdi(zahl(Math.abs(dx))), y: bdi(zahl(Math.abs(dy))) })); L.push(bdi("d = √(" + zahl(Math.abs(dx)) + "² + " + zahl(Math.abs(dy)) + "²) = √(" + (dx * dx) + " + " + (dy * dy) + ") = √" + (dx * dx + dy * dy) + " " + (genau(A2.l) ? "=" : "≈") + " " + zahl(A2.l))); }
     }
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     $("antwortzeile").querySelectorAll("button").forEach(function(b){ if(A2.typ === "umk") b.disabled = true; });
     $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);

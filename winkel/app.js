@@ -162,7 +162,7 @@
   }
   $("parR").addEventListener("input", parZeigen);
   var PQ = { phi: 60, ziel: "β", st: 1, fertig: false, ok: 0, n: 0 };
-  function pqNeu(){ do { PQ.phi = zuf(25, 155); } while(Math.abs(PQ.phi - 90) < 8); var L = []; NAMEN.forEach(function(n){ [1, 2].forEach(function(s){ if(!(n === "α" && s === 1)) L.push([n, s]); }); }); var z = wahl(L); PQ.ziel = z[0]; PQ.st = z[1]; PQ.fertig = false; $("pqEin").value = ""; $("pqMeld").textContent = ""; $("pqMeld").className = "meldung"; $("pqWegBox").open = false; pqZeigen(); }
+  function pqNeu(){ PQ.zw = false; do { PQ.phi = zuf(25, 155); } while(Math.abs(PQ.phi - 90) < 8); var L = []; NAMEN.forEach(function(n){ [1, 2].forEach(function(s){ if(!(n === "α" && s === 1)) L.push([n, s]); }); }); var z = wahl(L); PQ.ziel = z[0]; PQ.st = z[1]; PQ.fertig = false; $("pqEin").value = ""; $("pqMeld").textContent = ""; $("pqMeld").className = "meldung"; $("pqWegBox").open = false; pqZeigen(); }
   function zielName(){ return PQ.ziel + (PQ.st === 2 ? STR : ""); }
   function pqZeigen(){
     var mark = { "α1": { f: "#2563eb", t: "α = " + PQ.phi + "°" } }, w = wertVon(PQ.ziel, PQ.phi);
@@ -179,7 +179,9 @@
   }
   function pqPruefen(){
     if(PQ.fertig) return; var e = lies($("pqEin").value); if(!isFinite(e)) return;
-    PQ.fertig = true; PQ.n++; var w = wertVon(PQ.ziel, PQ.phi), ok = Math.abs(e - w) < 0.5; if(ok) PQ.ok++;
+    var w = wertVon(PQ.ziel, PQ.phi), ok = Math.abs(e - w) < 0.5;
+    if(!ok && !PQ.zw){ PQ.zw = true; msNochmal($("pqMeld")); return; }
+    PQ.fertig = true; PQ.n++; if(ok) PQ.ok++;
     $("pqMeld").textContent = ok ? t("parOk") : t("parFalsch", { w: w }); $("pqMeld").className = "meldung " + (ok ? "gut" : "schlecht");
     $("pqWegBox").open = true; pqZeigen();
   }

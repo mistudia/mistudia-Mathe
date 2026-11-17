@@ -247,9 +247,9 @@
   function setzeZWeg(w){ zWeg = w; var box = $("zWeg"); box.innerHTML = ""; [["zerlegen", "zw1"], ["ergaenzen", "zw2"], ["umfang", "zw3"]].forEach(function(x){ var b = document.createElement("button"); b.type = "button"; b.textContent = t(x[1]); b.setAttribute("aria-pressed", x[0] === zWeg ? "true" : "false"); b.addEventListener("click", function(){ setzeZWeg(x[0]); }); box.appendChild(b); }); zus(); }
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var art = wahl(["A", "A", "A", "u", "u", "rueck", "L"]), A = { art: art };
     if(art === "A" || art === "u"){
       var ty = art === "A" ? wahl(["quadrat", "rechteck", "parallelogramm", "dreieck", "trapez", "raute", "drachen", "kreis"]) : wahl(["quadrat", "rechteck", "parallelogramm", "kreis"]), P = {};
@@ -296,7 +296,7 @@
     if(beantwortet) return;
     var v = lies(e); if(!isFinite(v)) return;
     var A = auf, tol = Math.max(0.011, Math.abs(A.l) * 0.006), ok = Math.abs(v - A.l) <= tol;
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var einh = (A.art === "A" || (A.art === "L" && A.frage === "A")) ? " cm²" : " cm", lt = zg(A.l) + einh, L = [];
     if(A.art === "A") L.push(bdi(A.R.fA[0] + " = " + A.R.fA[1] + (A.R.zA || []).map(function(x){ return " = " + x; }).join("") + " " + (genau(A.l) ? "=" : "≈") + " " + zahl(A.l) + einh));
     else if(A.art === "u") L.push(bdi(A.R.fu[0] + " = " + A.R.fu[1] + (A.R.zu || []).map(function(x){ return " = " + x; }).join("") + " " + (genau(A.l) ? "=" : "≈") + " " + zahl(A.l) + einh));

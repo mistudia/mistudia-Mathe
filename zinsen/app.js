@@ -163,9 +163,9 @@
   [["zzKR", "zzK"], ["zzPR", "zzP"], ["zzNR", "zzN"]].forEach(function(x){ $(x[0]).addEventListener("input", function(){ var v = String(Number($(x[0]).value)); $(x[1]).value = komma() ? v.replace(".", ",") : v; zinseszins(); }); });
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var typ = wahl(["W", "W", "G", "P", "E", "S", "zJ", "zM", "zT", "zz"]), A = { typ: typ };
     if(typ === "W"){ A.p = wahl([5, 10, 15, 20, 25, 30, 40, 60, 75]); A.G = zuf(4, 30) * 20; A.l = A.G * A.p / 100; A.geld = false; }
     else if(typ === "G"){ A.p = wahl([10, 20, 25, 40, 50, 75]); A.G = zuf(4, 30) * 20; A.W = A.G * A.p / 100; A.l = A.G; }
@@ -194,7 +194,7 @@
     var v = lies(e); if(!isFinite(v)) return;
     var A = auf, tol = A.geld ? (gf() === 1 ? 0.011 : 1.01) : Math.max(0.011, Math.abs(A.l) * 0.001);
     var ok = Math.abs(v - A.l) <= tol;
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var g = function(x){ return A.geld ? geld(x) : zahl(x, 2); }, lt = A.typ === "P" ? zahl(A.l, 2) + " %" : g(A.l), L = [];
     if(A.typ === "W") L.push(bdi("W = G · p : 100 = " + zahl(A.G) + " · " + zahl(A.p) + " : 100 = " + zahl(A.G * A.p) + " : 100 = " + zahl(A.l)));
     else if(A.typ === "G") L.push(bdi("G = W · 100 : p = " + zahl(A.W) + " · 100 : " + zahl(A.p) + " = " + zahl(A.W * 100) + " : " + zahl(A.p) + " = " + zahl(A.l)));

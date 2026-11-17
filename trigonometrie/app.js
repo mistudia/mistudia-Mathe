@@ -253,9 +253,9 @@
   $("fall").addEventListener("change", rechnerFelder);
 
   // ---------- Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false;
   function neueAufgabe(){
-    beantwortet = false;
+    beantwortet = false; zweiterV = false;
     var typ = wahl(["begriff", "seite", "seite", "winkel", "kreis"]);
     if(typ === "begriff"){
       var a = zuf(3, 8), b = zuf(4, 9), bz = wahl(["al", "be"]), was = wahl(["gk", "ak", "hyp"]);
@@ -328,7 +328,7 @@
       else if(auf.typ === "winkel"){ ok = Math.abs(v - auf.l) <= 0.6; ltxt = "≈ " + z(auf.l, 1) + "°"; lauf = auf.L.schritte.slice(1, 2); }
       else { ok = Math.abs(v - auf.l) <= 0.011; var e = exakt(auf.fn, auf.deg); ltxt = zf(auf.l, 2) + (e && e !== zf(auf.l, 2) && e !== "1" && e !== "0" && e !== "−1" ? " (" + t("genau", { e: e }) + ")" : ""); }
     }
-    beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(eingabe)){ zweiterV = true; msNochmal($("meldung")); return; } beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht");
     m.innerHTML = ok ? t("richtig") + " " + bdi(ltxt) : t("falsch", { l: bdi(ltxt) });
     if(auf.typ === "begriff") m.innerHTML += '<br><span class="muted" style="font-weight:400">' + t(auf.was + "E") + "</span>";

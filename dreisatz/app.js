@@ -171,9 +171,9 @@
   $("pruefBtn").addEventListener("click", pruefeTabelle);
 
   // ---------- Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false;
   function neueAufgabe(){
-    beantwortet = false;
+    beantwortet = false; zweiterV = false;
     var typ = wahl(["text", "text", "text", "erk", "luecke"]);
     if(typ === "text"){ var V = erzeuge(wahl(VORLAGEN)); auf = { typ: typ, V: V, l: V.r }; }
     else if(typ === "erk"){
@@ -222,7 +222,7 @@
     var ok, ltxt;
     if(auf.typ === "erk"){ ok = eingabe === auf.l; ltxt = t(auf.l === "p" ? "prop" : auf.l === "a" ? "anti" : "keine"); }
     else { var v = lies(eingabe); if(!isFinite(v)) return; ok = Math.abs(v - auf.l) <= 0.005 * Math.max(1, Math.abs(auf.l)); ltxt = auf.typ === "text" ? yZelle(auf.V, auf.l) : z(auf.l); }
-    beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(eingabe)){ zweiterV = true; msNochmal($("meldung")); return; } beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht");
     m.innerHTML = ok ? t("richtig") + " " + bdi(ltxt) : t("falsch", { l: bdi(ltxt) });
     if(auf.typ === "text"){ $("uLoes").innerHTML = dreisatzHTML(auf.V); $("uLoes").hidden = false; }

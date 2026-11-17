@@ -273,10 +273,10 @@
   $("funk").addEventListener("change", graph); $("eigenF").addEventListener("input", graph);
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   var UFIG = ["quadrat", "rechteck", "raute", "parallelogramm", "drachen", "trapez", "dreieckGS", "dreieckGSch", "dreieck", "fuenfeck", "sechseck", "bH", "bA", "bE", "bN", "bZ", "bX", "bT"];
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var r = Math.random(), typ = r < 0.2 ? "achsen" : r < 0.36 ? "punkt" : r < 0.6 ? "spiegelP" : r < 0.82 ? "ergaenze" : "funktion";
     if(typ === "achsen" || typ === "punkt"){ var k = wahl(UFIG); auf = { typ: typ, k: k, l: typ === "achsen" ? sym(k).achsen.length : sym(k).dreh.indexOf(180) >= 0 }; }
     else if(typ === "spiegelP"){ var P; do { P = [zuf(-6, 6), zuf(-6, 6)]; } while(!P[0] || !P[1] || P[0] === P[1]); var a = wahl(KOARTEN); auf = { typ: typ, P: P, a: a, l: koBild(P, a) }; }
@@ -365,7 +365,7 @@
       ok = true; for(var r = 0; r < auf.R; r++) for(var c = 0; c < auf.C; c++) if(istZiel(r, c) !== !!auf.wahl[r + "," + c]) ok = false;
       lt = t("siehe");
     } else { ok = e === auf.l; lt = t(auf.l === "y" ? "gAchseK" : auf.l === "o" ? "gPunktK" : "gKeineK"); }
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     if(auf.typ === "achsen" || auf.typ === "punkt"){ figurZeichnen($("uSvg"), auf.k, { achsen: true, dreh: auf.typ === "punkt" ? 180 : null }); L.push(figInfo(auf.k)); if(auf.typ === "punkt") L.push(t("punktErkl")); }
     else if(auf.typ === "spiegelP") L.push(t("regel_" + auf.a) + ": " + pt(auf.P) + " → " + pt(auf.l));
     else if(auf.typ === "ergaenze"){ uRaster(true); L.push(t("ergErkl")); }

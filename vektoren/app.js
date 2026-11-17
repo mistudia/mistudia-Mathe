@@ -198,10 +198,10 @@
   }
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   function rv(a, b){ return [zuf(a, b), zuf(a, b), zuf(a, b)]; }
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var typ = wahl(["ab", "betrag", "skalar", "ortho", "winkel", "mitte", "kreuz", "lage"]), A = { typ: typ };
     if(typ === "ab"){ A.P = rv(-5, 6); A.Q = rv(-5, 6); A.l = sub(A.Q, A.P); A.n = 3; }
     else if(typ === "betrag"){ var T = wahl([[1, 2, 2], [2, 3, 6], [2, 6, 9], [4, 4, 7], [1, 4, 8], [2, 10, 11], [3, 4, 12]]); A.v = T.map(function(x){ return x * wahl([1, -1]); }).sort(function(){ return Math.random() - 0.5; }); A.l = len(A.v); A.n = 1; }
@@ -259,7 +259,7 @@
         var zeilen = [z0(a[1]) + "·" + z0(b[2]) + " − " + z0(a[2]) + "·" + z0(b[1]), z0(a[2]) + "·" + z0(b[0]) + " − " + z0(a[0]) + "·" + z0(b[2]), z0(a[0]) + "·" + z0(b[1]) + " − " + z0(a[1]) + "·" + z0(b[0])];
         L.push(bdi("a × b = " + '<span class="vk">' + zeilen.map(function(x){ return "<span>" + x + "</span>"; }).join("") + "</span> = " + vk(A.l))); }
     }
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + lt : t("falsch", { l: lt });
     if(A.typ === "ortho" || A.typ === "lage") $("antwortzeile").querySelectorAll("button").forEach(function(b){ b.disabled = true; });
     $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);

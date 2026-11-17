@@ -292,7 +292,7 @@
     auf = { typ: "lap", ex: ex, ev: ev, k: k, n: O.length, l: F(k, O.length) }; zeige();
   }
   function pruefeLap(v){
-    var ok = Math.abs(v - num(auf.l)) <= 0.005; beantwortet = true; anzahl++; if(ok) punkte++;
+    var ok = Math.abs(v - num(auf.l)) <= 0.005; if(!ok && !zweiterV && true){ zweiterV = true; msNochmal($("meldung")); return; } beantwortet = true; anzahl++; if(ok) punkte++;
     var lt = fmt(auf.l, "bruch") + " = " + fmt(auf.l, "prozent");
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     $("uLauf").innerHTML = "<li>" + t("lapWeg", { k: auf.k, n: auf.n }) + " " + bdi("P = " + auf.k + "/" + auf.n + " = " + fmt(auf.l, "bruch")) + "</li>"; sicht($("uLauf"), true);
@@ -469,7 +469,7 @@
   }
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false;
   function expText(X){
     var k = X.stufen;
     if(X.art === "muenze") return t("expMuenze", { k: k });
@@ -497,7 +497,7 @@
     return t("uKtx_" + auf.pr, { n: auf.n }) + " " + (auf.art === "luecke" ? t("aufVierLuecke") : t("aufVierBed", { q: bdi(frageSym(auf.q) + " = " + frageName(auf.q, auf.pr)) }));
   }
   function neueAufgabe(){
-    beantwortet = false;
+    beantwortet = false; zweiterV = false;
     var zz = Math.random(); if(zz < 0.3) return neueVier(); if(zz < 0.5) return neueLaplace();
     var art = wahl(["muenze", "wuerfel", "urneMit", "urneOhne", "urneOhne", "rad"]), st = art === "rad" ? 2 : wahl([2, 2, 3]);
     var r = zuf(2, 6), b = zuf(2, 5), X = experiment(art, st, r, b, F(1, 4)), BB = baumBauen(X), typ = wahl(["pfad", "ereignis", "ereignis"]);
@@ -529,7 +529,7 @@
   }
   function pruefeVier(v){
     var lu = auf.art === "luecke", ok = lu ? Math.abs(v - auf.l) < 1e-9 : Math.abs(v - num(auf.l)) <= 0.005;
-    beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && true){ zweiterV = true; msNochmal($("meldung")); return; } beantwortet = true; anzahl++; if(ok) punkte++;
     var lt = lu ? String(auf.l) : fmt(auf.l, "bruch") + " ≈ " + zahl(num(auf.l) * 100, 2) + " %";
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     var M = auf.M, L = [];
@@ -554,7 +554,7 @@
     if(auf.typ === "vier") return pruefeVier(v);
     if(auf.typ === "lap") return pruefeLap(v);
     var ok = Math.abs(v - num(auf.l)) <= 0.005;
-    beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } beantwortet = true; anzahl++; if(ok) punkte++;
     var lt = fmt(auf.l, "bruch") + " ≈ " + zahl(num(auf.l) * 100, 2) + " %";
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     var sv = $("uBaum"); sicht(sv, true); zeichneBaum(sv, auf.B, { stufen: auf.X.stufen, auswahl: auf.aus });

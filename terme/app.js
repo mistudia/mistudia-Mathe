@@ -290,12 +290,12 @@
   function beispiele(box, inp, L, f){ box.innerHTML = ""; L.forEach(function(x){ var b = document.createElement("button"); b.type = "button"; b.textContent = x; b.addEventListener("click", function(){ inp.value = x; f(); }); box.appendChild(b); }); }
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   function vz(c, erst){ return erst ? (c < 0 ? "−" : "") : (c < 0 ? " − " : " + "); }
   function glied(c, v, erst){ var a = Math.abs(c); return vz(c, erst) + (v ? (a === 1 ? "" : a) + v : a); }
   function nz(a, b){ var x; do { x = zuf(a, b); } while(!x); return x; }
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var typ = wahl(["zus", "zus", "prod", "klammer", "klammer", "pm", "pm", "binom", "aus", "aus"]), txt = "", V = wahl([["a", "b"], ["x", "y"], ["m", "n"]]);
     if(typ === "zus"){
       var n = zuf(4, 6), L = [];
@@ -368,7 +368,7 @@
       }
       ok = gleich && form; if(gleich && !form) hinweis = t("h_nichtGanz", { f: bdi(ft) });
     } else { ok = gleich && vereinfacht(ast); if(gleich && !ok) hinweis = t("h_weiter"); }
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); if(hinweis) $("meldung").innerHTML += " " + hinweis; return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var loes = A.typ === "aus" ? (function(){ var R = ausklammern(A.p); return faktorTxt(R.G) + "(" + ptxt(R.innen) + ")"; })() : ptxt(A.p);
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht");
     m.innerHTML = ok ? t("richtig") + " " + bdi(loes) : (hinweis ? hinweis + " " : (gleich ? "" : t("h_falsch") + " ")) + t("loesung", { l: bdi(loes) });

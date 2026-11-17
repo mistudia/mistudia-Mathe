@@ -116,9 +116,9 @@
   ["bn", "bp", "bk"].forEach(function(id){ $(id).addEventListener("input", naeherung); });
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var bsp = wahl(["koerper", "iq", "abfuell", "pruefung", "lampe"]), B = BSP[bsp], mu = B[0], s = B[1];
     var typ = wahl(["kleiner", "groesser", "zwischen", "sigma", "z", "quantil"]), A = { typ: typ, bsp: bsp, mu: mu, s: s };
     var off = function(){ return Math.round(wahl([-2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2, 2.5]) * s * 10) / 10; };
@@ -154,7 +154,7 @@
     else if(A.typ === "sigma") L.push(t("sigmaRegel"));
     else if(A.typ === "z") L.push(bdi("z = (x − μ) : σ = (" + zahl(A.x, 2) + " − " + zahl(A.mu, 2) + ") : " + zahl(A.s, 2) + " = " + zahl(A.l, 2)));
     else L.push(bdi("Φ(z) = " + zahl(A.q, 2) + " → z ≈ " + zahl(quantil(A.q), 3) + " → x = μ + z · σ ≈ " + zahl(A.l, 1)));
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);
     $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });

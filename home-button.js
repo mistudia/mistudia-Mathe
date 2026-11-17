@@ -25,6 +25,27 @@
   a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2 2.5 11.1a1 1 0 0 0 1.3 1.5l.7-.6V20a1 1 0 0 0 1 1h4.5v-5.5h4V21H18.5a1 1 0 0 0 1-1v-8l.7.6a1 1 0 1 0 1.3-1.5Z"/></svg>';
   document.body.appendChild(a);
 
+  // Üben: zweiter Versuch nach einer falschen getippten Antwort (alle Kacheln).
+  // msTippbar(e): true, wenn die Antwort aus einem Eingabefeld kommt (Text oder
+  // mehrere Felder) – bei Ja/Nein- oder Auswahl-Knöpfen gibt es keinen 2. Versuch.
+  // msNochmal(meldungEl): zeigt „Noch nicht richtig …“ und setzt den Cursor ins Feld.
+  var NOCH = { de: "Noch nicht richtig – versuch es noch einmal.", en: "Not quite – try once more.", es: "Todavía no – inténtalo otra vez.",
+    zh: "还不对——再试一次。", fr: "Pas encore – essaie encore une fois.", ru: "Пока неверно – попробуй ещё раз.",
+    ar: "ليست صحيحة بعد – حاول مرة أخرى.", ja: "まだちがいます。もう一度やってみよう。", pt: "Ainda não – tente mais uma vez." };
+  window.msTippbar = function(e){
+    if(Array.isArray(e)) return true;
+    if(typeof e !== "string" || !e.trim()) return false;
+    var ins = document.querySelectorAll("input");
+    for(var i = 0; i < ins.length; i++){ var ty = (ins[i].type || "text").toLowerCase(); if(ty !== "checkbox" && ty !== "radio" && ty !== "range" && ins[i].value === e) return true; }
+    return false;
+  };
+  window.msNochmal = function(m){
+    if(m){ m.className = "meldung schlecht"; m.textContent = NOCH[lang] || NOCH.de; }
+    var f = document.activeElement && document.activeElement.tagName === "INPUT" ? document.activeElement : null;
+    if(!f){ var ins = document.querySelectorAll("input"); for(var i = ins.length - 1; i >= 0; i--){ if(ins[i].offsetParent && !ins[i].disabled && /^(text|number|)$/i.test(ins[i].type || "") && ins[i].value){ f = ins[i]; break; } } }
+    if(f){ try { f.focus(); f.select(); } catch(x){} }
+  };
+
   // VocabBoss-Konto: richtige Aufgaben → Dogdex-Karte (konto.js)
   var kj = document.createElement("script"); kj.src = "/konto.js"; kj.defer = true; document.head.appendChild(kj);
 

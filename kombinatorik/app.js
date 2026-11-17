@@ -192,21 +192,22 @@
     var m = $("meldung");
     if(!status){ m.textContent = ""; m.className = "meldung"; sicht($("uLoesung"), false); $("pruefen").disabled = false; return; }
     if(status.leer){ m.textContent = t("keineZahl"); m.className = "meldung schlecht"; return; }
+    if(status.nochmal){ msNochmal(m); return; }
     var w = anzahl(auf.fall, auf.n, auf.k);
     m.textContent = status.gut ? t("richtig") : t("falsch", { erg: gz(w) }); m.className = "meldung " + (status.gut ? "gut" : "schlecht");
     $("uLoesung").innerHTML = '<p class="zeile">' + esc(t("fall", { fall: fallName(auf.fall) })) + '</p><p class="zeile">' + f(gegeben(auf.fall, auf.n, auf.k)) + '</p><p class="wert">' + rechnung(auf.fall, auf.n, auf.k) + "</p>";
     sicht($("uLoesung"), true); $("pruefen").disabled = true;
   }
   function pruefe(){
-    if(!auf || (status && !status.leer)) return;
+    if(!auf || (status && !status.leer && !status.nochmal)) return;
     var s = $("uAntwort").value.replace(/[\s.,'’  ]/g, "");
     if(!/^\d+$/.test(s)){ status = { leer: true }; zeigeAufgabe(); return; }
     var gut = Number(s) === anzahl(auf.fall, auf.n, auf.k);
-    status = { gut: gut }; gemacht++; if(gut) punkte++;
+    if(!gut && !(status && status.nochmal)){ status = { nochmal: true }; msNochmal($("meldung")); return; } status = { gut: gut }; gemacht++; if(gut) punkte++;
     zeigeAufgabe();
   }
   $("pruefen").addEventListener("click", pruefe);
-  $("uAntwort").addEventListener("keydown", function(e){ if(e.key === "Enter"){ if(status && !status.leer) neueAufgabe(); else pruefe(); } });
+  $("uAntwort").addEventListener("keydown", function(e){ if(e.key === "Enter"){ if(status && !status.leer && !status.nochmal) neueAufgabe(); else pruefe(); } });
   $("weiter").addEventListener("click", neueAufgabe);
 
   // ---------- Reiter & Texte ----------

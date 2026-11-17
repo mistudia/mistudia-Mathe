@@ -415,19 +415,20 @@
     var m = $("meldung");
     if(!status){ m.textContent = ""; m.className = "meldung"; sicht($("uWeg"), false); $("pruefen").disabled = false; return; }
     if(status.leer){ m.textContent = t("keineZahl"); m.className = "meldung schlecht"; return; }
+    if(status.nochmal){ msNochmal(m); return; }
     m.textContent = status.gut ? t("richtig") : t("falsch", { erg: zahl(auf.soll, 2) }); m.className = "meldung " + (status.gut ? "gut" : "schlecht");
     $("uWeg").innerHTML = "<b>" + esc(t("wegL")) + "</b><ol>" + auf.weg.map(function(z){ return "<li>" + bdi(z) + "</li>"; }).join("") + "</ol>";
     sicht($("uWeg"), true); $("pruefen").disabled = true;
   }
   function pruefe(){
-    if(!auf || (status && !status.leer)) return;
+    if(!auf || (status && !status.leer && !status.nochmal)) return;
     var v = lies($("uAntwort").value);
     if(!isFinite(v)){ status = { leer: true }; zeigeAufgabe(); return; }
     var gut = Math.abs(v - auf.soll) <= 0.0051 + 1e-9 * Math.abs(auf.soll);
-    status = { gut: gut }; gemacht++; if(gut) punkte++; zeigeAufgabe();
+    if(!gut && !(status && status.nochmal)){ status = { nochmal: true }; msNochmal($("meldung")); return; } status = { gut: gut }; gemacht++; if(gut) punkte++; zeigeAufgabe();
   }
   $("pruefen").addEventListener("click", pruefe);
-  $("uAntwort").addEventListener("keydown", function(e){ if(e.key === "Enter"){ if(status && !status.leer) neueAufgabe(); else pruefe(); } });
+  $("uAntwort").addEventListener("keydown", function(e){ if(e.key === "Enter"){ if(status && !status.leer && !status.nochmal) neueAufgabe(); else pruefe(); } });
   $("weiter").addEventListener("click", neueAufgabe);
 
   // ---------- Reiter & Texte ----------

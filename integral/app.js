@@ -356,7 +356,7 @@
   });
 
   // ---------- Reiter 4: Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false;
   function zufPoly(gr, teilbar){
     var p = [];
     for(var k = 0; k <= gr; k++){ var c = zuf(-3, 3); if(teilbar && k > 0 && Math.random() < 0.7) c = (k + 1) * zuf(-2, 2); p.push(B(c)); }
@@ -364,7 +364,7 @@
     return FK.trim(p);
   }
   function neueAufgabe(){
-    beantwortet = false;
+    beantwortet = false; zweiterV = false;
     var typ = wahl(["stamm", "integral", "integral", "flaeche"]);
     if(typ === "stamm"){
       var p = zufPoly(zuf(1, 3), true), F = stamm(p), richtig = FK.ptxt(F);
@@ -425,7 +425,7 @@
           namen: R.teile.map(function(tl, i){ var m = (tl.von.v + tl.bis.v) / 2; return { x: m, y: auf.fn.f(m) / 2, text: "I" + tief(i + 1) }; }) });
       }
     }
-    beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht");
     m.innerHTML = ok ? t("richtig") + " " + bdi(ltxt) : t("falsch", { l: bdi(ltxt) });
     if(auf.typ === "stamm") $("antwortzeile").querySelectorAll("button").forEach(function(b){ if(b.dataset.w === auf.l) b.classList.add("gut"); else if(b.dataset.w === e) b.classList.add("schlecht"); });

@@ -21,6 +21,8 @@
     return (r < 0 ? "−" : "") + s;
   }
   function zk(v){ return v < 0 ? "(" + z(v) + ")" : z(v); } // in Klammern, wenn negativ
+  function zp(v){ return (Math.round(v * 100) > 0 ? "+" : "") + z(v); } // mit Vorzeichen, auch „+“
+  function zkp(v){ return Math.round(v * 100) !== 0 ? "(" + zp(v) + ")" : z(v); } // 2. Zahl immer mit Vorzeichen in Klammern
   function lies(s){ s = String(s).trim().replace(/[−–]/g, "-").replace(",", ".").replace(/\s/g, ""); if(s === "" || s === "-") return NaN; return Number(s); }
   function zuf(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
   function sicht(e, an){ if(an) e.removeAttribute("hidden"); else e.setAttribute("hidden", ""); } // SVG kennt .hidden nicht
@@ -259,11 +261,11 @@
         var x = p[0], y = p[1], r = rechne(x, op, y), ex = isFinite(r) && Math.abs(r * 100 - Math.round(r * 100)) > 1e-9, an = x === a && y === b;
         if(VSELBST && isFinite(r)){
           var k = z(x) + op + z(y), wert = VE[k] || "";
-          if(VZEIG && !wert) wert = z(vRund(r));
-          h += '<div class="vzeile vselbst' + (an ? " an" : "") + '">' + bdi(z(x) + " " + opZ(op) + " " + zk(y) + (ex ? " ≈ " : " = ")) +
+          if(VZEIG && !wert) wert = zp(vRund(r));
+          h += '<div class="vzeile vselbst' + (an ? " an" : "") + '">' + bdi(zp(x) + " " + opZ(op) + " " + zkp(y) + (ex ? " ≈ " : " = ")) +
             '<input class="vein' + (VZEIG && !VE[k] ? " zeig" : "") + '" autocomplete="off" spellcheck="false" dir="ltr" data-k="' + k + '" data-r="' + r + '" value="' + wert.replace(/"/g, "") + '"' + (VZEIG && !VE[k] ? " readonly" : "") + "></div>";
         } else {
-          h += '<button type="button" class="vzeile' + (an ? " an" : "") + '" data-a="' + x + '" data-b="' + y + '">' + bdi(z(x) + " " + opZ(op) + " " + zk(y) + (isFinite(r) ? (ex ? " ≈ " : " = ") + "<b>" + z(r) + "</b>" : " = –")) + "</button>";
+          h += '<button type="button" class="vzeile' + (an ? " an" : "") + '" data-a="' + x + '" data-b="' + y + '">' + bdi(zp(x) + " " + opZ(op) + " " + zkp(y) + (isFinite(r) ? (ex ? " ≈ " : " = ") + "<b>" + zp(r) + "</b>" : " = –")) + "</button>";
         }
       });
       h += "</div>";
@@ -300,11 +302,11 @@
   $("rop").addEventListener("change", rechnen);
 
   // ---------- Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false;
   var TYPEN = ["ablesen", "vergleich", "temp", "plusminus", "plusminus", "maldurch", "betrag"];
   function neueAufgabe(){
     var typ = TYPEN[zuf(0, TYPEN.length - 1)], a, b, op;
-    beantwortet = false;
+    beantwortet = false; zweiterV = false;
     if(typ === "ablesen"){ a = zuf(-15, 15) || -6; auf = { typ: typ, a: a, l: a }; }
     else if(typ === "vergleich"){ a = zuf(-20, 20); b = Math.random() < 0.1 ? a : zuf(-20, 20); auf = { typ: typ, a: a, b: b, l: a < b ? "<" : a > b ? ">" : "=" }; }
     else if(typ === "temp"){ a = zuf(-12, 8); var n = zuf(2, 15), w = Math.random() < 0.5 ? 1 : -1; auf = { typ: typ, a: a, n: n, w: w, l: a + w * n, op: w > 0 ? "+" : "-", b: n }; }
@@ -352,7 +354,7 @@
     var ok;
     if(auf.typ === "vergleich") ok = eingabe === auf.l;
     else { var v = lies(eingabe); if(!isFinite(v)) return; ok = Math.abs(v - auf.l) < 1e-9; }
-    beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(eingabe)){ zweiterV = true; msNochmal($("meldung")); return; } beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung");
     var loesText = auf.typ === "vergleich" ? z(auf.a) + " " + auf.l + " " + z(auf.b) : z(auf.l);
     m.className = "meldung " + (ok ? "gut" : "schlecht");

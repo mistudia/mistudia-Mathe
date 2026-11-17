@@ -141,9 +141,9 @@
   ["gn", "gp"].forEach(function(id){ $(id).addEventListener("input", galReset); });
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var typ = wahl(["gleich", "gleich", "hoechstens", "mind1", "mu", "sigma", "wieoft"]), A = { typ: typ };
     if(typ === "gleich" || typ === "hoechstens"){ A.n = zuf(4, 12); A.p = wahl([0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.75, 0.8]); A.k = Math.max(0, Math.min(A.n, Math.round(A.n * A.p) + zuf(-2, 1))); var P = verteilung(A.n, A.p); A.l = 0; for(var i = (typ === "gleich" ? A.k : 0); i <= A.k; i++) A.l += P[i]; }
     else if(typ === "mind1"){ A.n = zuf(3, 10); A.p = wahl([0.05, 0.1, 0.2, 0.25, 1 / 6]); A.l = 1 - Math.pow(1 - A.p, A.n); }
@@ -182,7 +182,7 @@
     else if(A.typ === "mu") L.push(bdi("μ = n · p = " + A.n + " · " + zahl(A.p, 2) + " = " + zahl(A.l, 2)));
     else if(A.typ === "sigma") L.push(bdi("σ = √(" + A.n + " · " + zahl(A.p, 2) + " · " + zahl(1 - A.p, 2) + ") = √" + zahl(A.n * A.p * (1 - A.p), 2) + " ≈ " + zahl(A.l, 2)));
     else { L.push(bdi("1 − " + zahl(1 - A.p, 4) + "<sup>n</sup> ≥ " + zahl(A.q, 2) + " ⇔ " + zahl(1 - A.p, 4) + "<sup>n</sup> ≤ " + zahl(1 - A.q, 2))); L.push(bdi("n ≥ ln(" + zahl(1 - A.q, 2) + ") : ln(" + zahl(1 - A.p, 4) + ") ≈ " + zahl(Math.log(1 - A.q) / Math.log(1 - A.p), 2) + " → n = " + A.l)); }
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);
     $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });

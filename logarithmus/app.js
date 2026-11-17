@@ -144,9 +144,9 @@
   ["ga", "gb", "gc"].forEach(function(id){ $(id).addEventListener("input", gleichung); });
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzte = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzte = null;
   function neueAufgabe(){
-    beantwortet = false; letzte = null;
+    beantwortet = false; zweiterV = false; letzte = null;
     var typ = wahl(["kopf", "kopf", "kopfNeg", "gesetz", "gleich", "gleich", "db", "zeit"]), A = { typ: typ };
     if(typ === "kopf"){ var B = wahl([2, 3, 5, 10]), k = B === 2 ? zuf(1, 8) : B === 10 ? zuf(1, 6) : zuf(1, 4); A.b = B; A.x = Math.pow(B, k); A.l = k; }
     else if(typ === "kopfNeg"){ var B2 = wahl([2, 3, 10]), k2 = -zuf(1, 3); A.b = B2; A.xs = "1/" + Math.pow(B2, -k2); A.l = k2; if(Math.random() < 0.3){ A.xs = "1"; A.l = 0; } }
@@ -183,7 +183,7 @@
     else if(A.typ === "gleich"){ var q = A.c / A.a; if(A.a !== 1) L.push(bdi(zahl(A.b) + "<sup>x</sup> = " + zahl(q))); L.push(bdi("x = ln(" + zahl(q) + ") : ln(" + zahl(A.b) + ") " + gl(A.l, 2) + " " + zahl(A.l, 4))); }
     else if(A.typ === "db") L.push(t("dbWeg", { c: bdi(zahl(A.c)) }));
     else L.push(bdi(zahl(1 + A.p / 100, 2) + "<sup>n</sup> = 2 → n = ln(2) : ln(" + zahl(1 + A.p / 100, 2) + ") ≈ " + zahl(A.l)));
-    letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzte = e; beantwortet = true; anzahl++; if(ok) punkte++;
     var m = $("meldung"); m.className = "meldung " + (ok ? "gut" : "schlecht"); m.innerHTML = ok ? t("richtig") + " " + bdi(lt) : t("falsch", { l: bdi(lt) });
     $("uLauf").innerHTML = L.map(function(s){ return "<li>" + s + "</li>"; }).join(""); sicht($("uLauf"), true);
     $("punkte").textContent = t("punkte", { p: punkte, n: anzahl });

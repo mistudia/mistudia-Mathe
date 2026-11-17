@@ -159,9 +159,9 @@
   $("siebReset").addEventListener("click", function(){ siebSchritt = 0; sieb(); });
 
   // ---------- Reiter Üben ----------
-  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, letzteEingabe = null;
+  var auf = null, punkte = 0, anzahl = 0, beantwortet = false, zweiterV = false, letzteEingabe = null;
   function neueAufgabe(){
-    beantwortet = false; letzteEingabe = null;
+    beantwortet = false; zweiterV = false; letzteEingabe = null;
     var r = Math.random(), typ = r < 0.4 ? "jn" : r < 0.65 ? "ziffer" : r < 0.85 ? "prim" : "anzahl";
     if(typ === "jn"){
       var d = wahl(TEILER), ja = Math.random() < 0.5, n;
@@ -215,7 +215,7 @@
       if(auf.typ === "ziffer"){ ok = v.length === 1 && auf.gut.indexOf(Number(v)) >= 0; lt = bdi(auf.gut.join(", ")); }
       else { ok = Number(v) === auf.l; lt = String(auf.l); }
     }
-    letzteEingabe = e; beantwortet = true; anzahl++; if(ok) punkte++;
+    if(!ok && !zweiterV && msTippbar(e)){ zweiterV = true; msNochmal($("meldung")); return; } letzteEingabe = e; beantwortet = true; anzahl++; if(ok) punkte++;
     if(auf.typ === "jn"){
       var A = anwenden(auf.d, auf.s); L.push(t("r" + auf.d)); L.push(A.ziffern + " " + A.z.join("<br>"));
       L.push(t(A.ok ? "istT" : "nichtT", { a: bdi(auf.s), d: auf.d }));
