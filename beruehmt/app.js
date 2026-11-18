@@ -490,11 +490,13 @@
     var h = w * K.h / K.w;
     fView = { x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - h / 2, w: w, h: h }; fKlemmen();
   }
-  var F_BSP = [["europa", "Luxemburg"], ["deutschland", "Thüringen"], ["usa", "Nevada"], ["deutschland", "Sachsen-Anhalt"], ["europa", "Tschechien"], ["usa", "Kansas"]];
+  var F_BSP = [["deutschland", "Thüringen"], ["deutschland", "Sachsen-Anhalt"], ["europa", "Luxemburg"], ["europa", "Tschechien"], ["afrika", "Malawi"], ["afrika", "Burundi"], ["afrika", "Tschad"], ["afrika", "Niger"], ["asien", "Laos"], ["asien", "Usbekistan"], ["asien", "Kirgisistan"], ["asien", "Afghanistan"], ["usa", "Nevada"], ["usa", "Kansas"], ["suedamerika", "Paraguay"], ["suedamerika", "Bolivien"]];
   function fNameVon(art, name){ var K = window.F_KARTEN && F_KARTEN[art], ni = Math.max(0, ["de", "en", "es", "zh", "fr", "ru", "ar", "ja", "pt"].indexOf(lang)); if(!K) return null; var r = K.r.filter(function(x){ return x.n[0] === name; })[0]; return r ? { r: r, g: K.r.indexOf(r), name: r.n[ni] || r.n[1], K: K } : null; }
   function fBspZeigen(){
     var box = $("fBsp"); if(!box || !window.F_KARTEN || box.dataset.ok) return; box.dataset.ok = "1";
-    box.innerHTML = "<b>" + esc(t("f_bsp")) + "</b> " + F_BSP.map(function(e, i){ var x = fNameVon(e[0], e[1]); return x ? '<button type="button" class="chip" data-i="' + i + '">' + esc(x.name) + " (" + x.K.nb[x.g].length + ")</button>" : ""; }).join("");
+    var gr = {}, folge = [];
+    F_BSP.forEach(function(e, i){ var x = fNameVon(e[0], e[1]); if(!x) return; if(!gr[e[0]]){ gr[e[0]] = []; folge.push(e[0]); } gr[e[0]].push('<button type="button" class="chip" data-i="' + i + '">' + esc(x.name) + " (" + x.K.nb[x.g].length + ")</button>"); });
+    box.innerHTML = '<p class="zeile"><b>' + esc(t("f_bsp")) + "</b></p>" + folge.map(function(a){ return '<div class="chips fBspG"><span class="muted">' + esc(tA("f_karten")[F_ARTEN.indexOf(a)]) + ":</span> " + gr[a].join("") + "</div>"; }).join("");
     box.querySelectorAll("[data-i]").forEach(function(bt){ bt.addEventListener("click", function(){ var e = F_BSP[+bt.dataset.i]; fHi = { art: e[0], name: e[1] }; fWaehle(e[0]); var z = $("fSvg"); if(z && z.scrollIntoView) z.scrollIntoView({ behavior: "smooth", block: "center" }); }); });
   }
   PROBE.vierfarben = function(){
@@ -502,7 +504,7 @@
     b.innerHTML = '<p class="zeile">' + esc(t("f_anl")) + '</p><div class="chips" id="fArt"><b>' + esc(t("f_wahl")) + "</b> " + F_ARTEN.map(function(a, i){ return '<button type="button" class="chip" data-a="' + a + '">' + esc(tA("f_karten")[i]) + "</button>"; }).join("") + '</div><div class="chips" id="fPal">' + F_FARBEN.map(function(c, i){ return '<button type="button" class="fFarbe" data-f="' + i + '" style="background:' + c + '" aria-label="' + (i + 1) + '"></button>'; }).join("") +
       '<button type="button" class="chip" data-f="-1">' + esc(t("f_radier")) + '</button></div><div id="fSvg"></div><p class="zeile" id="fStatus"></p>' +
       '<p><button type="button" class="knopf hell" id="fNeu">' + esc(t("f_neu")) + '</button> <button type="button" class="knopf hell" id="fLeer">' + esc(t("f_leeren")) + '</button> <button type="button" class="knopf hell" id="fLoes">' + esc(t("f_loesung")) + '</button> <button type="button" class="chip" id="fNetzB">' + esc(t("f_netz")) + '</button></p><p class="zeile" id="fHiTxt" hidden></p><p class="merke">' + esc(t("f_warum")) + "</p>" +
-      '<div class="chips" id="fBsp"></div>' +
+      '<div id="fBsp"></div>' +
       '<h3 class="fH">' + esc(t("f_ring_h")) + '</h3><p class="zeile">' + esc(t("f_ring_anl")) + '</p><label class="reglerZ"><span>' + esc(t("f_ring_n")) + ' <b id="frNz"></b></span><input type="range" id="frN" min="3" max="8" step="1"></label>' +
       '<div id="frSvg"></div><p class="zeile" id="frStatus"></p><p><button type="button" class="knopf hell" id="frLoes">' + esc(t("f_loesung")) + '</button> <button type="button" class="knopf hell" id="frLeer">' + esc(t("f_leeren")) + '</button></p><p class="merke" id="frRegel"></p>' +
       '<h3 class="fH">' + esc(t("f_bew_h")) + '</h3><ol class="fBew">' + tA("f_bew").map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>";
@@ -608,14 +610,18 @@
     K.r.forEach(function(r, g){
       var f = fGel[g] >= 0 ? F_FARBEN[fGel[g]] : "#ffffff", p = el("path", { d: r.d, fill: f, stroke: "#1a2233", "stroke-width": sw, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round", "data-g": g, "class": "fZelle" });
       p.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(p);
-      if(r.m){ var c = el("circle", { cx: r.m[0], cy: r.m[1], r: (fKarte.art === "welt" ? 4 : 5) * zf, fill: f, stroke: "#1a2233", "stroke-width": 1, "vector-effect": "non-scaling-stroke", "data-g": g, "class": "fZelle fPunkt", "data-r": fKarte.art === "welt" ? 4 : 5 }); c.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(c); }
+      if(r.m && r.ml){
+        s.appendChild(el("line", { x1: r.c[0], y1: r.c[1], x2: r.m[0], y2: r.m[1], stroke: "#1a2233", "stroke-width": 1, "vector-effect": "non-scaling-stroke", "pointer-events": "none" }));
+        var ch = el("circle", { cx: r.m[0], cy: r.m[1], r: 12, fill: f, stroke: "#1a2233", "stroke-width": 1.4, "vector-effect": "non-scaling-stroke", "data-g": g, "class": "fZelle" }); ch.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(ch);
+        s.appendChild(el("text", { x: r.m[0] + 15, y: r.m[1] + 4.5, "class": "bk-klein", "pointer-events": "none" }, r.k));
+      } else if(r.m){ var c = el("circle", { cx: r.m[0], cy: r.m[1], r: (fKarte.art === "welt" ? 4 : 5) * zf, fill: f, stroke: "#1a2233", "stroke-width": 1, "vector-effect": "non-scaling-stroke", "data-g": g, "class": "fZelle fPunkt", "data-r": fKarte.art === "welt" ? 4 : 5 }); c.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(c); }
     });
     K.r.forEach(function(r, g){ if(schlecht[g]) s.appendChild(el("path", { d: r.d, fill: "none", stroke: "#dc2626", "stroke-width": 2.6, "vector-effect": "non-scaling-stroke", "stroke-dasharray": "5 3", "pointer-events": "none" })); });
     if(fHi && fHi.art === fKarte.art && fHi.g >= 0){
       K.nb[fHi.g].forEach(function(h){ s.appendChild(el("path", { d: K.r[h].d, fill: "none", stroke: "#7c3aed", "stroke-width": 3, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round", "pointer-events": "none" })); });
       s.appendChild(el("path", { d: K.r[fHi.g].d, fill: "none", stroke: "#7c3aed", "stroke-width": 6, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round", "pointer-events": "none" }));
     }
-    fNetzMalen(s, K.r.map(function(r){ return r.m || r.c; }), K.nb, zf);
+    fNetzMalen(s, K.r.map(function(r){ return r.ml ? r.c : (r.m || r.c); }), K.nb, zf);
     return { s: s, nk: Object.keys(konf).length, ni: ni };
   }
   function fZeichnen(){
@@ -1327,6 +1333,191 @@
     var a = wahl([3.6, 4.5, 5, 6, 7.2, 7.5, 9, 10, 12]), s = zuf(4, 12) * 100, n = 360 / a, U = n * s;
     return { q: t("e_q", { a: z(a, 1), s: gz(s) }), w: U, tol: 1, l: gz(U) + " km", weg: ["360° : " + z(a, 1) + "° = " + z(n, 2), "U = " + z(n, 2) + " · " + gz(s) + " km = " + gz(U) + " km"] };
   };
+
+  // ---------- Runde 6: Liu Hui, Sangaku, Ada Lovelace, Galileis Fallrinne ----------
+  P.splice(P.indexOf(finde("archimedes")) + 1, 0, { k: "liuhui", p: "lh", sym: "3072", col: "#9a3412", leg: "nEcken lhs lhA r pi approx wurzel", link: [["beruehmt/#archimedes", "a_name"], ["pythagoras", "lh_lPy"]] });
+  P.push({ k: "sangaku", p: "sg", sym: "○○", col: "#78350f", leg: "sgR r sgd wurzel", link: [["pythagoras", "lh_lPy"]] });
+  P.push({ k: "lovelace", p: "al", sym: "V₁", col: "#be185d", leg: "alV", link: [["beruehmt/#turing", "tu_name"], ["beruehmt/#gauss", "g_name"]] });
+  finde("galilei").leg = "gaH tSek gErd alpha";
+
+  // ===== Liu Hui: Vieleck verdoppeln =====
+  var LH_N = [6, 12, 24, 48, 96, 192, 384, 768, 1536, 3072], lhI = 1;
+  function lhTab(){ var L = [{ n: 6, s: 1 }]; for(var i = 1; i < LH_N.length; i++){ var s = L[i - 1].s, a = Math.sqrt(1 - s * s / 4), g = 1 - a; L.push({ n: LH_N[i], s: Math.sqrt(s * s / 4 + g * g), a: a, g: g, sv: s }); } return L; }
+  PROBE.liuhui = function(){
+    var b = $("probe");
+    b.innerHTML = absatz("lh_erkl") + '<div class="chips" id="lhC"><b>' + esc(t("lh_ecken")) + "</b> " + LH_N.slice(1).map(function(n, i){ return '<button type="button" class="chip" data-i="' + (i + 1) + '">' + n + "</button>"; }).join("") +
+      '</div><div class="zwei"><div id="lhSvg"></div><div><ol class="weg" id="lhWeg"></ol></div></div><div class="tabWrap"><table class="tab" id="lhTab"></table></div>' + merkeP("lh_grenze") + absatz("lh_zu");
+    b.querySelectorAll("#lhC [data-i]").forEach(function(c){ c.addEventListener("click", function(){ lhI = +c.dataset.i; lhZeichnen(); }); });
+    lhZeichnen();
+  };
+  function lhZeichnen(){
+    document.querySelectorAll("#lhC [data-i]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.i === lhI ? "true" : "false"); });
+    var L = lhTab(), e = L[lhI], alt = L[lhI - 1], s = svgNeu(320, 320), C = 160, R = 140;
+    function vieleck(n, col, sw, fill){ var d = ""; for(var i = 0; i <= Math.min(n, 400); i++){ var w = 2 * Math.PI * i / Math.min(n, 400) - Math.PI / 2; d += (i ? "L" : "M") + (C + R * Math.cos(w)).toFixed(2) + " " + (C + R * Math.sin(w)).toFixed(2); } s.appendChild(el("path", { d: d + "Z", fill: fill || "none", stroke: col, "stroke-width": sw, "stroke-linejoin": "round" })); }
+    s.appendChild(el("circle", { cx: C, cy: C, r: R, fill: "#ffffff", stroke: "#1a2233", "stroke-width": 2.4 }));
+    vieleck(alt.n, "#b8860b", 2, "rgba(184,134,11,0.10)");
+    if(e.n <= 96) vieleck(e.n, "#7c3aed", 2);
+    // Ein Abschnitt vergrößert (nur bei kleinen n gut sichtbar): Mitte → halbe Seite → Lücke g
+    if(alt.n <= 24){
+      var w1 = -Math.PI / 2, w2 = -Math.PI / 2 + 2 * Math.PI / alt.n, P1 = [C + R * Math.cos(w1), C + R * Math.sin(w1)], P2 = [C + R * Math.cos(w2), C + R * Math.sin(w2)], M = [(P1[0] + P2[0]) / 2, (P1[1] + P2[1]) / 2], wm = (w1 + w2) / 2, Q = [C + R * Math.cos(wm), C + R * Math.sin(wm)];
+      s.appendChild(el("line", { x1: C, y1: C, x2: Q[0], y2: Q[1], stroke: "#1a2233", "stroke-width": 1.6, "stroke-dasharray": "5 4" }));
+      s.appendChild(el("line", { x1: M[0], y1: M[1], x2: Q[0], y2: Q[1], stroke: "#0f766e", "stroke-width": 4 }));
+      s.appendChild(el("line", { x1: P1[0], y1: P1[1], x2: Q[0], y2: Q[1], stroke: "#7c3aed", "stroke-width": 4 }));
+      schrift(s, (M[0] + Q[0]) / 2 + 10, (M[1] + Q[1]) / 2 + 4, "g", "start", "bt", { fill: "#0f766e" });
+      schrift(s, (C + M[0]) / 2 + 8, (C + M[1]) / 2, "a", "start", "bt");
+    }
+    $("lhSvg").innerHTML = ""; $("lhSvg").appendChild(s);
+    $("lhSvg").insertAdjacentHTML("beforeend", '<p class="leg"><span style="color:#b8860b">■ ' + alt.n + " " + esc(t("lh_eck")) + '</span> · <span style="color:#7c3aed">■ ' + e.n + " " + esc(t("lh_eck")) + "</span></p>");
+    var h = "<tr><th>n</th><th>sₙ</th><th>A₂ₙ = n · sₙ : 2</th><th>" + esc(t("lh_oben")) + "</th></tr>";
+    for(var i = 0; i < L.length - 1; i++){ var A2 = L[i].n * L[i].s / 2, A1 = i ? L[i - 1].n * L[i - 1].s / 2 : 0; h += "<tr" + (i === lhI - 1 ? ' class="an"' : "") + "><td>" + L[i].n + "</td><td>" + bdi(z(L[i].s, 6)) + "</td><td>" + bdi(z(A2, 6)) + "</td><td>" + (i ? bdi(z(2 * A2 - A1, 6)) : "–") + "</td></tr>"; }
+    $("lhTab").innerHTML = h;
+    $("lhWeg").innerHTML = weg([{ lbl: t("lh_w0", { n: alt.n }) }, "s = " + z(e.sv, 5), { lbl: t("lh_w1") }, "a = √(1 − (s : 2)²) ≈ " + z(e.a, 5), { lbl: t("lh_w2") }, "g = 1 − a ≈ " + z(e.g, 5), { lbl: t("lh_w3", { n: e.n }) }, "s₂ = √((s : 2)² + g²) ≈ " + z(e.s, 5), { lbl: t("lh_w4", { n: e.n }) }, "A = " + alt.n + " · " + z(e.sv, 5) + " : 2 ≈ " + z(alt.n * e.sv / 2, 5)]);
+  }
+  GEN.liuhui = function(){
+    var L = lhTab();
+    if(Math.random() < 0.5){ var i = zuf(1, 4), n = L[i].n, sv = Math.round(L[i].s * 10000) / 10000, A = n * sv / 2;
+      return { q: t("lh_qA", { n: n, s: z(sv, 4), m: 2 * n }), w: A, tol: 0.0006, l: z(A, 4), weg: [{ lbl: t("lh_wA") }, "A = n · s : 2 = " + n + " · " + z(sv, 4) + " : 2 ≈ " + z(A, 4)] }; }
+    var e = L[1];
+    return { q: t("lh_qS"), w: e.s, tol: 0.0006, l: z(e.s, 4), weg: ["a = √(1 − 0,5²) = √0,75 ≈ 0,8660", "g = 1 − 0,8660 = 0,1340", "s₁₂ = √(0,5² + 0,1340²) ≈ √0,26795 ≈ 0,5176"].map(function(x){ return komma() ? x : x.replace(/(\d),(\d)/g, "$1.$2"); }) };
+  };
+
+  // ===== Sangaku: drei Kreise an einer Geraden =====
+  var sg = { a: 9, b: 4 };
+  PROBE.sangaku = function(){
+    var b = $("probe");
+    b.innerHTML = absatz("sg_erkl") + '<label class="reglerZ"><span>R₁ = <b id="sgAz"></b></span><input type="range" id="sgA" min="1" max="16" step="1"></label><label class="reglerZ"><span>R₂ = <b id="sgBz"></b></span><input type="range" id="sgB" min="1" max="16" step="1"></label>' +
+      '<div id="sgSvg"></div><ol class="weg" id="sgWeg"></ol>' + merkeP("sg_tipp") + absatz("sg_mehr");
+    $("sgA").value = sg.a; $("sgB").value = sg.b;
+    $("sgA").addEventListener("input", function(){ sg.a = +this.value; sgZeichnen(); });
+    $("sgB").addEventListener("input", function(){ sg.b = +this.value; sgZeichnen(); });
+    sgZeichnen();
+  };
+  function sgZeichnen(){
+    var A = sg.a, B = sg.b, d = 2 * Math.sqrt(A * B), r = Math.pow(1 / (1 / Math.sqrt(A) + 1 / Math.sqrt(B)), 2), W = 640, H = 360;
+    $("sgAz").textContent = A; $("sgBz").textContent = B;
+    var breite = A + d + B, sk = Math.min((W - 80) / breite, (H - 100) / (2 * Math.max(A, B))), y0 = H - 58, x1 = (W - breite * sk) / 2 + A * sk, x2 = x1 + d * sk, xr = x1 + 2 * Math.sqrt(A * r) * sk;
+    var s = svgNeu(W, H);
+    s.appendChild(el("rect", { x: 4, y: 4, width: W - 8, height: H - 8, rx: 10, fill: "#fbf3e2", stroke: "#78350f", "stroke-width": 8 }));
+    s.appendChild(el("line", { x1: 30, y1: y0, x2: W - 30, y2: y0, stroke: "#1a2233", "stroke-width": 2.4 }));
+    s.appendChild(el("circle", { cx: x1, cy: y0 - A * sk, r: A * sk, fill: "rgba(124,58,237,0.12)", stroke: "#7c3aed", "stroke-width": 2.6 }));
+    s.appendChild(el("circle", { cx: x2, cy: y0 - B * sk, r: B * sk, fill: "rgba(184,134,11,0.14)", stroke: "#b8860b", "stroke-width": 2.6 }));
+    s.appendChild(el("circle", { cx: xr, cy: y0 - r * sk, r: r * sk, fill: "rgba(15,118,110,0.18)", stroke: "#0f766e", "stroke-width": 2.6 }));
+    // Hilfsdreieck zwischen den Mittelpunkten (Pythagoras)
+    var yA = y0 - A * sk, yB = y0 - B * sk;
+    s.appendChild(el("path", { d: "M" + x1 + " " + yA + "L" + x2 + " " + yB + "L" + (A > B ? x2 : x1) + " " + (A > B ? yA : yB) + "Z", fill: "none", stroke: "#1a2233", "stroke-width": 1.4, "stroke-dasharray": "5 4" }));
+    [[x1, yA], [x2, yB], [xr, y0 - r * sk]].forEach(function(p){ s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 3, fill: "#1a2233" })); });
+    pfeil(s, x1, y0 + 16, x2, y0 + 16, "#1a2233", true); schrift(s, (x1 + x2) / 2, y0 + 32, "d = 2 · √(R₁ · R₂)", "middle", "bk-klein");
+    schrift(s, x1, yA - 8, "R₁", "middle", "bt", { fill: "#5b21b6" }); schrift(s, x2, yB - 8, "R₂", "middle", "bt", { fill: "#8a5a00" }); schrift(s, xr, y0 - 2 * r * sk - 6, "r", "middle", "bt", { fill: "#0f766e" });
+    $("sgSvg").innerHTML = ""; $("sgSvg").appendChild(s);
+    $("sgWeg").innerHTML = weg([{ lbl: t("sg_w1") }, "d² = (R₁ + R₂)² − (R₁ − R₂)² = 4 · R₁ · R₂", "d = 2 · √(" + A + " · " + B + ") ≈ " + z(d, 3), { lbl: t("sg_w2") }, "2 · √(R₁ · r) + 2 · √(R₂ · r) = 2 · √(R₁ · R₂)", { lbl: t("sg_w3") }, "1 : √r = 1 : √R₁ + 1 : √R₂", "1 : √r = 1 : √" + A + " + 1 : √" + B + " ≈ " + z(1 / Math.sqrt(r), 4), "r ≈ " + z(r, 3)]);
+  }
+  GEN.sangaku = function(){
+    var a = zuf(1, 6), b; do { b = zuf(1, 6); } while(b === a);
+    if(Math.random() < 0.35) return { q: t("sg_qd", { A: a * a, B: b * b }), w: 2 * a * b, tol: 0.01, l: String(2 * a * b), weg: ["d = 2 · √(R₁ · R₂)", "d = 2 · √(" + a * a + " · " + b * b + ") = 2 · " + a * b + " = " + 2 * a * b] };
+    var sr = a * b / (a + b), r = sr * sr;
+    return { q: t("sg_q", { A: a * a, B: b * b }), w: Math.round(r * 100) / 100, tol: 0.011, l: z(r, 2), weg: ["1 : √r = 1 : √R₁ + 1 : √R₂", "1 : √r = 1 : " + a + " + 1 : " + b + " = " + (a + b) + " : " + a * b, "√r = " + a * b + " : " + (a + b) + " ≈ " + z(sr, 4), "r ≈ " + z(r, 2)] };
+  };
+
+  // ===== Ada Lovelace: Programm auf Lochkarten =====
+  var AL_P = [
+    { v: function(n){ return [1, 0, n]; }, k: [["V2", "V2 + V1"], ["V1", "V1 + 2"], ["V3", "V3 − 1"], ["?"]] },
+    { v: function(n){ return [1, 0, n]; }, k: [["V2", "V2 + V1"], ["V1", "V1 + 1"], ["V3", "V3 − 1"], ["?"]] },
+    { v: function(n){ return [0, 1, n]; }, k: [["V2", "V2 + V2"], ["V3", "V3 − 1"], ["?"]] }
+  ];
+  var al = { p: 0, n: 5, V: null, z: 0, fertig: false, log: [] };
+  function alReset(){ al.V = AL_P[al.p].v(al.n); al.z = 0; al.fertig = false; al.log = []; }
+  function alSchritt(){
+    if(al.fertig) return;
+    var K = AL_P[al.p].k, c = K[al.z], V = al.V;
+    if(c[0] === "?"){ if(V[2] > 0) al.z = 0; else { al.fertig = true; } al.log.push(V[1]); return; }
+    var i = +c[0][1] - 1, ausdr = c[1].split(" "), x = V[+ausdr[0][1] - 1], y = ausdr[2][0] === "V" ? V[+ausdr[2][1] - 1] : +ausdr[2];
+    V[i] = ausdr[1] === "+" ? x + y : x - y; al.z++;
+  }
+  PROBE.lovelace = function(){
+    var b = $("probe");
+    b.innerHTML = absatz("al_erkl") + '<div class="chips" id="alP"><b>' + esc(t("al_prog")) + "</b> " + tA("al_progs").map(function(x, i){ return '<button type="button" class="chip" data-p="' + i + '">' + esc(x) + "</button>"; }).join("") + "</div>" +
+      '<label class="reglerZ"><span>' + esc(t("al_runden")) + ' <b id="alNz"></b></span><input type="range" id="alN" min="1" max="10" step="1"></label>' +
+      '<div class="zwei"><div id="alKarten"></div><div><div id="alSpeicher"></div><p class="zeile" id="alLog"></p></div></div>' +
+      '<p><button type="button" class="knopf" id="alS">' + esc(t("al_schritt")) + '</button> <button type="button" class="knopf hell" id="alE">' + esc(t("al_ende")) + '</button> <button type="button" class="knopf hell" id="alR">' + esc(t("al_neu")) + "</button></p>" +
+      merkeP("al_schleife") + absatz("al_musik");
+    b.querySelectorAll("#alP [data-p]").forEach(function(c){ c.addEventListener("click", function(){ al.p = +c.dataset.p; alReset(); alZeichnen(); }); });
+    $("alN").value = al.n; $("alN").addEventListener("input", function(){ al.n = +this.value; alReset(); alZeichnen(); });
+    $("alS").addEventListener("click", function(){ alSchritt(); alZeichnen(); });
+    $("alE").addEventListener("click", function(){ var g = 0; while(!al.fertig && g++ < 500) alSchritt(); alZeichnen(); });
+    $("alR").addEventListener("click", function(){ alReset(); alZeichnen(); });
+    if(!al.V) alReset(); alZeichnen();
+  };
+  function alZeichnen(){
+    document.querySelectorAll("#alP [data-p]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.p === al.p ? "true" : "false"); });
+    $("alNz").textContent = al.n;
+    var K = AL_P[al.p].k;
+    $("alKarten").innerHTML = '<p class="zeile"><b>' + esc(t("al_karten")) + "</b></p>" + K.map(function(c, i){
+      var txt = c[0] === "?" ? t("al_wenn") : c[0] + " = " + c[1];
+      return '<div class="alKarte' + (i === al.z && !al.fertig ? " an" : "") + '" dir="ltr"><span class="alNr">' + (i + 1) + "</span>" + esc(txt) + '<span class="alLoch"></span></div>';
+    }).join("");
+    $("alSpeicher").innerHTML = '<p class="zeile"><b>' + esc(t("al_speicher")) + '</b></p><div class="alV" dir="ltr">' + al.V.map(function(v, i){ return '<div class="alSp"><span>V' + (i + 1) + "</span><b>" + v + "</b><i>" + esc(tA("al_vn" + al.p)[i]) + "</i></div>"; }).join("") + "</div>";
+    $("alLog").innerHTML = (al.log.length ? "<b>" + esc(t("al_log")) + "</b> " + bdi(al.log.join(", ")) : "") + (al.fertig ? '<br><span class="gut">' + esc(t("al_fertig" + al.p, { n: al.n, w: al.V[1] })) + "</span>" : "");
+    $("alS").disabled = al.fertig;
+  }
+  GEN.lovelace = function(){
+    var p = zuf(0, 2), n = p === 2 ? zuf(3, 10) : zuf(3, 12), w = p === 0 ? n * n : p === 1 ? n * (n + 1) / 2 : Math.pow(2, n), L = [], V = AL_P[p].v(n);
+    for(var k = 0; k < n; k++){ if(p === 2) V[1] *= 2; else { V[1] += V[0]; V[0] += p === 0 ? 2 : 1; } L.push(V[1]); }
+    var weg1 = p === 0 ? "1 + 3 + 5 + … = " + n + "² = " + w : p === 1 ? "1 + 2 + … + " + n + " = " + n + " · " + (n + 1) + " : 2 = " + w : "2" + hoch(n) + " = " + w;
+    return { q: t("al_q", { p: tA("al_progs")[p], n: n }), w: w, tol: 0, l: gz(w), weg: [{ lbl: t("al_log") }, L.join(", "), weg1] };
+  };
+
+  // ===== Galilei: die Fallrinne =====
+  var gr = { w: 8, an: null, klang: true }, _gaAlt = PROBE.galilei;
+  PROBE.galilei = function(){
+    _gaAlt();
+    $("probe").insertAdjacentHTML("beforeend", karteH("ga_r_h") + absatz("ga_r_erkl") + '<label class="reglerZ"><span>' + esc(t("ga_r_w")) + ' <b id="grWz"></b></span><input type="range" id="grW" min="2" max="30" step="1"></label>' +
+      '<p><button type="button" class="knopf" id="grLos">' + esc(t("ga_r_los")) + '</button> <label class="chk"><input type="checkbox" id="grTon"> ' + esc(t("ga_r_ton")) + '</label></p><div id="grSvg"></div><div class="tabWrap"><table class="tab" id="grTab"></table></div>' + merkeP("ga_r_uhr"));
+    $("grW").value = gr.w; $("grW").addEventListener("input", function(){ gr.w = +this.value; if(gr.an){ cancelAnimationFrame(gr.an); gr.an = null; } grZeichnen(0, -1); });
+    $("grTon").checked = gr.klang; $("grTon").addEventListener("change", function(){ gr.klang = this.checked; });
+    $("grLos").addEventListener("click", grStart);
+    grZeichnen(0, -1); grTabelle();
+  };
+  var grAudio = null;
+  function grDing(){ if(!gr.klang) return; try { grAudio = grAudio || new (window.AudioContext || window.webkitAudioContext)(); var o = grAudio.createOscillator(), g = grAudio.createGain(); o.frequency.value = 1320; o.type = "sine"; g.gain.setValueAtTime(0.25, grAudio.currentTime); g.gain.exponentialRampToValueAtTime(0.001, grAudio.currentTime + 0.5); o.connect(g); g.connect(grAudio.destination); o.start(); o.stop(grAudio.currentTime + 0.5); } catch(x){} }
+  function grT(){ var a = 9.81 * Math.sin(gr.w * Math.PI / 180) * 5 / 7; return Math.sqrt(2 * 5 / a); }
+  function grStart(){
+    if(gr.an) cancelAnimationFrame(gr.an);
+    var T = grT(), t0 = performance.now(), k = 0;
+    (function bild(){
+      var tt = (performance.now() - t0) / 1000, q = Math.min(1, tt / T), kk = Math.floor(q * 5 + 1e-9);
+      while(k < kk){ k++; grDing(); }
+      grZeichnen(q, k);
+      if(q < 1) gr.an = requestAnimationFrame(bild); else gr.an = null;
+    })();
+  }
+  function grZeichnen(q, k){
+    var W = 640, w = gr.w * Math.PI / 180, wz = Math.max(w, 6 * Math.PI / 180), L = 540, x0 = 50, y0 = 56, H = Math.round(y0 + L * Math.sin(wz) + 34), s = svgNeu(W, H);
+    $("grWz").textContent = gr.w + "°";
+    var ex = x0 + L * Math.cos(wz), ey = y0 + L * Math.sin(wz);
+    s.appendChild(el("rect", { x: 0, y: 0, width: W, height: H, rx: 12, fill: "#fbf6ea" }));
+    s.appendChild(el("path", { d: "M" + x0 + " " + y0 + "L" + ex + " " + ey + "L" + x0 + " " + ey + "Z", fill: "#e7d3a8", stroke: "#8a6d3b", "stroke-width": 2 }));
+    s.appendChild(el("line", { x1: x0, y1: y0, x2: ex, y2: ey, stroke: "#5b3a1e", "stroke-width": 5, "stroke-linecap": "round" }));
+    for(var i = 1; i <= 5; i++){
+      var f = i * i / 25, bx = x0 + f * L * Math.cos(wz), by = y0 + f * L * Math.sin(wz), an = i <= k;
+      s.appendChild(el("line", { x1: bx, y1: by, x2: bx - 16 * Math.sin(wz), y2: by - 16 * Math.cos(wz), stroke: "#1a2233", "stroke-width": 1.6 }));
+      s.appendChild(el("path", { d: "M" + (bx - 16 * Math.sin(wz) - 9) + " " + (by - 16 * Math.cos(wz)) + "q9 -16 18 0z", fill: an ? "#facc15" : "#d6d3d1", stroke: "#1a2233", "stroke-width": 1.4 }));
+      schrift(s, bx - 30 * Math.sin(wz), by - 30 * Math.cos(wz) - 4, i * i + "", "middle", "bk-klein", { fill: "#7c2d12" });
+      if(i > 1){ var f0 = (i - 1) * (i - 1) / 25, mx = x0 + (f + f0) / 2 * L * Math.cos(wz), my = y0 + (f + f0) / 2 * L * Math.sin(wz); schrift(s, mx + 12 * Math.sin(wz), my + 12 * Math.cos(wz) + 12, "+" + (2 * i - 1), "middle", "bk-klein", { fill: "#7c3aed" }); }
+    }
+    schrift(s, x0 + 0.02 * L * Math.cos(wz) + 12 * Math.sin(wz), y0 + 0.02 * L * Math.sin(wz) + 22, "+1", "start", "bk-klein", { fill: "#7c3aed" });
+    var bq = Math.max(0, q), cx = x0 + bq * L * Math.cos(wz) - 10 * Math.sin(wz), cy = y0 + bq * L * Math.sin(wz) - 10 * Math.cos(wz);
+    s.appendChild(el("circle", { cx: cx, cy: cy, r: 10, fill: "#1565c0", stroke: "#0b3d91", "stroke-width": 2 }));
+    s.appendChild(el("path", { d: "M" + (ex - 50) + " " + ey + "A50 50 0 0 0 " + (ex - 50 * Math.cos(wz)) + " " + (ey - 50 * Math.sin(wz)), fill: "none", stroke: "#7c3aed", "stroke-width": 2 }));
+    schrift(s, ex - 58, ey - 4, gr.w + "°", "end", "bk-klein", { fill: "#5b21b6" });
+    $("grSvg").innerHTML = ""; $("grSvg").appendChild(s);
+    if(w < 6 * Math.PI / 180) $("grSvg").insertAdjacentHTML("beforeend", '<p class="leg muted">' + esc(t("ga_r_flach")) + "</p>");
+    var T = grT(); $("grSvg").insertAdjacentHTML("beforeend", '<p class="leg">' + esc(t("ga_r_zeit", { T: z(T, 2), d: z(T / 5, 2) })) + "</p>");
+  }
+  function grTabelle(){
+    var h = "<tr><th>" + esc(t("ga_r_tk")) + "</th><th>" + esc(t("ga_r_ts")) + "</th><th>" + esc(t("ga_r_tg")) + "</th></tr>";
+    for(var i = 1; i <= 5; i++) h += "<tr><td>" + i + "</td><td>" + (2 * i - 1) + "</td><td>" + i * i + "</td></tr>";
+    $("grTab").innerHTML = h;
+  }
 
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){

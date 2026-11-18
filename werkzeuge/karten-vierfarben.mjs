@@ -98,6 +98,10 @@ kont("suedamerika", i => i.c === "SA", [60, 20], [-82, -56, -34, 13], 640, 820);
   t = vereinfachen(t, 0.1);
   const W = 960, H = 600, proj = d3.geoAlbersUsa().fitExtent([[8, 8], [W - 8, H - 8]], { type: "FeatureCollection", features: fs50 });
   OUT.usa = karte(t, "s", () => true, proj, W, H, g => ({ n: g.properties.n }));
+  // Kleine Staaten im Nordosten: Antipp-Kreis mit Kürzel im Atlantik, Linie zur Staatsmitte
+  [["Vermont", "VT"], ["New Hampshire", "NH"], ["Massachusetts", "MA"], ["Rhode Island", "RI"], ["Connecticut", "CT"], ["New Jersey", "NJ"], ["Delaware", "DE"], ["Maryland", "MD"]].forEach((e, i) => {
+    const r = OUT.usa.r.find(x => x.n[0] === e[0]); r.m = [926, 196 + i * 30]; r.ml = 1; r.k = e[1];
+  });
 }
 let js = "// beruehmt/karten-data.js – Karten für das Vierfarben-Malspiel (erzeugt mit /home/claude/fgen/gen.mjs, nicht von Hand bearbeiten).\n" +
   "// Länder: Natural Earth 1:50m über world-atlas (gemeinfrei). Bundesländer und US-Bundesstaaten: Natural Earth 1:10m admin-1 (gemeinfrei).\n" +

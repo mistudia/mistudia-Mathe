@@ -98,6 +98,12 @@
   var s = document.createElement("script"); s.src = "/verschieben.js"; document.head.appendChild(s);
 })();
 
+// ---------- Lupen-Knopf: Seite vergrößern/verkleinern (/seitenzoom.js) ----------
+(function(){
+  if(window.MS_SEITENZOOM || document.querySelector('script[src="/seitenzoom.js"]')) return;
+  var s = document.createElement("script"); s.src = "/seitenzoom.js"; document.head.appendChild(s);
+})();
+
 // ---------- Legende der Formelzeichen und Abkürzungen (/zeichen.js) ----------
 (function(){
   if(window.MS_ZEICHEN || document.querySelector('script[src="/zeichen.js"]')) return;
