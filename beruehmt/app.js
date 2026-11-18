@@ -1749,6 +1749,182 @@
   var fzPlan = false;
   new MutationObserver(function(){ if(fzPlan) return; fzPlan = true; requestAnimationFrame(function(){ fzPlan = false; fzAlle(); }); }).observe(document.getElementById("s_detail"), { childList: true, subtree: true, characterData: true });
 
+  // ---------- Runde 8: Eratosthenes (Bibliothek, Weltwunder), Thales im Kreis, Türme von Hanoi, Euklids ggT-Spiel ----------
+  var _erAlt8 = PROBE.eratosthenes;
+  PROBE.eratosthenes = function(){
+    _erAlt8();
+    $("probe").insertAdjacentHTML("beforeend", karteH("e_bib_h") + absatz("e_bib") + karteH("e_wunder_h") + absatz("e_wunder_m") +
+      '<ol class="bListe">' + tA("e_wunder").map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>");
+  };
+
+  // Thales-Kreis: C auf dem Halbkreis ziehbar; thk.w = Winkel CMB in Grad
+  var thk = { w: 120 };
+  var _thAlt8 = PROBE.thales;
+  PROBE.thales = function(){
+    _thAlt8();
+    $("probe").insertAdjacentHTML("beforeend", karteH("th_k_h") + absatz("th_k_anl") +
+      '<div class="zwei"><div id="thkSvg"></div><div><p class="zeile"><b>' + esc(t("th_k_w")) + ' <bdi id="thkW" dir="ltr"></bdi></b></p><p class="zeile">' + esc(t("th_k_bew")) + '</p><ol class="weg" id="thkWeg"></ol></div></div>' +
+      merkeP("th_k_merke") + absatz("th_k_bez"));
+    thkZeichnen();
+  };
+  function thkZeichnen(){
+    var box = $("thkSvg"); if(!box) return;
+    var W = 440, H = 270, mx = 220, my = 225, r = 180, s = svgNeu(W, H);
+    var w = thk.w * Math.PI / 180, A = [mx - r, my], B = [mx + r, my], C = [mx + r * Math.cos(w), my - r * Math.sin(w)], M = [mx, my];
+    var al = thk.w / 2, be = 90 - al;
+    function ang(P, Q){ return Math.atan2(Q[1] - P[1], Q[0] - P[0]); }
+    function keil(P, a1, a2, rad, col){
+      var d = a2 - a1; while(d > Math.PI) d -= 2 * Math.PI; while(d < -Math.PI) d += 2 * Math.PI;
+      var p1 = [P[0] + rad * Math.cos(a1), P[1] + rad * Math.sin(a1)], p2 = [P[0] + rad * Math.cos(a1 + d), P[1] + rad * Math.sin(a1 + d)];
+      s.appendChild(el("path", { d: "M" + P[0] + " " + P[1] + "L" + p1[0].toFixed(1) + " " + p1[1].toFixed(1) + "A" + rad + " " + rad + " 0 0 " + (d > 0 ? 1 : 0) + " " + p2[0].toFixed(1) + " " + p2[1].toFixed(1) + "Z", fill: col, stroke: "#1a2233", "stroke-width": 1 }));
+      return a1 + d / 2;
+    }
+    function lbl(P, mitte, rad, txt, cls){ schrift(s, P[0] + rad * Math.cos(mitte), P[1] + rad * Math.sin(mitte) + 6, txt, "middle", cls || "bk-klein", { "font-weight": 800, "font-size": 19 }); }
+    s.appendChild(el("path", { d: "M" + A[0] + " " + my + "A" + r + " " + r + " 0 0 1 " + B[0] + " " + my, fill: "none", stroke: "#94a3b8", "stroke-width": 2, "stroke-dasharray": "6 5" }));
+    s.appendChild(el("path", { d: "M" + A.join(" ") + "L" + C[0].toFixed(1) + " " + C[1].toFixed(1) + "L" + B.join(" ") + "Z", fill: "rgba(184,134,11,0.10)", stroke: "#1a2233", "stroke-width": 2.5, "stroke-linejoin": "round" }));
+    s.appendChild(el("line", { x1: mx, y1: my, x2: C[0], y2: C[1], stroke: "#7c3aed", "stroke-width": 2, "stroke-dasharray": "5 4" }));
+    var FA = "rgba(245,158,11,0.55)", FB = "rgba(167,139,250,0.6)";
+    var mA = keil(A, ang(A, B), ang(A, C), 40, FA); lbl(A, mA, 56, "α");
+    var mB = keil(B, ang(B, A), ang(B, C), 40, FB); lbl(B, mB, 56, "β");
+    var mCa = keil(C, ang(C, A), ang(C, M), 34, FA), mCb = keil(C, ang(C, M), ang(C, B), 34, FB);
+    lbl(C, mCa, 48, "α"); lbl(C, mCb, 48, "β");
+    s.appendChild(el("circle", { cx: C[0] + 14 * Math.cos(ang(C, M)), cy: C[1] + 14 * Math.sin(ang(C, M)), r: 3, fill: "#1a2233" }));
+    [[A, "A", -16, 22], [B, "B", 16, 22], [M, "M", 0, 24]].forEach(function(q){ schrift(s, q[0][0] + q[2], q[0][1] + q[3], q[1], "middle", "bk-klein", { "font-weight": 800, "font-size": 19 }); });
+    var cx = C[0] - mx, cy = C[1] - my, cl = Math.hypot(cx, cy) || 1;
+    schrift(s, C[0] + cx / cl * 22, C[1] + cy / cl * 22 + 5, "C", "middle", "bk-klein", { "font-weight": 800, "font-size": 19 });
+    s.appendChild(el("circle", { cx: C[0], cy: C[1], r: 13, fill: "rgba(124,58,237,0.25)", stroke: "#7c3aed", "stroke-width": 2.5, style: "cursor:grab" }));
+    s.style.touchAction = "none";
+    box.innerHTML = ""; box.appendChild(s);
+    $("thkW").textContent = z(al, 1) + "° + " + z(be, 1) + "° = 90°";
+    $("thkWeg").innerHTML = weg(["α + β + (α + β) = 180°", "2 · (α + β) = 180°", "α + β = 90°", "α ≈ " + z(al, 1) + "°", "β ≈ " + z(be, 1) + "°"]);
+    var zieh = false;
+    function setze(e){ var q = s.getBoundingClientRect(), k = W / q.width, x = (e.clientX - q.left) * k, y = (e.clientY - q.top) * k; var g = Math.atan2(my - y, x - mx) * 180 / Math.PI; if(g < -90) g = 180; thk.w = Math.max(6, Math.min(174, g)); thkZeichnen(); }
+    s.addEventListener("pointerdown", function(e){ zieh = true; try { s.setPointerCapture(e.pointerId); } catch(x){} setze(e); });
+    s.addEventListener("pointermove", function(e){ if(zieh) setze(e); });
+    s.addEventListener("pointerup", function(){ zieh = false; });
+  }
+
+  // Türme von Hanoi
+  P.push({ k: "hanoi", p: "ha", sym: "2ⁿ−1", col: "#b45309", leg: "haN haZ", link: [["exponential", "link_exp"]] });
+  P.push({ k: "euklid", p: "eg", sym: "▯▫", col: "#7c2d12", leg: "egAB", link: [["brueche", "eg_l1"], ["beruehmt/#eratosthenes", "e_name"]] });
+  var ha = { n: 4, st: null, sel: -1, z: 0, msg: "", T: null, auto: false };
+  function haReset(){ if(ha.T){ clearInterval(ha.T); ha.T = null; } ha.st = [[], [], []]; for(var i = ha.n; i >= 1; i--) ha.st[0].push(i); ha.sel = -1; ha.z = 0; ha.msg = ""; ha.auto = false; ha.gelobt = false; }
+  PROBE.hanoi = function(){
+    if(!ha.st) haReset();
+    var b = $("probe"), T = [];
+    for(var n = 1; n <= 10; n++) T.push([n, Math.pow(2, n) - 1]);
+    b.innerHTML = absatz("ha_anl") + '<div class="chips" id="haN"><b>' + esc(t("ha_n")) + "</b> " + [3, 4, 5, 6, 7, 8].map(function(n){ return '<button type="button" class="chip" data-n="' + n + '">' + n + "</button>"; }).join("") + "</div>" +
+      '<div id="haSvg"></div><p class="zeile" id="haSt"></p><p class="zeile" id="haMsg"></p><p><button type="button" class="knopf hell" id="haNeu">' + esc(t("ha_neu")) + '</button> <button type="button" class="knopf hell" id="haLoes">' + esc(t("ha_loes")) + "</button></p>" +
+      karteH("ha_formel_h") + absatz("ha_formel") + '<ol class="weg">' + weg(["Z(1) = 1", "Z(n) = 2 · Z(n − 1) + 1", "Z(n) = 2" + "ⁿ − 1"]) + "</ol>" +
+      '<div class="haTabW"><table class="haTab" dir="ltr"><tr><th>' + esc(t("ha_tab")) + "</th>" + T.map(function(r){ return "<td>" + r[0] + "</td>"; }).join("") + "</tr><tr><th>" + esc(t("ha_tabZ")) + "</th>" + T.map(function(r){ return "<td>" + gz(r[1]) + "</td>"; }).join("") + "</tr></table></div>" +
+      merkeP("ha_legende");
+    b.querySelectorAll("#haN [data-n]").forEach(function(c){ c.addEventListener("click", function(){ ha.n = +c.dataset.n; haReset(); haZeichnen(); }); });
+    $("haNeu").addEventListener("click", function(){ haReset(); haZeichnen(); });
+    $("haLoes").addEventListener("click", function(){
+      haReset(); ha.auto = true; var Z = [];
+      (function zug(n, von, nach, frei){ if(!n) return; zug(n - 1, von, frei, nach); Z.push([von, nach]); zug(n - 1, frei, nach, von); })(ha.n, 0, 2, 1);
+      var i = 0; haZeichnen();
+      ha.T = setInterval(function(){ if(i >= Z.length || !$("haSvg")){ clearInterval(ha.T); ha.T = null; return; } ha.st[Z[i][1]].push(ha.st[Z[i][0]].pop()); ha.z++; i++; haZeichnen(); }, ha.n <= 4 ? 450 : ha.n <= 6 ? 160 : 60);
+    });
+    haZeichnen();
+  };
+  function haKlick(p){
+    if(ha.T || ha.st[2].length === ha.n) return;
+    ha.msg = "";
+    if(ha.sel < 0){ if(ha.st[p].length) ha.sel = p; }
+    else if(ha.sel === p) ha.sel = -1;
+    else {
+      var d = ha.st[ha.sel][ha.st[ha.sel].length - 1], oben = ha.st[p][ha.st[p].length - 1];
+      if(oben && oben < d) ha.msg = "falsch";
+      else { ha.st[p].push(ha.st[ha.sel].pop()); ha.z++; ha.sel = -1; }
+    }
+    haZeichnen();
+  }
+  function haZeichnen(){
+    var box = $("haSvg"); if(!box) return;
+    var W = 600, H = 250, X = [100, 300, 500], yb = 215, dh = Math.min(22, 150 / ha.n), maxB = 180, s = svgNeu(W, H);
+    var FARB = ["#f59e0b", "#fb923c", "#a78bfa", "#f472b6", "#2dd4bf", "#facc15", "#c084fc", "#fdba74"];
+    s.appendChild(el("rect", { x: 10, y: yb, width: W - 20, height: 14, rx: 5, fill: "#a16207" }));
+    X.forEach(function(x, p){
+      s.appendChild(el("rect", { x: x - 5, y: 40, width: 10, height: yb - 40, rx: 4, fill: "#78350f" }));
+      if(p === 2) s.appendChild(el("text", { x: x, y: 32, "text-anchor": "middle", "class": "bk-klein", "font-weight": 800 }, "★"));
+    });
+    X.forEach(function(x, p){
+      ha.st[p].forEach(function(d, i){
+        var weg = p === ha.sel && i === ha.st[p].length - 1, bw = 34 + (maxB - 34) * (d - 1) / Math.max(1, ha.n - 1), y = weg ? 6 : yb - (i + 1) * dh;
+        s.appendChild(el("rect", { x: x - bw / 2, y: y, width: bw, height: dh - 2, rx: Math.min(9, dh / 2), fill: FARB[(d - 1) % FARB.length], stroke: "#1a2233", "stroke-width": weg ? 3 : 1.5 }));
+        if(dh >= 16) s.appendChild(el("text", { x: x, y: y + dh / 2 + 4, "text-anchor": "middle", "font-size": 12, "font-weight": 800, fill: "#1a2233" }, String(d)));
+      });
+      var hit = el("rect", { x: x - 100, y: 0, width: 200, height: H, fill: "transparent", style: "cursor:pointer" });
+      hit.addEventListener("click", function(){ haKlick(p); }); s.appendChild(hit);
+    });
+    box.innerHTML = ""; box.appendChild(s);
+    var min = Math.pow(2, ha.n) - 1, fertig = ha.st[2].length === ha.n, st = $("haSt"), mg = $("haMsg");
+    document.querySelectorAll("#haN [data-n]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.n === ha.n ? "true" : "false"); });
+    st.className = "zeile"; st.textContent = t("ha_zuege", { z: ha.z, m: min });
+    mg.className = "zeile"; mg.textContent = "";
+    if(ha.msg === "falsch"){ mg.className = "zeile schlecht"; mg.textContent = t("ha_falsch"); }
+    if(fertig){ mg.className = "zeile gut"; mg.textContent = t(ha.z === min ? "ha_okMin" : "ha_ok", { z: ha.z }); if(!ha.auto && !ha.gelobt){ ha.gelobt = true; if(typeof msRichtig === "function") try { msRichtig(); } catch(x){} } }
+  }
+  GEN.hanoi = function(){
+    if(Math.random() < 0.5){ var n = zuf(3, 12), p = Math.pow(2, n), Z = p - 1; return { q: t("ha_q", { n: n }), w: Z, tol: 0, l: gz(Z), weg: ["Z = 2" + hoch(n) + " − 1", "Z = " + gz(p) + " − 1", "Z = " + gz(Z)] }; }
+    var m = zuf(3, 11), Zm = Math.pow(2, m) - 1, Z2 = 2 * Zm + 1;
+    return { q: t("ha_q2", { n: m, z: gz(Zm), m: m + 1 }), w: Z2, tol: 0, l: gz(Z2), weg: ["Z(n + 1) = 2 · Z(n) + 1", "Z(" + (m + 1) + ") = 2 · " + gz(Zm) + " + 1", "Z(" + (m + 1) + ") = " + gz(Z2)] };
+  };
+
+  // Euklids ggT-Spiel: Rechteck a × b, größte Quadrate abschneiden
+  var eg = { a: 21, b: 13, cut: 0 };
+  function egPlan(a, b){
+    var Q = [], x = 0, y = 0, w = a, h = b, D = [], A = Math.max(a, b), B = Math.min(a, b);
+    while(B > 0){ D.push([A, Math.floor(A / B), B, A % B]); var r = A % B; A = B; B = r; }
+    var runde = 0, letzt = null;
+    while(w > 0 && h > 0){ var sq = Math.min(w, h); if(letzt !== null && sq !== letzt) runde++; letzt = sq; Q.push({ x: x, y: y, s: sq, r: runde }); if(w >= h){ x += h; w -= h; } else { y += w; h -= w; } }
+    return { Q: Q, D: D, g: A };
+  }
+  function ggtWort(){ return t("eg_ggt"); }
+  PROBE.euklid = function(){
+    var b = $("probe");
+    b.innerHTML = absatz("eg_anl") + '<div class="chips"><label>' + esc(t("eg_a")) + ' <input class="zahl egZ" id="egA" inputmode="numeric" maxlength="3" value="' + eg.a + '"></label><label>' + esc(t("eg_b")) + ' <input class="zahl egZ" id="egB" inputmode="numeric" maxlength="3" value="' + eg.b + '"></label>' +
+      '<button type="button" class="knopf hell" id="egAll">' + esc(t("eg_alles")) + '</button><button type="button" class="knopf hell" id="egNeu">' + esc(t("eg_neu")) + "</button></div>" +
+      '<div id="egSvg"></div><p class="zeile" id="egSt"></p><p class="zeile"><b>' + esc(t("eg_weg_h")) + '</b></p><ol class="weg" id="egWeg"></ol>' + absatz("eg_warum") + merkeP("eg_merke");
+    function lies(id, alt){ var v = parseInt($(id).value, 10); return v >= 1 && v <= 300 ? v : alt; }
+    $("egA").addEventListener("input", function(){ eg.a = lies("egA", eg.a); eg.cut = 0; egZeichnen(); });
+    $("egB").addEventListener("input", function(){ eg.b = lies("egB", eg.b); eg.cut = 0; egZeichnen(); });
+    $("egAll").addEventListener("click", function(){ eg.cut = 9999; egZeichnen(); });
+    $("egNeu").addEventListener("click", function(){ var g = zuf(2, 12), m = zuf(2, 12), n; do { n = zuf(1, m - 1); } while(ggT(m, n) !== 1); eg.a = g * m; eg.b = g * n; if(Math.random() < 0.5){ var x = eg.a; eg.a = eg.b; eg.b = x; } $("egA").value = eg.a; $("egB").value = eg.b; eg.cut = 0; egZeichnen(); });
+    egZeichnen();
+  };
+  function ggT(a, b){ while(b){ var r = a % b; a = b; b = r; } return a; }
+  function egZeichnen(){
+    var box = $("egSvg"); if(!box) return;
+    var Pl = egPlan(eg.a, eg.b), N = Pl.Q.length, cut = Math.min(eg.cut, N - 1), fertig = cut >= N - 1;
+    var k = Math.min(560 / eg.a, 300 / eg.b), W = eg.a * k + 20, H = eg.b * k + 20, s = svgNeu(W, H);
+    var FARB = ["#fbbf24", "#a78bfa", "#2dd4bf", "#fb923c", "#f472b6", "#facc15", "#c084fc", "#fdba74"];
+    s.appendChild(el("rect", { x: 10, y: 10, width: eg.a * k, height: eg.b * k, fill: "#ffffff", stroke: "#1a2233", "stroke-width": 2 }));
+    for(var i = 0; i < cut; i++){ var q = Pl.Q[i]; s.appendChild(el("rect", { x: 10 + q.x * k, y: 10 + q.y * k, width: q.s * k, height: q.s * k, fill: FARB[q.r % FARB.length], stroke: "#1a2233", "stroke-width": 1.5 })); if(q.s * k >= 26) schrift(s, 10 + (q.x + q.s / 2) * k, 10 + (q.y + q.s / 2) * k + 6, String(q.s), "middle", "bk-klein", { "font-weight": 800 }); }
+    // Rest-Rechteck
+    var R = cut < N ? Pl.Q[cut] : null, rx = R ? R.x : 0, ry = R ? R.y : 0, rw = 0, rh = 0;
+    if(R){ var x2 = 0, y2 = 0; for(var j = cut; j < N; j++){ x2 = Math.max(x2, Pl.Q[j].x + Pl.Q[j].s); y2 = Math.max(y2, Pl.Q[j].y + Pl.Q[j].s); } rw = x2 - rx; rh = y2 - ry; }
+    if(fertig){ s.appendChild(el("rect", { x: 10 + rx * k, y: 10 + ry * k, width: rw * k, height: rh * k, fill: "rgba(124,58,237,0.35)", stroke: "#5b21b6", "stroke-width": 3.5 })); if(rw * k >= 22) schrift(s, 10 + (rx + rw / 2) * k, 10 + (ry + rh / 2) * k + 6, String(rw), "middle", "bk-klein", { "font-weight": 800 }); }
+    else s.appendChild(el("rect", { x: 10 + rx * k, y: 10 + ry * k, width: rw * k, height: rh * k, fill: "none", stroke: "#7c3aed", "stroke-width": 3, "stroke-dasharray": "7 5" }));
+    s.style.cursor = fertig ? "default" : "pointer";
+    s.addEventListener("click", function(){ if(eg.cut < N - 1){ eg.cut++; egZeichnen(); } });
+    box.innerHTML = ""; box.appendChild(s);
+    var st = $("egSt");
+    if(fertig){ st.className = "zeile gut"; st.textContent = t("eg_fertig", { g: Pl.g, a: eg.a, b: eg.b }); }
+    else { st.className = "zeile"; st.textContent = t("eg_stand", { n: cut, x: rw, y: rh }); }
+    // Rechnung: Zeile einer Runde erscheint, sobald ihre Quadrate abgeschnitten sind
+    var L = [], kum = 0;
+    Pl.D.forEach(function(d, i){ kum += d[1]; var schwelle = i === Pl.D.length - 1 ? kum - 1 : kum; if(cut >= schwelle) L.push(d[0] + " = " + d[1] + " · " + d[2] + " + " + d[3]); });
+    if(fertig) L.push(ggtWort() + "(" + eg.a + ", " + eg.b + ") = " + Pl.g);
+    $("egWeg").innerHTML = weg(L);
+  }
+  GEN.euklid = function(){
+    var g = zuf(2, 15), m = zuf(3, 14), n; do { n = zuf(2, m - 1); } while(ggT(m, n) !== 1);
+    var a = g * m, b = g * n, Pl = egPlan(a, b);
+    return { q: t("eg_q", { a: a, b: b }), w: g, tol: 0, l: String(g), weg: Pl.D.map(function(d){ return d[0] + " = " + d[1] + " · " + d[2] + " + " + d[3]; }).concat([ggtWort() + "(" + a + ", " + b + ") = " + g]) };
+  };
+
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){
     $("frage").textContent = auf.q;

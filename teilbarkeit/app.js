@@ -153,6 +153,8 @@
     $("hSieb").textContent = t("hSieb");
     $("siebText").textContent = siebSchritt === 0 ? t("sieb0") : siebSchritt <= 4 ? t("siebS", { p: SP[siebSchritt - 1] }) : t("siebEnde");
     $("siebWeiter").textContent = t("weiterS"); $("siebWeiter").disabled = siebSchritt >= 5; $("siebReset").textContent = t("reset");
+    var LK = { de: ["Wer war Eratosthenes?", "Riesige Primzahlen"], en: ["Who was Eratosthenes?", "Giant primes"], es: ["¿Quién fue Eratóstenes?", "Números primos gigantes"], zh: ["埃拉托色尼是谁？", "巨大的质数"], fr: ["Qui était Ératosthène ?", "Nombres premiers géants"], ru: ["Кто такой Эратосфен?", "Гигантские простые числа"], ar: ["من كان إراتوستينس؟", "أعداد أولية عملاقة"], ja: ["エラトステネスってだれ？", "巨大な素数"], pt: ["Quem foi Eratóstenes?", "Números primos gigantes"] }[lang] || ["Wer war Eratosthenes?", "Riesige Primzahlen"], pf = lang === "ar" ? " ←" : " →";
+    $("siebLinks").innerHTML = '<a class="knopf hell" href="/beruehmt/#eratosthenes">' + LK[0] + pf + '</a> <a class="knopf hell" href="/beruehmt/#primzahlen">' + LK[1] + pf + "</a>";
     $("siebLeg").innerHTML = SP.map(function(p){ return '<span><i style="background:' + SF[p] + '"></i>' + t("vielf", { p: p }) + "</span>"; }).join("") + '<span><i style="background:#4f46e5"></i>' + t("primL") + "</span>";
   }
   $("siebWeiter").addEventListener("click", function(){ if(siebSchritt < 5){ siebSchritt++; sieb(); } });
