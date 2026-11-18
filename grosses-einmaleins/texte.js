@@ -1,6 +1,7 @@
 // grosses-einmaleins/texte.js – Texte (9 Sprachen) für das Große Einmaleins
 var GE = {
 "de": {
+"tab_diplom": "Diplom",
 "titel": "Großes Einmaleins",
 "tab_tabelle": "Tabelle",
 "tab_tricks": "Tricks",
@@ -38,6 +39,7 @@ var GE = {
 "durchHilfe": "Tipp: Welche Zahl mal {b} ergibt {p}?"
 },
 "en": {
+"tab_diplom": "Diploma",
 "titel": "Big Times Tables",
 "tab_tabelle": "Table",
 "tab_tricks": "Tricks",
@@ -75,6 +77,7 @@ var GE = {
 "durchHilfe": "Tip: which number times {b} makes {p}?"
 },
 "es": {
+"tab_diplom": "Diploma",
 "titel": "Tablas grandes",
 "tab_tabelle": "Tabla",
 "tab_tricks": "Trucos",
@@ -112,6 +115,7 @@ var GE = {
 "durchHilfe": "Pista: ¿qué número por {b} da {p}?"
 },
 "zh": {
+"tab_diplom": "证书",
 "titel": "大乘法表",
 "tab_tabelle": "表格",
 "tab_tricks": "技巧",
@@ -149,6 +153,7 @@ var GE = {
 "durchHilfe": "提示：几乘 {b} 等于 {p}？"
 },
 "fr": {
+"tab_diplom": "Diplôme",
 "titel": "Grandes tables de multiplication",
 "tab_tabelle": "Tableau",
 "tab_tricks": "Astuces",
@@ -186,6 +191,7 @@ var GE = {
 "durchHilfe": "Astuce : quel nombre fois {b} donne {p} ?"
 },
 "ru": {
+"tab_diplom": "Диплом",
 "titel": "Большая таблица умножения",
 "tab_tabelle": "Таблица",
 "tab_tricks": "Приёмы",
@@ -223,6 +229,7 @@ var GE = {
 "durchHilfe": "Подсказка: какое число на {b} даёт {p}?"
 },
 "ar": {
+"tab_diplom": "الشهادة",
 "titel": "جدول الضرب الكبير",
 "tab_tabelle": "الجدول",
 "tab_tricks": "حيل",
@@ -260,6 +267,7 @@ var GE = {
 "durchHilfe": "تلميح: أي عدد في {b} يساوي {p}؟"
 },
 "ja": {
+"tab_diplom": "賞状",
 "titel": "大きなかけ算",
 "tab_tabelle": "表",
 "tab_tricks": "コツ",
@@ -297,6 +305,7 @@ var GE = {
 "durchHilfe": "ヒント：何に {b} をかけると {p}？"
 },
 "pt": {
+"tab_diplom": "Diploma",
 "titel": "Tabuada grande",
 "tab_tabelle": "Tabela",
 "tab_tricks": "Truques",

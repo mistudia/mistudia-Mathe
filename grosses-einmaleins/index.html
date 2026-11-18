@@ -62,6 +62,7 @@
   .fehler { color: var(--schlecht); font-weight: 700; }
   /* Tabelle 11–20 */
   .tabwrap { overflow-x: auto; max-width: 100%; }
+  #diplomFrame { display: block; width: 100%; border: 0; min-height: 640px; background: transparent; }
   table.tab { border-collapse: separate; border-spacing: 3px; margin: 6px auto; direction: ltr; font-variant-numeric: tabular-nums; }
   table.tab th { font: 800 15px system-ui, sans-serif; color: var(--blue); padding: 4px; min-width: 34px; }
   table.tab td { padding: 0; }
@@ -97,11 +98,15 @@
   <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
   <h1 id="titel">Großes Einmaleins</h1>
   <div class="tabs" role="tablist">
-    <button type="button" role="tab" data-tab="tabelle" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="diplom" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="tabelle" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="tricks" aria-selected="false"></button>
     <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
   </div>
-  <section id="s_tabelle">
+  <section id="s_diplom">
+    <iframe id="diplomFrame" title="Diplom" src="/einmaleins/?gross=1&amp;embed=1" loading="eager"></iframe>
+  </section>
+  <section id="s_tabelle" hidden>
     <div class="karte">
       <p class="zeile" id="tabIntro"></p>
       <div class="tabwrap" id="tabelle"></div>

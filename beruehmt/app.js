@@ -992,7 +992,7 @@
     var gl = $("raGl");
     gl.className = andere.length ? "zeile gut" : "zeile muted";
     gl.textContent = andere.length ? t("ra_gleich", { p: andere.map(function(p){ return p[0] + "³ + " + p[1] + "³"; }).join(", ") }) : t("ra_keine");
-    $("raListe").innerHTML = Object.keys(M).filter(function(k){ return M[k].length > 1; }).map(function(k){ return "<b>" + gz(+k) + "</b> = " + M[k].map(function(p){ return p[0] + "³ + " + p[1] + "³"; }).join(" = "); }).join("<br>");
+    $("raListe").innerHTML = Object.keys(M).filter(function(k){ return M[k].length > 1; }).map(function(k){ return '<span class="fzB" dir="ltr">' + M[k].map(function(p, i){ return '<span class="fzL">' + (i ? "" : "<b>" + gz(+k) + "</b>") + '</span><span class="fzR">= ' + p[0] + "³ + " + p[1] + "³</span>"; }).join("") + "</span>"; }).join("");
     var h = ""; for(var n = 1; n <= 20; n++) h += '<span class="' + (n === a || n === b ? "an" : "") + '">' + n + "³ = " + gz(n * n * n) + "</span>";
     $("raKub").innerHTML = h;
   }
@@ -1125,7 +1125,7 @@
     pfeil(s, C - sq * sk / 2, C + sq * sk / 2 + 14, C + sq * sk / 2, C + sq * sk / 2 + 14, "#b8860b", true); schrift(s, C, C + sq * sk / 2 + 30, "8/9 · d = " + z(sq, 2), "middle", "bk-klein", { fill: "#8a5a00" });
     $("qSvg").innerHTML = ""; $("qSvg").appendChild(s); $("qSvg").insertAdjacentHTML("beforeend", qLeg());
     $("qWeg").innerHTML = weg([{ lbl: t("q_kreis") }, "r = " + z(d, 0) + " : 2 = " + z(r, 1), "A = π · r² = π · " + z(r, 1) + "² ≈ " + z(AK, 2) + " m²", { lbl: t("q_quadrat") }, "a = 8/9 · " + z(d, 0) + (sq % 1 ? " ≈ " : " = ") + z(sq, 2), "A = a² " + (sq % 1 ? "≈ " : "= ") + z(AQ, 2) + " m²"]);
-    $("qErg").innerHTML = "<b>" + esc(t("q_abw", { p: z(Math.abs(AQ - AK) / AK * 100, 2) })) + "</b><br>" + esc(t("q_piAeg"));
+    $("qErg").innerHTML = "<b>" + esc(t("q_abw", { p: z(Math.abs(AQ - AK) / AK * 100, 2) })) + '</b><span class="fzZ" style="display:block">' + esc(t("q_piAeg")) + "</span>";
   }
   function qMond(){
     var a = qm.a, c = a * Math.SQRT2, D = a * a / 2, KH = Math.PI * a * a / 4, s = svgNeu(320, 260), O = [160, 230], R = 130, rs = R / Math.SQRT2;
@@ -1207,7 +1207,7 @@
     s.appendChild(el("line", { x1: P5[0][0], y1: P5[0][1], x2: P5[2][0], y2: P5[2][1], stroke: "#7c3aed", "stroke-width": 5, "stroke-linecap": "round" }));
     s.appendChild(el("line", { x1: P5[2][0], y1: P5[2][1], x2: P5[3][0], y2: P5[3][1], stroke: "#b8860b", "stroke-width": 5, "stroke-linecap": "round" }));
     $("fgPent").innerHTML = ""; $("fgPent").appendChild(s);
-    $("fgPent").insertAdjacentHTML("beforeend", '<p class="leg"><span style="color:#7c3aed">▬ ' + esc(t("fi_g_diag")) + '</span> : <span style="color:#b8860b">▬ ' + esc(t("fi_g_seite")) + "</span> = φ ≈ 1,618</p>");
+    $("fgPent").insertAdjacentHTML("beforeend", '<p class="leg"><span style="color:#7c3aed">▬ ' + esc(t("fi_g_diag")) + '</span> : <span style="color:#b8860b">▬ ' + esc(t("fi_g_seite")) + "</span> = φ</p><p class=\"leg\">φ ≈ " + z(1.618, 3) + "</p>");
   }
 
   // ===== Euler: Karte wird zum Netz =====
@@ -1779,7 +1779,7 @@
       s.appendChild(el("path", { d: "M" + P[0] + " " + P[1] + "L" + p1[0].toFixed(1) + " " + p1[1].toFixed(1) + "A" + rad + " " + rad + " 0 0 " + (d > 0 ? 1 : 0) + " " + p2[0].toFixed(1) + " " + p2[1].toFixed(1) + "Z", fill: col, stroke: "#1a2233", "stroke-width": 1 }));
       return a1 + d / 2;
     }
-    function lbl(P, mitte, rad, txt, cls){ schrift(s, P[0] + rad * Math.cos(mitte), P[1] + rad * Math.sin(mitte) + 6, txt, "middle", cls || "bk-klein", { "font-weight": 800, "font-size": 19 }); }
+    function lbl(P, mitte, rad, txt, cls){ schrift(s, P[0] + rad * Math.cos(mitte), P[1] + rad * Math.sin(mitte) + 6, txt, "middle", cls || "bk-klein", { style: "font:800 19px system-ui,sans-serif" }); }
     s.appendChild(el("path", { d: "M" + A[0] + " " + my + "A" + r + " " + r + " 0 0 1 " + B[0] + " " + my, fill: "none", stroke: "#94a3b8", "stroke-width": 2, "stroke-dasharray": "6 5" }));
     s.appendChild(el("path", { d: "M" + A.join(" ") + "L" + C[0].toFixed(1) + " " + C[1].toFixed(1) + "L" + B.join(" ") + "Z", fill: "rgba(184,134,11,0.10)", stroke: "#1a2233", "stroke-width": 2.5, "stroke-linejoin": "round" }));
     s.appendChild(el("line", { x1: mx, y1: my, x2: C[0], y2: C[1], stroke: "#7c3aed", "stroke-width": 2, "stroke-dasharray": "5 4" }));
@@ -1789,9 +1789,9 @@
     var mCa = keil(C, ang(C, A), ang(C, M), 34, FA), mCb = keil(C, ang(C, M), ang(C, B), 34, FB);
     lbl(C, mCa, 48, "α"); lbl(C, mCb, 48, "β");
     s.appendChild(el("circle", { cx: C[0] + 14 * Math.cos(ang(C, M)), cy: C[1] + 14 * Math.sin(ang(C, M)), r: 3, fill: "#1a2233" }));
-    [[A, "A", -16, 22], [B, "B", 16, 22], [M, "M", 0, 24]].forEach(function(q){ schrift(s, q[0][0] + q[2], q[0][1] + q[3], q[1], "middle", "bk-klein", { "font-weight": 800, "font-size": 19 }); });
+    [[A, "A", -16, 22], [B, "B", 16, 22], [M, "M", 0, 24]].forEach(function(q){ schrift(s, q[0][0] + q[2], q[0][1] + q[3], q[1], "middle", "bk-klein", { style: "font:800 19px system-ui,sans-serif" }); });
     var cx = C[0] - mx, cy = C[1] - my, cl = Math.hypot(cx, cy) || 1;
-    schrift(s, C[0] + cx / cl * 22, C[1] + cy / cl * 22 + 5, "C", "middle", "bk-klein", { "font-weight": 800, "font-size": 19 });
+    schrift(s, C[0] + cx / cl * 22, C[1] + cy / cl * 22 + 5, "C", "middle", "bk-klein", { style: "font:800 19px system-ui,sans-serif" });
     s.appendChild(el("circle", { cx: C[0], cy: C[1], r: 13, fill: "rgba(124,58,237,0.25)", stroke: "#7c3aed", "stroke-width": 2.5, style: "cursor:grab" }));
     s.style.touchAction = "none";
     box.innerHTML = ""; box.appendChild(s);
@@ -1924,6 +1924,101 @@
     var a = g * m, b = g * n, Pl = egPlan(a, b);
     return { q: t("eg_q", { a: a, b: b }), w: g, tol: 0, l: String(g), weg: Pl.D.map(function(d){ return d[0] + " = " + d[1] + " · " + d[2] + " + " + d[3]; }).concat([ggtWort() + "(" + a + ", " + b + ") = " + g]) };
   };
+
+  // ---------- Runde 9: Vitruv-Original, Bematisten, Turingmaschine zum Zuschauen ----------
+  var _vAlt9 = PROBE.davinci;
+  PROBE.davinci = function(){
+    _vAlt9();
+    $("probe").insertAdjacentHTML("afterbegin", karteH("v_orig_h") + '<figure class="vOrig"><img src="vitruv-leonardo.webp" width="466" height="453" alt="' + esc(t("v_orig_h")) + '" loading="lazy"><figcaption>' + esc(t("v_orig_q")) + "</figcaption></figure>" + absatz("v_orig"));
+  };
+  var _erAlt9 = PROBE.eratosthenes;
+  PROBE.eratosthenes = function(){
+    _erAlt9();
+    var h = karteH("e_bema_h") + absatz("e_bema") + merkeP("e_bema_r");
+    var bib = Array.prototype.filter.call(document.querySelectorAll("#probe h3.fH"), function(x){ return x.textContent === t("e_bib_h"); })[0];
+    if(bib) bib.insertAdjacentHTML("beforebegin", h); else $("probe").insertAdjacentHTML("beforeend", h);
+  };
+
+  // Turingmaschine: Programme als Regeltabellen {Zustand: {gelesen: [schreibt, Richtung, neu]}}
+  var TV_P = [
+    { start: "rechts", R: { A: { "1": ["0", "L", "A"], "0": ["1", "N", "S"], " ": ["1", "N", "S"] } } },
+    { start: "links", R: { A: { "0": ["0", "R", "A"], "1": ["1", "R", "A"], " ": ["0", "N", "S"] } } },
+    { start: "links", R: { A: { "0": ["1", "R", "A"], "1": ["0", "R", "A"], " ": [" ", "N", "S"] } } }
+  ];
+  var tv = { p: 0, ein: "1011", band: [], pos: 0, z: "A", n: 0, last: null, T: null, tempo: 600 };
+  function tvLaden(){
+    if(tv.T){ clearInterval(tv.T); tv.T = null; }
+    tv.band = [" "].concat(tv.ein.split("")).concat([" "]); tv.z = "A"; tv.n = 0; tv.last = null;
+    tv.pos = TV_P[tv.p].start === "rechts" ? tv.band.length - 2 : 1;
+  }
+  function tvSchritt(){
+    if(tv.z === "S") return;
+    var c = tv.band[tv.pos], r = TV_P[tv.p].R[tv.z][c];
+    tv.last = { z: tv.z, c: c };
+    tv.band[tv.pos] = r[0]; tv.z = r[2]; tv.n++;
+    if(r[1] === "L"){ tv.pos--; if(tv.pos < 0){ tv.band.unshift(" "); tv.pos = 0; } }
+    else if(r[1] === "R"){ tv.pos++; if(tv.pos >= tv.band.length) tv.band.push(" "); }
+    tvZeichnen();
+  }
+  function tvWert(b){ var s = b.join("").trim(); return s ? parseInt(s, 2) : 0; }
+  PROBE.turing = function(){
+    var b = $("probe");
+    b.innerHTML = karteH("tv_h") + absatz("tv_anl") + '<div class="chips" id="tvProg">' + tA("tv_prog").map(function(x, i){ return '<button type="button" class="chip" data-p="' + i + '">' + esc(x) + "</button>"; }).join("") + "</div>" +
+      '<p class="zeile" id="tvInfo"></p><label class="reglerZ"><span>' + esc(t("tu_zahl")) + '</span><input class="zahl" id="tvEin" inputmode="numeric" maxlength="10" style="max-width:160px" data-nofit value="' + esc(tv.ein) + '"></label><p class="zeile muted" id="tvFehl"></p>' +
+      '<div id="tvSvg"></div><p><button type="button" class="knopf" id="tvS">' + esc(t("tu_schritt")) + '</button> <button type="button" class="knopf" id="tvA">' + esc(t("tu_auto")) + '</button> <button type="button" class="knopf hell" id="tvR">' + esc(t("tu_reset")) + '</button> <label class="chk">' + esc(t("tv_tempo")) + ' <input type="range" id="tvT" min="0" max="4" step="1" value="2" data-nofit> ' + esc(t("tv_tempo2")) + "</label></p>" +
+      '<div class="zwei"><div><table class="tvTab" dir="ltr" id="tvTab"></table></div><div><p class="zeile" id="tvErg"></p></div></div>' +
+      '<p class="merke">' + esc(t("tu_bin")) + "</p>" + karteH("tv_mensch_h") + '<table class="tvTab tvM"><tr><th>' + esc(tA("tv_mensch_k")[0]) + "</th><th>" + esc(tA("tv_mensch_k")[1]) + "</th></tr>" +
+      tA("tv_mensch").map(function(r){ return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td></tr>"; }).join("") + "</table>" + absatz("tv_uni");
+    if(!tv.band.length) tvLaden();
+    b.querySelectorAll("#tvProg [data-p]").forEach(function(c){ c.addEventListener("click", function(){ tv.p = +c.dataset.p; tvLaden(); tvZeichnen(); }); });
+    $("tvEin").addEventListener("input", function(){ var v = this.value.trim(); if(/^[01]{1,10}$/.test(v)){ $("tvFehl").textContent = ""; tv.ein = v; tvLaden(); tvZeichnen(); } else $("tvFehl").textContent = t("tu_ungueltig"); });
+    $("tvS").addEventListener("click", function(){ if(tv.T){ clearInterval(tv.T); tv.T = null; } tvSchritt(); });
+    $("tvA").addEventListener("click", function(){ if(tv.T) clearInterval(tv.T); tv.T = setInterval(function(){ if(tv.z === "S" || !$("tvSvg")){ clearInterval(tv.T); tv.T = null; return; } tvSchritt(); }, tv.tempo); });
+    $("tvR").addEventListener("click", function(){ tvLaden(); tvZeichnen(); });
+    $("tvT").addEventListener("input", function(){ tv.tempo = [1100, 800, 600, 350, 180][+this.value]; if(tv.T){ clearInterval(tv.T); tv.T = null; $("tvA").click(); } });
+    tvZeichnen();
+  };
+  function tvZeichnen(){
+    var box = $("tvSvg"); if(!box) return;
+    var n = tv.band.length, Z = 46, W = Math.max(560, n * Z + 40), H = 210, x0 = (W - n * Z) / 2, y0 = 110, s = svgNeu(W, H);
+    var ziff = tv.band.join("").trim().length;
+    // Band
+    s.appendChild(el("rect", { x: x0 - 14, y: y0 - 6, width: n * Z + 28, height: Z + 12, rx: 6, fill: "#fef3c7", stroke: "#b8860b", "stroke-width": 1.5 }));
+    tv.band.forEach(function(c, i){
+      var x = x0 + i * Z, akt = i === tv.pos;
+      s.appendChild(el("rect", { x: x + 2, y: y0, width: Z - 4, height: Z, rx: 6, fill: akt ? "#ede9fe" : "#ffffff", stroke: akt ? "#7c3aed" : "#b0b0b8", "stroke-width": akt ? 3 : 1.5 }));
+      if(c !== " ") schrift(s, x + Z / 2, y0 + Z / 2 + 9, c, "middle", "bk-klein", { style: "font:800 26px ui-monospace,monospace" });
+    });
+    // Stellenwerte unter den Ziffern (von der letzten Ziffer aus)
+    var letzte = -1; tv.band.forEach(function(c, i){ if(c !== " ") letzte = i; });
+    tv.band.forEach(function(c, i){ if(c !== " " && letzte - i < 12) schrift(s, x0 + i * Z + Z / 2, y0 + Z + 22, String(Math.pow(2, letzte - i)), "middle", "bk-klein", { style: "font-size:12px;fill:#64748b" }); });
+    // Lesekopf (kleiner Roboter) über dem aktuellen Feld
+    var hx = x0 + tv.pos * Z + Z / 2, stop = tv.z === "S";
+    var g = el("g", { transform: "translate(" + hx + ",0)" });
+    g.appendChild(el("rect", { x: -26, y: 18, width: 52, height: 44, rx: 10, fill: stop ? "#e2e8f0" : "#c4b5fd", stroke: "#1a2233", "stroke-width": 2 }));
+    g.appendChild(el("circle", { cx: -10, cy: 34, r: 5, fill: "#1a2233" })); g.appendChild(el("circle", { cx: 10, cy: 34, r: 5, fill: "#1a2233" }));
+    g.appendChild(el("line", { x1: 0, y1: 18, x2: 0, y2: 8, stroke: "#1a2233", "stroke-width": 2 })); g.appendChild(el("circle", { cx: 0, cy: 6, r: 4, fill: stop ? "#94a3b8" : "#f59e0b" }));
+    g.appendChild(el("path", { d: "M-10 62 L10 62 L0 96 Z", fill: "#7c3aed" }));
+    var zt = stop ? t("tv_stop") : t("tu_zustand") + " " + tv.z;
+    schrift(g, 0, 54, zt.length > 9 ? (stop ? "■" : tv.z) : zt, "middle", "bk-klein", { style: "font:800 11px system-ui,sans-serif" });
+    s.appendChild(g);
+    // Bewegungspfeil des letzten Schritts
+    if(tv.last && !stop){ var r = TV_P[tv.p].R[tv.last.z][tv.last.c]; if(r[1] !== "N") pfeil(s, hx + (r[1] === "L" ? Z * 0.9 : -Z * 0.9), 40, hx + (r[1] === "L" ? 32 : -32), 40, "#b8860b"); }
+    box.innerHTML = ""; box.appendChild(s);
+    document.querySelectorAll("#tvProg [data-p]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.p === tv.p ? "true" : "false"); });
+    $("tvInfo").textContent = tA("tv_info")[tv.p];
+    // Regeltabelle mit markierter Zeile
+    var R = TV_P[tv.p].R, D = { L: t("tv_L"), R: t("tv_R"), N: t("tv_N") };
+    function zn(c){ return c === " " ? t("tv_leer") : c; }
+    var h = "<tr>" + tA("tv_tab").map(function(x){ return "<th>" + esc(x) + "</th>"; }).join("") + "</tr>";
+    Object.keys(R).forEach(function(z){ ["0", "1", " "].forEach(function(c){ var r = R[z][c], an = tv.last && tv.last.z === z && tv.last.c === c;
+      h += '<tr class="' + (an ? "an" : "") + '"><td>' + z + "</td><td>" + esc(zn(c)) + "</td><td>" + esc(zn(r[0])) + "</td><td>" + esc(D[r[1]]) + "</td><td>" + (r[2] === "S" ? esc(t("tv_stop")) : r[2]) + "</td></tr>"; }); });
+    $("tvTab").innerHTML = h;
+    $("tvErg").innerHTML = "<b>" + esc(t("tv_vorher")) + "</b> " + bdi(esc(tv.ein)) + " (" + parseInt(tv.ein, 2) + ")<br><b>" + esc(t("tv_nachher")) + "</b> " + (stop ? bdi(esc(tv.band.join("").trim())) + " (" + tvWert(tv.band) + ")" : "…") + "<br>" + esc(t("tv_schritte", { n: tv.n }));
+    $("tvS").disabled = stop; $("tvA").disabled = stop;
+    if(stop && tv.n && !tv.gelobt){ tv.gelobt = true; }
+    if(!stop) tv.gelobt = false;
+  }
 
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){

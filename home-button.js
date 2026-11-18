@@ -23,7 +23,7 @@
   var a = document.createElement("a");
   a.href = "/" + (window.MS_URL_LANG ? "?lang=" + window.MS_URL_LANG : ""); a.className = "ms-home-btn"; a.setAttribute("aria-label", T[lang]); a.title = T[lang];
   a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.2 2.5 11.1a1 1 0 0 0 1.3 1.5l.7-.6V20a1 1 0 0 0 1 1h4.5v-5.5h4V21H18.5a1 1 0 0 0 1-1v-8l.7.6a1 1 0 1 0 1.3-1.5Z"/></svg>';
-  document.body.appendChild(a);
+  if(!window.MS_EMBED) document.body.appendChild(a);
 
   // Üben: zweiter Versuch nach einer falschen getippten Antwort (alle Kacheln).
   // msTippbar(e): true, wenn die Antwort aus einem Eingabefeld kommt (Text oder
@@ -100,7 +100,7 @@
 
 // ---------- Lupen-Knopf: Seite vergrößern/verkleinern (/seitenzoom.js) ----------
 (function(){
-  if(window.MS_SEITENZOOM || document.querySelector('script[src="/seitenzoom.js"]')) return;
+  if(window.MS_EMBED || window.MS_SEITENZOOM || document.querySelector('script[src="/seitenzoom.js"]')) return;
   var s = document.createElement("script"); s.src = "/seitenzoom.js"; document.head.appendChild(s);
 })();
 
@@ -108,6 +108,11 @@
 (function(){
   if(window.MS_ZEICHEN || document.querySelector('script[src="/zeichen.js"]')) return;
   var s = document.createElement("script"); s.src = "/zeichen.js"; document.head.appendChild(s);
+})();
+// ---------- Gleichungen im Fließtext: ein „=“ pro Zeile (/fliesstext-formeln.js) ----------
+(function(){
+  if(window.MS_FZ || document.querySelector('script[src="/fliesstext-formeln.js"]')) return;
+  var s = document.createElement("script"); s.src = "/fliesstext-formeln.js"; document.head.appendChild(s);
 })();
 // ---------- Rechenwege Zeile für Zeile, Brüche, Wurzeln (/formel.js) ----------
 (function(){
@@ -117,7 +122,7 @@
 
 // ---------- Beispielbilder unten auf der Kachel (für Google Bilder): /beispiel-bilder.js + /beispiel-galerie.js ----------
 (function(){
-  if(location.pathname === "/" || document.querySelector('script[src="/beispiel-galerie.js"]')) return;
+  if(window.MS_EMBED || location.pathname === "/" || document.querySelector('script[src="/beispiel-galerie.js"]')) return;
   var a = document.createElement("script"); a.src = "/beispiel-bilder.js";
   a.onload = function(){ var k = location.pathname.split("/").filter(Boolean)[0]; if(!window.MS_BB || !MS_BB[k]) return; var b = document.createElement("script"); b.src = "/beispiel-galerie.js"; document.head.appendChild(b); };
   document.head.appendChild(a);

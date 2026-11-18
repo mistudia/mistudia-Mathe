@@ -144,7 +144,7 @@
   $("uAntwort").addEventListener("keydown", function(e){ if(e.key !== "Enter") return; e.preventDefault(); if(beantwortet){ aufraeumen(); neueAufgabe(); } else pruefen(); });
 
   // ---------- Reiter & Texte ----------
-  var tab = "tabelle", TABS = ["tabelle", "tricks", "ueben"];
+  var tab = "diplom", TABS = ["diplom", "tabelle", "tricks", "ueben"];
   function zeigeTab(k){
     tab = k;
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
@@ -161,6 +161,9 @@
     if(auf){ zeige(); if(beantwortet) $("uWeg").innerHTML = wegHtml(auf.a, auf.b, auf.durch ? { d: auf.a, e: auf.b } : null); }
     $("pruefen").textContent = t("pruefen"); $("weiter").textContent = t("weiter");
   }
-  window.MS_LANG = { apply: function(l){ if(GE[l]){ lang = l; alles(); } } };
+  window.MS_LANG = { apply: function(l){ if(GE[l]){ lang = l; alles(); try { var w = $("diplomFrame").contentWindow; if(w && w.MS_LANG) w.MS_LANG.apply(l); } catch(x){} } } };
+  // Diplom (eingebettete Einmaleins-Diplom-Ansicht im Modus „groß“): Höhe vom Rahmen übernehmen
+  window.addEventListener("message", function(e){ if(e.origin === location.origin && e.data && e.data.msEmbedH) $("diplomFrame").style.height = (e.data.msEmbedH + 8) + "px"; });
   alles();
+  var hz = (location.hash || "").slice(1); if(TABS.indexOf(hz) >= 0) zeigeTab(hz);
 })();

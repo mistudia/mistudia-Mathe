@@ -151,7 +151,10 @@
       f.k.forEach(function(kk){ var e = S.E[kk]; if(e.glatt ? e.f.some(function(j){ return !vorn[j]; }) : sichtbar(e)) kante(e, false); });
     });
     if(loch){
-      var gI = el("g", { opacity: 0.82 }); sv.appendChild(gI); innen.forEach(function(f){ flaeche(f, gI); });
+      // Ganze Aussparung (vordere und hintere Wände) rot einfärben – so ist der ausgeschnittene Teil aus jeder Richtung
+      // gleich gefärbt, auch die Öffnung (vorher je nach Blickrichtung mal rot, mal blau).
+      innen = S.F.filter(function(f){ return f.inv; }).sort(function(a, b){ return a.tief - b.tief; });
+      var gI = el("g", { opacity: 0.78 }); sv.appendChild(gI); innen.forEach(function(f){ flaeche(f, gI); });
       for(var k2 in S.E){ var e2 = S.E[k2];
         if(e2.glatt ? (e2.f.some(function(j){ return vorn[j]; }) && e2.f.some(function(j){ return !vorn[j]; })) : sichtbar(e2)) kante(e2, false); }
     }

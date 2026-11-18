@@ -387,7 +387,7 @@
   $("weiter").addEventListener("click", neueAufgabe);
 
   // ---------- Reiter & Texte ----------
-  var tab = "einfach", TABS = ["grund", "einfach", "mult", "klammer", "ueben"];
+  var tab = "einfach", TABS = ["grund", "gleich", "einfach", "mult", "klammer", "ueben"];
   function zeigeTab(k){
     tab = k;
     document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab === k ? "true" : "false"); });
@@ -400,7 +400,7 @@
     if(!nurRechnen){
       document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
       document.title = "miStudia – " + t("titel"); $("titel").textContent = t("titel");
-      document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = b.dataset.tab === "grund" ? MS_GRUND.t("tab", lang) : t("tab_" + b.dataset.tab); });
+      document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = b.dataset.tab === "grund" ? MS_GRUND.t("tab", lang) : b.dataset.tab === "gleich" ? (window.MS_TGL ? MS_TGL.tab(lang) : "=") : t("tab_" + b.dataset.tab); });
       // Grundlagen-Karten (gemeinsam mit „Negative Zahlen“, /grundlagen.js) in der aktuellen Sprache
       if(window.MS_GRUND) MS_GRUND.karten($("grundBox"), ["minus", "verteilen", "sorten", "fallen", "potenz", "kuerzen"], lang);
       $("tTerm").textContent = t("termL"); $("tTerm2").textContent = t("termL2"); $("tTerm3").textContent = t("termL3"); $("hinweis").textContent = t("hinweis");
@@ -411,7 +411,7 @@
     if(tab === "einfach") vereinfachen(); else if(tab === "mult") ausmult(); else if(tab === "klammer") klammer();
     if(!nurRechnen && auf){ var war = beantwortet, e = letzte, gut = $("meldung").classList.contains("gut"); zeige(); if(war){ beantwortet = false; anzahl--; if(gut) punkte--; $("uAntwort").value = e; pruefe(e); } }
   }
-  window.MS_LANG = { apply: function(l){ if(TT[l]){ lang = l; alles(); } } };
+  window.MS_LANG = { apply: function(l){ if(TT[l]){ lang = l; alles(); if(window.MS_TGL) MS_TGL.sprache(l); } } };
   // Testzugang für automatische Prüfungen
   window.MS_TERM_LADEN = function(w){ // Alltagsbeispiel (alltag-daten.js): {tab, term}
     var id = { einfach: "term", mult: "term2", klammer: "term3" }[w.tab];
