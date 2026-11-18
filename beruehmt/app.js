@@ -464,7 +464,7 @@
     return fLoese(3) ? 3 : 4;
   }
   var fView = null;
-  var F_ARTEN = ["zufall", "deutschland", "europa", "afrika", "asien", "nordamerika", "suedamerika", "welt"], fArt = "deutschland", fName = "";
+  var F_ARTEN = ["zufall", "deutschland", "europa", "afrika", "asien", "nordamerika", "usa", "suedamerika", "welt"], fNetz = false, fHi = null, fArt = "deutschland", fName = "";
   function fWaehle(art){
     fArt = art; fName = "";
     if(art === "zufall"){ fNeu(); fZeichnen(); return; }
@@ -476,15 +476,43 @@
     var K = F_KARTEN[art];
     fKarte = { echt: true, art: art, K: K, n: K.r.length, nb: K.nb }; fView = { x: 0, y: 0, w: K.w, h: K.h };
     fGel = []; for(var i = 0; i < fKarte.n; i++) fGel.push(-1);
-    fMin = fChrom(); fZeichnen();
+    fMin = fChrom();
+    if(fHi && fHi.art === art){ fHi.g = K.r.findIndex(function(r){ return r.n[0] === fHi.name; }); fHiView(); } else fHi = null;
+    fBspZeigen(); fZeichnen();
+  }
+  // Ansicht auf ein Beispiel-Land und seinen Nachbarring richten
+  function fHiView(){
+    var K = fKarte.K, g = fHi.g; if(g < 0) return;
+    var P = [g].concat(K.nb[g]).map(function(i){ return K.r[i].c; }).filter(Boolean);
+    var x0 = Math.min.apply(null, P.map(function(p){ return p[0]; })), x1 = Math.max.apply(null, P.map(function(p){ return p[0]; }));
+    var y0 = Math.min.apply(null, P.map(function(p){ return p[1]; })), y1 = Math.max.apply(null, P.map(function(p){ return p[1]; }));
+    var w = Math.max(x1 - x0, (y1 - y0) * K.w / K.h) * 2.2 + K.w / 25; w = Math.min(K.w, w);
+    var h = w * K.h / K.w;
+    fView = { x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - h / 2, w: w, h: h }; fKlemmen();
+  }
+  var F_BSP = [["europa", "Luxemburg"], ["deutschland", "Thüringen"], ["usa", "Nevada"], ["deutschland", "Sachsen-Anhalt"], ["europa", "Tschechien"], ["usa", "Kansas"]];
+  function fNameVon(art, name){ var K = window.F_KARTEN && F_KARTEN[art], ni = Math.max(0, ["de", "en", "es", "zh", "fr", "ru", "ar", "ja", "pt"].indexOf(lang)); if(!K) return null; var r = K.r.filter(function(x){ return x.n[0] === name; })[0]; return r ? { r: r, g: K.r.indexOf(r), name: r.n[ni] || r.n[1], K: K } : null; }
+  function fBspZeigen(){
+    var box = $("fBsp"); if(!box || !window.F_KARTEN || box.dataset.ok) return; box.dataset.ok = "1";
+    box.innerHTML = "<b>" + esc(t("f_bsp")) + "</b> " + F_BSP.map(function(e, i){ var x = fNameVon(e[0], e[1]); return x ? '<button type="button" class="chip" data-i="' + i + '">' + esc(x.name) + " (" + x.K.nb[x.g].length + ")</button>" : ""; }).join("");
+    box.querySelectorAll("[data-i]").forEach(function(bt){ bt.addEventListener("click", function(){ var e = F_BSP[+bt.dataset.i]; fHi = { art: e[0], name: e[1] }; fWaehle(e[0]); var z = $("fSvg"); if(z && z.scrollIntoView) z.scrollIntoView({ behavior: "smooth", block: "center" }); }); });
   }
   PROBE.vierfarben = function(){
     var b = $("probe");
     b.innerHTML = '<p class="zeile">' + esc(t("f_anl")) + '</p><div class="chips" id="fArt"><b>' + esc(t("f_wahl")) + "</b> " + F_ARTEN.map(function(a, i){ return '<button type="button" class="chip" data-a="' + a + '">' + esc(tA("f_karten")[i]) + "</button>"; }).join("") + '</div><div class="chips" id="fPal">' + F_FARBEN.map(function(c, i){ return '<button type="button" class="fFarbe" data-f="' + i + '" style="background:' + c + '" aria-label="' + (i + 1) + '"></button>'; }).join("") +
       '<button type="button" class="chip" data-f="-1">' + esc(t("f_radier")) + '</button></div><div id="fSvg"></div><p class="zeile" id="fStatus"></p>' +
-      '<p><button type="button" class="knopf hell" id="fNeu">' + esc(t("f_neu")) + '</button> <button type="button" class="knopf hell" id="fLeer">' + esc(t("f_leeren")) + '</button> <button type="button" class="knopf hell" id="fLoes">' + esc(t("f_loesung")) + '</button></p><p class="merke">' + esc(t("f_warum")) + "</p>";
+      '<p><button type="button" class="knopf hell" id="fNeu">' + esc(t("f_neu")) + '</button> <button type="button" class="knopf hell" id="fLeer">' + esc(t("f_leeren")) + '</button> <button type="button" class="knopf hell" id="fLoes">' + esc(t("f_loesung")) + '</button> <button type="button" class="chip" id="fNetzB">' + esc(t("f_netz")) + '</button></p><p class="zeile" id="fHiTxt" hidden></p><p class="merke">' + esc(t("f_warum")) + "</p>" +
+      '<div class="chips" id="fBsp"></div>' +
+      '<h3 class="fH">' + esc(t("f_ring_h")) + '</h3><p class="zeile">' + esc(t("f_ring_anl")) + '</p><label class="reglerZ"><span>' + esc(t("f_ring_n")) + ' <b id="frNz"></b></span><input type="range" id="frN" min="3" max="8" step="1"></label>' +
+      '<div id="frSvg"></div><p class="zeile" id="frStatus"></p><p><button type="button" class="knopf hell" id="frLoes">' + esc(t("f_loesung")) + '</button> <button type="button" class="knopf hell" id="frLeer">' + esc(t("f_leeren")) + '</button></p><p class="merke" id="frRegel"></p>' +
+      '<h3 class="fH">' + esc(t("f_bew_h")) + '</h3><ol class="fBew">' + tA("f_bew").map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>";
     b.querySelectorAll("#fPal [data-f]").forEach(function(x){ x.addEventListener("click", function(){ fFarbe = +x.dataset.f; fZeichnen(); }); });
-    b.querySelectorAll("#fArt [data-a]").forEach(function(x){ x.addEventListener("click", function(){ fWaehle(x.dataset.a); }); });
+    b.querySelectorAll("#fArt [data-a]").forEach(function(x){ x.addEventListener("click", function(){ fHi = null; fWaehle(x.dataset.a); }); });
+    $("fNetzB").addEventListener("click", function(){ fNetz = !fNetz; fZeichnen(); });
+    $("frN").value = frN; $("frN").addEventListener("input", function(){ frN = +this.value; frGel = []; frZeichnen(); });
+    $("frLoes").addEventListener("click", function(){ frGel = [0]; for(var i = 0; i < frN; i++) frGel.push(i === frN - 1 && frN % 2 ? 3 : 1 + i % 2); frZeichnen(); });
+    $("frLeer").addEventListener("click", function(){ frGel = []; frZeichnen(); });
+    frZeichnen(); fBspZeigen();
     $("fNeu").addEventListener("click", function(){ fWaehle("zufall"); });
     $("fLeer").addEventListener("click", function(){ fGel = fGel.map(function(){ return -1; }); fZeichnen(); });
     $("fLoes").addEventListener("click", function(){ var l = fLoese(fMin) || fLoese(4); if(l) fGel = l; fZeichnen(); });
@@ -536,6 +564,40 @@
     }
     s.addEventListener("pointerup", ende); s.addEventListener("pointercancel", function(e){ bewegt = true; ende(e); });
   }
+  // Ring-Demo: ein Land in der Mitte, rundherum n Nachbarn
+  var frN = 5, frGel = [];
+  function frZeichnen(){
+    var n = frN, W = 300, M = 150, r0 = 52, r1 = 134, s = svgNeu(W, W, "bsvg frSvg"), F = function(i){ return frGel[i] >= 0 ? F_FARBEN[frGel[i]] : "#ffffff"; };
+    $("frNz").textContent = n;
+    function pt(r, a){ var w = (a - 90) * Math.PI / 180; return (M + r * Math.cos(w)).toFixed(1) + " " + (M + r * Math.sin(w)).toFixed(1); }
+    var konf = 0, rand = [];
+    for(var i = 0; i < n; i++){
+      var a0 = 360 / n * i, a1 = 360 / n * (i + 1);
+      var p = el("path", { d: "M" + pt(r1, a0) + "A" + r1 + " " + r1 + " 0 0 1 " + pt(r1, a1) + "L" + pt(r0, a1) + "A" + r0 + " " + r0 + " 0 0 0 " + pt(r0, a0) + "Z", fill: F(i + 1), stroke: "#1a2233", "stroke-width": 3, "stroke-linejoin": "round", "data-i": i + 1, "class": "fZelle" });
+      s.appendChild(p);
+      var j = (i + 1) % n;
+      if(frGel[i + 1] >= 0 && frGel[i + 1] === frGel[j + 1]){ konf++; rand.push("M" + pt(r0, a1) + "L" + pt(r1, a1)); }
+      if(frGel[i + 1] >= 0 && frGel[i + 1] === frGel[0]){ konf++; rand.push("M" + pt(r0, a0) + "A" + r0 + " " + r0 + " 0 0 1 " + pt(r0, a1)); }
+    }
+    s.appendChild(el("circle", { cx: M, cy: M, r: r0, fill: F(0), stroke: "#1a2233", "stroke-width": 3, "data-i": 0, "class": "fZelle" }));
+    rand.forEach(function(d){ s.appendChild(el("path", { d: d, fill: "none", stroke: "#dc2626", "stroke-width": 5, "stroke-dasharray": "6 4", "stroke-linecap": "round", "pointer-events": "none" })); });
+    $("frSvg").innerHTML = ""; $("frSvg").appendChild(s);
+    s.querySelectorAll("[data-i]").forEach(function(x){ x.addEventListener("click", function(){ var i = +x.getAttribute("data-i"), v = frGel[i] >= 0 ? frGel[i] : -1; frGel[i] = v >= 3 ? -1 : v + 1; frZeichnen(); }); });
+    var offen = 0, ben = {}; for(var k = 0; k <= n; k++){ if(!(frGel[k] >= 0)) offen++; else ben[frGel[k]] = 1; }
+    var st = $("frStatus");
+    if(konf){ st.className = "zeile schlecht"; st.textContent = t("f_konflikt", { n: konf }); }
+    else if(offen){ st.className = "zeile"; st.textContent = t("f_offen", { n: offen }); }
+    else { st.className = "zeile gut"; st.textContent = t("f_geschafft", { k: Object.keys(ben).length }); }
+    $("frRegel").textContent = t(n % 2 ? "f_ring_u" : "f_ring_g", { n: n });
+  }
+  // Nachbarschaftsnetz: Punkt je Land, Linie je Nachbarpaar
+  function fNetzMalen(s, C, NB, zf){
+    if(!fNetz) return;
+    var g = el("g", { "pointer-events": "none" });
+    NB.forEach(function(L, a){ L.forEach(function(b){ if(b > a && C[a] && C[b]) g.appendChild(el("line", { x1: C[a][0], y1: C[a][1], x2: C[b][0], y2: C[b][1], stroke: "#1a2233", "stroke-width": 1.8, "vector-effect": "non-scaling-stroke" })); }); });
+    C.forEach(function(c){ if(c) g.appendChild(el("circle", { cx: c[0], cy: c[1], r: 3.5 * zf, "data-r": 3.5, "class": "fPunkt", fill: "#1a2233" })); });
+    s.appendChild(g);
+  }
   function fZeichnenEcht(){
     var K = fKarte.K, s = svgNeu(K.w, K.h, "bsvg fKarte fEcht"), sw = fKarte.art === "welt" ? 0.7 : 1.1, zf = fView.w / K.w;
     s.setAttribute("viewBox", fView.x + " " + fView.y + " " + fView.w + " " + fView.h);
@@ -549,12 +611,22 @@
       if(r.m){ var c = el("circle", { cx: r.m[0], cy: r.m[1], r: (fKarte.art === "welt" ? 4 : 5) * zf, fill: f, stroke: "#1a2233", "stroke-width": 1, "vector-effect": "non-scaling-stroke", "data-g": g, "class": "fZelle fPunkt", "data-r": fKarte.art === "welt" ? 4 : 5 }); c.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(c); }
     });
     K.r.forEach(function(r, g){ if(schlecht[g]) s.appendChild(el("path", { d: r.d, fill: "none", stroke: "#dc2626", "stroke-width": 2.6, "vector-effect": "non-scaling-stroke", "stroke-dasharray": "5 3", "pointer-events": "none" })); });
+    if(fHi && fHi.art === fKarte.art && fHi.g >= 0){
+      K.nb[fHi.g].forEach(function(h){ s.appendChild(el("path", { d: K.r[h].d, fill: "none", stroke: "#7c3aed", "stroke-width": 3, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round", "pointer-events": "none" })); });
+      s.appendChild(el("path", { d: K.r[fHi.g].d, fill: "none", stroke: "#7c3aed", "stroke-width": 6, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round", "pointer-events": "none" }));
+    }
+    fNetzMalen(s, K.r.map(function(r){ return r.m || r.c; }), K.nb, zf);
     return { s: s, nk: Object.keys(konf).length, ni: ni };
   }
   function fZeichnen(){
     document.querySelectorAll("#fPal [data-f]").forEach(function(x){ x.setAttribute("aria-pressed", +x.dataset.f === fFarbe ? "true" : "false"); });
     document.querySelectorAll("#fArt [data-a]").forEach(function(x){ x.setAttribute("aria-pressed", x.dataset.a === fArt ? "true" : "false"); });
     $("fNeu").hidden = fArt !== "zufall";
+    $("fNetzB").setAttribute("aria-pressed", fNetz ? "true" : "false");
+    var hx = $("fHiTxt"), aktiv = fHi && fKarte.echt && fHi.art === fKarte.art && fHi.g >= 0;
+    hx.hidden = !aktiv;
+    if(aktiv){ var ni = Math.max(0, ["de", "en", "es", "zh", "fr", "ru", "ar", "ja", "pt"].indexOf(lang)), R = fKarte.K.r, NBh = fKarte.K.nb[fHi.g], nm = function(i){ return R[i].n[ni] || R[i].n[1]; };
+      hx.textContent = t("f_bsp_info", { c: nm(fHi.g), n: NBh.length, l: NBh.map(nm).join(lang === "ar" ? "، " : (lang === "zh" || lang === "ja") ? "、" : ", ") }) + " " + t(NBh.length % 2 ? "f_hier4" : "f_hier3"); }
     if(fKarte.echt){
       var E = fZeichnenEcht();
       $("fSvg").innerHTML = '<div class="fZoom"><button type="button" class="chip" data-z="1.6" aria-label="+">+</button><button type="button" class="chip" data-z="0.625" aria-label="−">−</button><button type="button" class="chip" data-z="0" aria-label="⟲">⟲</button><span class="muted">' + esc(t("f_zoom")) + "</span></div>";
@@ -582,6 +654,8 @@
         s.appendChild(el("line", { x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], stroke: schlecht ? "#dc2626" : "#1a2233", "stroke-width": schlecht ? 4 : 2.2, "stroke-dasharray": schlecht ? "5 3" : "none", "stroke-linecap": "round", "pointer-events": "none" }));
       });
     });
+    var CS = []; K.zellen.forEach(function(zl){ var g = K.land[zl[0] + "," + zl[1]], m = hxMitte(zl[0], zl[1]); if(!CS[g]) CS[g] = [0, 0, 0]; CS[g][0] += m[0]; CS[g][1] += m[1]; CS[g][2]++; });
+    fNetzMalen(s, CS.map(function(c){ return c ? [c[0] / c[2], c[1] / c[2]] : null; }), K.nb, 1);
     $("fSvg").innerHTML = ""; $("fSvg").appendChild(s);
     s.querySelectorAll(".fZelle").forEach(function(p){ p.addEventListener("click", function(){ fGel[+p.getAttribute("data-g")] = fFarbe; fZeichnen(); }); });
     fStatus(Object.keys(konf).length);

@@ -38,7 +38,7 @@ de: {
   f_story: "1852 färbte der Student Francis Guthrie eine Karte der englischen Grafschaften und bemerkte: Vier Farben reichen, damit benachbarte Gebiete nie gleich gefärbt sind. Gilt das für jede Karte? Über 100 Jahre suchten Mathematiker nach einem Beweis. Erst 1976 gelang er Kenneth Appel und Wolfgang Haken – mit einem Computer, der fast 2000 Sonderfälle prüfte. Es war einer der ersten großen Beweise mit Computerhilfe. Länder, die sich nur in einem Punkt berühren, zählen dabei nicht als Nachbarn.",
   f_anl: "Wähle eine Farbe und tippe Länder an. Nachbarländer dürfen nicht dieselbe Farbe haben. Schaffst du es mit 4 Farben – oder sogar mit 3?",
   f_neu: "Neue Karte", f_loesung: "Lösung zeigen", f_leeren: "Alles löschen", f_radier: "Radierer",
-  f_konflikt: "{n} Nachbarpaare haben dieselbe Farbe (rot gestrichelt).", f_offen: "Noch {n} Länder ohne Farbe.", f_geschafft: "Geschafft – mit {k} Farben!",
+  f_konflikt: "Gleich gefärbte Nachbarpaare: {n} (rot gestrichelt).", f_offen: "Noch ohne Farbe: {n}.", f_geschafft: "Geschafft – mit {k} Farben!",
   f_min: "Für diese Karte reichen schon {k} Farben.",
   f_warum: "Warum reichen 3 Farben nicht immer? Wenn ein Land von einem Ring aus 3 oder 5 Ländern umgeben ist, braucht man eine vierte Farbe – zum Beispiel Luxemburg: Belgien, Frankreich und Deutschland berühren sich alle gegenseitig und auch Luxemburg."
 },
@@ -77,7 +77,7 @@ en: {
   f_story: "In 1852 the student Francis Guthrie was colouring a map of the English counties and noticed: four colours are enough so that neighbouring areas never share a colour. Is that true for every map? For more than 100 years mathematicians looked for a proof. Only in 1976 did Kenneth Appel and Wolfgang Haken succeed – with a computer that checked almost 2000 special cases. It was one of the first big proofs done with computer help. Countries that touch at only one point do not count as neighbours.",
   f_anl: "Choose a colour and tap countries. Neighbouring countries must not have the same colour. Can you do it with 4 colours – or even 3?",
   f_neu: "New map", f_loesung: "Show a solution", f_leeren: "Clear all", f_radier: "Eraser",
-  f_konflikt: "{n} pairs of neighbours share a colour (red dashed).", f_offen: "{n} countries still without colour.", f_geschafft: "Done – with {k} colours!",
+  f_konflikt: "Neighbour pairs with the same colour: {n} (red dashed).", f_offen: "Still without colour: {n}.", f_geschafft: "Done – with {k} colours!",
   f_min: "For this map {k} colours are already enough.",
   f_warum: "Why are 3 colours not always enough? If a country is surrounded by a ring of 3 or 5 countries, you need a fourth colour – for example Luxembourg: Belgium, France and Germany all touch each other and Luxembourg."
 },
@@ -116,7 +116,7 @@ es: {
   f_story: "En 1852, el estudiante Francis Guthrie coloreaba un mapa de los condados de Inglaterra y notó que bastaban cuatro colores para que las zonas vecinas nunca tuvieran el mismo. ¿Vale para cualquier mapa? Durante más de 100 años los matemáticos buscaron una demostración. Hasta 1976 no lo lograron Kenneth Appel y Wolfgang Haken, con un ordenador que comprobó casi 2000 casos especiales. Fue una de las primeras grandes demostraciones con ayuda de un ordenador. Los países que solo se tocan en un punto no cuentan como vecinos.",
   f_anl: "Elige un color y toca países. Los países vecinos no pueden tener el mismo color. ¿Lo consigues con 4 colores, o incluso con 3?",
   f_neu: "Nuevo mapa", f_loesung: "Mostrar una solución", f_leeren: "Borrar todo", f_radier: "Borrador",
-  f_konflikt: "{n} parejas de vecinos tienen el mismo color (rojo discontinuo).", f_offen: "Faltan {n} países por colorear.", f_geschafft: "¡Conseguido, con {k} colores!",
+  f_konflikt: "Parejas de vecinos con el mismo color: {n} (rojo discontinuo).", f_offen: "Sin colorear todavía: {n}.", f_geschafft: "¡Conseguido, con {k} colores!",
   f_min: "Para este mapa bastan ya {k} colores.",
   f_warum: "¿Por qué no siempre bastan 3 colores? Si un país está rodeado por un anillo de 3 o 5 países, hace falta un cuarto color; por ejemplo Luxemburgo: Bélgica, Francia y Alemania se tocan todas entre sí y también con Luxemburgo."
 },
@@ -194,7 +194,7 @@ fr: {
   f_story: "En 1852, l’étudiant Francis Guthrie coloriait une carte des comtés anglais et remarqua que quatre couleurs suffisaient pour que des régions voisines n’aient jamais la même. Est-ce vrai pour toute carte ? Pendant plus de 100 ans, les mathématiciens ont cherché une preuve. Ce n’est qu’en 1976 que Kenneth Appel et Wolfgang Haken y parvinrent – avec un ordinateur qui vérifia près de 2000 cas particuliers. Ce fut l’une des premières grandes preuves réalisées avec l’aide d’un ordinateur. Des pays qui ne se touchent qu’en un point ne comptent pas comme voisins.",
   f_anl: "Choisis une couleur et touche des pays. Deux pays voisins ne doivent pas avoir la même couleur. Y arrives-tu avec 4 couleurs – voire 3 ?",
   f_neu: "Nouvelle carte", f_loesung: "Montrer une solution", f_leeren: "Tout effacer", f_radier: "Gomme",
-  f_konflikt: "{n} paires de voisins ont la même couleur (pointillés rouges).", f_offen: "Encore {n} pays sans couleur.", f_geschafft: "Réussi – avec {k} couleurs !",
+  f_konflikt: "Paires de voisins de même couleur : {n} (pointillés rouges).", f_offen: "Encore sans couleur : {n}.", f_geschafft: "Réussi – avec {k} couleurs !",
   f_min: "Pour cette carte, {k} couleurs suffisent déjà.",
   f_warum: "Pourquoi 3 couleurs ne suffisent-elles pas toujours ? Si un pays est entouré d’un anneau de 3 ou 5 pays, il faut une quatrième couleur – par exemple le Luxembourg : la Belgique, la France et l’Allemagne se touchent toutes entre elles et touchent aussi le Luxembourg."
 },
@@ -233,7 +233,7 @@ ru: {
   f_story: "В 1852 году студент Фрэнсис Гатри раскрашивал карту английских графств и заметил: четырёх цветов хватает, чтобы соседние области никогда не были одного цвета. Верно ли это для любой карты? Больше 100 лет математики искали доказательство. Лишь в 1976 году его нашли Кеннет Аппель и Вольфганг Хакен – с помощью компьютера, который проверил почти 2000 особых случаев. Это одно из первых больших доказательств, сделанных с помощью компьютера. Страны, которые касаются друг друга только в одной точке, соседями не считаются.",
   f_anl: "Выбери цвет и нажимай на страны. Соседние страны не должны быть одного цвета. Получится ли с 4 цветами – а может, и с 3?",
   f_neu: "Новая карта", f_loesung: "Показать решение", f_leeren: "Стереть всё", f_radier: "Ластик",
-  f_konflikt: "{n} пар соседей одного цвета (красный пунктир).", f_offen: "Ещё {n} стран без цвета.", f_geschafft: "Получилось – {k} цвета!",
+  f_konflikt: "Пар соседей одного цвета: {n} (красный пунктир).", f_offen: "Ещё {n} стран без цвета.", f_geschafft: "Получилось – {k} цвета!",
   f_min: "Для этой карты хватает уже {k} цветов.",
   f_warum: "Почему трёх цветов хватает не всегда? Если страну окружает кольцо из 3 или 5 стран, нужен четвёртый цвет. Например, Люксембург: Бельгия, Франция и Германия граничат друг с другом и с Люксембургом."
 },
@@ -272,7 +272,7 @@ ar: {
   f_story: "في عام 1852 كان الطالب فرانسيس غوثري يلوّن خريطة مقاطعات إنجلترا فلاحظ أن أربعة ألوان تكفي كي لا تتشابه ألوان المناطق المتجاورة أبدًا. فهل يصحّ ذلك لكل خريطة؟ بحث علماء الرياضيات أكثر من 100 عام عن برهان، ولم ينجح في ذلك إلا كينيث أبيل وفولفغانغ هاكن عام 1976 – بمساعدة حاسوب فحص قرابة 2000 حالة خاصة. وكان من أوائل البراهين الكبيرة بمساعدة الحاسوب. والبلدان التي تتلامس في نقطة واحدة فقط لا تُعدّ متجاورة.",
   f_anl: "اختر لونًا ثم اضغط على البلدان. لا يجوز أن يكون لبلدين متجاورين اللون نفسه. هل تنجح بأربعة ألوان – أو حتى بثلاثة؟",
   f_neu: "خريطة جديدة", f_loesung: "اعرض حلًّا", f_leeren: "امسح الكل", f_radier: "ممحاة",
-  f_konflikt: "{n} أزواج من الجيران لها اللون نفسه (خط أحمر متقطع).", f_offen: "بقي {n} بلدًا دون لون.", f_geschafft: "نجحت – بـ{k} ألوان!",
+  f_konflikt: "أزواج جيران بلون واحد: {n} (خط أحمر متقطع).", f_offen: "بقي {n} بلدًا دون لون.", f_geschafft: "نجحت – بـ{k} ألوان!",
   f_min: "لهذه الخريطة تكفي {k} ألوان.",
   f_warum: "لماذا لا تكفي 3 ألوان دائمًا؟ إذا أحاطت ببلدٍ حلقةٌ من 3 أو 5 بلدان احتجنا إلى لون رابع – مثل لوكسمبورغ: بلجيكا وفرنسا وألمانيا تتجاور كلها فيما بينها ومع لوكسمبورغ."
 },
@@ -350,7 +350,7 @@ pt: {
   f_story: "Em 1852, o estudante Francis Guthrie pintava um mapa dos condados de Inglaterra e reparou que quatro cores bastam para que áreas vizinhas nunca tenham a mesma cor. Será assim em qualquer mapa? Durante mais de 100 anos os matemáticos procuraram uma demonstração. Só em 1976 Kenneth Appel e Wolfgang Haken o conseguiram – com um computador que verificou quase 2000 casos especiais. Foi uma das primeiras grandes demonstrações feitas com ajuda de um computador. Países que só se tocam num ponto não contam como vizinhos.",
   f_anl: "Escolha uma cor e toque nos países. Países vizinhos não podem ter a mesma cor. Consegue com 4 cores – ou até com 3?",
   f_neu: "Novo mapa", f_loesung: "Mostrar uma solução", f_leeren: "Apagar tudo", f_radier: "Borracha",
-  f_konflikt: "{n} pares de vizinhos têm a mesma cor (tracejado vermelho).", f_offen: "Faltam {n} países por pintar.", f_geschafft: "Conseguiu – com {k} cores!",
+  f_konflikt: "Pares de vizinhos com a mesma cor: {n} (tracejado vermelho).", f_offen: "Ainda sem cor: {n}.", f_geschafft: "Conseguiu – com {k} cores!",
   f_min: "Para este mapa bastam já {k} cores.",
   f_warum: "Porque é que 3 cores nem sempre chegam? Se um país estiver rodeado por um anel de 3 ou 5 países, é preciso uma quarta cor – por exemplo o Luxemburgo: a Bélgica, a França e a Alemanha tocam-se todas entre si e também o Luxemburgo."
 }

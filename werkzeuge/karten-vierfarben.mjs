@@ -24,6 +24,13 @@ function infoLand(g){
   const e = EXTRA[nm]; if(e) return { a2: null, n: e.n, c: e.c };
   return { a2: null, n: L.map(() => nm), c: null };
 }
+// d3 erwartet Außenringe im Uhrzeigersinn: Polygone, die „fast die ganze Kugel“ bedecken, umdrehen
+function rewind(f){
+  const g = f.geometry, fix = rings => d3.geoArea({ type: "Polygon", coordinates: rings }) > 2 * Math.PI ? rings.map(r => r.slice().reverse()) : rings;
+  if(g.type === "Polygon") g.coordinates = fix(g.coordinates);
+  else if(g.type === "MultiPolygon") g.coordinates = g.coordinates.map(fix);
+  return f;
+}
 function karte(topology, objName, auswahl, proj, W, H, info, dig){
   const geoms = topology.objects[objName].geometries;
   const idx = geoms.map((g, i) => i).filter(i => auswahl(geoms[i], i));
@@ -32,10 +39,16 @@ function karte(topology, objName, auswahl, proj, W, H, info, dig){
   const path = d3.geoPath(proj).digits(dig == null ? 1 : dig);
   const R = [], NB = [];
   idx.forEach((i, k) => {
-    const f = topo.feature(topology, geoms[i]);
+    const f = rewind(topo.feature(topology, geoms[i]));
     const d = path(f) || "";
     const ar = path.area(f), c = path.centroid(f);
     const r = { d, n: info(geoms[i]).n };
+    // Mittelpunkt des größten Teilstücks (für das Nachbarschaftsnetz)
+    let gr = f.geometry, best = null, ba = -1;
+    const teile = gr && gr.type === "MultiPolygon" ? gr.coordinates.map(c => ({ type: "Polygon", coordinates: c })) : gr ? [gr] : [];
+    teile.forEach(pg => { const a = path.area(pg); if(a > ba){ ba = a; best = pg; } });
+    const cc = best ? path.centroid(best) : c;
+    if(isFinite(cc[0])) r.c = [Math.round(cc[0]), Math.round(cc[1])];
     if(ar < 40 && isFinite(c[0])) r.m = [Math.round(c[0] * 10) / 10, Math.round(c[1] * 10) / 10];
     R.push(r);
     NB.push(nbAll[i].filter(j => pos[j] != null).map(j => pos[j]));
@@ -77,9 +90,18 @@ kont("suedamerika", i => i.c === "SA", [60, 20], [-82, -56, -34, 13], 640, 820);
   const W = 700, H = 900, proj = d3.geoMercator().fitExtent([[8, 8], [W - 8, H - 8]], { type: "FeatureCollection", features: fs16 });
   OUT.deutschland = karte(t, "s", () => true, proj, W, H, g => ({ n: g.properties.n }));
 }
+// USA (50 Bundesstaaten, Alaska und Hawaii als Einschub)
+{
+  const j = JSON.parse(fs.readFileSync("ne/geojson/ne_10m_admin_1_states_provinces.geojson", "utf8"));
+  const fs50 = j.features.filter(f => f.properties.adm0_a3 === "USA" && f.properties.postal !== "DC").map(rewind).map(f => ({ type: "Feature", properties: { n: L.map(l => f.properties["name_" + l] || f.properties.name) }, geometry: f.geometry }));
+  let t = server.topology({ s: { type: "FeatureCollection", features: fs50 } });
+  t = vereinfachen(t, 0.1);
+  const W = 960, H = 600, proj = d3.geoAlbersUsa().fitExtent([[8, 8], [W - 8, H - 8]], { type: "FeatureCollection", features: fs50 });
+  OUT.usa = karte(t, "s", () => true, proj, W, H, g => ({ n: g.properties.n }));
+}
 let js = "// beruehmt/karten-data.js – Karten für das Vierfarben-Malspiel (erzeugt mit /home/claude/fgen/gen.mjs, nicht von Hand bearbeiten).\n" +
-  "// Länder: Natural Earth 1:50m über world-atlas (gemeinfrei). Bundesländer: Natural Earth 1:10m admin-1 (gemeinfrei).\n" +
-  "// Je Karte: w, h, r = [{ d: SVG-Pfad, n: Namen [de,en,es,zh,fr,ru,ar,ja,pt], m: Mittelpunkt (nur sehr kleine Länder) }], nb = Nachbarn (gemeinsame Grenze).\n" +
+  "// Länder: Natural Earth 1:50m über world-atlas (gemeinfrei). Bundesländer und US-Bundesstaaten: Natural Earth 1:10m admin-1 (gemeinfrei).\n" +
+  "// Je Karte: w, h, r = [{ d: SVG-Pfad, n: Namen [de,en,es,zh,fr,ru,ar,ja,pt], m: Punkt (nur sehr kleine Länder), c: Mitte fürs Nachbarschaftsnetz }], nb = Nachbarn (gemeinsame Grenze).\n" +
   "var F_KARTEN = " + JSON.stringify(OUT) + ";\n";
 fs.writeFileSync("/home/claude/mistudia-mathe/beruehmt/karten-data.js", js);
 for(const k in OUT){ const o = OUT[k]; console.log(k, o.r.length, "Länder", Math.round(JSON.stringify(o).length / 1024) + " KB", "Kanten", o.nb.reduce((s, l) => s + l.length, 0) / 2); }
