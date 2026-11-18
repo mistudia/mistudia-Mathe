@@ -463,6 +463,7 @@
       for(var x = 0; x < gem.length; x++) for(var y = x + 1; y < gem.length; y++) if(adj[gem[x]][gem[y]]) return 4; }
     return fLoese(3) ? 3 : 4;
   }
+  var fView = null;
   var F_ARTEN = ["zufall", "deutschland", "europa", "afrika", "asien", "nordamerika", "suedamerika", "welt"], fArt = "deutschland", fName = "";
   function fWaehle(art){
     fArt = art; fName = "";
@@ -473,7 +474,7 @@
       return;
     }
     var K = F_KARTEN[art];
-    fKarte = { echt: true, art: art, K: K, n: K.r.length, nb: K.nb };
+    fKarte = { echt: true, art: art, K: K, n: K.r.length, nb: K.nb }; fView = { x: 0, y: 0, w: K.w, h: K.h };
     fGel = []; for(var i = 0; i < fKarte.n; i++) fGel.push(-1);
     fMin = fChrom(); fZeichnen();
   }
@@ -489,18 +490,65 @@
     $("fLoes").addEventListener("click", function(){ var l = fLoese(fMin) || fLoese(4); if(l) fGel = l; fZeichnen(); });
     if(fKarte && (fKarte.echt ? fKarte.art : "zufall") === fArt) fZeichnen(); else fWaehle(fArt);
   };
+  // Zoomen und Verschieben (Ansicht = viewBox in Kartenkoordinaten)
+  function fZoomUm(px, py, f){
+    var K = fKarte.K, w = Math.min(K.w, Math.max(K.w / 25, fView.w / f)), k = w / fView.w, h = fView.h * k;
+    fView = { x: px - (px - fView.x) * k, y: py - (py - fView.y) * k, w: w, h: h }; fKlemmen();
+  }
+  function fKlemmen(){ var K = fKarte.K; fView.x = Math.max(0, Math.min(K.w - fView.w, fView.x)); fView.y = Math.max(0, Math.min(K.h - fView.h, fView.y)); }
+  function fViewSetzen(s){
+    s.setAttribute("viewBox", fView.x + " " + fView.y + " " + fView.w + " " + fView.h);
+    var zf = fView.w / fKarte.K.w; s.querySelectorAll(".fPunkt").forEach(function(c){ c.setAttribute("r", c.getAttribute("data-r") * zf); });
+  }
+  function fGesten(s, malen){
+    var P = {}, start = null, bewegt = false;
+    function punkt(e){ var r = s.getBoundingClientRect(); return [fView.x + (e.clientX - r.left) / r.width * fView.w, fView.y + (e.clientY - r.top) / r.height * fView.h]; }
+    function liste(){ return Object.keys(P).map(function(k){ return P[k]; }); }
+    s.addEventListener("wheel", function(e){ e.preventDefault(); var q = punkt(e); fZoomUm(q[0], q[1], Math.pow(1.0015, -e.deltaY)); fViewSetzen(s); }, { passive: false });
+    s.addEventListener("pointerdown", function(e){
+      P[e.pointerId] = { x: e.clientX, y: e.clientY }; try { s.setPointerCapture(e.pointerId); } catch(x){}
+      var L = liste(); bewegt = L.length > 1;
+      start = { v: { x: fView.x, y: fView.y, w: fView.w, h: fView.h }, L: L.map(function(p){ return { x: p.x, y: p.y }; }), ziel: e.target };
+    });
+    s.addEventListener("pointermove", function(e){
+      if(!P[e.pointerId] || !start) return;
+      P[e.pointerId] = { x: e.clientX, y: e.clientY };
+      var L = liste(), r = s.getBoundingClientRect(), sk = start.v.w / r.width;
+      if(L.length === 1 && start.L.length === 1){
+        var dx = L[0].x - start.L[0].x, dy = L[0].y - start.L[0].y;
+        if(Math.abs(dx) + Math.abs(dy) > 6) bewegt = true;
+        if(bewegt){ fView = { x: start.v.x - dx * sk, y: start.v.y - dy * sk, w: start.v.w, h: start.v.h }; fKlemmen(); fViewSetzen(s); }
+      } else if(L.length >= 2 && start.L.length >= 2){
+        var d0 = Math.hypot(start.L[0].x - start.L[1].x, start.L[0].y - start.L[1].y), d1 = Math.hypot(L[0].x - L[1].x, L[0].y - L[1].y);
+        var mx = (L[0].x + L[1].x) / 2, my = (L[0].y + L[1].y) / 2, m0x = (start.L[0].x + start.L[1].x) / 2, m0y = (start.L[0].y + start.L[1].y) / 2;
+        fView = { x: start.v.x, y: start.v.y, w: start.v.w, h: start.v.h };
+        var px = start.v.x + (m0x - r.left) / r.width * start.v.w, py = start.v.y + (m0y - r.top) / r.height * start.v.h;
+        fZoomUm(px, py, d1 / Math.max(10, d0));
+        fView.x -= (mx - m0x) * fView.w / r.width; fView.y -= (my - m0y) * fView.h / r.height; fKlemmen(); fViewSetzen(s);
+      }
+    });
+    function ende(e){
+      if(!P[e.pointerId]) return;
+      delete P[e.pointerId];
+      var rest = liste();
+      if(!rest.length){ if(!bewegt && start && start.ziel && start.ziel.getAttribute && start.ziel.getAttribute("data-g") != null) malen(+start.ziel.getAttribute("data-g")); start = null; }
+      else start = { v: { x: fView.x, y: fView.y, w: fView.w, h: fView.h }, L: rest.map(function(p){ return { x: p.x, y: p.y }; }), ziel: null };
+    }
+    s.addEventListener("pointerup", ende); s.addEventListener("pointercancel", function(e){ bewegt = true; ende(e); });
+  }
   function fZeichnenEcht(){
-    var K = fKarte.K, s = svgNeu(K.w, K.h, "bsvg fKarte fEcht"), sw = fKarte.art === "welt" ? 0.5 : 0.9;
+    var K = fKarte.K, s = svgNeu(K.w, K.h, "bsvg fKarte fEcht"), sw = fKarte.art === "welt" ? 0.7 : 1.1, zf = fView.w / K.w;
+    s.setAttribute("viewBox", fView.x + " " + fView.y + " " + fView.w + " " + fView.h);
     s.appendChild(el("rect", { x: 0, y: 0, width: K.w, height: K.h, rx: 12, fill: "#e0f2fe" }));
     var konf = {}, schlecht = {};
     K.nb.forEach(function(L, g){ L.forEach(function(h){ if(fGel[g] >= 0 && fGel[g] === fGel[h]){ konf[Math.min(g, h) + "-" + Math.max(g, h)] = 1; schlecht[g] = schlecht[h] = 1; } }); });
     var ni = Math.max(0, ["de", "en", "es", "zh", "fr", "ru", "ar", "ja", "pt"].indexOf(lang));
     K.r.forEach(function(r, g){
-      var f = fGel[g] >= 0 ? F_FARBEN[fGel[g]] : "#ffffff", p = el("path", { d: r.d, fill: f, stroke: "#1a2233", "stroke-width": sw, "stroke-linejoin": "round", "data-g": g, "class": "fZelle" });
+      var f = fGel[g] >= 0 ? F_FARBEN[fGel[g]] : "#ffffff", p = el("path", { d: r.d, fill: f, stroke: "#1a2233", "stroke-width": sw, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round", "data-g": g, "class": "fZelle" });
       p.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(p);
-      if(r.m){ var c = el("circle", { cx: r.m[0], cy: r.m[1], r: fKarte.art === "welt" ? 4 : 5, fill: f, stroke: "#1a2233", "stroke-width": 1, "data-g": g, "class": "fZelle" }); c.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(c); }
+      if(r.m){ var c = el("circle", { cx: r.m[0], cy: r.m[1], r: (fKarte.art === "welt" ? 4 : 5) * zf, fill: f, stroke: "#1a2233", "stroke-width": 1, "vector-effect": "non-scaling-stroke", "data-g": g, "class": "fZelle fPunkt", "data-r": fKarte.art === "welt" ? 4 : 5 }); c.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(c); }
     });
-    K.r.forEach(function(r, g){ if(schlecht[g]) s.appendChild(el("path", { d: r.d, fill: "none", stroke: "#dc2626", "stroke-width": fKarte.art === "welt" ? 1.6 : 2.6, "stroke-dasharray": "5 3", "pointer-events": "none" })); });
+    K.r.forEach(function(r, g){ if(schlecht[g]) s.appendChild(el("path", { d: r.d, fill: "none", stroke: "#dc2626", "stroke-width": 2.6, "vector-effect": "non-scaling-stroke", "stroke-dasharray": "5 3", "pointer-events": "none" })); });
     return { s: s, nk: Object.keys(konf).length, ni: ni };
   }
   function fZeichnen(){
@@ -509,9 +557,11 @@
     $("fNeu").hidden = fArt !== "zufall";
     if(fKarte.echt){
       var E = fZeichnenEcht();
-      $("fSvg").innerHTML = ""; $("fSvg").appendChild(E.s);
+      $("fSvg").innerHTML = '<div class="fZoom"><button type="button" class="chip" data-z="1.6" aria-label="+">+</button><button type="button" class="chip" data-z="0.625" aria-label="−">−</button><button type="button" class="chip" data-z="0" aria-label="⟲">⟲</button><span class="muted">' + esc(t("f_zoom")) + "</span></div>";
+      $("fSvg").appendChild(E.s);
       $("fSvg").insertAdjacentHTML("beforeend", '<p class="leg muted">' + esc(t("f_klein")) + " " + esc(t("f_quelle")) + "</p>");
-      E.s.querySelectorAll(".fZelle").forEach(function(p){ p.addEventListener("click", function(){ var g = +p.getAttribute("data-g"); fGel[g] = fFarbe; fName = fKarte.K.r[g].n[E.ni] || fKarte.K.r[g].n[1]; fZeichnen(); }); });
+      $("fSvg").querySelectorAll("[data-z]").forEach(function(bz){ bz.addEventListener("click", function(){ var f = +bz.dataset.z; if(!f) fView = { x: 0, y: 0, w: fKarte.K.w, h: fKarte.K.h }; else fZoomUm(fView.x + fView.w / 2, fView.y + fView.h / 2, f); fViewSetzen(E.s); }); });
+      fGesten(E.s, function(g){ fGel[g] = fFarbe; fName = fKarte.K.r[g].n[E.ni] || fKarte.K.r[g].n[1]; fZeichnen(); });
       return fStatus(E.nk);
     }
     var K = fKarte, W = HW * (HX_C + 0.5) + 16, H = 1.5 * HX * (HX_R - 1) + 2 * HX + 12, s = svgNeu(W, H, "bsvg fKarte");
