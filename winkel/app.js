@@ -33,7 +33,7 @@
     sv.appendChild(el("path", { d: sektor(c, c, 126, SCH.s, SCH.s + SCH.w), fill: "#22c55e", stroke: "#1a2233", "stroke-width": 2, "stroke-linejoin": "round" }));
     for(var d = 0; d < 360; d += 30){ var a = P(c, c, 122, d), b = P(c, c, 152, d); sv.appendChild(el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: "#1a2233", "stroke-width": 2 })); }
     if(SCH.fertig){
-      var e = P(c, c, 140, SCH.s + SCH.est); sv.appendChild(el("line", { x1: c, y1: c, x2: e[0], y2: e[1], stroke: "#dc2626", "stroke-width": 3, "stroke-dasharray": "7 5" }));
+      var e = P(c, c, 140, SCH.s + SCH.est); if(SCH.est !== null) sv.appendChild(el("line", { x1: c, y1: c, x2: e[0], y2: e[1], stroke: "#dc2626", "stroke-width": 3, "stroke-dasharray": "7 5" }));
       var m = P(c, c, 70, SCH.s + SCH.w / 2); txt(sv, m[0], m[1] + 6, SCH.w + "°", { "font-size": 22, fill: "#14532d" });
     }
   }
@@ -43,6 +43,10 @@
   }
   function schPruefen(){
     if(SCH.fertig) return; var e = lies($("schEin").value); if(!isFinite(e)) return;
+    if(window.MS_LEER_LOES){   // Prüfen ohne Eingabe: nur die Lösung zeigen, keine Schätzung werten
+      SCH.fertig = true; $("schEin").value = ""; $("schMeld").textContent = t("istL", { w: SCH.w }) + (SCH.n >= 10 ? " " + t("ende", { p: SCH.p }) : ""); $("schMeld").className = "meldung schlecht";
+      $("schWeiter").hidden = false; SCH.est = null; schZeichnen(); schTexte(); $("schWeiter").focus(); return;
+    }
     SCH.est = Math.max(0, Math.min(360, e)); SCH.fertig = true;
     var d = Math.round(Math.abs(SCH.est - SCH.w)), pk = d <= 5 ? 3 : d <= 10 ? 2 : d <= 20 ? 1 : 0; SCH.p += pk;
     $("schMeld").textContent = t("sch" + pk, { d: d }) + " " + t("istL", { w: SCH.w }) + (SCH.n >= 10 ? " " + t("ende", { p: SCH.p }) : "");

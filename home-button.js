@@ -33,6 +33,7 @@
     zh: "还不对——再试一次。", fr: "Pas encore – essaie encore une fois.", ru: "Пока неверно – попробуй ещё раз.",
     ar: "ليست صحيحة بعد – حاول مرة أخرى.", ja: "まだちがいます。もう一度やってみよう。", pt: "Ainda não – tente mais uma vez." };
   window.msTippbar = function(e){
+    if(window.MS_LEER_LOES) return false;   // „Prüfen“ ohne Eingabe: gleich die Lösung, kein zweiter Versuch
     if(Array.isArray(e)) return true;
     if(typeof e !== "string" || !e.trim()) return false;
     var ins = document.querySelectorAll("input");
@@ -246,12 +247,47 @@
     clearTimeout(timer); timer = setTimeout(function(){ blase.hidden = true; f.classList.remove("ms-leer-feld"); }, 2600);
     f.addEventListener("input", function weg(){ blase.hidden = true; f.classList.remove("ms-leer-feld"); f.removeEventListener("input", weg); });
   }
+  // „Lösung zeigen“-Knopf in der Nähe (gleicher Aufgabenbereich)?
+  var LRE = /(lösung|loesung|lösungsweg|solution|solución|答案|解答|решение|الحل|答え|解き方|solução|resolução)/i;
+  function loesKnopf(b){
+    var c = b.parentElement;
+    for(var n = 0; c && n < 3; n++, c = c.parentElement){
+      var L = Array.prototype.filter.call(c.querySelectorAll("button, a, details > summary"), function(x){ return x !== b && x.offsetParent !== null && !x.disabled && LRE.test(x.textContent || "") && !/verbergen|ausblenden|hide|ocultar|masquer|скрыть|إخفاء|隠す|esconder|隐藏/i.test(x.textContent || ""); });
+      if(L.length) return L[0];
+    }
+    return null;
+  }
+  var SENT = "987654";   // Platzhalter, der sicher falsch ist → die Kachel wertet „falsch“ und zeigt den Lösungsweg
   window.addEventListener("click", function(e){
+    if(window.MS_LEER_LOES) return;
     var b = e.target && e.target.closest && e.target.closest("button, input[type=button], input[type=submit], [role=button]");
     if(!b || b.disabled || !istPruef(b)) return;
-    var leer = bereich(b).filter(function(i){ return !String(i.value || "").trim(); });
+    var alle = bereich(b), leer = alle.filter(function(i){ return !String(i.value || "").trim(); });
     if(!leer.length) return;
+    // 🆕 Chat-Wunsch: Prüfen ohne Eingabe zeigt gleich die Lösung
+    var lk = loesKnopf(b);
+    if(lk){
+      e.preventDefault(); e.stopImmediatePropagation();
+      if(lk.tagName === "SUMMARY"){ lk.parentElement.open = true; try { lk.parentElement.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch(x){} }
+      else lk.click();
+      return;
+    }
     e.preventDefault(); e.stopImmediatePropagation();
-    zeige(leer[0]);
+    window.MS_LEER_LOES = true;
+    leer.forEach(function(i){ i.value = SENT; });
+    var vorher = (b.closest(".karte, section, form, main") || document.body).innerText;
+    // Kacheln mit eigenem Zähler für weitere Versuche: so lange „falsch“ abgeben (höchstens 3-mal),
+    // bis die Felder gesperrt sind oder der Knopf verschwindet
+    for(var v = 0; v < 3; v++){
+      var offen = leer.filter(function(i){ return i.isConnected && !i.readOnly && !i.disabled && i.offsetParent !== null; });
+      if(v && (!offen.length || !b.isConnected || b.disabled || b.offsetParent === null)) break;
+      offen.forEach(function(i){ if(!String(i.value || "").trim() || i.value === SENT) i.value = SENT; });
+      try { b.click(); } catch(x){}
+    }
+    function aufraeumen(){ Array.prototype.forEach.call(document.querySelectorAll("input, textarea"), function(i){ if(i.value === SENT) i.value = ""; }); }
+    aufraeumen(); setTimeout(aufraeumen, 0); setTimeout(aufraeumen, 300);
+    window.MS_LEER_LOES = false;
+    var m = document.querySelectorAll(".meldung, .feedback, .rueck, [id*=meld], [id*=Msg], [id*=msg]");
+    Array.prototype.forEach.call(m, function(x){ if(/987[  .,]?654/.test(x.textContent)) x.textContent = x.textContent.replace(/987[  .,]?654/g, "–"); });
   }, true);
 })();
