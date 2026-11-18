@@ -2024,9 +2024,52 @@
   var _gaAlt10 = PROBE.galilei;
   PROBE.galilei = function(){
     _gaAlt10();
+    $("probe").insertAdjacentHTML("beforeend", karteH("gs_h") + absatz("gs_intro") + karteH("gs_ged_h") + absatz("gs_ged") + karteH("gs_warum_h") + absatz("gs_warum") +
+      karteH("gs_luft_h") + absatz("gs_luft") + '<p class="zeile"><b>' + esc(t("gs_sim")) + '</b></p><div class="chips" id="gsWahl"></div><div class="chips" id="gsLuft"></div>' +
+      '<p><button type="button" class="knopf" id="gsLos">' + esc(t("gs_los")) + '</button></p><div id="gsSvg"></div><p class="zeile" id="gsErg"></p>' +
+      merkeP("gs_mond") + absatz("gs_versuch") + '<p class="zeile muted">' + esc(t("gs_g")) + "</p>");
+    gsBauen();
     $("probe").insertAdjacentHTML("beforeend", '<div data-ms-bewegung id="bewegung"></div>');
     if(window.MS_BEW) MS_BEW.einbauen(document.getElementById("bewegung"));
   };
+
+  // Fallversuch: zwei Gegenstände aus 10 m, mit Luft (Endgeschwindigkeit vt) oder ohne Luft
+  var GS_VT = [140, 30, 6, 1.2, 0.6], GS_F = ["#64748b", "#c6e03a", "#e2e8f0", "#ffffff", "#f5f5f4"];
+  var gs = { a: 0, b: 3, luft: true, t: 0, raf: 0, lauf: false };
+  function gsZeit(i, luft){ var g = 9.81, h = 10; if(!luft) return Math.sqrt(2 * h / g); var v = GS_VT[i]; return v / g * Math.log(Math.exp(h * g / (v * v)) + Math.sqrt(Math.exp(2 * h * g / (v * v)) - 1)); }
+  function gsWeg(i, t, luft){ var g = 9.81; if(!luft) return 0.5 * g * t * t; var v = GS_VT[i]; return v * v / g * Math.log(Math.cosh(g * t / v)); }
+  function gsBauen(){
+    var O = tA("gs_obj");
+    $("gsWahl").innerHTML = [0, 1].map(function(k){ return '<span class="gsSp">' + O.map(function(o, i){ return '<button type="button" class="chip" data-k="' + k + '" data-i="' + i + '" aria-pressed="' + ((k ? gs.b : gs.a) === i) + '">' + esc(o) + "</button>"; }).join("") + "</span>"; }).join('<b class="gsVs">↔</b>');
+    $("gsLuft").innerHTML = [true, false].map(function(l){ return '<button type="button" class="chip" data-l="' + l + '" aria-pressed="' + (gs.luft === l) + '">' + esc(t(l ? "gs_mit" : "gs_ohne")) + "</button>"; }).join("");
+    $("gsWahl").querySelectorAll("[data-i]").forEach(function(c){ c.addEventListener("click", function(){ if(+c.dataset.k) gs.b = +c.dataset.i; else gs.a = +c.dataset.i; gs.t = 0; gs.lauf = false; gsBauen(); }); });
+    $("gsLuft").querySelectorAll("[data-l]").forEach(function(c){ c.addEventListener("click", function(){ gs.luft = c.dataset.l === "true"; gs.t = 0; gs.lauf = false; gsBauen(); }); });
+    $("gsLos").onclick = function(){ cancelAnimationFrame(gs.raf); gs.t = 0; gs.lauf = true; var t0 = performance.now(), tmax = Math.max(gsZeit(gs.a, gs.luft), gsZeit(gs.b, gs.luft));
+      (function f(now){ if(!$("gsSvg")) return; gs.t = Math.min(tmax, (now - t0) / 1000); gsZeichnen(); if(gs.t < tmax) gs.raf = requestAnimationFrame(f); else { gs.lauf = false; gsZeichnen(); } })(t0); };
+    gsZeichnen();
+  }
+  function gsZeichnen(){
+    var box = $("gsSvg"); if(!box) return;
+    var W = 420, H = 330, y0 = 30, y1 = 300, k = (y1 - y0) / 10, s = svgNeu(W, H), O = tA("gs_obj");
+    s.appendChild(el("rect", { x: 0, y: 0, width: W, height: H, rx: 12, fill: gs.luft ? "#e0f2fe" : "#1e293b" }));
+    s.appendChild(el("rect", { x: 0, y: y1, width: W, height: H - y1, fill: gs.luft ? "#86efac" : "#94a3b8" }));
+    for(var m = 0; m <= 10; m += 2){ var yy = y0 + m * k; s.appendChild(el("line", { x1: 30, y1: yy, x2: 40, y2: yy, stroke: gs.luft ? "#475569" : "#cbd5e1", "stroke-width": 1.5 })); schrift(s, 26, yy + 4, (10 - m) + " m", "end", "bk-klein", { style: "font-size:11px;fill:" + (gs.luft ? "#475569" : "#e2e8f0") }); }
+    [[gs.a, 150], [gs.b, 300]].forEach(function(q){
+      var i = q[0], x = q[1], tz = gsZeit(i, gs.luft), w = Math.min(10, gsWeg(i, gs.t, gs.luft)), y = y0 + w * k - (i < 2 ? (i ? 10 : 14) : i === 3 ? 4 : 10), wk = gs.luft ? 1 : 0, g = el("g", { transform: "translate(" + x + "," + y + ")" });
+      if(i === 0 || i === 1) g.appendChild(el("circle", { cx: 0, cy: 0, r: i ? 10 : 14, fill: GS_F[i], stroke: "#1a2233", "stroke-width": 2 }));
+      else if(i === 2) g.appendChild(el("path", { d: "M-11 -4 L-6 -11 L3 -9 L11 -3 L9 7 L1 11 L-8 8 Z", fill: GS_F[i], stroke: "#1a2233", "stroke-width": 1.8 }));
+      else if(i === 3) g.appendChild(el("rect", { x: -22, y: -2, width: 44, height: 4, transform: "rotate(" + (wk * Math.sin(gs.t * 3) * 14) + ")", fill: GS_F[i], stroke: "#1a2233", "stroke-width": 1.5 }));
+      else g.appendChild(el("path", { d: "M-16 6 C-6 -10 8 -12 18 -8 C10 -2 0 4 -16 6 Z M-16 6 L-22 10", fill: GS_F[i], stroke: "#1a2233", "stroke-width": 1.5, transform: "rotate(" + (wk * Math.sin(gs.t * 2) * 20) + ")" }));
+      s.appendChild(g);
+      schrift(s, x, 16, O[i], "middle", "bk-klein", { style: "font:700 12px system-ui,sans-serif;fill:" + (gs.luft ? "#1a2233" : "#f8fafc") });
+      if(gs.t >= tz - 1e-6 && gs.t > 0) schrift(s, x, y1 + 20, z(tz, 2) + " s", "middle", "bk-klein", { style: "font:800 15px system-ui,sans-serif;fill:#1a2233" });
+    });
+    schrift(s, W - 8, H - 8, "t = " + z(gs.t, 2) + " s", "end", "bk-klein", { style: "font:700 13px system-ui,sans-serif;fill:#1a2233" });
+    box.innerHTML = ""; box.appendChild(s);
+    var e = $("gsErg");
+    if(!gs.luft) e.textContent = t("gs_ohneErg", { t: z(gsZeit(0, false), 2) });
+    else e.textContent = [gs.a, gs.b].map(function(i){ return t("gs_unten", { o: O[i], t: z(gsZeit(i, true), 2) }); }).join(" · ");
+  }
 
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){

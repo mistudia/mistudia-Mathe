@@ -137,7 +137,6 @@
 </main>
 <script src="/konto.js"></script>
 <script src="/seitenzoom.js" defer></script>
-<script src="/suchindex.js" defer></script>
 <script>
 var APPS = [
   { slug: "einmaleins", badge: "7×8", color: "#ff8a00",
@@ -334,7 +333,7 @@ function render(){
 var STUFEN = [[1, 4, "#f59e0b"], [5, 6, "#16a34a"], [7, 8, "#0ea5e9"], [9, 10, "#7c3aed"], [11, 13, "#db2777"]];
 function klassen(a){ var m = a.grade.de.match(/(\d+)\s*[–-]\s*(\d+)/) || a.grade.de.match(/(\d+)/); return m ? [+m[1], +(m[2] || m[1])] : [1, 13]; }
 function kachel(a, extra){
-  return '<a class="tile" href="/' + a.slug + '/' + (window.MS_URL_LANG ? "?lang=" + window.MS_URL_LANG : "") + '">' +
+  return '<a class="tile" href="/' + a.slug + '/' + (window.MS_URL_LANG ? "?lang=" + window.MS_URL_LANG : "") + (extra && extra.ziel || "") + '">' +
     '<span class="badge" style="background:' + a.color + ';font-size:' + (a.badge.length > 4 ? 15 : a.badge.length > 2 ? 19 : 26) + 'px">' + esc(a.badge) + '</span>' +
     '<span><b>' + (extra && extra.name || esc(a.name[lang])) + '</b><span class="desc">' + (extra && extra.desc || esc(a.desc[lang])) + '</span>' +
     '<span class="grade">' + esc(a.grade[lang]) + '</span>' + (extra && extra.hit ? '<span class="hit">' + extra.hit + "</span>" : "") + '</span></a>';
@@ -363,18 +362,31 @@ function suchen(){
   var W = q.split(/\s+/).filter(Boolean), IDX = (window.MS_SUCHE && (MS_SUCHE[lang] || MS_SUCHE.de)) || {}, R = [];
   APPS.forEach(function(a){
     var kopf = [a.name[lang], a.desc[lang], a.grade[lang], a.slug].join(" "), teile = IDX[a.slug] || [], punkte = 0, hits = [];
-    var alles = norm(kopf + " " + teile.join(" "));
+    var alles = norm(kopf + " " + teile.join(" ").replace(/\u0001#[a-z0-9-]+/g, ""));
     if(!W.every(function(w){ return alles.indexOf(w) >= 0; })) return;
     W.forEach(function(w){ if(norm(a.name[lang]).indexOf(w) >= 0) punkte += 10; if(norm(a.desc[lang]).indexOf(w) >= 0) punkte += 4; });
-    teile.forEach(function(x){ var n = norm(x); if(W.some(function(w){ return n.indexOf(w) >= 0; })){ punkte += 1; if(hits.length < 4 && hits.indexOf(x) < 0) hits.push(x); } });
-    R.push({ a: a, p: punkte, hit: hits.map(function(x){ return markiere(x, W); }).join(" · "), name: markiere(a.name[lang], W), desc: markiere(a.desc[lang], W) });
+    // Einträge „Text\u0001#unterseite“ (Berühmte Aufgaben): Treffer springt direkt auf die Unterseite
+    var ziel = "", proZiel = {};
+    teile.forEach(function(x){ var tx = x.split("\u0001"), n = norm(tx[0]); if(tx[1]) proZiel[tx[1]] = (proZiel[tx[1]] || "") + " " + n; });
+    // Unterseite, auf der die meisten Suchwörter vorkommen (bei Gleichstand: längster Treffer zuerst)
+    var bestP = 0; Object.keys(proZiel).forEach(function(h){ var p = 0; W.forEach(function(w){ if(proZiel[h].indexOf(w) >= 0) p += w.length; }); if(p > bestP){ bestP = p; ziel = h; } });
+    teile.forEach(function(x){ var tx = x.split("\u0001"), n = norm(tx[0]); if(tx[1] && ziel && tx[1] !== ziel) return; if(W.some(function(w){ return n.indexOf(w) >= 0; })){ punkte += 1; if(hits.length < 4 && hits.indexOf(tx[0]) < 0) hits.push(tx[0]); } });
+    R.push({ a: a, p: punkte, ziel: ziel, hit: hits.map(function(x){ return markiere(x, W); }).join(" · "), name: markiere(a.name[lang], W), desc: markiere(a.desc[lang], W) });
   });
   R.sort(function(x, y){ return y.p - x.p; });
   info.hidden = false; info.textContent = R.length ? u.treffer.replace("{n}", R.length) : u.keine;
   tr.hidden = !R.length; st.hidden = true;
   tr.innerHTML = R.map(function(r){ return kachel(r.a, r); }).join("");
 }
-document.getElementById("suche").addEventListener("input", suchen);
+// Suchindex (gut 1 MB) erst laden, wenn jemand die Suche benutzt
+var suchLaden = null;
+function suchIndex(fertig){
+  if(window.MS_SUCHE) return fertig();
+  if(!suchLaden){ suchLaden = []; var sc = document.createElement("script"); sc.src = "/suchindex.js"; sc.onload = sc.onerror = function(){ var l = suchLaden; suchLaden = null; l.forEach(function(f){ f(); }); }; document.head.appendChild(sc); }
+  if(suchLaden) suchLaden.push(fertig);
+}
+document.getElementById("suche").addEventListener("focus", function(){ suchIndex(function(){}); });
+document.getElementById("suche").addEventListener("input", function(){ suchen(); if(!window.MS_SUCHE) suchIndex(suchen); });
 document.querySelectorAll(".langs button").forEach(function(b){
   b.addEventListener("click", function(){
     lang = b.dataset.l;
@@ -387,7 +399,7 @@ document.querySelectorAll(".langs button").forEach(function(b){
   });
 });
 render();
-window.addEventListener("load", function(){ if(document.getElementById("suche").value) suchen(); });
+window.addEventListener("load", function(){ if(document.getElementById("suche").value) suchIndex(suchen); });
 if("serviceWorker" in navigator){
   window.addEventListener("load", function(){ navigator.serviceWorker.register("/sw.js").catch(function(){}); });
 }

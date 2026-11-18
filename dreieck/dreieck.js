@@ -1111,7 +1111,7 @@
     if(!aufg) neueAufgabe();
     var h = '<p class="auftrag">' + t("auftrag") + ' <b><bdi dir="ltr">' + wertText(aufg.g) + '</bdi></b> <span class="typ">(' + t("typ" + aufg.typ) + ")</span></p>";
     h += '<details class="schritte"><summary>' + t("schritte") + "</summary><ol>" + schritte().map(function(s){ return "<li>" + s + "</li>"; }).join("") + "</ol></details>";
-    h += '<div class="knoepfe"><button type="button" class="knopf" id="pruefen">' + t("pruefen") + '</button><button type="button" class="knopf hell" id="neuA">' + t("neueAufg") + "</button></div>";
+    h += '<div class="knoepfe"><button type="button" class="knopf" id="pruefen" data-noleer>' + t("pruefen") + '</button><button type="button" class="knopf hell" id="neuA">' + t("neueAufg") + "</button></div>";
     if(meldung) h += '<p class="meldung ' + meldung[0] + '">' + meldung[1] + "</p>";
     box.innerHTML = h;
     document.getElementById("pruefen").addEventListener("click", pruefen);

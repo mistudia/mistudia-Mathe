@@ -205,3 +205,53 @@
   if(window.MutationObserver) new MutationObserver(spaeter).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["placeholder", "value", "hidden", "class"] });
   window.msFelderAnpassen = alle;
 })();
+
+// ---------- „Prüfen“ ohne Eingabe: Hinweis statt Stille (alle Kacheln) ----------
+// 🆕 Chat-Wunsch: Prüfen-Knöpfe reagieren auch, wenn noch nichts eingetippt ist – mit einer Fehlermeldung
+// direkt am leeren Feld. Erkannt werden Knöpfe am Text (Prüfen/Check/… in 9 Sprachen) oder an id/Klasse
+// mit „pruef“/„check“. Zugehörige Felder = kleinster umgebender Bereich mit sichtbaren Eingabefeldern.
+// Abschalten je Knopf oder Bereich: data-noleer.
+(function(){
+  var LEER = { de: "Bitte gib zuerst eine Antwort ein.", en: "Please enter an answer first.", es: "Primero escribe una respuesta.", zh: "请先输入答案。", fr: "Écris d’abord une réponse.", ru: "Сначала введи ответ.", ar: "اكتب إجابة أولًا.", ja: "先に答えを入力してね。", pt: "Escreve primeiro uma resposta." };
+  var RE = /^[\s✓✔→▶]*(prüfen|überprüfen|antwort prüfen|kontrollieren|check|check answer|comprobar|corregir|检查|核对|检验|vérifier|проверить|تحقق|تحقّق|確かめる|確認|チェック|答え合わせ|verificar|conferir)\b/i;
+  function sprache(){ var l = "de"; try { l = localStorage.getItem("msMathLang") || window.MS_MATH_LANG || "de"; } catch(e){} return LEER[l] ? l : "de"; }
+  function istPruef(b){
+    if(!b || b.closest("[data-noleer]")) return false;
+    var id = (b.id || "") + " " + (typeof b.className === "string" ? b.className : "");
+    return RE.test((b.textContent || "").trim()) || /pruef|prüf|check/i.test(id);
+  }
+  function felder(c){
+    return Array.prototype.filter.call(c.querySelectorAll("input, textarea"), function(i){
+      var t = (i.type || "text").toLowerCase();
+      return /^(text|number|search|tel|)$/.test(t) && !i.readOnly && !i.disabled && i.offsetParent !== null && !i.closest("[data-noleer]") && !i.matches(".hzw-tile-search, #suche, .box-word-filter");
+    });
+  }
+  function bereich(b){
+    var c = b.parentElement;
+    for(var n = 0; c && n < 5; n++, c = c.parentElement){ var f = felder(c); if(f.length) return f; }
+    return [];
+  }
+  var blase = null, timer = 0;
+  function zeige(f){
+    if(!blase){
+      blase = document.createElement("div"); blase.className = "ms-leer"; blase.setAttribute("role", "alert");
+      var st = document.createElement("style");
+      st.textContent = ".ms-leer{position:absolute;z-index:9000;background:#c62828;color:#fff;font:700 14px system-ui,sans-serif;padding:6px 10px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.2);pointer-events:none;max-width:260px}.ms-leer::before{content:'';position:absolute;top:-6px;left:14px;border:6px solid transparent;border-top:0;border-bottom-color:#c62828}.ms-leer-feld{outline:3px solid #c62828 !important;outline-offset:1px}";
+      document.head.appendChild(st); document.body.appendChild(blase);
+    }
+    var r = f.getBoundingClientRect();
+    blase.textContent = LEER[sprache()]; blase.hidden = false;
+    blase.style.left = Math.max(4, r.left + window.scrollX) + "px"; blase.style.top = (r.bottom + window.scrollY + 8) + "px";
+    f.classList.add("ms-leer-feld"); try { f.focus(); } catch(x){}
+    clearTimeout(timer); timer = setTimeout(function(){ blase.hidden = true; f.classList.remove("ms-leer-feld"); }, 2600);
+    f.addEventListener("input", function weg(){ blase.hidden = true; f.classList.remove("ms-leer-feld"); f.removeEventListener("input", weg); });
+  }
+  window.addEventListener("click", function(e){
+    var b = e.target && e.target.closest && e.target.closest("button, input[type=button], input[type=submit], [role=button]");
+    if(!b || b.disabled || !istPruef(b)) return;
+    var leer = bereich(b).filter(function(i){ return !String(i.value || "").trim(); });
+    if(!leer.length) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    zeige(leer[0]);
+  }, true);
+})();
