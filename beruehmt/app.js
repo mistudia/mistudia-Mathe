@@ -2020,6 +2020,14 @@
     if(!stop) tv.gelobt = false;
   }
 
+  // ---------- Runde 10: Bewegungen im Diagramm (/bewegung.js) auf der Galilei-Seite ----------
+  var _gaAlt10 = PROBE.galilei;
+  PROBE.galilei = function(){
+    _gaAlt10();
+    $("probe").insertAdjacentHTML("beforeend", '<div data-ms-bewegung id="bewegung"></div>');
+    if(window.MS_BEW) MS_BEW.einbauen(document.getElementById("bewegung"));
+  };
+
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){
     $("frage").textContent = auf.q;
