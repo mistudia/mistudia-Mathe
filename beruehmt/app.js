@@ -1282,18 +1282,40 @@
   }
 
   // ===== Eratosthenes: Erdumfang mit Schatten =====
-  var er = { a: 7.2, s: 800 };
-  finde("eratosthenes").nurText = false; finde("eratosthenes").leg = "alpha sKm eU";
+  var er = { a: 7.2, s: 800, mod: 0, H: 25, S: 3.15 };
+  finde("eratosthenes").nurText = false; finde("eratosthenes").leg = "alpha sKm eU erH erS";
   PROBE.eratosthenes = function(){
     var b = $("probe");
-    b.innerHTML = absatz("e_anl") + '<label class="reglerZ"><span>' + esc(t("e_alpha")) + ' <b id="erAz"></b></span><input type="range" id="erA" min="3" max="15" step="0.1"></label><label class="reglerZ"><span>' + esc(t("e_s")) + ' <b id="erSz"></b></span><input type="range" id="erS" min="400" max="1200" step="10"></label>' +
-      '<div class="zwei"><div id="erSvg"></div><div><ol class="weg" id="erWeg"></ol><p class="zeile" id="erErg"></p></div></div>' + merkeP("e_wechsel") + absatz("e_stadion");
-    $("erA").value = er.a; $("erS").value = er.s;
+    b.innerHTML = absatz("e_anl") + '<div class="chips" id="erMod">' + tA("e_mod").map(function(x, i){ return '<button type="button" class="chip" data-m="' + i + '">' + esc(x) + "</button>"; }).join("") + "</div>" +
+      '<div id="erWBox"><label class="reglerZ"><span>' + esc(t("e_alpha")) + ' <b id="erAz"></b></span><input type="range" id="erA" min="3" max="15" step="0.1"></label></div>' +
+      '<div id="erOBox"><div class="zwei"><div><label class="reglerZ"><span>' + esc(t("e_H")) + ' <b id="erHz"></b></span><input type="range" id="erH" min="10" max="40" step="0.5"></label><label class="reglerZ"><span>' + esc(t("e_Sch")) + ' <b id="erShz"></b></span><input type="range" id="erSh" min="0.5" max="6" step="0.05"></label></div><div id="erObSvg"></div></div></div>' +
+      '<label class="reglerZ"><span>' + esc(t("e_s")) + ' <b id="erSz"></b></span><input type="range" id="erS" min="400" max="1200" step="10"></label>' +
+      '<div class="zwei"><div id="erSvg"></div><div><ol class="weg" id="erWeg"></ol><p class="zeile" id="erErg"></p></div></div>' + merkeP("e_wechsel") + absatz("e_stadion") + merkeP("e_obelisk");
+    $("erA").value = er.a; $("erS").value = er.s; $("erH").value = er.H; $("erSh").value = er.S;
     $("erA").addEventListener("input", function(){ er.a = +this.value; erZeichnen(); });
     $("erS").addEventListener("input", function(){ er.s = +this.value; erZeichnen(); });
+    $("erH").addEventListener("input", function(){ er.H = +this.value; erZeichnen(); });
+    $("erSh").addEventListener("input", function(){ er.S = +this.value; erZeichnen(); });
+    b.querySelectorAll("#erMod [data-m]").forEach(function(c){ c.addEventListener("click", function(){ er.mod = +c.dataset.m; erZeichnen(); }); });
     erZeichnen();
   };
+  function erObelisk(){
+    var W = 260, Hs = 230, s = svgNeu(W, Hs), fx = 150, by = 205, sk = 170 / 40, h = er.H * sk, sl = er.S * sk * 3, a = Math.atan(er.S / er.H);
+    s.appendChild(el("rect", { x: 0, y: 0, width: W, height: Hs, rx: 10, fill: "#eef5ff" }));
+    s.appendChild(el("line", { x1: 10, y1: by, x2: W - 10, y2: by, stroke: "#8a6d3b", "stroke-width": 3 }));
+    s.appendChild(el("path", { d: "M" + (fx - 7) + " " + by + "L" + (fx - 4) + " " + (by - h + 8) + "L" + fx + " " + (by - h) + "L" + (fx + 4) + " " + (by - h + 8) + "L" + (fx + 7) + " " + by + "Z", fill: "#e7d3a8", stroke: "#5b3a1e", "stroke-width": 1.6 }));
+    s.appendChild(el("line", { x1: fx, y1: by - h, x2: fx - sl, y2: by, stroke: "#f59e0b", "stroke-width": 2.4 }));
+    s.appendChild(el("line", { x1: fx, y1: by, x2: fx - sl, y2: by, stroke: "#334155", "stroke-width": 6, opacity: 0.55 }));
+    s.appendChild(el("path", { d: "M" + fx + " " + (by - h + 30) + "A30 30 0 0 1 " + (fx - 30 * Math.sin(a * 3 > 1.2 ? 1.2 : a * 3)) + " " + (by - h + 30 * Math.cos(a * 3 > 1.2 ? 1.2 : a * 3)), fill: "none", stroke: "#7c3aed", "stroke-width": 2.4 }));
+    schrift(s, fx - 12, by - h + 46, "α", "end", "bt", { fill: "#5b21b6" });
+    schrift(s, fx + 12, by - h / 2, "H", "start", "bt"); schrift(s, fx - sl / 2, by + 18, "S", "middle", "bt");
+    schrift(s, W / 2, 16, t("e_nicht"), "middle", "bk-klein");
+    $("erObSvg").innerHTML = ""; $("erObSvg").appendChild(s);
+  }
   function erZeichnen(){
+    document.querySelectorAll("#erMod [data-m]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.m === er.mod ? "true" : "false"); });
+    $("erWBox").hidden = er.mod !== 0; $("erOBox").hidden = er.mod !== 1;
+    if(er.mod === 1){ er.a = Math.round(Math.atan(er.S / er.H) * 1800 / Math.PI) / 10; $("erHz").textContent = z(er.H, 1) + " m"; $("erShz").textContent = z(er.S, 2) + " m"; erObelisk(); }
     var a = er.a, U = 360 / a * er.s, s = svgNeu(400, 420), C = [200, 350], R = 175, vis = a * 4 * Math.PI / 180;
     $("erAz").textContent = z(a, 1) + "°"; $("erSz").textContent = gz(er.s) + " km";
     s.appendChild(el("rect", { x: 0, y: 0, width: 400, height: 420, rx: 12, fill: "#eef5ff" }));
@@ -1325,11 +1347,14 @@
     schrift(s, 200, 412, t("e_nicht"), "middle", "bk-klein");
     $("erSvg").innerHTML = ""; $("erSvg").appendChild(s);
     var n = 360 / a, gl = Math.abs(n - Math.round(n * 100) / 100) < 1e-9 ? " = " : " ≈ ";
-    $("erWeg").innerHTML = weg([{ lbl: t("e_w1") }, "360° : " + z(a, 1) + "°" + gl + z(n, 2), { lbl: t("e_w2") }, "U = " + z(n, 2) + " · " + gz(er.s) + " km" + gl + gz(U) + " km", { lbl: t("e_w3") }, "r = U : (2 · π) ≈ " + gz(U / 2 / Math.PI) + " km"]);
+    var tanW = er.mod === 1 ? [{ lbl: t("e_wtan") }, "tan α = S : H", "tan α = " + z(er.S, 2) + " : " + z(er.H, 1) + " ≈ " + z(er.S / er.H, 4), "α ≈ " + z(a, 1) + "°"] : [];
+    $("erWeg").innerHTML = weg(tanW.concat([{ lbl: t("e_w1") }, "360° : " + z(a, 1) + "°" + gl + z(n, 2), { lbl: t("e_w2") }, "U = " + z(n, 2) + " · " + gz(er.s) + " km" + gl + gz(U) + " km", { lbl: t("e_w3") }, "r = U : (2 · π) ≈ " + gz(U / 2 / Math.PI) + " km"]));
     var ab = (U - 40075) / 40075 * 100;
     $("erErg").innerHTML = esc(t("e_real")) + "<br><b>" + esc(t("e_abw", { p: (ab > 0 ? "+" : "") + z(ab, 1) })) + "</b>";
   }
   GEN.eratosthenes = function(){
+    if(Math.random() < 0.4){ var H = wahl([20, 24, 25, 30]), S = Math.round(H * Math.tan(wahl([6, 7.2, 7.5, 9]) * Math.PI / 180) * 100) / 100, al = Math.atan(S / H) * 180 / Math.PI, alr = Math.round(al * 10) / 10, sk = zuf(5, 10) * 100, Uo = 360 / alr * sk;
+      return { q: t("e_qO", { H: H, S: z(S, 2), s: gz(sk) }), w: Uo, tol: Uo * 0.015, l: "≈ " + gz(Uo) + " km", weg: ["tan α = S : H", "tan α = " + z(S, 2) + " : " + H + " ≈ " + z(S / H, 4), "α ≈ " + z(alr, 1) + "°", "U = 360° : " + z(alr, 1) + "° · " + gz(sk) + " km", "U ≈ " + gz(Uo) + " km"] }; }
     var a = wahl([3.6, 4.5, 5, 6, 7.2, 7.5, 9, 10, 12]), s = zuf(4, 12) * 100, n = 360 / a, U = n * s;
     return { q: t("e_q", { a: z(a, 1), s: gz(s) }), w: U, tol: 1, l: gz(U) + " km", weg: ["360° : " + z(a, 1) + "° = " + z(n, 2), "U = " + z(n, 2) + " · " + gz(s) + " km = " + gz(U) + " km"] };
   };
@@ -1518,6 +1543,211 @@
     for(var i = 1; i <= 5; i++) h += "<tr><td>" + i + "</td><td>" + (2 * i - 1) + "</td><td>" + i * i + "</td></tr>";
     $("grTab").innerHTML = h;
   }
+
+  // ---------- Runde 7: Die Jagd nach π, riesige Primzahlen ----------
+  P.push({ k: "pijagd", p: "pj", sym: "π…", col: "#4338ca", leg: "piN piK pi approx", link: [["beruehmt/#archimedes", "a_name"], ["beruehmt/#liuhui", "lh_name"], ["beruehmt/#buffon", "bu_name"]] });
+  P.push({ k: "primzahlen", p: "pr", sym: "2ᵖ−1", col: "#0f766e", leg: "prP prM prS", link: [["teilbarkeit/#sieb", "e_l2"], ["beruehmt/#eratosthenes", "e_name"]] });
+  var PI_STR = "3.14159265358979323846264338327950288419716939937510";
+  function piStellen(x){ var s = x.toFixed(15), n = 0; for(var i = 0; i < s.length && s[i] === PI_STR[i]; i++) if(s[i] !== ".") n++; return Math.max(0, n - 1); }
+
+  // ===== Die Jagd nach π =====
+  // [Jahr (negativ = v. Chr.), Wert, richtige Nachkommastellen]
+  var PJ_ZEIT = [[-1800, "25/8 = 3,125", "1"], [-1650, "256/81 ≈ 3,16", "1"], [-250, "3,1408 < π < 3,1429", "2"], [263, "3,1416", "4"], [480, "355/113 ≈ 3,1415929", "6"], [1400, "3,14159265359", "11"], [1424, "3,1415926535897932", "16"], [1610, "3,14159265358979323846…", "35"], [1706, "3,14159…", "100"], [1949, "3,14159…", "2037"], [2025, "3,14159…", ""]];
+  var pj = { mod: 0, n: 0, k: 0, P: [], reihe: 0, t: 20 };
+  PROBE.pijagd = function(){
+    var b = $("probe");
+    b.innerHTML = '<div class="chips" id="pjMod">' + tA("pj_modi").map(function(x, i){ return '<button type="button" class="chip" data-m="' + i + '">' + esc(x) + "</button>"; }).join("") + '</div><div id="pjBox"></div>';
+    b.querySelectorAll("#pjMod [data-m]").forEach(function(c){ c.addEventListener("click", function(){ pj.mod = +c.dataset.m; pjAufbau(); }); });
+    pjAufbau();
+  };
+  function pjAufbau(){
+    document.querySelectorAll("#pjMod [data-m]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.m === pj.mod ? "true" : "false"); });
+    var B = $("pjBox");
+    if(pj.mod === 0){
+      var W = tA("pj_wer"), J = tA("pj_wie");
+      B.innerHTML = absatz("pj_zeit_erkl") + '<div class="tabWrap"><table class="tab pjTab"><tr><th>' + esc(t("pj_jahr")) + "</th><th>" + esc(t("pj_wer_h")) + "</th><th>" + esc(t("pj_wert")) + "</th><th>" + esc(t("pj_richtig")) + "</th></tr>" +
+        PJ_ZEIT.map(function(z2, i){ var jahr = z2[0] < 0 ? t("pj_vchr", { j: -z2[0] }) : String(z2[0]), wert = komma() ? z2[1] : z2[1].replace(/(\d),(\d)/g, "$1.$2"); return "<tr><td>" + esc(jahr) + "</td><td><b>" + esc(W[i] || "") + '</b><br><span class="muted">' + esc(J[i] || "") + "</span></td><td>" + bdi(esc(wert)) + "</td><td>" + esc(z2[2] ? gz(+z2[2]) : t("pj_rek_zahl")) + "</td></tr>"; }).join("") + "</table></div>" + merkeP("pj_zeit_fazit");
+    } else if(pj.mod === 1){
+      B.innerHTML = absatz("pj_mc_erkl") + '<p class="zeile">' + [10, 100, 1000, 10000].map(function(n){ return '<button type="button" class="chip" data-n="' + n + '">+' + gz(n) + "</button>"; }).join("") + ' <button type="button" class="knopf hell" id="pjR">' + esc(t("bu_reset")) + '</button></p><div class="zwei"><div id="pjSvg"></div><div><ol class="weg" id="pjWeg"></ol><p class="zeile" id="pjErg"></p></div></div>' + merkeP("pj_mc_warum");
+      B.querySelectorAll("[data-n]").forEach(function(c){ c.addEventListener("click", function(){ pjWerfen(+c.dataset.n); }); });
+      $("pjR").addEventListener("click", function(){ pj.n = 0; pj.k = 0; pj.P = []; pjMc(); });
+      pjMc();
+    } else {
+      B.innerHTML = absatz("pj_r_erkl") + '<div class="chips" id="pjR2">' + tA("pj_reihen").map(function(x, i){ return '<button type="button" class="chip" data-r="' + i + '">' + esc(x) + "</button>"; }).join("") + '</div><p class="pjFormel" id="pjF" dir="ltr"></p><label class="reglerZ"><span>' + esc(t("pj_glieder")) + ' <b id="pjTz"></b></span><input type="range" id="pjT" min="1" max="200" step="1"></label><div id="pjKurve"></div><ol class="weg" id="pjRW"></ol><p class="zeile" id="pjRE"></p>' + merkeP("pj_r_heute");
+      B.querySelectorAll("#pjR2 [data-r]").forEach(function(c){ c.addEventListener("click", function(){ pj.reihe = +c.dataset.r; pjReihe(); }); });
+      $("pjT").value = pj.t; $("pjT").addEventListener("input", function(){ pj.t = +this.value; pjReihe(); });
+      pjReihe();
+    }
+  }
+  function pjWerfen(a){ for(var i = 0; i < a; i++){ var x = Math.random(), y = Math.random(), d = x * x + y * y <= 1; pj.n++; if(d) pj.k++; pj.P.push([x, y, d]); if(pj.P.length > 3000) pj.P.shift(); } pjMc(); }
+  function pjMc(){
+    var S = 300, s = svgNeu(S + 20, S + 20), o = 10;
+    s.appendChild(el("rect", { x: o, y: o, width: S, height: S, fill: "#f8fafc", stroke: "#1a2233", "stroke-width": 2 }));
+    s.appendChild(el("path", { d: "M" + o + " " + o + "A" + S + " " + S + " 0 0 1 " + (o + S) + " " + (o + S) + "L" + o + " " + (o + S) + "Z", fill: "rgba(124,58,237,0.12)", stroke: "#7c3aed", "stroke-width": 2 }));
+    pj.P.forEach(function(p){ s.appendChild(el("circle", { cx: o + p[0] * S, cy: o + S - p[1] * S, r: 1.8, fill: p[2] ? "#7c3aed" : "#b8860b" })); });
+    $("pjSvg").innerHTML = ""; $("pjSvg").appendChild(s);
+    $("pjSvg").insertAdjacentHTML("beforeend", '<p class="leg"><span style="color:#7c3aed">● ' + esc(t("pj_innen")) + '</span> · <span style="color:#b8860b">● ' + esc(t("pj_aussen")) + "</span></p>");
+    $("pjWeg").innerHTML = pj.n ? weg([{ lbl: t("pj_mc_w1") }, "k : n = π : 4", { lbl: t("pj_mc_w2") }, "π ≈ 4 · k : n", "π ≈ 4 · " + gz(pj.k) + " : " + gz(pj.n), "π ≈ " + z(4 * pj.k / pj.n, 4)]) : "";
+    $("pjErg").textContent = pj.n ? t("pj_stellen", { n: piStellen(4 * pj.k / pj.n) }) : t("pj_mc_leer");
+  }
+  function pjSumme(r, n){
+    var s = 0, i, L = [];
+    if(r === 0){ for(i = 0; i < n; i++){ s += (i % 2 ? -1 : 1) / (2 * i + 1); L.push(4 * s); } }
+    else if(r === 1){ s = 3; for(i = 0; i < n; i++){ var a = 2 * i + 2; s += (i % 2 ? -4 : 4) / (a * (a + 1) * (a + 2)); L.push(s); } }
+    else { s = 1; for(i = 1; i <= n; i++){ s *= (4 * i * i) / (4 * i * i - 1); L.push(2 * s); } }
+    return L;
+  }
+  function pjReihe(){
+    document.querySelectorAll("#pjR2 [data-r]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.r === pj.reihe ? "true" : "false"); });
+    var r = pj.reihe, n = pj.t, L = pjSumme(r, n), v = L[n - 1];
+    $("pjTz").textContent = n;
+    $("pjF").textContent = ["π : 4 = 1 − 1/3 + 1/5 − 1/7 + …", "π = 3 + 4/(2·3·4) − 4/(4·5·6) + 4/(6·7·8) − …", "π : 2 = (2/1 · 2/3) · (4/3 · 4/5) · (6/5 · 6/7) · …"][r];
+    var W = 620, H = 200, s = svgNeu(W, H), lo = 2.6, hi = 3.7, sx = (W - 50) / Math.max(n, 2), sy = function(y){ return H - 20 - (Math.max(lo, Math.min(hi, y)) - lo) / (hi - lo) * (H - 40); };
+    s.appendChild(el("rect", { x: 0, y: 0, width: W, height: H, rx: 10, fill: "#f8fafc" }));
+    s.appendChild(el("line", { x1: 40, y1: sy(Math.PI), x2: W - 6, y2: sy(Math.PI), stroke: "#0f766e", "stroke-width": 2, "stroke-dasharray": "6 4" }));
+    schrift(s, 34, sy(Math.PI) + 4, "π", "end", "bt", { fill: "#0f766e" });
+    s.appendChild(el("polyline", { points: L.map(function(y, i){ return (40 + (i + 1) * sx).toFixed(1) + "," + sy(y).toFixed(1); }).join(" "), fill: "none", stroke: "#7c3aed", "stroke-width": 2.2 }));
+    [3, 3.5].forEach(function(y){ schrift(s, 34, sy(y) + 4, z(y, 1), "end", "bk-klein"); });
+    $("pjKurve").innerHTML = ""; $("pjKurve").appendChild(s);
+    var weg1 = r === 0 ? ["S = 1 − 1/3 + 1/5 − …", "S ≈ " + z(L[n - 1] / 4, 8), "π ≈ 4 · S", "π ≈ " + z(v, 8)] : ["π ≈ " + z(v, 8)];
+    $("pjRW").innerHTML = weg([{ lbl: t("pj_nach", { n: n }) }].concat(weg1));
+    $("pjRE").textContent = t("pj_stellen", { n: piStellen(v) }) + " " + t("pj_r_hinweis" + r);
+  }
+  GEN.pijagd = function(){
+    if(Math.random() < 0.5){ var n = zuf(2, 20) * 50, k = Math.round(n * Math.PI / 4 * (1 + (Math.random() - 0.5) * 0.04)), v = Math.round(4 * k / n * 100) / 100;
+      return { q: t("pj_qMC", { n: gz(n), k: gz(k) }), w: v, tol: 0.011, l: z(v, 2), weg: ["π ≈ 4 · k : n", "π ≈ 4 · " + gz(k) + " : " + gz(n), "π ≈ " + z(4 * k / n, 4)] }; }
+    var g = zuf(3, 5), L = [], s = 0; for(var i = 0; i < g; i++){ s += (i % 2 ? -1 : 1) / (2 * i + 1); L.push((i ? (i % 2 ? " − " : " + ") : "") + "1/" + (2 * i + 1)); }
+    var w = Math.round(4 * s * 1000) / 1000;
+    return { q: t("pj_qL", { g: g, s: L.join("").replace(/^1\/1/, "1") }), w: w, tol: 0.0011, l: z(w, 3), weg: ["S = " + L.join("").replace(/^1\/1/, "1"), "S ≈ " + z(s, 5), "π ≈ 4 · S", "π ≈ " + z(4 * s, 3)] };
+  };
+
+  // ===== Riesige Primzahlen =====
+  var PR_P = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 61, 67, 89, 107, 127];
+  var pr = { eu: [2, 3, 5], p: 13 };
+  function prFaktoren(n){ var f = [], d = 2; while(d * d <= n){ while(n % d === 0){ f.push(d); n /= d; } d++; } if(n > 1) f.push(n); return f; }
+  PROBE.primzahlen = function(){
+    var b = $("probe"), PE = [2, 3, 5, 7, 11, 13, 17];
+    b.innerHTML = karteH("pr_eu_h") + absatz("pr_eu_erkl") + '<div class="chips" id="prEu">' + PE.map(function(p){ return '<button type="button" class="chip" data-p="' + p + '">' + p + "</button>"; }).join("") + '</div><ol class="weg" id="prEuW"></ol><p class="zeile" id="prEuE"></p>' +
+      karteH("pr_me_h") + absatz("pr_me_erkl") + '<div class="chips" id="prMe"><b>p:</b> ' + PR_P.map(function(p){ return '<button type="button" class="chip" data-p="' + p + '">' + p + "</button>"; }).join("") + '</div><div id="prZahl"></div><div class="tabWrap"><table class="tab" id="prLL"></table></div><p class="zeile" id="prLLE"></p>' + merkeP("pr_ll_info") +
+      karteH("pr_rek_h") + absatz("pr_rek") + '<div id="prRek"></div>' + merkeP("pr_wozu");
+    b.querySelectorAll("#prEu [data-p]").forEach(function(c){ c.addEventListener("click", function(){ var p = +c.dataset.p, i = pr.eu.indexOf(p); if(i >= 0){ if(pr.eu.length > 1) pr.eu.splice(i, 1); } else pr.eu.push(p); pr.eu.sort(function(a, b2){ return a - b2; }); prEuklid(); }); });
+    b.querySelectorAll("#prMe [data-p]").forEach(function(c){ c.addEventListener("click", function(){ pr.p = +c.dataset.p; prMersenne(); }); });
+    prEuklid(); prMersenne(); prRekord();
+  };
+  function prEuklid(){
+    document.querySelectorAll("#prEu [data-p]").forEach(function(c){ c.setAttribute("aria-pressed", pr.eu.indexOf(+c.dataset.p) >= 0 ? "true" : "false"); });
+    var prod = pr.eu.reduce(function(a, b2){ return a * b2; }, 1), N = prod + 1, F = prFaktoren(N);
+    $("prEuW").innerHTML = weg([pr.eu.join(" · ") + " = " + gz(prod), gz(prod) + " + 1 = " + gz(N), { lbl: F.length === 1 ? t("pr_eu_prim", { n: gz(N) }) : t("pr_eu_zerl", { n: gz(N) }) }].concat(F.length > 1 ? [gz(N) + " = " + F.map(gz).join(" · ")] : []));
+    $("prEuE").textContent = t("pr_eu_neu", { f: F.filter(function(x, i){ return F.indexOf(x) === i; }).map(gz).join(", ") });
+  }
+  function prMersenne(){
+    document.querySelectorAll("#prMe [data-p]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.p === pr.p ? "true" : "false"); });
+    var p = pr.p, M = (1n << BigInt(p)) - 1n, ds = M.toString(), bin = "1".repeat(p);
+    $("prZahl").innerHTML = '<p class="zeile" dir="ltr"><b>M' + hochTief(p) + " = 2" + hoch(p) + " − 1</b></p>" +
+      '<p class="prZiffern" dir="ltr">' + esc(ds.length > 60 ? ds.slice(0, 30) + " … " + ds.slice(-20) : ds) + '</p><p class="zeile muted">' + esc(t("pr_stellen", { n: ds.length })) + " · " + esc(t("pr_binaer")) + ' <span class="prBin" dir="ltr">' + esc(bin.length > 60 ? bin.slice(0, 60) + "…" : bin) + "</span></p>";
+    var L = [], s = 4n, rows = "";
+    if(p === 2){ $("prLL").innerHTML = ""; $("prLLE").className = "zeile gut"; $("prLLE").textContent = t("pr_ll_2"); return; }
+    for(var k = 1; k <= p - 2; k++){ s = (s * s - 2n) % M; L.push(s); }
+    var zeig = function(v){ var st = v.toString(); return st.length > 24 ? st.slice(0, 10) + "…" + st.slice(-8) : st.length > 15 ? st : gz(Number(st)); };
+    rows = "<tr><th>k</th><th>sₖ</th></tr><tr><td>0</td><td>4</td></tr>";
+    L.forEach(function(v, i){ if(i < 6 || i >= L.length - 3){ rows += "<tr" + (i === L.length - 1 ? ' class="an"' : "") + "><td>" + (i + 1) + "</td><td dir=\"ltr\">" + esc(zeig(v)) + "</td></tr>"; } else if(i === 6) rows += "<tr><td>…</td><td>…</td></tr>"; });
+    $("prLL").innerHTML = rows;
+    var prim = L[L.length - 1] === 0n, e = $("prLLE");
+    if(prim){ e.className = "zeile gut"; e.textContent = t("pr_ll_ja", { f: "2" + hoch(p) + " − 1", k: p - 2 }); }
+    else {
+      var f = null; if(p < 64){ var Mn = Number(M); for(var d = 2 * p + 1; d * d <= Mn && d < 5e6; d += 2 * p){ if(Mn % d === 0){ f = d; break; } } }
+      e.className = "zeile"; e.textContent = t("pr_ll_nein", { f: "2" + hoch(p) + " − 1", p: p, k: p - 2 }) + (f ? " " + t("pr_ll_teiler", { d: gz(f), q: gz(Number(M) / f) }) : "") + (p === 67 ? " " + t("pr_cole") : "");
+    }
+  }
+  function hochTief(n){ return String(n).replace(/\d/g, function(c){ return "₀₁₂₃₄₅₆₇₈₉"[+c]; }); }
+  function prRekord(){
+    var p = 136279841, st = Math.floor(p * Math.log10(2)) + 1, seiten = Math.round(st / 3000), km = st * 2 / 1e6;
+    $("prRek").innerHTML = '<ol class="weg">' + weg([{ lbl: t("pr_rek_w1") }, "M = 2" + hoch(p) + " − 1", { lbl: t("pr_rek_w2") }, gz(p) + " · " + z(0.30103, 5) + " ≈ " + gz(st), { lbl: t("pr_rek_w3") }, gz(st) + " : 3000 ≈ " + gz(seiten), { lbl: t("pr_rek_w4") }, gz(st) + " · 2 mm ≈ " + z(km, 0) + " km"]) + "</ol>";
+  }
+  GEN.primzahlen = function(){
+    var a = zuf(0, 2);
+    if(a === 0){ var E = [[2, 3], [2, 3, 5], [2, 3, 5, 7], [2, 3, 5, 7, 11]][zuf(0, 3)], pd = E.reduce(function(x, y){ return x * y; }, 1);
+      return { q: t("pr_qE", { l: E.join(" · ") }), w: pd + 1, tol: 0, l: gz(pd + 1), weg: [E.join(" · ") + " = " + gz(pd), gz(pd) + " + 1 = " + gz(pd + 1)] }; }
+    if(a === 1){ var p = wahl([3, 5, 7, 11, 13, 17]), M = Math.pow(2, p) - 1;
+      return { q: t("pr_qM", { f: "2" + hoch(p) + " − 1" }), w: M, tol: 0, l: gz(M), weg: ["2" + hoch(p) + " = " + gz(M + 1), gz(M + 1) + " − 1 = " + gz(M)] }; }
+    var c = wahl([[11, 23, 89], [23, 47, 178481], [29, 233, 2304167]]), Mc = Math.pow(2, c[0]) - 1;
+    return { q: t("pr_qT", { f: "2" + hoch(c[0]) + " − 1", M: gz(Mc), d: gz(c[1]) }), w: Mc / c[1], tol: 0, l: gz(Mc / c[1]), weg: ["2" + hoch(c[0]) + " − 1 = " + gz(Mc), gz(Mc) + " : " + gz(c[1]) + " = " + gz(Mc / c[1])] };
+  };
+
+
+  // ===== Euler: Haus vom Nikolaus zum Ausprobieren =====
+  var NK_P = [[60, 250], [220, 250], [220, 110], [60, 110], [140, 30]], NK_K = [[0, 1], [1, 2], [2, 3], [3, 0], [0, 2], [1, 3], [3, 4], [2, 4]];
+  var nk = { start: -1, cur: -1, used: [], grad: true, loesT: null };
+  var _euAlt2 = PROBE.euler;
+  PROBE.euler = function(){
+    _euAlt2();
+    $("probe").insertAdjacentHTML("beforeend", karteH("eu_nk_h") + absatz("eu_nk_anl") + '<p><label class="chk"><input type="checkbox" id="nkG"> ' + esc(t("eu_nk_grad")) + '</label></p><div class="zwei"><div id="nkSvg"></div><div><p class="zeile" id="nkSt"></p><p class="nkSilben" id="nkSil"></p><p><button type="button" class="knopf hell" id="nkNeu">' + esc(t("eu_nk_neu")) + '</button> <button type="button" class="knopf hell" id="nkLoes">' + esc(t("eu_nk_loes")) + "</button></p></div></div>" + merkeP("eu_nk_regel"));
+    $("nkG").checked = nk.grad; $("nkG").addEventListener("change", function(){ nk.grad = this.checked; nkZeichnen(); });
+    $("nkNeu").addEventListener("click", function(){ nkReset(); nkZeichnen(); });
+    $("nkLoes").addEventListener("click", function(){ nkReset(); var W = [0, 1, 2, 3, 0, 2, 4, 3, 1], i = 0; nk.start = nk.cur = 0; nkZeichnen(); nk.loesT = setInterval(function(){ i++; if(i >= W.length || !$("nkSvg")){ clearInterval(nk.loesT); nk.loesT = null; return; } nkSchritt(W[i]); }, 600); });
+    nkZeichnen();
+  };
+  function nkReset(){ if(nk.loesT){ clearInterval(nk.loesT); nk.loesT = null; } nk.start = nk.cur = -1; nk.used = []; }
+  function nkKante(a, b){ for(var i = 0; i < NK_K.length; i++){ var k = NK_K[i]; if((k[0] === a && k[1] === b) || (k[0] === b && k[1] === a)) return i; } return -1; }
+  function nkSchritt(i){
+    if(nk.cur < 0){ nk.start = nk.cur = i; nkZeichnen(); return; }
+    var k = nkKante(nk.cur, i); if(k < 0 || nk.used.indexOf(k) >= 0) return;
+    nk.used.push(k); nk.cur = i; nkZeichnen();
+  }
+  function nkZeichnen(){
+    var s = svgNeu(280, 290);
+    s.appendChild(el("rect", { x: 0, y: 0, width: 280, height: 290, rx: 12, fill: "#fbf6ea" }));
+    NK_K.forEach(function(k, i){ var a = NK_P[k[0]], b = NK_P[k[1]], n = nk.used.indexOf(i);
+      s.appendChild(el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: n >= 0 ? "#7c3aed" : "#c9b98f", "stroke-width": n >= 0 ? 6 : 3, "stroke-dasharray": n >= 0 ? "none" : "6 6", "stroke-linecap": "round" }));
+      if(n >= 0){ var q = (i === 4 || i === 5) ? 0.3 : 0.5, mx = a[0] + (b[0] - a[0]) * q, my = a[1] + (b[1] - a[1]) * q; s.appendChild(el("circle", { cx: mx, cy: my, r: 10, fill: "#7c3aed" })); schrift(s, mx, my + 4.5, String(n + 1), "middle", "bk-klein", { fill: "#ffffff" }); }
+    });
+    NK_P.forEach(function(p, i){
+      var g = NK_K.filter(function(k){ return k[0] === i || k[1] === i; }).length, frei = nk.cur >= 0 && i !== nk.cur && nkKante(nk.cur, i) >= 0 && nk.used.indexOf(nkKante(nk.cur, i)) < 0;
+      var c = el("circle", { cx: p[0], cy: p[1], r: 17, fill: i === nk.cur ? "#7c3aed" : frei ? "#ede9fe" : (nk.grad ? (g % 2 ? "#fde68a" : "#ffffff") : "#ffffff"), stroke: nk.grad && g % 2 ? "#b8860b" : "#1a2233", "stroke-width": frei ? 3.5 : 2.4, "class": "nkEcke" });
+      c.style.cursor = "pointer"; c.addEventListener("click", function(){ if(!nk.loesT) nkSchritt(i); }); s.appendChild(c);
+      if(nk.grad) schrift(s, p[0], p[1] + 5, String(g), "middle", "bt", { fill: i === nk.cur ? "#ffffff" : "#1a2233", "pointer-events": "none" });
+    });
+    $("nkSvg").innerHTML = ""; $("nkSvg").appendChild(s);
+    var S = tA("eu_nk_silben"); $("nkSil").textContent = nk.used.map(function(k, i){ return S[i]; }).join(" ").replace(/- /g, "-");
+    var st = $("nkSt"), offen = NK_K.filter(function(k, i){ return nk.used.indexOf(i) < 0 && (k[0] === nk.cur || k[1] === nk.cur); }).length;
+    if(nk.used.length === 8){ st.className = "zeile gut"; st.textContent = t("eu_nk_ok"); if(typeof msRichtig === "function" && !nk.loesT) try { msRichtig(); } catch(x){} }
+    else if(nk.cur >= 0 && !offen){ var gs = NK_K.filter(function(k){ return k[0] === nk.start || k[1] === nk.start; }).length; st.className = "zeile schlecht"; st.textContent = t("eu_nk_fest", { n: nk.used.length }) + (gs % 2 ? "" : " " + t("eu_nk_start")); }
+    else { st.className = "zeile"; st.textContent = nk.cur < 0 ? t("eu_nk_tipp") : t("eu_nk_stand", { n: nk.used.length }); }
+  }
+  // ---------- Gleichungen im Fließtext: höchstens ein „=“/„≈“ pro Zeile ----------
+  // Enthält ein Absatz (p.zeile, p.merke, p.story, #frage, li …) zwei oder mehr = bzw. ≈, wird jede Formel
+  // mit = oder ≈ als eigener Block gesetzt; Ketten (a = b = c) stehen untereinander, am Zeichen ausgerichtet.
+  var FZ_REL = /^[=≈]$/;
+  var FZ_RE = (function(){
+    var opd = "[\\(\\[]*[−-]?(?:√\\(?)?(?:[0-9][0-9,./]*[a-zA-Z]?|[a-zA-Zπφθαβ](?:[₀-₉ₙₖₚ]+|′)?)[²³⁰-⁹ⁿ]*…?[\\)\\]]*[²³]?";
+    var num = "[0-9][0-9,./]*";
+    return new RegExp("(?<![A-Za-zÀ-ÿА-яЁё0-9])" + opd + "(?:\\s+[=≈<>+−·:/×]\\s+" + opd + "|\\s+" + num + "(?![A-Za-zÀ-ÿА-яЁё]))*(?![A-Za-zÀ-ÿА-яЁё0-9])", "g");
+  })();
+  function fzHtml(s){
+    var teile = [], pos = 0, n = 0, m;
+    FZ_RE.lastIndex = 0;
+    while((m = FZ_RE.exec(s))){
+      var f = m[0].replace(/[.,]$/, ""), r = (f.match(/\s[=≈]\s/g) || []).length;
+      if(!r){ if(!m[0].length) FZ_RE.lastIndex++; continue; }
+      teile.push({ t: s.slice(pos, m.index) }); teile.push({ f: f }); pos = m.index + f.length; n += r;
+    }
+    if(n < 2) return null;
+    teile.push({ t: s.slice(pos) });
+    return teile.map(function(x){
+      if(x.t != null){ var t2 = x.t.replace(/^[\s.,;:：。、，،]+/, "").trim(); return t2 ? '<span class="fzT">' + esc(t2) + "</span>" : ""; }
+      var Z = x.f.split(/\s(?=[=≈]\s)/);
+      return '<span class="fzB" dir="ltr">' + Z.slice(1).map(function(z, i){ return '<span class="fzL">' + (i ? "" : esc(Z[0])) + '</span><span class="fzR">' + esc(z) + "</span>"; }).join("") + "</span>";
+    }).join(" ");
+  }
+  function fzElement(e){
+    if(e.children.length || e.dataset.fz === e.textContent) return;
+    var h = fzHtml(e.textContent);
+    if(h){ e.innerHTML = h; e.classList.add("fzP"); }
+    e.dataset.fz = e.textContent;
+  }
+  function fzAlle(){ document.querySelectorAll("#s_detail p.zeile, #s_detail p.merke, #s_detail p.story, #frage, #s_detail ul.bListe li, #s_detail p.leg").forEach(fzElement); }
+  var fzPlan = false;
+  new MutationObserver(function(){ if(fzPlan) return; fzPlan = true; requestAnimationFrame(function(){ fzPlan = false; fzAlle(); }); }).observe(document.getElementById("s_detail"), { childList: true, subtree: true, characterData: true });
 
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){
