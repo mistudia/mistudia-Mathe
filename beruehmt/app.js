@@ -13,7 +13,7 @@
   function bdi(s){ return '<bdi dir="ltr">' + s + "</bdi>"; }
   function komma(){ return ["de", "es", "fr", "ru", "pt"].indexOf(lang) >= 0; }
   function z(x, d){ d = d == null ? 2 : d; var f = Math.pow(10, d), r = Math.round(x * f) / f, s = String(r); if(s.indexOf("e") >= 0) s = r.toFixed(d); return (komma() ? s.replace(".", ",") : s).replace("-", "−"); }
-  function lies(s){ s = String(s).trim().replace(/\s+/g, "").replace(/[−–]/g, "-").replace(/[%a-zA-Zа-яА-Я]+$/, "").replace(",", "."); return /^-?\d*\.?\d+$/.test(s) ? +s : NaN; }
+  function lies(s){ s = String(s).trim().replace(/\s+/g, ""); if(/^-?\d{1,3}(,\d{3})+$/.test(s) && !komma()) s = s.replace(/,/g, ""); if(/^-?\d{1,3}(\.\d{3})+$/.test(s) && komma()) s = s.replace(/\./g, ""); s = s.replace(/[−–]/g, "-").replace(/[%a-zA-Zа-яА-Я]+$/, "").replace(",", "."); return /^-?\d*\.?\d+$/.test(s) ? +s : NaN; }
   function hoch(n){ return String(n).replace(/\d/g, function(c){ return "⁰¹²³⁴⁵⁶⁷⁸⁹"[+c]; }); }
   function zuf(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
   function wahl(L){ return L[Math.floor(Math.random() * L.length)]; }
@@ -38,7 +38,10 @@
     { k: "pascal", p: "pf", sym: "A:B", col: "#9333ea", leg: "", link: [["wahrscheinlichkeit", "link_wk"]] },
     { k: "buffon", p: "bu", sym: "π?", col: "#be123c", leg: "buN buK pi approx", link: [["wahrscheinlichkeit", "link_wk"]] },
     { k: "heron", p: "he", sym: "√", col: "#15803d", leg: "heA heX wurzel", link: [["pythagoras", "link_wurzel"]] },
-    { k: "chwarizmi", p: "ch", sym: "x²", col: "#0e7490", leg: "xUnb wurzel", link: [["quadratisch", "link_quad"]] }
+    { k: "chwarizmi", p: "ch", sym: "x²", col: "#0e7490", leg: "xUnb wurzel", link: [["quadratisch", "link_quad"]] },
+    { k: "galilei", p: "ga", sym: "↓", col: "#475569", leg: "gaH tSek gErd", link: [] },
+    { k: "bernoulli", p: "jb", sym: "e", col: "#059669", leg: "jbN e", link: [["zinsen", "link_zinsen"]] },
+    { k: "ramanujan", p: "ra", sym: "1729", col: "#c2410c", leg: "", link: [["terme", "link_terme"]] }
   ];
   function symGr(s){ return s.length > 3 ? 15 : s.length > 2 ? 18 : 24; }
   function finde(k){ for(var i = 0; i < P.length; i++) if(P[i].k === k) return P[i]; return null; }
@@ -434,27 +437,83 @@
     fGel = []; for(var b = 0; b < reg; b++) fGel.push(-1);
     fMin = fChrom();
   }
+  // Färben mit k Farben: DSatur (Land mit den meisten verschiedenen Nachbarfarben zuerst) + Rücksetzen, mit Schrittgrenze
   function fLoese(k){
-    var N = fKarte.n, col = []; for(var i = 0; i < N; i++) col.push(-1);
-    var ord = []; for(var j = 0; j < N; j++) ord.push(j); ord.sort(function(a, b){ return fKarte.nb[b].length - fKarte.nb[a].length; });
-    function rek(p){ if(p === N) return true; var v = ord[p]; for(var c = 0; c < k; c++){ if(fKarte.nb[v].every(function(u){ return col[u] !== c; })){ col[v] = c; if(rek(p + 1)) return true; col[v] = -1; } } return false; }
-    return rek(0) ? col : null;
+    var N = fKarte.n, NB = fKarte.nb, col = [], schritte = 0;
+    for(var i = 0; i < N; i++) col.push(-1);
+    function waehle(){
+      var best = -1, bs = -1, bd = -1;
+      for(var v = 0; v < N; v++){ if(col[v] >= 0) continue; var m = {}, sat = 0; NB[v].forEach(function(u){ if(col[u] >= 0 && !m[col[u]]){ m[col[u]] = 1; sat++; } }); if(sat > bs || (sat === bs && NB[v].length > bd)){ best = v; bs = sat; bd = NB[v].length; } }
+      return best;
+    }
+    function rek(){
+      var v = waehle(); if(v < 0) return true; if(++schritte > 200000) return false;
+      for(var c = 0; c < k; c++){ if(NB[v].every(function(u){ return col[u] !== c; })){ col[v] = c; if(rek()) return true; col[v] = -1; } }
+      return false;
+    }
+    return rek() ? col : null;
   }
-  function fChrom(){ for(var k = 1; k <= 4; k++) if(fLoese(k)) return k; return 4; }
+  function fChrom(){
+    var N = fKarte.n, NB = fKarte.nb, kanten = NB.some(function(L){ return L.length; });
+    if(!kanten) return 1;
+    if(fLoese(2)) return 2;
+    var adj = NB.map(function(L){ var o = {}; L.forEach(function(u){ o[u] = 1; }); return o; });
+    for(var u = 0; u < N; u++) for(var a = 0; a < NB[u].length; a++){ var v = NB[u][a]; if(v < u) continue;
+      var gem = NB[u].filter(function(w){ return adj[v][w]; });
+      for(var x = 0; x < gem.length; x++) for(var y = x + 1; y < gem.length; y++) if(adj[gem[x]][gem[y]]) return 4; }
+    return fLoese(3) ? 3 : 4;
+  }
+  var F_ARTEN = ["zufall", "deutschland", "europa", "afrika", "asien", "nordamerika", "suedamerika", "welt"], fArt = "deutschland", fName = "";
+  function fWaehle(art){
+    fArt = art; fName = "";
+    if(art === "zufall"){ fNeu(); fZeichnen(); return; }
+    if(!window.F_KARTEN){
+      $("fSvg").innerHTML = '<p class="zeile muted">' + esc(t("f_laden")) + "</p>";
+      if(!document.getElementById("fKartenSkript")){ var sc = document.createElement("script"); sc.id = "fKartenSkript"; sc.src = "karten-data.js"; sc.onload = function(){ if(fArt === art && $("fSvg")) fWaehle(art); }; document.head.appendChild(sc); }
+      return;
+    }
+    var K = F_KARTEN[art];
+    fKarte = { echt: true, art: art, K: K, n: K.r.length, nb: K.nb };
+    fGel = []; for(var i = 0; i < fKarte.n; i++) fGel.push(-1);
+    fMin = fChrom(); fZeichnen();
+  }
   PROBE.vierfarben = function(){
-    if(!fKarte) fNeu();
     var b = $("probe");
-    b.innerHTML = '<p class="zeile">' + esc(t("f_anl")) + '</p><div class="chips" id="fPal">' + F_FARBEN.map(function(c, i){ return '<button type="button" class="fFarbe" data-f="' + i + '" style="background:' + c + '" aria-label="' + (i + 1) + '"></button>'; }).join("") +
+    b.innerHTML = '<p class="zeile">' + esc(t("f_anl")) + '</p><div class="chips" id="fArt"><b>' + esc(t("f_wahl")) + "</b> " + F_ARTEN.map(function(a, i){ return '<button type="button" class="chip" data-a="' + a + '">' + esc(tA("f_karten")[i]) + "</button>"; }).join("") + '</div><div class="chips" id="fPal">' + F_FARBEN.map(function(c, i){ return '<button type="button" class="fFarbe" data-f="' + i + '" style="background:' + c + '" aria-label="' + (i + 1) + '"></button>'; }).join("") +
       '<button type="button" class="chip" data-f="-1">' + esc(t("f_radier")) + '</button></div><div id="fSvg"></div><p class="zeile" id="fStatus"></p>' +
       '<p><button type="button" class="knopf hell" id="fNeu">' + esc(t("f_neu")) + '</button> <button type="button" class="knopf hell" id="fLeer">' + esc(t("f_leeren")) + '</button> <button type="button" class="knopf hell" id="fLoes">' + esc(t("f_loesung")) + '</button></p><p class="merke">' + esc(t("f_warum")) + "</p>";
     b.querySelectorAll("#fPal [data-f]").forEach(function(x){ x.addEventListener("click", function(){ fFarbe = +x.dataset.f; fZeichnen(); }); });
-    $("fNeu").addEventListener("click", function(){ fNeu(); fZeichnen(); });
+    b.querySelectorAll("#fArt [data-a]").forEach(function(x){ x.addEventListener("click", function(){ fWaehle(x.dataset.a); }); });
+    $("fNeu").addEventListener("click", function(){ fWaehle("zufall"); });
     $("fLeer").addEventListener("click", function(){ fGel = fGel.map(function(){ return -1; }); fZeichnen(); });
-    $("fLoes").addEventListener("click", function(){ var l = fLoese(fMin); if(l) fGel = l; fZeichnen(); });
-    fZeichnen();
+    $("fLoes").addEventListener("click", function(){ var l = fLoese(fMin) || fLoese(4); if(l) fGel = l; fZeichnen(); });
+    if(fKarte && (fKarte.echt ? fKarte.art : "zufall") === fArt) fZeichnen(); else fWaehle(fArt);
   };
+  function fZeichnenEcht(){
+    var K = fKarte.K, s = svgNeu(K.w, K.h, "bsvg fKarte fEcht"), sw = fKarte.art === "welt" ? 0.5 : 0.9;
+    s.appendChild(el("rect", { x: 0, y: 0, width: K.w, height: K.h, rx: 12, fill: "#e0f2fe" }));
+    var konf = {}, schlecht = {};
+    K.nb.forEach(function(L, g){ L.forEach(function(h){ if(fGel[g] >= 0 && fGel[g] === fGel[h]){ konf[Math.min(g, h) + "-" + Math.max(g, h)] = 1; schlecht[g] = schlecht[h] = 1; } }); });
+    var ni = Math.max(0, ["de", "en", "es", "zh", "fr", "ru", "ar", "ja", "pt"].indexOf(lang));
+    K.r.forEach(function(r, g){
+      var f = fGel[g] >= 0 ? F_FARBEN[fGel[g]] : "#ffffff", p = el("path", { d: r.d, fill: f, stroke: "#1a2233", "stroke-width": sw, "stroke-linejoin": "round", "data-g": g, "class": "fZelle" });
+      p.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(p);
+      if(r.m){ var c = el("circle", { cx: r.m[0], cy: r.m[1], r: fKarte.art === "welt" ? 4 : 5, fill: f, stroke: "#1a2233", "stroke-width": 1, "data-g": g, "class": "fZelle" }); c.appendChild(el("title", {}, r.n[ni] || r.n[1])); s.appendChild(c); }
+    });
+    K.r.forEach(function(r, g){ if(schlecht[g]) s.appendChild(el("path", { d: r.d, fill: "none", stroke: "#dc2626", "stroke-width": fKarte.art === "welt" ? 1.6 : 2.6, "stroke-dasharray": "5 3", "pointer-events": "none" })); });
+    return { s: s, nk: Object.keys(konf).length, ni: ni };
+  }
   function fZeichnen(){
     document.querySelectorAll("#fPal [data-f]").forEach(function(x){ x.setAttribute("aria-pressed", +x.dataset.f === fFarbe ? "true" : "false"); });
+    document.querySelectorAll("#fArt [data-a]").forEach(function(x){ x.setAttribute("aria-pressed", x.dataset.a === fArt ? "true" : "false"); });
+    $("fNeu").hidden = fArt !== "zufall";
+    if(fKarte.echt){
+      var E = fZeichnenEcht();
+      $("fSvg").innerHTML = ""; $("fSvg").appendChild(E.s);
+      $("fSvg").insertAdjacentHTML("beforeend", '<p class="leg muted">' + esc(t("f_klein")) + " " + esc(t("f_quelle")) + "</p>");
+      E.s.querySelectorAll(".fZelle").forEach(function(p){ p.addEventListener("click", function(){ var g = +p.getAttribute("data-g"); fGel[g] = fFarbe; fName = fKarte.K.r[g].n[E.ni] || fKarte.K.r[g].n[1]; fZeichnen(); }); });
+      return fStatus(E.nk);
+    }
     var K = fKarte, W = HW * (HX_C + 0.5) + 16, H = 1.5 * HX * (HX_R - 1) + 2 * HX + 12, s = svgNeu(W, H, "bsvg fKarte");
     s.appendChild(el("rect", { x: 0, y: 0, width: W, height: H, rx: 12, fill: "#e0f2fe" }));
     function ecke(m, i){ var w = Math.PI / 180 * (60 * i - 30); return [m[0] + HX * Math.cos(w), m[1] + HX * Math.sin(w)]; }
@@ -475,10 +534,13 @@
     });
     $("fSvg").innerHTML = ""; $("fSvg").appendChild(s);
     s.querySelectorAll(".fZelle").forEach(function(p){ p.addEventListener("click", function(){ fGel[+p.getAttribute("data-g")] = fFarbe; fZeichnen(); }); });
-    var nk = Object.keys(konf).length, offen = fGel.filter(function(x){ return x < 0; }).length, st = $("fStatus");
+    fStatus(Object.keys(konf).length);
+  }
+  function fStatus(nk){
+    var offen = fGel.filter(function(x){ return x < 0; }).length, st = $("fStatus"), vor = fName ? fName + " · " : "";
     var benutzt = {}; fGel.forEach(function(x){ if(x >= 0) benutzt[x] = 1; });
-    if(nk){ st.className = "zeile schlecht"; st.textContent = t("f_konflikt", { n: nk }); }
-    else if(offen){ st.className = "zeile"; st.textContent = t("f_offen", { n: offen }); }
+    if(nk){ st.className = "zeile schlecht"; st.textContent = vor + t("f_konflikt", { n: nk }); }
+    else if(offen){ st.className = "zeile"; st.textContent = vor + t("f_offen", { n: offen }); }
     else { st.className = "zeile gut"; st.textContent = t("f_geschafft", { k: Object.keys(benutzt).length }) + " " + t("f_min", { k: fMin }); if(typeof msRichtig === "function") try { msRichtig(); } catch(x){} }
   }
 
@@ -722,6 +784,92 @@
     $("chWeg").innerHTML = weg(chWeg(b, c));
   }
   GEN.chwarizmi = function(){ var x = zuf(1, 9), b = 2 * zuf(1, 8), c = x * x + b * x; return { q: t("ch_q", { b: b, c: c }), w: x, tol: 0, l: String(x), weg: chWeg(b, c) }; };
+  // ---------- Runde 4: Galilei, Jakob Bernoulli, Ramanujan ----------
+  var ga = { h: 56, mond: false, an: null };
+  PROBE.galilei = function(){
+    var b = $("probe");
+    b.innerHTML = '<label class="reglerZ"><span>' + esc(t("ga_hoehe")) + ' <b id="gaHz"></b></span><input type="range" id="gaH" min="1" max="100" step="1"></label>' +
+      '<div class="chips" id="gaOrt"><button type="button" class="chip" data-m="0">' + esc(t("ga_erde")) + '</button><button type="button" class="chip" data-m="1">' + esc(t("ga_mond")) + '</button> <button type="button" class="knopf" id="gaLos">' + esc(t("ga_fallen")) + '</button> <b id="gaUhr" class="gaUhr"></b></div>' +
+      '<div class="zwei"><div id="gaSvg"></div><div><ol class="weg" id="gaWeg"></ol><div class="tabWrap"><table class="tab" id="gaTab"></table></div><p class="zeile muted">' + esc(t("ga_turm")) + "</p></div></div>";
+    $("gaH").value = ga.h; $("gaH").addEventListener("input", function(){ ga.h = +this.value; gaZeichnen(0); });
+    b.querySelectorAll("#gaOrt [data-m]").forEach(function(c){ c.addEventListener("click", function(){ ga.mond = c.dataset.m === "1"; gaZeichnen(0); }); });
+    $("gaLos").addEventListener("click", gaStart);
+    gaZeichnen(0);
+  };
+  function gaG(){ return ga.mond ? 1.62 : 9.81; }
+  function gaZeichnen(tt){
+    document.querySelectorAll("#gaOrt [data-m]").forEach(function(c){ c.setAttribute("aria-pressed", (c.dataset.m === "1") === ga.mond ? "true" : "false"); });
+    $("gaHz").textContent = ga.h + " m";
+    var g = gaG(), T = Math.sqrt(2 * ga.h / g), s = Math.min(ga.h, 0.5 * g * tt * tt), H = 300, sk = 260 / 100, y0 = H - 20 - ga.h * sk, sv = svgNeu(200, H);
+    sv.appendChild(el("rect", { x: 0, y: 0, width: 200, height: H, fill: ga.mond ? "#1f2636" : "#e0f2fe", rx: 10 }));
+    sv.appendChild(el("rect", { x: 0, y: H - 20, width: 200, height: 20, fill: ga.mond ? "#9ca3af" : "#86a35b" }));
+    sv.appendChild(el("rect", { x: 40, y: y0, width: 34, height: ga.h * sk, fill: "#f3e7c9", stroke: "#8a6d3b", "stroke-width": 1.5 }));
+    sv.appendChild(el("circle", { cx: 100, cy: y0 + s * sk - 9, r: 9, fill: "#7c3aed", stroke: "#4c1d95", "stroke-width": 1.5 }));
+    sv.appendChild(el("text", { x: 120, y: y0 + 4, "class": "bk-klein", fill: ga.mond ? "#e8ecf4" : "#4f5b6e" }, "h = " + ga.h + " m"));
+    $("gaSvg").innerHTML = ""; $("gaSvg").appendChild(sv);
+    $("gaUhr").textContent = "t = " + z(Math.min(tt, T), 2) + " s";
+    $("gaWeg").innerHTML = weg(["h = ½ · g · t²", "t = √(2 · h : g)", "t = √(2 · " + ga.h + " : " + z(g, 2) + ") ≈ " + z(T, 2) + " s"]);
+    var h = "<tr><th>" + esc(t("ga_tab")) + "</th><th>" + esc(t("ga_weg")) + "</th><th>" + esc(t("ga_dazu")) + "</th></tr>";
+    for(var i = 1; i <= 4; i++) h += "<tr><td>" + i + " s</td><td>" + bdi(z(0.5 * g * i * i, 1) + " m") + "</td><td>" + bdi(z(0.5 * g * (2 * i - 1), 1) + " m = " + (2 * i - 1) + " · " + z(0.5 * g, 2) + " m") + "</td></tr>";
+    $("gaTab").innerHTML = h;
+  }
+  function gaStart(){
+    var a0 = performance.now(), T = Math.sqrt(2 * ga.h / gaG());
+    cancelAnimationFrame(ga.an);
+    (function lauf(n){ var tt = (n - a0) / 1000; if(!document.getElementById("gaSvg")) return; gaZeichnen(Math.min(tt, T)); if(tt < T) ga.an = requestAnimationFrame(lauf); })(a0);
+  }
+  GEN.galilei = function(){
+    var tt = wahl([1, 1.5, 2, 2.5, 3, 4, 5]), s = 0.5 * 9.81 * tt * tt;
+    return { q: t("ga_q", { t: z(tt, 1) }), w: Math.round(s * 10) / 10, tol: 0.06, l: z(s, 1) + " m", weg: ["s = ½ · g · t²", "s = 0,5 · 9,81 · " + z(tt, 1) + "²".replace(",", komma() ? "," : "."), "s ≈ " + z(s, 1) + " m"].map(function(x){ return komma() ? x : x.replace(/(\d),(\d)/g, "$1.$2"); }) };
+  };
+
+  var JB_N = [1, 2, 4, 12, 52, 365, 8760, 525600], jbI = 3;
+  PROBE.bernoulli = function(){
+    var b = $("probe");
+    b.innerHTML = '<div class="chips" id="jbChips"><b>' + esc(t("jb_n")) + "</b> " + JB_N.map(function(n, i){ return '<button type="button" class="chip" data-i="' + i + '">' + gz(n) + "</button>"; }).join("") + '</div><ol class="weg" id="jbWeg"></ol><div class="tabWrap"><table class="tab" id="jbTab"></table></div>';
+    b.querySelectorAll("#jbChips [data-i]").forEach(function(c){ c.addEventListener("click", function(){ jbI = +c.dataset.i; jbZeichnen(); }); });
+    jbZeichnen();
+  };
+  function jbZeichnen(){
+    document.querySelectorAll("#jbChips [data-i]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.i === jbI ? "true" : "false"); });
+    var n = JB_N[jbI], v = Math.pow(1 + 1 / n, n);
+    $("jbWeg").innerHTML = weg(["(1 + 1/" + gz(n) + ")" + hoch(n) + " ≈ " + z(v, 5) + " €", { lbl: "e = 2,71828…".replace(",", komma() ? "," : ".") }]);
+    var N = tA("jb_N"), h = "<tr><th>" + esc(t("jb_tab")) + "</th><th>" + esc(t("jb_betrag")) + "</th></tr>";
+    JB_N.forEach(function(m, i){ h += "<tr" + (i === jbI ? ' class="an"' : "") + "><td>" + esc(N[i]) + "</td><td>" + bdi(z(Math.pow(1 + 1 / m, m), 5) + " €") + "</td></tr>"; });
+    $("jbTab").innerHTML = h;
+  }
+  GEN.bernoulli = function(){
+    var n = wahl([2, 3, 4, 5, 6, 10]), q = 1 + 1 / n, v = Math.pow(q, n);
+    return { q: t("jb_q", { n: n }).replace("^" + n, hoch(n)), w: Math.round(v * 1000) / 1000, tol: 0.0011, l: z(v, 3) + " €", weg: ["(1 + 1/" + n + ")" + hoch(n) + " = " + z(q, 4) + hoch(n) + " ≈ " + z(v, 3)] };
+  };
+
+  var ra = { a: 1, b: 12 };
+  function raSummen(){ var M = {}; for(var a = 1; a <= 20; a++) for(var b = a; b <= 20; b++){ var s = a * a * a + b * b * b; (M[s] = M[s] || []).push([a, b]); } return M; }
+  PROBE.ramanujan = function(){
+    var b = $("probe");
+    b.innerHTML = '<p class="merke">' + esc(t("ra_kubik")) + '</p><label class="reglerZ"><span>' + esc(t("ra_a")) + ' <b id="raAz"></b></span><input type="range" id="raA" min="1" max="20" step="1"></label><label class="reglerZ"><span>' + esc(t("ra_b")) + ' <b id="raBz"></b></span><input type="range" id="raB" min="1" max="20" step="1"></label>' +
+      '<ol class="weg" id="raWeg"></ol><p class="zeile" id="raGl"></p><p class="zeile"><b>' + esc(t("ra_liste")) + '</b></p><p class="fiFolge" id="raListe" dir="ltr"></p><div class="raKub" id="raKub" dir="ltr"></div>';
+    $("raA").value = ra.a; $("raB").value = ra.b;
+    $("raA").addEventListener("input", function(){ ra.a = +this.value; raZeichnen(); });
+    $("raB").addEventListener("input", function(){ ra.b = +this.value; raZeichnen(); });
+    raZeichnen();
+  };
+  function raZeichnen(){
+    var a = ra.a, b = ra.b, s = a * a * a + b * b * b, M = raSummen(), lo = Math.min(a, b), hi = Math.max(a, b);
+    $("raAz").textContent = a; $("raBz").textContent = b;
+    $("raWeg").innerHTML = weg([a + "³ + " + b + "³ = " + (a * a * a) + " + " + (b * b * b) + " = " + gz(s)]);
+    var andere = (M[s] || []).filter(function(p){ return !(p[0] === lo && p[1] === hi); });
+    var gl = $("raGl");
+    gl.className = andere.length ? "zeile gut" : "zeile muted";
+    gl.textContent = andere.length ? t("ra_gleich", { p: andere.map(function(p){ return p[0] + "³ + " + p[1] + "³"; }).join(", ") }) : t("ra_keine");
+    $("raListe").innerHTML = Object.keys(M).filter(function(k){ return M[k].length > 1; }).map(function(k){ return "<b>" + gz(+k) + "</b> = " + M[k].map(function(p){ return p[0] + "³ + " + p[1] + "³"; }).join(" = "); }).join("<br>");
+    var h = ""; for(var n = 1; n <= 20; n++) h += '<span class="' + (n === a || n === b ? "an" : "") + '">' + n + "³ = " + gz(n * n * n) + "</span>";
+    $("raKub").innerHTML = h;
+  }
+  GEN.ramanujan = function(){
+    var a = zuf(1, 12), b = zuf(1, 12), s = a * a * a + b * b * b;
+    return { q: t("ra_q", { a: a, b: b }), w: s, tol: 0, l: gz(s), weg: [a + "³ = " + a + " · " + a + " · " + a + " = " + (a * a * a), b + "³ = " + b + " · " + b + " · " + b + " = " + (b * b * b), a + "³ + " + b + "³ = " + (a * a * a) + " + " + (b * b * b) + " = " + s] };
+  };
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){
     $("frage").textContent = auf.q;
