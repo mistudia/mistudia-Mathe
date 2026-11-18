@@ -36,7 +36,7 @@
     { k: "fibonacci", p: "fi", sym: "Fₙ", col: "#a16207", leg: "", link: [] },
     { k: "euler", p: "eu", sym: "7", col: "#0369a1", leg: "euE euK euF", link: [["koerper", "link_koerper"]] },
     { k: "pascal", p: "pf", sym: "A:B", col: "#9333ea", leg: "", link: [["wahrscheinlichkeit", "link_wk"]] },
-    { k: "buffon", p: "bu", sym: "π?", col: "#be123c", leg: "buN buK pi approx", link: [["wahrscheinlichkeit", "link_wk"]] },
+    { k: "buffon", p: "bu", sym: "π?", col: "#be123c", leg: "buN buK buL buD buX buTh pi approx", link: [["wahrscheinlichkeit", "link_wk"]] },
     { k: "heron", p: "he", sym: "√", col: "#15803d", leg: "heA heX wurzel", link: [["pythagoras", "link_wurzel"]] },
     { k: "chwarizmi", p: "ch", sym: "x²", col: "#0e7490", leg: "xUnb wurzel", link: [["quadratisch", "link_quad"]] },
     { k: "galilei", p: "ga", sym: "↓", col: "#475569", leg: "gaH tSek gErd", link: [] },
@@ -994,6 +994,340 @@
     var a = zuf(1, 12), b = zuf(1, 12), s = a * a * a + b * b * b;
     return { q: t("ra_q", { a: a, b: b }), w: s, tol: 0, l: gz(s), weg: [a + "³ = " + a + " · " + a + " · " + a + " = " + (a * a * a), b + "³ = " + b + " · " + b + " · " + b + " = " + (b * b * b), a + "³ + " + b + "³ = " + (a * a * a) + " + " + (b * b * b) + " = " + s] };
   };
+  // ---------- Runde 5: genauere Erklärungen, neue Bilder, Quadratur des Kreises, Eratosthenes zum Ausprobieren ----------
+  function karteH(k){ return '<h3 class="fH">' + esc(t(k)) + "</h3>"; }
+  function absatz(k, v){ return '<p class="zeile">' + esc(t(k, v)) + "</p>"; }
+  function merkeP(k, v){ return '<p class="merke">' + esc(t(k, v)) + "</p>"; }
+  function liste(k){ return '<ul class="bListe">' + tA(k).map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>"; }
+  function schrift(s, x, y, text, a, cls, extra){ var o = { x: x, y: y, "text-anchor": a || "middle", "class": cls || "bk-klein" }; for(var k in extra || {}) o[k] = extra[k]; var e = el("text", o, text); s.appendChild(e); return e; }
+  function pfeil(s, x1, y1, x2, y2, col, beide){
+    var w = Math.atan2(y2 - y1, x2 - x1), L = 9, B = 4.5;
+    function spitze(x, y, ww){ s.appendChild(el("path", { d: "M" + x + " " + y + "L" + (x - L * Math.cos(ww) + B * Math.sin(ww)) + " " + (y - L * Math.sin(ww) - B * Math.cos(ww)) + "L" + (x - L * Math.cos(ww) - B * Math.sin(ww)) + " " + (y - L * Math.sin(ww) + B * Math.cos(ww)) + "Z", fill: col })); }
+    s.appendChild(el("line", { x1: x1, y1: y1, x2: x2, y2: y2, stroke: col, "stroke-width": 1.8 }));
+    spitze(x2, y2, w); if(beide) spitze(x1, y1, w + Math.PI);
+  }
+
+  // ===== Leonardo da Vinci: Vitruvianischer Mensch =====
+  var vPose = 2, vRaster = true;
+  // Figur: Körpergröße H = 300 (Quadrat), Nabel bei 61 % → Kreis um den Nabel; zwei Haltungen wie bei Leonardo
+  function vMensch(s, o){
+    var cx = o.cx, fu = o.fu, H = o.H, p = o.p || 0.61, sk = H / 300, top = fu - H, nY = fu - p * H, R = p * H;
+    var haut = "#fde7c8", linie = "#1a2233";
+    function glied(pts, alpha){
+      var d = pts.map(function(q, i){ return (i ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }).join("");
+      s.appendChild(el("path", { d: d, fill: "none", stroke: linie, "stroke-width": 12 * sk, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: alpha }));
+      s.appendChild(el("path", { d: d, fill: "none", stroke: haut, "stroke-width": 8.5 * sk, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: alpha < 1 ? 1 : 1 }));
+    }
+    var schY = top + 54 * sk, huefY = fu - 150 * sk, hx = 17 * sk;
+    // Kreis-Haltung: Arme schräg nach oben bis an den Kreis, Beine gespreizt bis an den Kreis
+    if(o.pose !== 0){
+      var a = o.pose === 2 ? 0.75 : 1, wA = 58 * Math.PI / 180, wB = 30 * Math.PI / 180;
+      [-1, 1].forEach(function(sg){
+        glied([[cx + sg * 22 * sk, schY], [cx + sg * R * Math.sin(wA) * 0.55, nY - R * Math.cos(wA) * 0.62], [cx + sg * R * Math.sin(wA), nY - R * Math.cos(wA)]], a);
+        glied([[cx + sg * hx, huefY], [cx + sg * R * Math.sin(wB) * 0.62, nY + R * Math.cos(wB) * 0.62], [cx + sg * R * Math.sin(wB), nY + R * Math.cos(wB)]], a);
+      });
+    }
+    // Quadrat-Haltung: Arme waagrecht (Spanne = H), Beine geschlossen
+    if(o.pose !== 1){
+      [-1, 1].forEach(function(sg){
+        glied([[cx + sg * 22 * sk, schY], [cx + sg * 90 * sk, schY + 2 * sk], [cx + sg * 150 * sk, schY]], 1);
+        glied([[cx + sg * hx, huefY], [cx + sg * 13 * sk, fu - 75 * sk], [cx + sg * 10 * sk, fu - 4 * sk]], 1);
+        s.appendChild(el("path", { d: "M" + (cx + sg * 10 * sk) + " " + (fu - 4 * sk) + "l" + (sg * 16 * sk) + " 0", stroke: linie, "stroke-width": 4 * sk, "stroke-linecap": "round" }));
+      });
+    }
+    // Rumpf, Hals, Kopf
+    s.appendChild(el("path", { d: "M" + (cx - 30 * sk) + " " + (schY - 4 * sk) + "Q" + cx + " " + (schY - 12 * sk) + " " + (cx + 30 * sk) + " " + (schY - 4 * sk) + "L" + (cx + 22 * sk) + " " + (huefY - 20 * sk) + "Q" + (cx + 26 * sk) + " " + (huefY + 8 * sk) + " " + cx + " " + (huefY + 6 * sk) + "Q" + (cx - 26 * sk) + " " + (huefY + 8 * sk) + " " + (cx - 22 * sk) + " " + (huefY - 20 * sk) + "Z", fill: haut, stroke: linie, "stroke-width": 2.2 * sk, "stroke-linejoin": "round" }));
+    s.appendChild(el("rect", { x: cx - 6 * sk, y: top + 34 * sk, width: 12 * sk, height: 18 * sk, fill: haut, stroke: linie, "stroke-width": 2 * sk }));
+    s.appendChild(el("ellipse", { cx: cx, cy: top + 18.75 * sk, rx: 14 * sk, ry: 18.75 * sk, fill: haut, stroke: linie, "stroke-width": 2.4 * sk }));
+    s.appendChild(el("path", { d: "M" + (cx - 14 * sk) + " " + (top + 14 * sk) + "Q" + cx + " " + (top - 6 * sk) + " " + (cx + 14 * sk) + " " + (top + 14 * sk), fill: "none", stroke: "#8a6d3b", "stroke-width": 4 * sk, "stroke-linecap": "round" }));
+    s.appendChild(el("circle", { cx: cx, cy: nY, r: 3.2 * sk, fill: linie }));
+    return { nY: nY, R: R, top: top };
+  }
+  PROBE.davinci = function(){
+    var b = $("probe"), F = [["g", "v_groesse"], ["sp", "v_spanne"], ["k", "v_kopf"], ["f", "v_fuss"]];
+    b.innerHTML = '<div class="chips" id="vPose"><b>' + esc(t("v_pose")) + "</b> " + tA("v_posen").map(function(x, i){ return '<button type="button" class="chip" data-p="' + i + '">' + esc(x) + "</button>"; }).join("") +
+      ' <label class="chk"><input type="checkbox" id="vRaster"> ' + esc(t("v_raster")) + '</label></div><div class="zwei"><div id="vSvg"></div><div><p class="zeile muted">' + esc(t("v_tipp")) + "</p>" +
+      F.map(function(f){ return '<label class="vfeld"><span>' + esc(t(f[1])) + '</span><span><input class="zahl" inputmode="decimal" data-v="' + f[0] + '" value="' + esc(vMass[f[0]] || "") + '"> cm</span></label>'; }).join("") +
+      '<div id="vErg"></div></div></div><p class="zeile muted">' + esc(t("v_erkl")) + "</p>" +
+      karteH("v_zwei_h") + absatz("v_zwei") + karteH("v_wer_h") + absatz("v_wer") + merkeP("v_gold");
+    b.querySelectorAll("[data-v]").forEach(function(i){ i.addEventListener("input", function(){ vMass[i.dataset.v] = i.value; vRechnen(); }); });
+    b.querySelectorAll("#vPose [data-p]").forEach(function(c){ c.addEventListener("click", function(){ vPose = +c.dataset.p; vFigur(); }); });
+    $("vRaster").checked = vRaster; $("vRaster").addEventListener("change", function(){ vRaster = this.checked; vFigur(); });
+    vFigur(); vRechnen();
+  };
+  vFigur = function(){
+    document.querySelectorAll("#vPose [data-p]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.p === vPose ? "true" : "false"); });
+    var W = 420, Hh = 470, cx = 214, fu = 400, H = 300, s = svgNeu(W, Hh, "bsvg vSvg"), x0 = cx - H / 2, y0 = fu - H, nY = fu - 0.61 * H, R = 0.61 * H;
+    s.appendChild(el("rect", { x: 0, y: 0, width: W, height: Hh, rx: 12, fill: "#fbf6ea" }));
+    if(vRaster) for(var i = 0; i <= 8; i++){
+      var y = fu - i * H / 8;
+      s.appendChild(el("line", { x1: x0, y1: y, x2: x0 + H, y2: y, stroke: "#c9b98f", "stroke-width": 1, "stroke-dasharray": "3 4" }));
+      if(i < 8) schrift(s, x0 - 14, y - H / 16 + 4, String(8 - i), "middle", "bk-klein", { fill: i === 7 ? "#7c3aed" : "#8a6d3b" });
+    }
+    if(vRaster) s.appendChild(el("rect", { x: x0 - 22, y: y0, width: 16, height: H / 8, fill: "rgba(124,58,237,0.18)", stroke: "#7c3aed" }));
+    s.appendChild(el("rect", { x: x0, y: y0, width: H, height: H, fill: "none", stroke: "#0e7490", "stroke-width": 2.6 }));
+    if(vPose !== 0) s.appendChild(el("circle", { cx: cx, cy: nY, r: R, fill: "none", stroke: "#b8860b", "stroke-width": 2.6 }));
+    vMensch(s, { cx: cx, fu: fu, H: H, pose: vPose, p: 0.61 });
+    // Mittelpunkte
+    s.appendChild(el("circle", { cx: cx, cy: fu - H / 2, r: 4.5, fill: "#0e7490" }));
+    schrift(s, cx + 38, fu - H / 2 + 4, t("v_qmitte"), "start", "bk-klein", { fill: "#0e7490" });
+    if(vPose !== 0){ s.appendChild(el("circle", { cx: cx, cy: nY, r: 4.5, fill: "#b8860b" })); schrift(s, cx + 38, nY + 4, t("v_nabel"), "start", "bk-klein", { fill: "#8a5a00" }); }
+    // Maße
+    pfeil(s, x0, fu + 38, x0 + H, fu + 38, "#0e7490", true);
+    schrift(s, cx, fu + 56, t("v_spanne").split(" (")[0] + " = " + t("v_groesse"), "middle", "bk-klein", { fill: "#0e7490" });
+    pfeil(s, x0 + H + 22, y0, x0 + H + 22, fu, "#0e7490", true);
+    var tg = schrift(s, x0 + H + 36, (y0 + fu) / 2, t("v_groesse"), "middle", "bk-klein", { fill: "#0e7490" }); tg.setAttribute("transform", "rotate(90 " + (x0 + H + 36) + " " + ((y0 + fu) / 2) + ")");
+    if(vRaster){ schrift(s, x0 - 14, y0 - 8, t("v_kopflbl"), "middle", "bk-klein", { fill: "#7c3aed" }); pfeil(s, cx + 4, fu + 12, cx + 4 + H / 6, fu + 12, "#b45309", true); schrift(s, cx + 4 + H / 6 + 6, fu + 16, t("v_fusslbl"), "start", "bk-klein", { fill: "#b45309" }); }
+    $("vSvg").innerHTML = ""; $("vSvg").appendChild(s);
+  };
+
+  // ===== Quadratur des Kreises =====
+  P.splice(P.indexOf(finde("davinci")) + 1, 0, { k: "quadratur", p: "q", sym: "○=□", col: "#7e22ce", leg: "r qa Afl pi wurzel approx", link: [["beruehmt/#davinci", "q_lDav"], ["beruehmt/#archimedes", "q_lArchi"], ["flaechen", "link_flaechen"]] });
+  finde("davinci").link = [["beruehmt/#quadratur", "q_name"], ["dreisatz", "link_dreisatz"]];
+  var qm = { mod: 0, d: 18, a: 4, p: 0.61 };
+  PROBE.quadratur = function(){
+    var b = $("probe");
+    b.innerHTML = '<div class="chips" id="qMod">' + tA("q_modi").map(function(x, i){ return '<button type="button" class="chip" data-m="' + i + '">' + esc(x) + "</button>"; }).join("") + '</div><div id="qBox"></div>' +
+      merkeP("q_rech") + karteH("q_warum_h") + absatz("q_warum");
+    b.querySelectorAll("#qMod [data-m]").forEach(function(c){ c.addEventListener("click", function(){ qm.mod = +c.dataset.m; qAufbau(); }); });
+    qAufbau();
+  };
+  function qAufbau(){
+    document.querySelectorAll("#qMod [data-m]").forEach(function(c){ c.setAttribute("aria-pressed", +c.dataset.m === qm.mod ? "true" : "false"); });
+    var B = $("qBox");
+    if(qm.mod === 0){
+      B.innerHTML = absatz("q_aeg_erkl") + '<label class="reglerZ"><span>' + esc(t("q_d")) + ' <b id="qDz"></b></span><input type="range" id="qD" min="9" max="36" step="1"></label><div class="zwei"><div id="qSvg"></div><div><ol class="weg" id="qWeg"></ol><p class="zeile" id="qErg"></p></div></div>';
+      $("qD").value = qm.d; $("qD").addEventListener("input", function(){ qm.d = +this.value; qAeg(); }); qAeg();
+    } else if(qm.mod === 1){
+      B.innerHTML = absatz("q_mond_erkl") + '<label class="reglerZ"><span>' + esc(t("q_a")) + ' <b id="qAz"></b></span><input type="range" id="qA" min="2" max="10" step="1"></label><div class="zwei"><div id="qSvg"></div><div><ol class="weg" id="qWeg"></ol></div></div>' + merkeP("q_mond_fazit");
+      $("qA").value = qm.a; $("qA").addEventListener("input", function(){ qm.a = +this.value; qMond(); }); qMond();
+    } else {
+      B.innerHTML = absatz("q_vit_erkl") + '<label class="reglerZ"><span>' + esc(t("q_nabel")) + ' <b id="qPz"></b></span><input type="range" id="qP" min="50" max="70" step="0.1"></label><div class="chips" id="qPc">' +
+        [[56.4, 0], [60, 1], [61.8, 2]].map(function(x){ return '<button type="button" class="chip" data-v="' + x[0] + '">' + esc(tA("q_vit_b")[x[1]]) + "</button>"; }).join("") + '</div><div class="zwei"><div id="qSvg"></div><div><ol class="weg" id="qWeg"></ol><p class="zeile" id="qErg"></p></div></div>';
+      $("qP").value = qm.p * 100; $("qP").addEventListener("input", function(){ qm.p = this.value / 100; qVit(); });
+      B.querySelectorAll("#qPc [data-v]").forEach(function(c){ c.addEventListener("click", function(){ qm.p = c.dataset.v / 100; $("qP").value = c.dataset.v; qVit(); }); });
+      qVit();
+    }
+  }
+  function qLeg(){ return '<p class="leg"><span style="color:#7c3aed">■ ' + esc(t("q_kreis")) + '</span> · <span style="color:#b8860b">■ ' + esc(t("q_quadrat")) + "</span></p>"; }
+  function qAeg(){
+    var d = qm.d, r = d / 2, sq = 8 / 9 * d, AK = Math.PI * r * r, AQ = sq * sq, sk = 250 / d, s = svgNeu(300, 300), C = 150;
+    $("qDz").textContent = z(d, 0) + " m";
+    s.appendChild(el("circle", { cx: C, cy: C, r: r * sk, fill: "rgba(124,58,237,0.16)", stroke: "#7c3aed", "stroke-width": 2.6 }));
+    s.appendChild(el("rect", { x: C - sq * sk / 2, y: C - sq * sk / 2, width: sq * sk, height: sq * sk, fill: "rgba(184,134,11,0.16)", stroke: "#b8860b", "stroke-width": 2.6 }));
+    pfeil(s, C - r * sk, C, C + r * sk, C, "#7c3aed", true); schrift(s, C, C - 6, "d = " + z(d, 0), "middle", "bt", { fill: "#5b21b6" });
+    pfeil(s, C - sq * sk / 2, C + sq * sk / 2 + 14, C + sq * sk / 2, C + sq * sk / 2 + 14, "#b8860b", true); schrift(s, C, C + sq * sk / 2 + 30, "8/9 · d = " + z(sq, 2), "middle", "bk-klein", { fill: "#8a5a00" });
+    $("qSvg").innerHTML = ""; $("qSvg").appendChild(s); $("qSvg").insertAdjacentHTML("beforeend", qLeg());
+    $("qWeg").innerHTML = weg([{ lbl: t("q_kreis") }, "r = " + z(d, 0) + " : 2 = " + z(r, 1), "A = π · r² = π · " + z(r, 1) + "² ≈ " + z(AK, 2) + " m²", { lbl: t("q_quadrat") }, "a = 8/9 · " + z(d, 0) + (sq % 1 ? " ≈ " : " = ") + z(sq, 2), "A = a² " + (sq % 1 ? "≈ " : "= ") + z(AQ, 2) + " m²"]);
+    $("qErg").innerHTML = "<b>" + esc(t("q_abw", { p: z(Math.abs(AQ - AK) / AK * 100, 2) })) + "</b><br>" + esc(t("q_piAeg"));
+  }
+  function qMond(){
+    var a = qm.a, c = a * Math.SQRT2, D = a * a / 2, KH = Math.PI * a * a / 4, s = svgNeu(320, 260), O = [160, 230], R = 130, rs = R / Math.SQRT2;
+    $("qAz").textContent = a + " cm";
+    var A = [O[0] - R, O[1]], B = [O[0] + R, O[1]], Cp = [O[0], O[1] - R];
+    function P2(p){ return p[0].toFixed(1) + " " + p[1].toFixed(1); }
+    s.appendChild(el("path", { d: "M" + P2(A) + "A" + R + " " + R + " 0 0 1 " + P2(B), fill: "none", stroke: "#1a2233", "stroke-width": 1.6, "stroke-dasharray": "6 4" }));
+    s.appendChild(el("path", { d: "M" + P2(A) + "A" + rs + " " + rs + " 0 0 1 " + P2(Cp) + "A" + R + " " + R + " 0 0 0 " + P2(A) + "Z", fill: "rgba(184,134,11,0.35)", stroke: "#b8860b", "stroke-width": 2.4 }));
+    s.appendChild(el("path", { d: "M" + P2(B) + "A" + rs + " " + rs + " 0 0 0 " + P2(Cp) + "A" + R + " " + R + " 0 0 1 " + P2(B) + "Z", fill: "rgba(184,134,11,0.35)", stroke: "#b8860b", "stroke-width": 2.4 }));
+    s.appendChild(el("path", { d: "M" + P2(A) + "L" + P2(Cp) + "L" + P2(B) + "Z", fill: "rgba(124,58,237,0.22)", stroke: "#7c3aed", "stroke-width": 2.6, "stroke-linejoin": "round" }));
+    s.appendChild(el("path", { d: "M" + (Cp[0] - 9) + " " + (Cp[1] + 9) + "L" + Cp[0] + " " + (Cp[1] + 18) + "L" + (Cp[0] + 9) + " " + (Cp[1] + 9), fill: "none", stroke: "#7c3aed", "stroke-width": 1.6 }));
+    s.appendChild(el("circle", { cx: Cp[0], cy: Cp[1] + 9, r: 1.8, fill: "#7c3aed" }));
+    schrift(s, (A[0] + Cp[0]) / 2 + 12, (A[1] + Cp[1]) / 2 + 16, "a", "middle", "bt", { fill: "#5b21b6" });
+    schrift(s, (B[0] + Cp[0]) / 2 - 12, (B[1] + Cp[1]) / 2 + 16, "a", "middle", "bt", { fill: "#5b21b6" });
+    schrift(s, O[0], O[1] + 20, "c", "middle", "bt");
+    $("qSvg").innerHTML = ""; $("qSvg").appendChild(s);
+    $("qSvg").insertAdjacentHTML("beforeend", '<p class="leg"><span style="color:#7c3aed">■ ' + esc(t("q_dreieck")) + '</span> · <span style="color:#b8860b">■ ' + esc(t("q_moend")) + "</span></p>");
+    $("qWeg").innerHTML = weg([{ lbl: t("q_w_dr") }, "A = a · a : 2 = " + a + " · " + a + " : 2 = " + z(D, 2) + " cm²", { lbl: t("q_w_klein") }, "2 · ½ · π · (a : 2)² = π · a² : 4 ≈ " + z(KH, 2) + " cm²", { lbl: t("q_w_gross") }, "½ · π · (c : 2)² = π · 2a² : 8 = π · a² : 4 ≈ " + z(KH, 2) + " cm²", { lbl: t("q_w_m") }, z(KH, 2) + " − (" + z(KH, 2) + " − " + z(D, 2) + ") = " + z(D, 2) + " cm²"]);
+  }
+  function qVit(){
+    var p = qm.p, H = 260, s = svgNeu(400, 400, "bsvg vSvg"), cx = 200, fu = 382, R = p * H, AQ = 1, AK = Math.PI * p * p;
+    $("qPz").textContent = z(p * 100, 1) + " %";
+    document.querySelectorAll("#qPc [data-v]").forEach(function(c){ c.setAttribute("aria-pressed", Math.abs(c.dataset.v / 100 - p) < 0.0006 ? "true" : "false"); });
+    s.appendChild(el("rect", { x: cx - H / 2, y: fu - H, width: H, height: H, fill: "rgba(184,134,11,0.14)", stroke: "#b8860b", "stroke-width": 2.6 }));
+    s.appendChild(el("circle", { cx: cx, cy: fu - R, r: R, fill: "rgba(124,58,237,0.14)", stroke: "#7c3aed", "stroke-width": 2.6 }));
+    vMensch(s, { cx: cx, fu: fu, H: H, pose: 2, p: p });
+    pfeil(s, cx, fu - R, cx, fu, "#7c3aed", false); schrift(s, cx - 30, fu - R / 2, "r", "end", "bt", { fill: "#5b21b6" });
+    $("qSvg").innerHTML = ""; $("qSvg").appendChild(s); $("qSvg").insertAdjacentHTML("beforeend", qLeg());
+    $("qWeg").innerHTML = weg([{ lbl: t("q_quadrat") + " (" + t("v_groesse") + " = 1)" }, "A = 1 · 1 = 1", { lbl: t("q_kreis") }, "r = " + z(p, 3), "A = π · r² = π · " + z(p, 3) + "² ≈ " + z(AK, 3)]);
+    var gleich = Math.abs(AK - AQ) < 0.004;
+    $("qErg").className = "zeile" + (gleich ? " gut" : "");
+    $("qErg").textContent = t("q_vit_anteil", { p: z(AK * 100, 1) }) + " " + t("q_vit_gleich");
+  }
+  GEN.quadratur = function(){
+    var art = wahl(["A", "E", "M"]);
+    if(art === "A"){ var r = zuf(2, 20), A = Math.PI * r * r, a = r * Math.sqrt(Math.PI), aw = Math.round(a * 10) / 10;
+      return { q: t("q_qA", { r: r }), w: aw, tol: 0.051, l: z(aw, 1) + " cm", weg: ["A = π · r² = π · " + r + "² ≈ " + z(A, 2) + " cm²", "a = √A ≈ √" + z(A, 2) + " ≈ " + z(a, 2) + " cm", { lbl: t("q_kurz2") }, "a = r · √π ≈ " + r + " · 1,7725 ≈ " + z(aw, 1) + " cm"] }; }
+    if(art === "E"){ var k = zuf(1, 8), d = 9 * k, sq = 8 * k;
+      return { q: t("q_qE", { d: d }), w: sq * sq, tol: 0, l: gz(sq * sq) + " m²", weg: ["a = 8/9 · d = 8 · " + d + " : 9 = " + sq + " m", "A = a² = " + sq + " · " + sq + " = " + gz(sq * sq) + " m²"] }; }
+    var m = zuf(2, 12);
+    return { q: t("q_qM", { a: m }), w: m * m / 2, tol: 0.01, l: z(m * m / 2, 1) + " cm²", weg: [{ lbl: t("q_wM") }, "A = a · a : 2 = " + m + " · " + m + " : 2 = " + z(m * m / 2, 1) + " cm²"] };
+  };
+
+  // ===== Fibonacci: goldener Schnitt =====
+  var fiG = 0.7, PHI = (1 + Math.sqrt(5)) / 2, _fiAlt = PROBE.fibonacci;
+  PROBE.fibonacci = function(){
+    _fiAlt();
+    $("probe").insertAdjacentHTML("beforeend", karteH("fi_g_h") + absatz("fi_g_erkl") + '<label class="reglerZ"><span>' + esc(t("fi_g_pos")) + ' <b id="fgPz"></b></span><input type="range" id="fgP" min="50" max="90" step="0.1"></label><p><button type="button" class="knopf hell" id="fgB">' + esc(t("fi_g_btn")) + '</button></p><div id="fgSvg"></div><ol class="weg" id="fgWeg"></ol><p class="zeile" id="fgErg"></p>' +
+      merkeP("fi_g_formel") + '<div class="zwei"><div id="fgPent"></div><div>' + karteH("fi_g_wo_h") + liste("fi_g_wo") + "</div></div>");
+    $("fgP").value = fiG * 100; $("fgP").addEventListener("input", function(){ fiG = this.value / 100; fgZeichnen(); });
+    $("fgB").addEventListener("click", function(){ fiG = 1 / PHI; $("fgP").value = (100 / PHI).toFixed(1); fgZeichnen(); });
+    fgZeichnen(); fgPent();
+  };
+  function fgZeichnen(){
+    var L = 10, a = fiG * L, b = L - a, s = svgNeu(620, 250), x0 = 30, W = 560, xa = x0 + W * fiG;
+    $("fgPz").textContent = z(fiG * 100, 1) + " %";
+    s.appendChild(el("line", { x1: x0, y1: 40, x2: xa, y2: 40, stroke: "#7c3aed", "stroke-width": 8, "stroke-linecap": "round" }));
+    s.appendChild(el("line", { x1: xa, y1: 40, x2: x0 + W, y2: 40, stroke: "#b8860b", "stroke-width": 8, "stroke-linecap": "round" }));
+    s.appendChild(el("circle", { cx: xa, cy: 40, r: 7, fill: "#ffffff", stroke: "#1a2233", "stroke-width": 2.5 }));
+    schrift(s, (x0 + xa) / 2, 26, "a = " + z(a, 2), "middle", "bt", { fill: "#5b21b6" });
+    schrift(s, (xa + x0 + W) / 2, 26, "b = " + z(b, 2), "middle", "bt", { fill: "#8a5a00" });
+    pfeil(s, x0, 64, x0 + W, 64, "#1a2233", true); schrift(s, x0 + W / 2, 80, "a + b = " + L, "middle", "bk-klein");
+    // goldenes Rechteck a × (a+b) bzw. Rechteck mit Seiten (a+b) und a: Quadrat a·a + Rest
+    var h = 140, sk = h / a, wR = L * sk, rx = (620 - wR) / 2, ry = 100;
+    s.appendChild(el("rect", { x: rx, y: ry, width: a * sk, height: h, fill: "rgba(124,58,237,0.16)", stroke: "#7c3aed", "stroke-width": 2 }));
+    s.appendChild(el("rect", { x: rx + a * sk, y: ry, width: b * sk, height: h, fill: "rgba(184,134,11,0.18)", stroke: "#b8860b", "stroke-width": 2 }));
+    schrift(s, rx + a * sk / 2, ry + h / 2 + 5, "a × a", "middle", "bt", { fill: "#5b21b6" });
+    $("fgSvg").innerHTML = ""; $("fgSvg").appendChild(s);
+    var q1 = L / a, q2 = a / b, ok = Math.abs(q1 - q2) < 0.01;
+    $("fgWeg").innerHTML = weg(["(a + b) : a = " + L + " : " + z(a, 2) + " ≈ " + z(q1, 3), "a : b = " + z(a, 2) + " : " + z(b, 2) + " ≈ " + z(q2, 3)]);
+    $("fgErg").className = "zeile" + (ok ? " gut" : ""); $("fgErg").textContent = ok ? t("fi_g_treffer") : t("fi_g_nicht");
+  }
+  function fgPent(){
+    var s = svgNeu(260, 250), C = [130, 132], R = 110, P5 = [];
+    for(var i = 0; i < 5; i++){ var w = -Math.PI / 2 + i * 2 * Math.PI / 5; P5.push([C[0] + R * Math.cos(w), C[1] + R * Math.sin(w)]); }
+    function pp(p){ return p[0].toFixed(1) + " " + p[1].toFixed(1); }
+    s.appendChild(el("path", { d: "M" + P5.map(pp).join("L") + "Z", fill: "rgba(184,134,11,0.12)", stroke: "#b8860b", "stroke-width": 2.6 }));
+    s.appendChild(el("path", { d: "M" + [0, 2, 4, 1, 3].map(function(i){ return pp(P5[i]); }).join("L") + "Z", fill: "none", stroke: "#7c3aed", "stroke-width": 2.2 }));
+    s.appendChild(el("line", { x1: P5[0][0], y1: P5[0][1], x2: P5[2][0], y2: P5[2][1], stroke: "#7c3aed", "stroke-width": 5, "stroke-linecap": "round" }));
+    s.appendChild(el("line", { x1: P5[2][0], y1: P5[2][1], x2: P5[3][0], y2: P5[3][1], stroke: "#b8860b", "stroke-width": 5, "stroke-linecap": "round" }));
+    $("fgPent").innerHTML = ""; $("fgPent").appendChild(s);
+    $("fgPent").insertAdjacentHTML("beforeend", '<p class="leg"><span style="color:#7c3aed">▬ ' + esc(t("fi_g_diag")) + '</span> : <span style="color:#b8860b">▬ ' + esc(t("fi_g_seite")) + "</span> = φ ≈ 1,618</p>");
+  }
+
+  // ===== Euler: Karte wird zum Netz =====
+  var _euAlt = PROBE.euler, _euZ = euZeichnen;
+  PROBE.euler = function(){
+    _euAlt();
+    $("probe").insertAdjacentHTML("beforeend", karteH("eu_netz_h") + absatz("eu_netz_erkl") + '<div class="zwei"><div id="euNetz"></div><div><p class="zeile" id="euUng"></p>' + merkeP("eu_warum") + "</div></div>" + absatz("eu_nikolaus"));
+    euNetz();
+  };
+  euZeichnen = function(){ _euZ(); if($("euNetz")) euNetz(); };
+  function euNetz(){
+    var BR = euBruecken(), L = tA("eu_L"), POS = [[90, 135], [190, 32], [190, 238], [300, 135]], s = svgNeu(380, 270), zaehl = {};
+    BR.forEach(function(bb, j){
+      var key = Math.min(bb[0], bb[1]) + "-" + Math.max(bb[0], bb[1]), n = BR.filter(function(c){ return Math.min(c[0], c[1]) + "-" + Math.max(c[0], c[1]) === key; }).length, k = zaehl[key] = (zaehl[key] || 0) + 1;
+      var p = POS[bb[0]], q = POS[bb[1]], mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2, dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy), off = n > 1 ? (k - (n + 1) / 2) * 50 : 0;
+      var cxq = mx - dy / len * off, cyq = my + dx / len * off, used = eu.used.indexOf(j) >= 0;
+      s.appendChild(el("path", { d: "M" + p[0] + " " + p[1] + "Q" + cxq + " " + cyq + " " + q[0] + " " + q[1], fill: "none", stroke: used ? "#7c3aed" : "#8b5e3c", "stroke-width": used ? 5 : 3.5, "stroke-linecap": "round" }));
+      if(used){ var tx = 0.25 * p[0] + 0.5 * cxq + 0.25 * q[0], ty = 0.25 * p[1] + 0.5 * cyq + 0.25 * q[1]; s.appendChild(el("circle", { cx: tx, cy: ty, r: 10, fill: "#7c3aed" })); schrift(s, tx, ty + 4.5, String(eu.used.indexOf(j) + 1), "middle", "bk-klein", { fill: "#ffffff" }); }
+    });
+    var ung = 0;
+    POS.forEach(function(p, i){
+      var g = BR.filter(function(bb){ return bb[0] === i || bb[1] === i; }).length; if(g % 2) ung++;
+      s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 19, fill: g % 2 ? "#fde68a" : "#ede9fe", stroke: g % 2 ? "#b8860b" : "#7c3aed", "stroke-width": i === eu.cur ? 5 : 2.6 }));
+      schrift(s, p[0], p[1] + 6, String(g), "middle", "bt");
+      var lx = i === 0 ? p[0] - 24 : i === 3 ? p[0] + 24 : p[0] + 26, ly = i === 1 ? p[1] + 5 : i === 2 ? p[1] + 5 : p[1] - 26;
+      schrift(s, i === 0 || i === 3 ? p[0] : lx, ly, L[i], i === 0 || i === 3 ? "middle" : "start", "bk-klein");
+    });
+    $("euNetz").innerHTML = ""; $("euNetz").appendChild(s);
+    $("euNetz").insertAdjacentHTML("beforeend", '<p class="leg"><span style="color:#b8860b">● ' + esc(t("eu_ungerade")) + '</span> · <span style="color:#7c3aed">● ' + esc(t("eu_gerade")) + "</span></p>");
+    $("euUng").innerHTML = "<b>" + esc(t("eu_ung", { n: ung })) + "</b> " + esc(t(ung === 0 ? "eu_n0" : ung === 2 ? "eu_n2" : "eu_n4"));
+  }
+
+  // ===== Buffon: warum π? =====
+  var _buAlt = PROBE.buffon, _buZ = buZeichnen;
+  PROBE.buffon = function(){
+    _buAlt();
+    $("probe").insertAdjacentHTML("beforeend", karteH("bu_th_h") + '<div class="zwei"><div><div id="buEins"></div>' + absatz("bu_th1") + '</div><div><div id="buFl"></div>' + absatz("bu_th2") + "</div></div>" + '<ol class="weg" id="buTh"></ol>' + merkeP("bu_lazz"));
+    buEins(); buFlaeche();
+    $("buTh").innerHTML = weg([{ lbl: t("bu_w1") }, "A₁ = l : 2 · 2 = l", { lbl: t("bu_w2") }, "A₂ = π · d : 2", { lbl: t("bu_w3") }, "P = A₁ : A₂ = 2 · l : (π · d)", { lbl: t("bu_w4") }, "P = 2 : π  ⇒  π = 2 : P ≈ 2 · n : k"]);
+  };
+  buZeichnen = function(){ _buZ(); if($("buFl")) buFlaeche(); };
+  function buEins(){
+    var s = svgNeu(320, 220), d = 140, x1 = 40, x2 = x1 + d, M = [112, 110], th = 55 * Math.PI / 180, l = d;
+    s.appendChild(el("rect", { x: 0, y: 0, width: 320, height: 220, fill: "#fbf6ea" }));
+    [x1, x2, x2 + d].forEach(function(x){ s.appendChild(el("line", { x1: x, y1: 0, x2: x, y2: 220, stroke: "#8a6d3b", "stroke-width": 2 })); });
+    var dx = Math.cos(th) * l / 2, dy = Math.sin(th) * l / 2;
+    s.appendChild(el("line", { x1: M[0] - dx, y1: M[1] + dy, x2: M[0] + dx, y2: M[1] - dy, stroke: "#1565c0", "stroke-width": 4, "stroke-linecap": "round" }));
+    s.appendChild(el("circle", { cx: M[0], cy: M[1], r: 4.5, fill: "#1a2233" }));
+    pfeil(s, x1, 196, x2, 196, "#1a2233", true); schrift(s, (x1 + x2) / 2, 212, "d", "middle", "bt");
+    pfeil(s, x1, M[1], M[0], M[1], "#7c3aed", true); schrift(s, (x1 + M[0]) / 2, M[1] + 16, "x", "middle", "bt", { fill: "#5b21b6" });
+    s.appendChild(el("line", { x1: M[0], y1: M[1], x2: M[0] + 60, y2: M[1], stroke: "#1a2233", "stroke-width": 1, "stroke-dasharray": "4 3" }));
+    s.appendChild(el("path", { d: "M" + (M[0] + 30) + " " + M[1] + "A30 30 0 0 0 " + (M[0] + 30 * Math.cos(th)) + " " + (M[1] - 30 * Math.sin(th)), fill: "none", stroke: "#b8860b", "stroke-width": 2.4 }));
+    schrift(s, M[0] + 40, M[1] - 12, "θ", "start", "bt", { fill: "#8a5a00" });
+    schrift(s, M[0] + dx + 8, M[1] - dy + 4, "l", "start", "bt", { fill: "#1565c0" });
+    s.appendChild(el("line", { x1: M[0] - dx, y1: M[1] + dy, x2: M[0] - dx, y2: M[1], stroke: "#b8860b", "stroke-width": 2, "stroke-dasharray": "4 3" }));
+    $("buEins").innerHTML = ""; $("buEins").appendChild(s);
+  }
+  function buFlaeche(){
+    var W = 320, H = 210, L = 40, Bm = 175, sx = (W - L - 20) / Math.PI, sy = (Bm - 20) / 25, s = svgNeu(W, H);
+    s.appendChild(el("rect", { x: L, y: Bm - 25 * sy, width: Math.PI * sx, height: 25 * sy, fill: "#f8fafc", stroke: "#1a2233", "stroke-width": 1.6 }));
+    var d = "M" + L + " " + Bm; for(var i = 0; i <= 60; i++){ var th = Math.PI * i / 60; d += "L" + (L + th * sx).toFixed(1) + " " + (Bm - 25 * Math.sin(th) * sy).toFixed(1); }
+    s.appendChild(el("path", { d: d + "Z", fill: "rgba(184,134,11,0.25)", stroke: "#b8860b", "stroke-width": 2.4 }));
+    bu.N.forEach(function(nd){
+      var cx = (nd[0] + nd[2]) / 2, th = Math.atan2(nd[3] - nd[1], nd[2] - nd[0]), r = ((cx % BU_D) + BU_D) % BU_D, x = Math.min(r, BU_D - r);
+      s.appendChild(el("circle", { cx: L + th * sx, cy: Bm - x * sy, r: 2.6, fill: nd[4] ? "#dc2626" : "#1565c0" }));
+    });
+    schrift(s, L - 6, Bm + 4, "0", "end"); schrift(s, L - 6, Bm - 25 * sy + 4, "d/2", "end"); schrift(s, L + Math.PI * sx, Bm + 16, "π", "middle", "bt"); schrift(s, L + Math.PI / 2 * sx, Bm + 16, "θ", "middle", "bt", { fill: "#8a5a00" });
+    schrift(s, L - 22, Bm - 12.5 * sy, "x", "middle", "bt", { fill: "#5b21b6" });
+    schrift(s, L + Math.PI / 2 * sx, Bm - 6 * sy, "x ≤ l/2 · sin θ", "middle", "bk-klein", { fill: "#8a5a00" });
+    $("buFl").innerHTML = ""; $("buFl").appendChild(s);
+    $("buFl").insertAdjacentHTML("beforeend", '<p class="leg"><span style="color:#dc2626">● ' + esc(t("bu_treff")) + '</span> · <span style="color:#1565c0">● ' + esc(t("bu_daneben")) + "</span></p>");
+  }
+
+  // ===== Eratosthenes: Erdumfang mit Schatten =====
+  var er = { a: 7.2, s: 800 };
+  finde("eratosthenes").nurText = false; finde("eratosthenes").leg = "alpha sKm eU";
+  PROBE.eratosthenes = function(){
+    var b = $("probe");
+    b.innerHTML = absatz("e_anl") + '<label class="reglerZ"><span>' + esc(t("e_alpha")) + ' <b id="erAz"></b></span><input type="range" id="erA" min="3" max="15" step="0.1"></label><label class="reglerZ"><span>' + esc(t("e_s")) + ' <b id="erSz"></b></span><input type="range" id="erS" min="400" max="1200" step="10"></label>' +
+      '<div class="zwei"><div id="erSvg"></div><div><ol class="weg" id="erWeg"></ol><p class="zeile" id="erErg"></p></div></div>' + merkeP("e_wechsel") + absatz("e_stadion");
+    $("erA").value = er.a; $("erS").value = er.s;
+    $("erA").addEventListener("input", function(){ er.a = +this.value; erZeichnen(); });
+    $("erS").addEventListener("input", function(){ er.s = +this.value; erZeichnen(); });
+    erZeichnen();
+  };
+  function erZeichnen(){
+    var a = er.a, U = 360 / a * er.s, s = svgNeu(400, 420), C = [200, 350], R = 175, vis = a * 4 * Math.PI / 180;
+    $("erAz").textContent = z(a, 1) + "°"; $("erSz").textContent = gz(er.s) + " km";
+    s.appendChild(el("rect", { x: 0, y: 0, width: 400, height: 420, rx: 12, fill: "#eef5ff" }));
+    s.appendChild(el("circle", { cx: C[0], cy: C[1], r: R, fill: "#bfe3c0", stroke: "#1a2233", "stroke-width": 2.4 }));
+    var Sy = [C[0], C[1] - R], Al = [C[0] - R * Math.sin(vis), C[1] - R * Math.cos(vis)], st = 64, Top = [C[0] - (R + st) * Math.sin(vis), C[1] - (R + st) * Math.cos(vis)];
+    // parallele Sonnenstrahlen bis zum Boden
+    for(var x = 22; x <= 390; x += 34){ var dx = x - C[0], yb = Math.abs(dx) < R ? C[1] - Math.sqrt(R * R - dx * dx) : 420; s.appendChild(el("line", { x1: x, y1: 8, x2: x, y2: yb, stroke: "#f59e0b", "stroke-width": 1.4, "stroke-dasharray": "5 6", opacity: 0.8 })); }
+    s.appendChild(el("rect", { x: 236, y: 10, width: 156, height: 22, rx: 6, fill: "#ffffff", stroke: "#f59e0b" }));
+    schrift(s, 314, 26, t("e_sonne"), "middle", "bk-klein", { fill: "#b45309" });
+    // Strahl durch den Brunnen bis zur Erdmitte, Strahl an der Stabspitze
+    s.appendChild(el("line", { x1: Sy[0], y1: 40, x2: C[0], y2: C[1], stroke: "#f59e0b", "stroke-width": 2.6 }));
+    s.appendChild(el("line", { x1: Top[0], y1: 40, x2: Top[0], y2: C[1] - Math.sqrt(R * R - (Top[0] - C[0]) * (Top[0] - C[0])), stroke: "#f59e0b", "stroke-width": 2.6 }));
+    s.appendChild(el("line", { x1: C[0], y1: C[1], x2: Al[0], y2: Al[1], stroke: "#1a2233", "stroke-width": 1.6, "stroke-dasharray": "5 4" }));
+    // Schatten (vom Fuß des Stabs weg von Syene) und Stab
+    var sch = st * Math.tan(vis);
+    s.appendChild(el("line", { x1: Al[0], y1: Al[1], x2: Al[0] - Math.cos(vis) * sch, y2: Al[1] + Math.sin(vis) * sch, stroke: "#334155", "stroke-width": 6, "stroke-linecap": "round", opacity: 0.55 }));
+    s.appendChild(el("line", { x1: Al[0], y1: Al[1], x2: Top[0], y2: Top[1], stroke: "#5b3a1e", "stroke-width": 4.5, "stroke-linecap": "round" }));
+    s.appendChild(el("rect", { x: Sy[0] - 8, y: Sy[1] - 1, width: 16, height: 20, fill: "#1e3a8a", stroke: "#1a2233" }));
+    function bogen(m, r, w0, w1, col, sw){ s.appendChild(el("path", { d: "M" + (m[0] + r * Math.cos(w0)) + " " + (m[1] + r * Math.sin(w0)) + "A" + r + " " + r + " 0 0 " + (w1 > w0 ? 1 : 0) + " " + (m[0] + r * Math.cos(w1)) + " " + (m[1] + r * Math.sin(w1)), fill: "none", stroke: col, "stroke-width": sw || 2.6 })); }
+    bogen(Top, 26, Math.PI / 2 - vis, Math.PI / 2, "#7c3aed", 3);
+    var wb = Math.PI / 2 - vis / 2; schrift(s, Top[0] + 42 * Math.cos(wb), Top[1] + 42 * Math.sin(wb) + 5, "α", "middle", "bt", { fill: "#5b21b6" });
+    bogen(C, 46, -Math.PI / 2 - vis, -Math.PI / 2, "#7c3aed", 3);
+    var wc = -Math.PI / 2 - vis / 2; schrift(s, C[0] + 62 * Math.cos(wc), C[1] + 62 * Math.sin(wc) + 5, "α", "middle", "bt", { fill: "#5b21b6" });
+    bogen(C, R + 7, -Math.PI / 2 - vis, -Math.PI / 2, "#0f766e", 4);
+    var ws = -Math.PI / 2 - vis / 2; schrift(s, C[0] + (R + 22) * Math.cos(ws) + 6, C[1] + (R + 22) * Math.sin(ws) + 5, "s", "middle", "bt", { fill: "#0f766e" });
+    var halo = { stroke: "#ffffff", "stroke-width": 4, "paint-order": "stroke" };
+    schrift(s, Sy[0] + 14, Sy[1] + 30, t("e_syene"), "start", "bk-klein", halo); schrift(s, Al[0] + 4, Al[1] + 30, t("e_alex"), "end", "bk-klein", halo);
+    s.appendChild(el("circle", { cx: C[0], cy: C[1], r: 4.5, fill: "#1a2233" })); schrift(s, C[0] + 10, C[1] + 22, t("e_mitte"), "start", "bk-klein");
+    schrift(s, 200, 412, t("e_nicht"), "middle", "bk-klein");
+    $("erSvg").innerHTML = ""; $("erSvg").appendChild(s);
+    var n = 360 / a, gl = Math.abs(n - Math.round(n * 100) / 100) < 1e-9 ? " = " : " ≈ ";
+    $("erWeg").innerHTML = weg([{ lbl: t("e_w1") }, "360° : " + z(a, 1) + "°" + gl + z(n, 2), { lbl: t("e_w2") }, "U = " + z(n, 2) + " · " + gz(er.s) + " km" + gl + gz(U) + " km", { lbl: t("e_w3") }, "r = U : (2 · π) ≈ " + gz(U / 2 / Math.PI) + " km"]);
+    var ab = (U - 40075) / 40075 * 100;
+    $("erErg").innerHTML = esc(t("e_real")) + "<br><b>" + esc(t("e_abw", { p: (ab > 0 ? "+" : "") + z(ab, 1) })) + "</b>";
+  }
+  GEN.eratosthenes = function(){
+    var a = wahl([3.6, 4.5, 5, 6, 7.2, 7.5, 9, 10, 12]), s = zuf(4, 12) * 100, n = 360 / a, U = n * s;
+    return { q: t("e_q", { a: z(a, 1), s: gz(s) }), w: U, tol: 1, l: gz(U) + " km", weg: ["360° : " + z(a, 1) + "° = " + z(n, 2), "U = " + z(n, 2) + " · " + gz(s) + " km = " + gz(U) + " km"] };
+  };
+
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){
     $("frage").textContent = auf.q;

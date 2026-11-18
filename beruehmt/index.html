@@ -75,7 +75,7 @@
   .story { font-size: 16.5px; line-height: 1.55; margin: 0; }
   h3 { color: var(--blue); font-size: 18px; margin: 0 0 8px; }
   .bsvg { width: 100%; height: auto; display: block; max-width: 680px; margin: 6px auto; }
-  #aSvg .bsvg { max-width: 300px; } #vSvg .bsvg { max-width: 240px; }
+  #aSvg .bsvg { max-width: 300px; } #vSvg .bsvg { max-width: 440px; }
   .bt { font: 700 15px system-ui, sans-serif; fill: #1a2233; } .bz { font: 700 15px system-ui, sans-serif; fill: #1a2233; } .bk-klein { font: 600 12px system-ui, sans-serif; fill: #4f5b6e; }
   .reglerZ { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-weight: 700; margin: 6px 0; } .reglerZ input { flex: 1 1 180px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0 8px; }
@@ -117,6 +117,8 @@
   .pfFolgen { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; } .pfF { font: 700 15px ui-monospace, monospace; padding: 3px 7px; border-radius: 7px; border: 1.5px solid #b0b0b8; background: #ffffff; }
   .pfF.an { background: #ede9fe; border-color: #7c3aed; }
   ol.weg { direction: ltr; } [dir="rtl"] ol.weg li.wl { direction: rtl; text-align: right; }
+  [dir="rtl"] .bsvg { direction: ltr; } [dir="rtl"] ol.weg li.wl { margin-inline-start: 0; margin-left: -22px; }
+  ul.bListe { margin: 6px 0; padding-inline-start: 22px; font-size: 16px; line-height: 1.5; } ul.bListe li { margin: 4px 0; } label.chk { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; } .vSvg { max-width: 440px; display: block; margin: 0 auto; }
   .frSvg { max-width: 300px; display: block; margin: 4px auto; user-select: none; -webkit-user-select: none; } .frSvg .fZelle { cursor: pointer; } h3.fH { margin-top: 22px; } ol.fBew { margin: 6px 0; padding-inline-start: 26px; font-size: 16px; line-height: 1.5; } ol.fBew li { margin: 6px 0; } #fBsp { margin-top: 6px; }
   .fEcht { max-width: 900px; touch-action: none; user-select: none; -webkit-user-select: none; } .fZoom { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0; } .fZoom .chip { min-width: 40px; font-size: 18px; } .fEcht .fZelle:hover { filter: brightness(0.93); }
   .gaUhr { font: 800 20px ui-monospace, monospace; } #gaSvg .bsvg { max-width: 200px; }
@@ -151,6 +153,7 @@
 <script src="texte3.js"></script>
 <script src="texte4.js"></script>
 <script src="texte5.js"></script>
+<script src="texte6.js"></script>
 <script src="app.js"></script>
 <script src="/home-button.js"></script>
 </body>
