@@ -102,6 +102,11 @@
   .treffer-info { text-align: center; color: var(--muted); margin: 0 0 10px; font-size: 15px; }
   .tile span.hit { display: block; margin-top: 4px; font-size: 13px; color: #7c2d12; line-height: 1.35; }
   .tile mark { background: #fde68a; color: inherit; border-radius: 3px; padding: 0 1px; }
+  .vb-promo { display: flex; align-items: center; gap: 12px; max-width: 560px; margin: 18px auto 0; padding: 12px 16px; border-radius: 16px; border: 2px solid #3B9CE8; background: #ffffff; color: inherit; text-decoration: none; box-shadow: 0 3px 10px rgba(21,101,192,.12); }
+  .vb-promo:hover { background: #f3f9ff; }
+  .vb-promo-ico { font-size: 30px; }
+  .vb-promo b { display: block; color: #1565c0; font-size: 16px; }
+  .vb-promo small { display: block; color: #444; font-size: 13px; }
   footer { text-align: center; font-size: 13px; color: var(--muted); padding: 22px 0 8px; }
   footer a { color: var(--blue); }
 </style>
@@ -129,6 +134,8 @@
   <nav class="grid" id="treffer" hidden></nav>
   <div id="stufen"></div>
   <div id="konto"></div>
+  <!-- Businessplan: Verknüpfung zu VocabBoss (Sprachen) -->
+  <a id="vbPromo" class="vb-promo" href="https://vocabboss.com/" target="_blank" rel="noopener"><span class="vb-promo-ico" aria-hidden="true">🐘</span><span><b id="vbPromoT">Vokabeln lernen?</b><small id="vbPromoS">VocabBoss: Schulbuch-Vokabeln abfotografieren und gegen die Klasse spielen</small></span></a>
   <footer>
     <a id="privacy" href="/privacy.html">Datenschutz</a> ·
     <a id="imprint" href="https://mistudia.com/impressum" target="_blank" rel="noopener">Impressum</a> ·
@@ -324,6 +331,11 @@ function render(){
   document.getElementById("sub").textContent = u.sub;
   document.getElementById("privacy").textContent = u.privacy;
   document.getElementById("imprint").textContent = u.imprint;
+  var VB = {"de": ["Vokabeln lernen?", "VocabBoss: Schulbuch-Vokabeln abfotografieren und gegen die Klasse spielen"], "en": ["Learning vocabulary?", "VocabBoss: snap your textbook word list and play against your class"], "es": ["¿Aprendes vocabulario?", "VocabBoss: fotografía el vocabulario de tu libro y juega contra tu clase"], "zh": ["要背单词？", "VocabBoss：拍下课本单词表，和全班比赛"], "fr": ["Tu apprends du vocabulaire ?", "VocabBoss : photographie la liste de ton manuel et joue contre ta classe"], "ru": ["Учишь слова?", "VocabBoss: сфотографируй слова из учебника и играй против класса"], "ar": ["تتعلّم المفردات؟", "VocabBoss: صوّر قائمة كلمات كتابك والعب ضد صفّك"], "ja": ["単語をおぼえたい？", "VocabBoss：教科書の単語リストを写真にとって、クラスで対戦しよう"], "pt": ["Aprendendo vocabulário?", "VocabBoss: fotografe a lista do seu livro e jogue contra a turma"]};
+  var vb = VB[lang] || VB.en;
+  document.getElementById("vbPromoT").textContent = vb[0];
+  document.getElementById("vbPromoS").textContent = vb[1];
+  document.getElementById("vbPromo").href = "https://vocabboss.com/?ui=" + lang;
   window.MS_MATH_LANG = lang;
   if(window.MS_KONTO) MS_KONTO.box(document.getElementById("konto"));
   document.querySelectorAll(".langs button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.l === lang ? "true" : "false"); });
