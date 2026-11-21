@@ -105,6 +105,12 @@
   var s = document.createElement("script"); s.src = "/seitenzoom.js"; document.head.appendChild(s);
 })();
 
+// ---------- Direktlinks zu Reitern/Unterseiten + 🔗-Knopf (/bereichslink.js) ----------
+(function(){
+  if(window.MS_EMBED || window.MS_BEREICHSLINK || document.querySelector('script[src="/bereichslink.js"]')) return;
+  var s = document.createElement("script"); s.src = "/bereichslink.js"; document.head.appendChild(s);
+})();
+
 // ---------- Legende der Formelzeichen und Abkürzungen (/zeichen.js) ----------
 (function(){
   if(window.MS_ZEICHEN || document.querySelector('script[src="/zeichen.js"]')) return;
