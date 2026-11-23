@@ -394,6 +394,19 @@ h1{
     text-align:right;
 }
 
+/* 🆕 23.11.: Eingabefelder als solche erkennbar (vorher sah die Gleichung wie fester Text aus) */
+.leftEquationInput, .rightEquationInput{
+    border-bottom:2px dashed #90caf9;
+    border-radius:8px;
+    padding:4px 8px;
+    cursor:text;
+}
+.leftEquationInput:focus, .rightEquationInput:focus{
+    background:#ffffff;
+    border-bottom-color:#1565c0;
+    box-shadow:0 0 0 3px rgba(21,101,192,.18);
+}
+
 .rightEquationInput{
 
     text-align:left;
@@ -767,6 +780,10 @@ h1{
     .equationContainer{ flex: 1 1 auto; width:100%; flex-wrap:wrap; }
     .commandBarWrap{ width:100%; }
     .leftEquationInput, .rightEquationInput{ width:120px; font-size:20px; }
+    /* 🆕 23.11.: beide Seiten bleiben nebeneinander */
+    .equationContainer{ flex-wrap:nowrap; padding:10px 12px; }
+    .equationContainer .leftEquationInput, .equationContainer .rightEquationInput{ width:auto; flex:1 1 0; min-width:0; }
+    .equationContainer .equalsSign{ margin:0 8px; font-size:28px; }
     .bottomArea{ flex-direction:column; }
     .historyPanel{ width:100%; flex-basis:auto; max-height:260px; }
     #probeCard{ padding:18px; }
@@ -834,6 +851,7 @@ h1{
             value="2x-4x+7"
             aria-label="Linke Seite der Gleichung"
             onkeydown="handleEquationEnter(event)"
+            onchange="loadEquationIfValid()"
         >
 
         <div class="equalsSign">
@@ -846,6 +864,7 @@ h1{
             value="x+5"
             aria-label="Rechte Seite der Gleichung"
             onkeydown="handleEquationEnter(event)"
+            onchange="loadEquationIfValid()"
         >
 
     </div>
@@ -1124,7 +1143,32 @@ function parseSide(side){
 // LADEN
 // ===================================
 
+// 🆕 23.11.: auch Zeichen wie − (Minus aus der Anzeige kopiert), ·, ×, : und ÷ erlauben –
+// die App zeigt sie selbst an und nennt ·4 / ÷2 im Tipp, die Eingabe lehnte sie aber ab
+function normEquationInput(id){
+    const el = document.getElementById(id);
+    const v = el.value
+        .replace(/[−–—]/g, "-")
+        .replace(/[·×⋅∙]/g, "*")
+        .replace(/[:÷]/g, "/");
+    if(v !== el.value) el.value = v;
+}
+
+// 🆕 23.11.: Gleichung auch ohne Enter übernehmen (Handy), sobald man das Feld verlässt –
+// aber nur, wenn beide Seiten gültig sind (keine Fehlermeldung mitten im Tippen)
+function loadEquationIfValid(){
+    normEquationInput("leftEquationInput");
+    normEquationInput("rightEquationInput");
+    const a = parseSide(document.getElementById("leftEquationInput").value);
+    const b = parseSide(document.getElementById("rightEquationInput").value);
+    if([a.x, a.c, b.x, b.c].some(v => Number.isNaN(v))) return;
+    loadEquation();
+}
+
 function loadEquation(){
+
+    normEquationInput("leftEquationInput");
+    normEquationInput("rightEquationInput");
 
     let leftSide =
         document.getElementById(

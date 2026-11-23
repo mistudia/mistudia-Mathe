@@ -37,8 +37,10 @@ var MS_ALLTAG = (function(){
       h += '<div class="msa-bsp"><h3>' + esc(e[0]) + "</h3><p>" + text(e[1]) + "</p>";
       var bf = bilder(B); if(bf && bf[i]){ try { h += '<div class="msa-bild">' + bf[i]() + "</div>"; } catch(x){} }
       var lb = ""; if(B.loesBild && B.loesBild[i]){ try { lb = '<div class="msa-lbild" dir="ltr">' + B.loesBild[i]() + "</div>"; } catch(x){} }
-      if(e[2]) h += '<details><summary>' + esc(ui("loesung")) + "</summary><p>" + text(e[2]) + "</p>" + lb + "</details>";
-      if(B.laden && B.werte && B.werte[i] != null) h += '<button type="button" class="msa-los" data-i="' + i + '">' + esc(ui("probieren")) + "</button>";
+      // 🆕 23.11.: „Ausprobieren“ rechnet die Aufgabe sofort aus → erst nach „Lösung zeigen“
+      var los = (B.laden && B.werte && B.werte[i] != null) ? '<button type="button" class="msa-los" data-i="' + i + '">' + esc(ui("probieren")) + "</button>" : "";
+      if(e[2]) h += '<details><summary>' + esc(ui("loesung")) + "</summary><p>" + text(e[2]) + "</p>" + lb + los + "</details>";
+      else h += los;
       h += "</div>";
     });
     ov.innerHTML = h + "</div></div>";

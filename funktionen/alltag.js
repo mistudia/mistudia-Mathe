@@ -10,7 +10,7 @@
 var FA = (function(){
   "use strict";
   var F = {"linear": ["1,15x", "2x + 10", "-2,5x + 20", "2,5x + 4"], "quadratisch": ["-0,05x^2 + x + 1,5", "-0,02x^2 + 8", "-10x^2 + 80x - 70"], "polynom": ["4x^3 - 80x^2 + 400x", "0,01x^3 - 0,3x^2 + 2,25x + 5"], "rational": ["(2x + 600)/x", "120/x", "(x + 2)/(x + 10)"], "sinus": [null, null, null, null], "waage": [["3x+2", "8"], ["x+x+3", "21"], ["12+4x", "30+x"], ["5+0,1x", "15+0,05x"], ["2x+4x", "36"]]};
-  var UI = {"de": {"titel": "Aus dem Alltag", "probieren": "Ausprobieren", "bedeutung": "Was bedeutet was?", "waage": "Auf die Waage legen"}, "en": {"titel": "Everyday examples", "probieren": "Try it", "bedeutung": "What means what?", "waage": "Put it on the balance"}, "es": {"titel": "Ejemplos de la vida real", "probieren": "Probar", "bedeutung": "¿Qué significa cada cosa?", "waage": "Poner en la balanza"}, "fr": {"titel": "Exemples du quotidien", "probieren": "Essayer", "bedeutung": "Que signifie quoi ?", "waage": "Mettre sur la balance"}, "pt": {"titel": "Exemplos do dia a dia", "probieren": "Experimentar", "bedeutung": "O que significa o quê?", "waage": "Colocar na balança"}, "ru": {"titel": "Примеры из жизни", "probieren": "Попробовать", "bedeutung": "Что что значит?", "waage": "Положить на весы"}, "zh": {"titel": "生活中的例子", "probieren": "试一试", "bedeutung": "各部分的含义", "waage": "放到天平上"}, "ja": {"titel": "身近な例", "probieren": "試してみる", "bedeutung": "それぞれの意味", "waage": "てんびんにのせる"}, "ar": {"titel": "أمثلة من الحياة", "probieren": "جرّب", "bedeutung": "ماذا يعني كل جزء؟", "waage": "ضعها على الميزان"}};
+  var UI = {"de": {"loesung": "Lösung zeigen", "titel": "Aus dem Alltag", "probieren": "Ausprobieren", "bedeutung": "Was bedeutet was?", "waage": "Auf die Waage legen"}, "en": {"loesung": "Show solution", "titel": "Everyday examples", "probieren": "Try it", "bedeutung": "What means what?", "waage": "Put it on the balance"}, "es": {"loesung": "Ver solución", "titel": "Ejemplos de la vida real", "probieren": "Probar", "bedeutung": "¿Qué significa cada cosa?", "waage": "Poner en la balanza"}, "fr": {"loesung": "Voir la solution", "titel": "Exemples du quotidien", "probieren": "Essayer", "bedeutung": "Que signifie quoi ?", "waage": "Mettre sur la balance"}, "pt": {"loesung": "Ver solução", "titel": "Exemplos do dia a dia", "probieren": "Experimentar", "bedeutung": "O que significa o quê?", "waage": "Colocar na balança"}, "ru": {"loesung": "Показать решение", "titel": "Примеры из жизни", "probieren": "Попробовать", "bedeutung": "Что что значит?", "waage": "Положить на весы"}, "zh": {"loesung": "显示解答", "titel": "生活中的例子", "probieren": "试一试", "bedeutung": "各部分的含义", "waage": "放到天平上"}, "ja": {"loesung": "解答を見る", "titel": "身近な例", "probieren": "試してみる", "bedeutung": "それぞれの意味", "waage": "てんびんにのせる"}, "ar": {"loesung": "عرض الحل", "titel": "أمثلة من الحياة", "probieren": "جرّب", "bedeutung": "ماذا يعني كل جزء؟", "waage": "ضعها على الميزان"}};
   var D = {
 "de": {
 "linear": [
@@ -1093,9 +1093,13 @@ var FA = (function(){
       var ein = F[APP][i];
       h += '<div class="al-karte"><h3>' + FB.esc(e[0]) + "</h3><p>" + FB.text(e[1]) + "</p>";
       if(window.FA_BILD && FA_BILD[APP] && FA_BILD[APP][i]){ try { h += '<div class="al-bild">' + FA_BILD[APP][i]() + "</div>"; } catch(x){} }
+      // 🆕 23.11.: Gleichung/Funktion, Bedeutung und „Ausprobieren“ erst nach „Lösung zeigen“ –
+      // die Aufgabe ist ja gerade, die Gleichung selbst aufzustellen
+      h += '<details class="al-deut al-loes"><summary>' + FB.esc(ui("loesung")) + "</summary>";
       if(ein && FORMEL){ var ft = ""; try { ft = FORMEL(ein); } catch(x){} if(ft) h += '<div class="al-formel"><span class="f" dir="ltr">' + FB.mathe(ft) + "</span></div>"; }
-      h += '<details class="al-deut"><summary>' + FB.esc(ui("bedeutung")) + "</summary><p>" + FB.text(e[2]) + "</p></details>";
+      h += '<p class="al-bed-t"><b>' + FB.esc(ui("bedeutung")) + "</b></p><p>" + FB.text(e[2]) + "</p>";
       if(ein && LADEN) h += '<button type="button" class="al-los" data-i="' + i + '">' + FB.esc(ui(APP === "waage" ? "waage" : "probieren")) + "</button>";
+      h += "</details>";
       h += "</div>";
     });
     FB.popup(FB.esc(ui("titel")), h + "</div>");
@@ -1123,6 +1127,7 @@ var FA = (function(){
     ".al-karte h3{margin:0 0 4px;font-size:17px;color:#0f766e}.al-karte p{margin:4px 0}" +
     ".al-formel{text-align:center;margin:6px 0}.al-formel .f{font:19px 'Cambria Math',Cambria,'Times New Roman',serif}" +
     ".al-deut summary{cursor:pointer;color:#1565c0;font-weight:700;font-size:14px}.al-deut p{background:#f4f8ff;border-radius:8px;padding:6px 8px;font-size:15px}" +
+    ".al-deut p.al-bed-t{background:none;padding:0;margin:8px 0 2px;color:#0f766e}" +
     ".al-los{margin-top:6px;font:700 14px system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:0;background:#1565c0;color:#fff;cursor:pointer}";
   document.head.appendChild(css);
   return { einbauen: einbauen, texte: texte, zeigen: zeigen, D: D, F: F, app: function(){ return APP; } };

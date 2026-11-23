@@ -165,25 +165,120 @@
     $("paarText").textContent = t("e_" + paar);
   }
   $("parR").addEventListener("input", parZeigen);
-  var PQ = { phi: 60, ziel: "β", st: 1, fertig: false, ok: 0, n: 0 };
-  function pqNeu(){ PQ.zw = false; do { PQ.phi = zuf(25, 155); } while(Math.abs(PQ.phi - 90) < 8); var L = []; NAMEN.forEach(function(n){ [1, 2].forEach(function(s){ if(!(n === "α" && s === 1)) L.push([n, s]); }); }); var z = wahl(L); PQ.ziel = z[0]; PQ.st = z[1]; PQ.fertig = false; $("pqEin").value = ""; $("pqMeld").textContent = ""; $("pqMeld").className = "meldung"; $("pqWegBox").open = false; pqZeigen(); }
-  function zielName(){ return PQ.ziel + (PQ.st === 2 ? STR : ""); }
+  // ---------- Übung an Parallelen (3 Stufen) ----------
+  // 🆕 23.11.: Stufe 2 = drei Parallelen g ∥ h ∥ k (Winkel über zwei Schnittpunkte weitertragen),
+  // Stufe 3 = Dreieck zwischen zwei Parallelen (Wechselwinkel + gestreckter Winkel → Winkelsumme 180°)
+  var PQ = { lv: 1, phi: 60, ziel: "β", st: 1, fertig: false, ok: 0, n: 0, ans: 0 };
+  try { PQ.lv = +localStorage.getItem("msWinkelStufe") || 1; } catch(e){}
+  var STRS = ["", "", STR, "″"];
+  function nm(n, i){ return n + STRS[i]; }
+  function rel(von, zu, phi){   // Schritt von Name „von“ zu Name „zu“ am selben Schnittpunkt
+    if(von === zu) return null;
+    var sch = { "α": "γ", "γ": "α", "β": "δ", "δ": "β" };
+    return sch[von] === zu ? "scheitel" : "neben";
+  }
+  function pqNeu(){
+    PQ.zw = false; PQ.fertig = false;
+    if(PQ.lv === 3){
+      do { PQ.a = zuf(38, 80); PQ.b = zuf(38, 80); } while(PQ.a + PQ.b > 150 || PQ.a + PQ.b < 85);
+      PQ.c = 180 - PQ.a - PQ.b;
+      PQ.typ = wahl(["c", "c", "b", "aS"]);   // gesucht: γ, β (aus α und γ) oder α′ an der Spitze
+      PQ.ans = PQ.typ === "c" ? PQ.c : PQ.typ === "b" ? PQ.b : PQ.a;
+    } else {
+      do { PQ.phi = zuf(PQ.lv === 2 ? 35 : 25, PQ.lv === 2 ? 145 : 155); } while(Math.abs(PQ.phi - 90) < 8);
+      if(PQ.lv === 1){
+        var L = []; NAMEN.forEach(function(n){ [1, 2].forEach(function(s){ if(!(n === "α" && s === 1)) L.push([n, s]); }); });
+        var z = wahl(L); PQ.gn = "α"; PQ.gs = 1; PQ.ziel = z[0]; PQ.st = z[1];
+      } else {
+        PQ.gn = wahl(NAMEN); PQ.gs = wahl([1, 3]); PQ.st = PQ.gs === 1 ? 3 : 1;
+        if(Math.random() < 0.35) PQ.st = 2;
+        PQ.ziel = wahl(NAMEN.filter(function(n){ return n !== PQ.gn; }));
+      }
+      PQ.ans = wertVon(PQ.ziel, PQ.phi);
+    }
+    $("pqEin").value = ""; $("pqMeld").textContent = ""; $("pqMeld").className = "meldung"; $("pqWegBox").open = false; pqZeigen();
+  }
+  function zielName(){ return nm(PQ.ziel, PQ.st); }
+  function parZeichnen3(sv, mark){   // g oben? nein: h oben (Spitze P), g unten (A, B)
+    leer(sv);
+    var H = 170, P0 = [260, 80], gy = 250, A = [P0[0] - H / Math.tan(PQ.a * RAD), gy], B = [P0[0] + H / Math.tan(PQ.b * RAD), gy];
+    [[P0[1], "h"], [gy, "g"]].forEach(function(z){ sv.appendChild(el("line", { x1: 10, y1: z[0], x2: 510, y2: z[0], stroke: "#1a2233", "stroke-width": 3 })); txt(sv, 500, z[0] - 10, z[1], { "font-style": "italic", "font-size": 18 }); });
+    function verl(Q, R, k){ return [R[0] + (R[0] - Q[0]) * k, R[1] + (R[1] - Q[1]) * k]; }
+    var s1 = verl(P0, A, 0.15), s2 = verl(A, P0, 0.22), t1 = verl(P0, B, 0.15), t2 = verl(B, P0, 0.22);
+    sv.appendChild(el("line", { x1: s1[0], y1: s1[1], x2: s2[0], y2: s2[1], stroke: "#7c3aed", "stroke-width": 3 }));
+    sv.appendChild(el("line", { x1: t1[0], y1: t1[1], x2: t2[0], y2: t2[1], stroke: "#0d9488", "stroke-width": 3 }));
+    var W = [
+      ["αA", A, 0, PQ.a], ["βB", B, 180 - PQ.b, 180],
+      ["αP", P0, 180, 180 + PQ.a], ["γP", P0, 180 + PQ.a, 360 - PQ.b], ["βP", P0, 360 - PQ.b, 360]
+    ];
+    W.forEach(function(w){
+      var m = mark[w[0]], r = w[0] === "γP" ? 34 : 30;
+      if(!m) return;
+      sv.appendChild(el("path", { d: sektor(w[1][0], w[1][1], r, w[2], w[3]), fill: m.f, "fill-opacity": 0.5, stroke: m.f, "stroke-width": 2 }));
+      var mid = (w[2] + w[3]) / 2, p = P(w[1][0], w[1][1], m.t.length > 3 ? 62 : 50, mid);
+      txt(sv, p[0], p[1] + 6, m.t, { "font-size": 15 });
+    });
+    [A, B, P0].forEach(function(S){ sv.appendChild(el("circle", { cx: S[0], cy: S[1], r: 4, fill: "#1a2233" })); });
+    sv.appendChild(el("text", { x: 16, y: 28, "font-family": "system-ui, sans-serif", "font-size": 16, "font-weight": 700, fill: "#475569" }, "g ∥ h"));
+  }
+  function parZeichnen2(sv, phi, mark){   // drei Parallelen g, h, k mit einer Schnittgeraden
+    leer(sv); var Y = [70, 165, 260], u = [Math.cos(phi * RAD), -Math.sin(phi * RAD)], ct = Math.cos(phi * RAD) / Math.sin(phi * RAD);
+    var S = Y.map(function(y){ return [300 + (165 - y) * ct, y]; });
+    Y.forEach(function(y, i){ sv.appendChild(el("line", { x1: 10, y1: y, x2: 510, y2: y, stroke: "#1a2233", "stroke-width": 3 })); txt(sv, 500, y - 10, ["g", "h", "k"][i], { "font-style": "italic", "font-size": 18 }); });
+    var a = [S[0][0] + u[0] * 55, S[0][1] + u[1] * 55], b = [S[2][0] - u[0] * 55, S[2][1] - u[1] * 55];
+    sv.appendChild(el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: "#7c3aed", "stroke-width": 3 })); txt(sv, a[0] + 12, a[1] + 4, "s", { "font-style": "italic", "font-size": 18, fill: "#7c3aed" });
+    S.forEach(function(Sp, i){
+      NAMEN.forEach(function(n){
+        var key = n + (i + 1), m = mark[key], Bb = bereich(n, phi);
+        sv.appendChild(el("path", { d: sektor(Sp[0], Sp[1], 26, Bb[0], Bb[1]), fill: m ? m.f : "#e2e8f0", "fill-opacity": m ? 0.55 : 0.6, stroke: m ? m.f : "#94a3b8", "stroke-width": m ? 2 : 1 }));
+        var mid = (Bb[0] + Bb[1]) / 2, p = P(Sp[0], Sp[1], m && m.t && m.t.length > 4 ? 56 : 42, mid);
+        txt(sv, p[0], p[1] + 6, m && m.t ? m.t : nm(n, i + 1), { "font-size": m ? 15 : 13, fill: m ? "#1a2233" : "#64748b" });
+      });
+      sv.appendChild(el("circle", { cx: Sp[0], cy: Sp[1], r: 4, fill: "#1a2233" }));
+    });
+    sv.appendChild(el("text", { x: 16, y: 28, "font-family": "system-ui, sans-serif", "font-size": 16, "font-weight": 700, fill: "#475569" }, "g ∥ h ∥ k"));
+  }
   function pqZeigen(){
-    var mark = { "α1": { f: "#2563eb", t: "α = " + PQ.phi + "°" } }, w = wertVon(PQ.ziel, PQ.phi);
-    mark[PQ.ziel + PQ.st] = { f: "#dc2626", t: zielName() + (PQ.fertig ? " = " + w + "°" : " = ?") };
-    parZeichnen($("pqSvg"), PQ.phi, mark);
-    $("pqAuf").innerHTML = t("parQuiz", { a: PQ.phi, w: "<b>" + zielName() + "</b>" });
+    var L = [], fertig = PQ.fertig, BL = "#2563eb", RT = "#dc2626";
+    if(PQ.lv === 3){
+      var mark = {}, ziel = PQ.typ === "c" ? "γP" : PQ.typ === "b" ? "βB" : "αP";
+      mark.αA = { f: BL, t: "α = " + PQ.a + "°" };
+      if(PQ.typ === "b") mark.γP = { f: BL, t: "γ = " + PQ.c + "°" }; else mark.βB = { f: BL, t: "β = " + PQ.b + "°" };
+      var zn = PQ.typ === "c" ? "γ" : PQ.typ === "b" ? "β" : "α" + STR;
+      mark[ziel] = { f: RT, t: zn + (fertig ? " = " + PQ.ans + "°" : " = ?") };
+      if(fertig){ if(!mark.αP) mark.αP = { f: "#f59e0b", t: "α" + STR }; if(!mark.βP) mark.βP = { f: "#f59e0b", t: "β" + STR }; if(!mark.γP) mark.γP = { f: "#f59e0b", t: "γ" }; }
+      parZeichnen3($("pqSvg"), mark);
+      $("pqAuf").innerHTML = t(PQ.typ === "b" ? "parQuiz3b" : "parQuiz3a", { a: PQ.a, b: PQ.b, c: PQ.c, w: "<b>" + zn + "</b>" });
+      L.push(t("r_gleich", { x: "α" + STR, y: "α", p: t("p_wechsel") }));
+      if(PQ.typ !== "aS"){
+        L.push(t("r_gleich", { x: "β" + STR, y: "β", p: t("p_wechsel") }));
+        L.push(t("r_summe3", { a: "α" + STR, b: "γ", c: "β" + STR, p: t("p_gestreckt") }));
+        if(PQ.typ === "c") L.push(t("r_rest", { x: "γ", a: "α", b: "β" }) + " = 180° − " + PQ.a + "° − " + PQ.b + "° = " + PQ.c + "°");
+        else L.push(t("r_rest", { x: "β", a: "α", b: "γ" }) + " = 180° − " + PQ.a + "° − " + PQ.c + "° = " + PQ.b + "°");
+        L.push(t("parMerk3"));
+      } else L.push("α" + STR + " = " + PQ.a + "°");
+    } else {
+      var mk = {}, gkey = PQ.gn + PQ.gs, w = PQ.ans;
+      mk[gkey] = { f: BL, t: nm(PQ.gn, PQ.gs) + " = " + wertVon(PQ.gn, PQ.phi) + "°" };
+      mk[PQ.ziel + PQ.st] = { f: RT, t: zielName() + (fertig ? " = " + w + "°" : " = ?") };
+      if(PQ.lv === 1){ parZeichnen($("pqSvg"), PQ.phi, mk); $("pqAuf").innerHTML = t("parQuiz", { a: PQ.phi, w: "<b>" + zielName() + "</b>" }); }
+      else { parZeichnen2($("pqSvg"), PQ.phi, mk); $("pqAuf").innerHTML = t("parQuiz2", { g: nm(PQ.gn, PQ.gs), a: wertVon(PQ.gn, PQ.phi), w: "<b>" + zielName() + "</b>" }); }
+      // Weg: erst am gegebenen Schnittpunkt zum Zielnamen, dann per Stufenwinkel zum Zielpunkt
+      var X = PQ.ziel, G = PQ.gn, r = rel(G, X), gv = wertVon(G, PQ.phi);
+      if(r === "scheitel") L.push(t("r_gleich", { x: nm(X, PQ.gs), y: nm(G, PQ.gs), p: t("p_scheitel") }) + " = " + gv + "°");
+      else if(r === "neben") L.push(t("r_summe", { x: nm(X, PQ.gs), y: nm(G, PQ.gs), p: t("p_neben") }) + " = " + w + "°");
+      if(PQ.st !== PQ.gs) L.push(t("r_gleich", { x: nm(X, PQ.st), y: nm(X, PQ.gs), p: t("p_stufen") }));
+      L.push(zielName() + " = " + w + "°");
+    }
     $("pqPunkte").textContent = PQ.ok + " / " + PQ.n;
-    var L = [], X = PQ.ziel;
-    if(PQ.st === 2) L.push(t("r_gleich", { x: X + STR, y: X, p: t("p_stufen") }));
-    if(X === "γ") L.push(t("r_gleich", { x: "γ", y: "α", p: t("p_scheitel") }));
-    if(X === "β" || X === "δ") L.push(t("r_summe", { x: X, y: "α", p: t("p_neben") }));
-    L.push(zielName() + " = " + w + "°");
     $("pqWeg").innerHTML = L.map(function(s){ return '<li><bdi dir="ltr">' + s + "</bdi></li>"; }).join("");
+    var sw = $("pqStufe");
+    if(sw){ sw.innerHTML = [1, 2, 3].map(function(k){ return '<button type="button" data-lv="' + k + '" aria-pressed="' + (k === PQ.lv) + '">' + t("lv" + k) + "</button>"; }).join("");
+      sw.querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ PQ.lv = +b.dataset.lv; try { localStorage.setItem("msWinkelStufe", PQ.lv); } catch(e){} pqNeu(); }); }); }
   }
   function pqPruefen(){
     if(PQ.fertig) return; var e = lies($("pqEin").value); if(!isFinite(e)) return;
-    var w = wertVon(PQ.ziel, PQ.phi), ok = Math.abs(e - w) < 0.5;
+    var w = PQ.ans, ok = Math.abs(e - w) < 0.5;
     if(!ok && !PQ.zw){ PQ.zw = true; msNochmal($("pqMeld")); return; }
     PQ.fertig = true; PQ.n++; if(ok) PQ.ok++;
     $("pqMeld").textContent = ok ? t("parOk") : t("parFalsch", { w: w }); $("pqMeld").className = "meldung " + (ok ? "gut" : "schlecht");
@@ -213,7 +308,7 @@
     artZeigen(); quizZeigen();
     if(QZ.fertig){ var ok2 = QZ.gew === QZ.a; $("quizMeld").textContent = ok2 ? t("artRichtig") : t("artFalsch", { a: t("a_" + QZ.a) }); }
     parZeigen(); pqZeigen();
-    if(PQ.fertig){ var w = wertVon(PQ.ziel, PQ.phi), ok3 = $("pqMeld").classList.contains("gut"); $("pqMeld").textContent = ok3 ? t("parOk") : t("parFalsch", { w: w }); }
+    if(PQ.fertig){ var w = PQ.ans, ok3 = $("pqMeld").classList.contains("gut"); $("pqMeld").textContent = ok3 ? t("parOk") : t("parFalsch", { w: w }); }
   }
   window.MS_LANG = { apply: function(l){ if(WK[l]){ lang = l; alles(); } } };
   schNeu(); messNeu(); quizNeu(); pqNeu(); alles();

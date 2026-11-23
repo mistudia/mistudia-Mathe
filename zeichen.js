@@ -85,6 +85,8 @@
     par: ["∥", "ist parallel zu", "is parallel to", "es paralela a", "平行于", "est parallèle à", "параллельна", "يوازي", "平行である", "é paralela a"],
     wG: ["α, β, γ, δ", "Winkel an der Geraden g (alpha, beta, gamma, delta)", "angles at line g (alpha, beta, gamma, delta)", "ángulos en la recta g (alfa, beta, gamma, delta)", "直线 g 处的角（alpha、beta、gamma、delta）", "angles sur la droite g (alpha, bêta, gamma, delta)", "углы у прямой g (альфа, бета, гамма, дельта)", "الزوايا عند المستقيم g (ألفا، بيتا، غاما، دلتا)", "直線 g のところの角（アルファ・ベータ・ガンマ・デルタ）", "ângulos na reta g (alfa, beta, gama, delta)"],
     wH: ["α′, β′, γ′, δ′", "Winkel an der Geraden h (gelesen „alpha Strich“ …)", "angles at line h (read “alpha prime” …)", "ángulos en la recta h (se lee «alfa prima» …)", "直线 h 处的角（读作 alpha 撇 …）", "angles sur la droite h (lire « alpha prime » …)", "углы у прямой h (читается «альфа штрих» …)", "الزوايا عند المستقيم h (تُقرأ ألفا شرطة …)", "直線 h のところの角（アルファ ダッシュ …）", "ângulos na reta h (lê-se «alfa linha» …)"],
+    kPar: ["k", "dritte Parallele (Stufe „Mittel“)", "third parallel line (level “medium”)", "tercera paralela (nivel «medio»)", "第三条平行线（“中等”）", "troisième parallèle (niveau « moyen »)", "третья параллельная (уровень «средне»)", "المستقيم الموازي الثالث (المستوى المتوسط)", "3本目の平行線（「ふつう」）", "terceira paralela (nível «médio»)"],
+    wK: ["α″, β″, γ″, δ″", "Winkel an der Geraden k (gelesen „alpha zwei Strich“ …)", "angles at line k (read “alpha double prime” …)", "ángulos en la recta k (se lee «alfa segunda» …)", "直线 k 处的角（读作 alpha 两撇 …）", "angles sur la droite k (lire « alpha seconde » …)", "углы у прямой k (читается «альфа два штриха» …)", "الزوايا عند المستقيم k (تُقرأ ألفا شرطتان …)", "直線 k のところの角（アルファ ツーダッシュ …）", "ângulos na reta k (lê-se «alfa duas linhas» …)"],
     alpha1: ["α₁", "Teil des Winkels α (zwischen Seite und Diagonale)", "part of the angle α (between side and diagonal)", "parte del ángulo α (entre lado y diagonal)", "角 α 的一部分（边与对角线之间）", "partie de l’angle α (entre côté et diagonale)", "часть угла α (между стороной и диагональю)", "جزء من الزاوية α (بين الضلع والقطر)", "角 α の一部（辺と対角線の間）", "parte do ângulo α (entre lado e diagonal)"],
     eps: ["ε", "Winkel, unter dem sich die Diagonalen schneiden (griechisch epsilon)", "angle at which the diagonals cross (Greek epsilon)", "ángulo con que se cortan las diagonales (épsilon)", "两条对角线相交所成的角（希腊字母 epsilon）", "angle sous lequel les diagonales se coupent (epsilon)", "угол, под которым пересекаются диагонали (эпсилон)", "الزاوية التي يتقاطع بها القطران (إبسيلون)", "対角線が交わる角（ギリシャ文字イプシロン）", "ângulo em que as diagonais se cortam (épsilon)"],
     Mdiag: ["M", "Mittelpunkt bzw. Schnittpunkt der Diagonalen", "midpoint or crossing point of the diagonals", "punto medio o punto de corte de las diagonales", "中点或对角线的交点", "milieu ou point d’intersection des diagonales", "центр или точка пересечения диагоналей", "نقطة المنتصف أو تقاطع القطرين", "中点・対角線の交点", "ponto médio ou ponto de interseção das diagonais"],
@@ -237,7 +239,7 @@
     groessen: [{ in: "#eigenKarte", k: "u_km u_m u_dm u_cm u_mm u_hoch u_ha u_a u_hl u_t u_zeit", ende: true }],
     teilbarkeit: [{ in: "#s_regeln", k: "teilAB" }, { in: "#s_teiler", k: "Tn" }],
     symmetrie: [{ in: "#s_koord", k: "ecken strich" }, { in: "#s_graph", k: "fx fminus" }, { in: "#s_ueben", k: "Pstrich" }],
-    winkel: [{ in: "#s_sch", k: "alpha" }, { in: "#s_mess", k: "alpha" }, { in: "#s_par", k: "ghPar sSchn par wG wH" }],
+    winkel: [{ in: "#s_sch", k: "alpha" }, { in: "#s_mess", k: "alpha" }, { in: "#s_par", k: "ghPar sSchn par wG wH kPar wK" }],
     flaechen: [{ in: "#s_figur", k: "Afl u abcS h g ef r pi" }, { in: "#s_zus", k: "Afl u Lab Lcd A12 r pi approx" }, { in: "#s_ueben", k: "Afl u r pi" }],
     negativ: [{ in: "#s_entd", k: "gradC" }, { in: "#s_rech", k: "ab_bel" }],
     dreisatz: [{ in: "#s_zuo", k: "xZ yZ kZ" }],
@@ -269,11 +271,12 @@
       var d = ZD[k]; if(!d || d[LI] === "") return;
       var sym = typeof d[0] === "object" ? (d[0][lang] || d[0]._) : d[0], fehlt = false;
       sym = sym.replace(/\{(lbl\w)\}/g, function(_, n){ var v = window.FT && FT[lang] && FT[lang][n]; if(!v){ fehlt = true; return ""; } return v; });
-      if(fehlt || sym === "y" || sym === "x") return;   // Kachel ohne diese Beschriftung bzw. selbsterklärend
+      if(fehlt || ((sym === "y" || sym === "x") && k !== "xUnb")) return;   // Kachel ohne diese Beschriftung bzw. selbsterklärend (Waage: x = Unbekannte wird erklärt)
       var txt = String(d[LI] || d[1]).replace(/≈ /g, "≈\u00a0");
       if(!sym || (/[^\u0000-\u024f]/.test(sym) && sym.length > 1 && txt.indexOf(sym) === 0)) return;   // Wort-Beschriftung, die sich selbst erklärt (z. B. 頂点)
       teile.push('<span class="msz-e"><bdi dir="ltr" class="msz-s">' + esc(sym).replace(/_(\w)/g, "<sub>$1</sub>") + "</bdi> = " + esc(txt) + "</span>");
     });
+    if(!teile.length) return "";   // nichts zu erklären → keine leere „Zeichen:“-Zeile
     return '<b class="msz-t">' + TITEL[lang] + "</b> " + teile.join('<span class="msz-p"> · </span>');
   }
   var css = document.createElement("style");
@@ -292,7 +295,8 @@
       var richtig = c.nach ? (da && da.previousElementSibling === ziel) : (da && da.parentNode === ziel && (c.ende ? da === ziel.lastElementChild : da === ziel.firstElementChild));
       if(richtig) return;
       if(da) da.remove();
-      var p = document.createElement("p"); p.className = "ms-zeichen"; p.id = id; p.innerHTML = html(c.k.split(/\s+/));
+      var inhalt = html(c.k.split(/\s+/)); if(!inhalt) return;
+      var p = document.createElement("p"); p.className = "ms-zeichen"; p.id = id; p.innerHTML = inhalt;
       if(c.nach) ziel.parentNode.insertBefore(p, ziel.nextSibling);
       else if(c.ende) ziel.appendChild(p);
       else ziel.insertBefore(p, ziel.firstChild);
