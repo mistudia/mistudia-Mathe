@@ -32,7 +32,7 @@
   var GD = { on: false, x: 60, y: 60, w: 0 };
 
   function merke(){ hist.push(JSON.stringify(S)); if(hist.length > 100) hist.shift(); zukunft = []; auswahl = null; schnitteAlt = true; }
-  function laden(json){ S = JSON.parse(json); S.texte = S.texte || []; S.dims = S.dims || []; letzteKopie = null; auswahl = null; schnitteAlt = true; reset(); speichern(); zeichne(); hinweis(); }
+  function laden(json){ if(massEdit){ massEdit = null; feldZurueck(); } S = JSON.parse(json); S.texte = S.texte || []; S.dims = S.dims || []; letzteKopie = null; auswahl = null; schnitteAlt = true; reset(); speichern(); zeichne(); hinweis(); }
   function rueck(){ if(!hist.length) return; zukunft.push(JSON.stringify(S)); laden(hist.pop()); }
   function vor(){ if(!zukunft.length) return; hist.push(JSON.stringify(S)); laden(zukunft.pop()); }
   function speichern(){ try{ localStorage.setItem("msDreieckBlatt", JSON.stringify(S)); }catch(e){} }
@@ -441,6 +441,92 @@
     return { P: [A, B, C], a: dist(B, C), b: dist(A, C), c: dist(A, B), al: winkelBei(B, A, C), be: winkelBei(A, B, C), ga: winkelBei(A, C, B) };
   }
 
+  // ---------- Maße antippen und ändern, Aussehen (Farbe, Linienart, Füllung) ----------
+  var FARBEN = ["#1a2233", "#dc2626", "#16a34a", "#1565c0", "#ea580c", "#7c3aed"];
+  var massLabels = [], massEdit = null;
+  function gleichP(a, b){ return Math.abs(a.x - b.x) < 0.01 && Math.abs(a.y - b.y) < 0.01; }
+  function massTreffer(p){
+    var tol = 24 / ppm(), best = null;
+    massLabels.forEach(function(m){ var d = Math.hypot(p.x - m.x, p.y - m.y); if(d < tol){ tol = d; best = m; } });
+    return best;
+  }
+  function bewegePunkt(alt, neu){
+    var a = { x: alt.x, y: alt.y }, dx = neu.x - a.x, dy = neu.y - a.y;
+    var mv = function(o, kx, ky){ if(gleichP({ x: o[kx], y: o[ky] }, a)){ o[kx] += dx; o[ky] += dy; } };
+    S.pts.forEach(function(q){ mv(q, "x", "y"); });
+    S.lines.forEach(function(l){ mv(l, "x1", "y1"); mv(l, "x2", "y2"); });
+    S.arcs.forEach(function(c){ mv(c, "cx", "cy"); });
+    S.dims.forEach(function(d){ mv(d, "x1", "y1"); mv(d, "x2", "y2"); if(d.t === "w") mv(d, "sx", "sy"); });
+    schnitteAlt = true;
+  }
+  function massWertJetzt(m){
+    if(m.art === "l") return dist(m.P, m.Q) / 10;
+    return winkelBei(m.P1, m.V, m.P2) * 180 / Math.PI;
+  }
+  function massOeffnen(m){
+    massEdit = m;
+    var feld = document.getElementById("feldbox"), fe = document.getElementById("feld");
+    feld.hidden = false; feld.classList.remove("breit"); fe.setAttribute("inputmode", "decimal");
+    var v = massWertJetzt(m); fe.value = zahl(v, m.art === "l" ? 1 : 0);
+    feldTexte(); zeichne(); hinweis();
+    try{ fe.focus(); fe.select(); }catch(e){}
+  }
+  function feldZurueck(){
+    var feld = document.getElementById("feldbox"), fe = document.getElementById("feld");
+    feld.hidden = !FELD[tool]; fe.setAttribute("inputmode", tool === "text" ? "text" : "decimal");
+    feld.classList.toggle("breit", tool === "text" || tool === "rechteck"); fe.value = ""; feldTexte();
+  }
+  function massSchliessen(){ massEdit = null; feldZurueck(); zeichne(); hinweis(); }
+  function massUebernehmen(){
+    var m = massEdit; if(!m) return;
+    var v = feldWert();
+    if(!v || (m.art === "w" && v >= 180)){ hinweis("hMassFehler"); return; }
+    var P1, V, P2;
+    if(m.art === "l"){
+      var L = dist(m.P, m.Q); if(L < 0.01){ hinweis("hMassFehler"); return; }
+      merke();
+      bewegePunkt(m.Q, { x: m.P.x + (m.Q.x - m.P.x) / L * v * 10, y: m.P.y + (m.Q.y - m.P.y) / L * v * 10 });
+    } else {
+      V = m.V; P1 = m.P1; P2 = m.P2;
+      var a1 = Math.atan2(P1.y - V.y, P1.x - V.x), a2 = Math.atan2(P2.y - V.y, P2.x - V.x), w = a2 - a1, r = dist(V, P2);
+      while(w > Math.PI) w -= 2 * Math.PI; while(w <= -Math.PI) w += 2 * Math.PI;
+      var an = a1 + (w < 0 ? -1 : 1) * v * Math.PI / 180;
+      merke();
+      bewegePunkt(P2, { x: V.x + r * Math.cos(an), y: V.y + r * Math.sin(an) });
+    }
+    massEdit = null; feldZurueck(); fertig();
+  }
+  function dreieckSchluessel(P){ return P.map(function(q){ return q.id; }).sort(function(a, b){ return a - b; }).join(","); }
+  function dreieckLinien(P){
+    var r = [];
+    S.lines.forEach(function(l, i){
+      if(l.h) return;
+      for(var a = 0; a < 3; a++){ var p = P[a], q = P[(a + 1) % 3]; if(abstandStrecke(p, l) < 0.6 && abstandStrecke(q, l) < 0.6){ r.push(i); return; } }
+    });
+    return r;
+  }
+  function dreieckAuswahl(P){ var W = leereAuswahl(); W.pts = P.map(function(q){ return q.id; }); W.lines = dreieckLinien(P); return W; }
+  function stilSetzen(o){
+    if(!auswahl || !auswahl.lines.length) return;
+    var aw = auswahl; merke(); auswahl = aw;
+    aw.lines.forEach(function(i){
+      var l = S.lines[i]; if(!l) return;
+      if(o.c){ if(o.c === FARBEN[0]) delete l.c; else l.c = o.c; }
+      if("d" in o){ if(o.d) l.d = 1; else delete l.d; }
+    });
+    if(o.c){
+      S.fuell = S.fuell || {};
+      dreiecke().forEach(function(d){
+        var li = dreieckLinien(d.P);
+        if(li.length >= 3 && li.every(function(i){ return aw.lines.indexOf(i) >= 0; })){
+          var key = dreieckSchluessel(d.P);
+          if(o.c === FARBEN[0]) delete S.fuell[key]; else S.fuell[key] = o.c;
+        }
+      });
+    }
+    fertig();
+  }
+
   // ---------- Ansicht ----------
   function setzeView(){
     var w = svg.clientWidth || 600, h = svg.clientHeight || 400;
@@ -490,7 +576,18 @@
     defs.appendChild(pat); svg.appendChild(defs);
     svg.appendChild(el("rect", { x: view.x, y: view.y, width: view.w, height: view.h, fill: "url(#karo)" }));
     S.arcs.forEach(function(a){ svg.appendChild(bogenEl(a, "bogen")); });
-    S.lines.forEach(function(l){ svg.appendChild(el("line", { x1: l.x1, y1: l.y1, x2: l.x2, y2: l.y2, "class": l.h ? "strecke hilf" : "strecke", "vector-effect": "non-scaling-stroke" })); });
+    massLabels = [];
+    var FU = S.fuell || {};
+    if(Object.keys(FU).length) dreiecke().forEach(function(d){
+      var c = FU[dreieckSchluessel(d.P)];
+      if(c) svg.appendChild(el("polygon", { points: d.P.map(function(p){ return p.x + "," + p.y; }).join(" "), fill: c, "fill-opacity": 0.16, stroke: "none" }));
+    });
+    S.lines.forEach(function(l){
+      var a = { x1: l.x1, y1: l.y1, x2: l.x2, y2: l.y2, "class": l.h ? "strecke hilf" : "strecke", "vector-effect": "non-scaling-stroke" };
+      var st = ""; if(l.c) st += "stroke:" + l.c + ";"; if(l.d) st += "stroke-dasharray:9 6;";
+      if(st) a.style = st;
+      svg.appendChild(el("line", a));
+    });
     S.dims.forEach(zeichneBem);
     S.texte.forEach(function(n){ svg.appendChild(el("text", { x: n.x, y: n.y, "class": "notiz", "font-size": 5, "stroke-width": 1 }, n.s)); });
     // Dreiecke + Maße
@@ -512,10 +609,13 @@
         [[1, 2, "a"], [0, 2, "b"], [0, 1, "c"]].forEach(function(s){
           var p = d0.P[s[0]], q = d0.P[s[1]], cx = (p.x + q.x) / 2, cy = (p.y + q.y) / 2, ox = cx - mx, oy = cy - my, o = Math.hypot(ox, oy) || 1;
           svg.appendChild(text(cx + ox / o * 16 * k, cy + oy / o * 16 * k + 5 * k, s[2] + " = " + cm(d0[s[2]]) + " cm", "mass", 13));
+          massLabels.push({ x: cx + ox / o * 16 * k, y: cy + oy / o * 16 * k, art: "l", P: { x: p.x, y: p.y }, Q: { x: q.x, y: q.y } });
         });
         [["al", 0, "α"], ["be", 1, "β"], ["ga", 2, "γ"]].forEach(function(w){
           var p = d0.P[w[1]], ox = mx - p.x, oy = my - p.y, o = Math.hypot(ox, oy) || 1;
           svg.appendChild(text(p.x + ox / o * 38 * k, p.y + oy / o * 38 * k + 5 * k, w[2] + " = " + grad(d0[w[0]]) + "°", "mass winkel", 13));
+          var q1w = d0.P[(w[1] + 1) % 3], q2w = d0.P[(w[1] + 2) % 3];
+          massLabels.push({ x: p.x + ox / o * 38 * k, y: p.y + oy / o * 38 * k, art: "w", V: { x: p.x, y: p.y }, P1: { x: q1w.x, y: q1w.y }, P2: { x: q2w.x, y: q2w.y } });
         });
       }
     }
@@ -554,6 +654,7 @@
       g.appendChild(text(nx, ny, p.n, "pname", 17));
       svg.appendChild(g);
     });
+    if(massEdit) svg.appendChild(el("circle", { cx: massEdit.x, cy: massEdit.y, r: 20 * k, "class": "selp", "vector-effect": "non-scaling-stroke" }));
     zeichneGeo();
     vorschau();
     document.getElementById("rueck").disabled = !hist.length; document.getElementById("vor").disabled = !zukunft.length;
@@ -569,6 +670,7 @@
       p += "M" + (bx - ux * pf + nx * pf * 0.4) + " " + (by - uy * pf + ny * pf * 0.4) + "L" + bx + " " + by + "L" + (bx - ux * pf - nx * pf * 0.4) + " " + (by - uy * pf - ny * pf * 0.4);
       svg.appendChild(el("path", { d: p, "class": "bem", "vector-effect": "non-scaling-stroke" }));
       svg.appendChild(text((ax + bx) / 2 + nx * 9 * k, (ay + by) / 2 + ny * 9 * k + 5 * k, cm(L) + " cm", "bemtext", 13));
+      massLabels.push({ x: (ax + bx) / 2 + nx * 9 * k, y: (ay + by) / 2 + ny * 9 * k, art: "l", P: { x: d.x1, y: d.y1 }, Q: { x: d.x2, y: d.y2 } });
     } else {
       var a1 = Math.atan2(d.y1 - d.sy, d.x1 - d.sx), a2 = Math.atan2(d.y2 - d.sy, d.x2 - d.sx), w = a2 - a1, R = 26 * k;
       while(w > Math.PI) w -= 2 * Math.PI; while(w <= -Math.PI) w += 2 * Math.PI;
@@ -576,6 +678,7 @@
       svg.appendChild(el("path", { d: p, "class": "bem", "vector-effect": "non-scaling-stroke" }));
       var m = a1 + w / 2;
       svg.appendChild(text(d.sx + (R + 16 * k) * Math.cos(m), d.sy + (R + 16 * k) * Math.sin(m) + 5 * k, grad(Math.abs(w)) + "°", "bemtext", 13));
+      massLabels.push({ x: d.sx + (R + 16 * k) * Math.cos(m), y: d.sy + (R + 16 * k) * Math.sin(m), art: "w", V: { x: d.sx, y: d.sy }, P1: { x: d.x1, y: d.y1 }, P2: { x: d.x2, y: d.y2 } });
     }
   }
   function bemMitte(d){
@@ -632,6 +735,11 @@
     }
     if(tmp.m && tmp.m.length) tmp.m.forEach(function(q){ svg.appendChild(el("circle", { cx: q.x, cy: q.y, r: 8 * k, "class": "fang", "vector-effect": "non-scaling-stroke" })); });
     if(tmp.fang) svg.appendChild(el("circle", { cx: tmp.fang.x, cy: tmp.fang.y, r: 9 * k, "class": "fang", "vector-effect": "non-scaling-stroke" }));
+    if(tool === "lineal" && tmp.kette){
+      if(!tmp.a && tmp.hov) svg.appendChild(el("line", { x1: tmp.kette.x, y1: tmp.kette.y, x2: tmp.hov.x, y2: tmp.hov.y, "class": "strecke vor", "vector-effect": "non-scaling-stroke" }));
+      svg.appendChild(el("circle", { cx: tmp.kette.x, cy: tmp.kette.y, r: 4 * k, "class": "einstich" }));
+      if(tmp.start && tmp.start.n >= 2) svg.appendChild(el("circle", { cx: tmp.start.x, cy: tmp.start.y, r: 10 * k, "class": "fang", "vector-effect": "non-scaling-stroke" }));
+    }
     if(tool === "lineal" && tmp.a && tmp.b){
       svg.appendChild(el("line", { x1: tmp.a.x, y1: tmp.a.y, x2: tmp.b.x, y2: tmp.b.y, "class": "strecke vor", "vector-effect": "non-scaling-stroke" }));
       svg.appendChild(text((tmp.a.x + tmp.b.x) / 2, (tmp.a.y + tmp.b.y) / 2 - 10 * k, cm(dist(tmp.a, tmp.b)) + " cm", "live", 16));
@@ -720,14 +828,23 @@
   svg.addEventListener("pointerup", hoch);
   svg.addEventListener("pointercancel", function(ev){ delete zeiger[ev.pointerId]; pinch = null; if(drag){ drag = false; abbrechen(); } });
   svg.addEventListener("wheel", function(ev){ ev.preventDefault(); var p = welt(ev); zoom(ev.deltaY < 0 ? 1.15 : 1 / 1.15, p.x, p.y); }, { passive: false });
-  function hover(p){ if(tool === "hand" || tool === "radieren" || tool === "auswahl" || tool === "trimmen") return; var f = fang(p); var alt = tmp.fang; tmp.fang = f; if((alt && !f) || f && (!alt || alt.x !== f.x || alt.y !== f.y)) zeichne(); }
+  function hover(p){ if(tool === "hand" || tool === "radieren" || tool === "auswahl" || tool === "trimmen") return; var f = fang(p);
+    if(tool === "lineal" && tmp.kette && !tmp.a){ tmp.hov = f || p; tmp.fang = f; zeichne(); return; } var alt = tmp.fang; tmp.fang = f; if((alt && !f) || f && (!alt || alt.x !== f.x || alt.y !== f.y)) zeichne(); }
 
-  function abbrechen(){ drag = false; delete tmp.gd; tmp.info = null; if(tool === "auswahl"){ if(tmp.zieh && tmp.zieh.moved){ var aw = auswahl; S = JSON.parse(tmp.zieh.orig); hist.pop(); auswahl = aw; schnitteAlt = true; } tmp = {}; } else if(KONSTR.indexOf(tool) >= 0 || tool === "trimmen"){ tmp = {}; step = 0; } else if(tool === "lineal" || tool === "kreis" || tool === "rechteck" || tool === "kopieren"){ tmp = {}; if(tool === "kreis") step = 0; } else if(tool === "vieleck") tmp.cur = null; else if(tool === "zirkel"){ if(tmp.bogen) tmp.bogen = null; else if(!tmp.r){ tmp = {}; step = 0; } } else if(tool === "hand") tmp = {}; zeichne(); hinweis(); }
+  function abbrechen(){ drag = false; delete tmp.gd; tmp.info = null; if(tool === "auswahl"){ if(tmp.zieh && tmp.zieh.moved){ var aw = auswahl; S = JSON.parse(tmp.zieh.orig); hist.pop(); auswahl = aw; schnitteAlt = true; } tmp = {}; } else if(KONSTR.indexOf(tool) >= 0 || tool === "trimmen"){ tmp = {}; step = 0; } else if(tool === "lineal"){ tmp = tmp.kette ? { kette: tmp.kette, start: tmp.start } : {}; } else if(tool === "kreis" || tool === "rechteck" || tool === "kopieren"){ tmp = {}; if(tool === "kreis") step = 0; } else if(tool === "vieleck") tmp.cur = null; else if(tool === "zirkel"){ if(tmp.bogen) tmp.bogen = null; else if(!tmp.r){ tmp = {}; step = 0; } } else if(tool === "hand") tmp = {}; zeichne(); hinweis(); }
   function reset(){ tmp = {}; step = 0; }
 
   function runter(p){
     var f = fang(p);
+    if((tool === "auswahl" || tool === "bemassung" || tool === "messen") && !(tmp.m && tmp.m.length)){
+      var mz = massTreffer(p); if(mz){ tmp = { massTap: mz }; return; }
+    }
     if(tool === "lineal"){
+      if(tmp.kette){ // Linie ohne Absetzen: neues Stück beginnt am letzten Endpunkt
+        var ke = tmp.kette, ks = tmp.start;
+        tmp = { a: { x: ke.x, y: ke.y }, af: { x: ke.x, y: ke.y, pid: ke.pid }, b: f || p, bf: f, kette: ke, start: ks };
+        bewegt(p); return;
+      }
       if(GD.on && kanteAbstand(p) < 16 / ppm()){ var kp = kantePunkt(p); tmp = { a: kp.p, af: kp.f, b: kp.p, kante: true }; zeichne(); return; }
       tmp = { a: f || p, af: f, b: f || p }; zeichne(); return;
     }
@@ -740,6 +857,13 @@
       var tr = treffer(p);
       if(tr && tr[0] === "pts" && !imAuswahl(tr)) auswahl = auswahlAus(tr); // Punkt direkt ziehen (Zugmodus)
       if(auswahlZahl() && imAuswahl(tr)){ tmp = { zieh: { start: p, orig: JSON.stringify(S), p0: tr[0] === "pts" ? { x: S.pts[tr[1]].x, y: S.pts[tr[1]].y } : null, moved: false } }; zeichne(); return; }
+      if(!tr){ // in ein Dreieck getippt → ganzes Dreieck wählen (und gleich verschiebbar)
+        var Dd = dreiecke();
+        for(var di = Dd.length - 1; di >= 0; di--) if(inDreieck(p, Dd[di].P)){
+          auswahl = dreieckAuswahl(Dd[di].P);
+          tmp = { zieh: { start: p, orig: JSON.stringify(S), p0: null, moved: false } }; zeichne(); hinweis(); return;
+        }
+      }
       tmp = { rahmen: { a: p, b: p } }; return;
     }
     if((tool === "lot" || tool === "parallele") && step === 1){ tmp.cur = f ? { x: f.x, y: f.y } : p; zeichne(); return; }
@@ -762,6 +886,7 @@
   }
   function bewegt(p){
     var f;
+    if(tmp.massTap) return;
     if(tool === "lineal" && tmp.a){
       var L = feldWert(), r;
       tmp.info = null;
@@ -830,6 +955,7 @@
     tmp.w = A ? (d < 0 ? -1 : 1) * Math.min(A, 180) * Math.PI / 180 : Math.round(d * 180 / Math.PI) * Math.PI / 180;
   }
   function los(p){
+    if(tmp.massTap){ var mt = tmp.massTap; tmp = {}; massOeffnen(mt); return; }
     var f = fang(p);
     if(tool === "hand"){ tmp = {}; return; }
     if(tool === "punkt"){
@@ -838,12 +964,24 @@
       merke(); neuerPunkt(f ? f.x : p.x, f ? f.y : p.y); fertig(); return;
     }
     if(tool === "lineal" && tmp.a){
-      var b = tmp.b, bf = tmp.bf;
-      if(!b || dist(tmp.a, b) < 1){ tmp = {}; zeichne(); return; }
+      var b = tmp.b, bf = tmp.bf, kt = tmp.kette, st = tmp.start, kante = tmp.kante;
+      if(!b || dist(tmp.a, b) < 1){
+        if(kt || kante){ tmp = {}; zeichne(); hinweis(); return; } // letzten Punkt noch mal angetippt → Linie fertig
+        // nur angetippt: Startpunkt der Linie festlegen
+        var aw0 = tmp.af && tmp.af.pid ? punkt(tmp.af.pid) : null;
+        if(!aw0){ merke(); aw0 = sicherePunkt(tmp.af, tmp.a.x, tmp.a.y); speichern(); }
+        tmp = { kette: { x: aw0.x, y: aw0.y, pid: aw0.id }, start: { x: aw0.x, y: aw0.y, pid: aw0.id, n: 0 } };
+        zeichne(); hinweis(); return;
+      }
       merke();
       var A = sicherePunkt(tmp.af, tmp.a.x, tmp.a.y), B = sicherePunkt(bf, b.x, b.y);
       S.lines.push({ x1: A.x, y1: A.y, x2: B.x, y2: B.y });
-      tmp = {}; fertig(); return;
+      if(kante){ tmp = {}; fertig(); return; }
+      if(!st) st = { x: A.x, y: A.y, pid: A.id, n: 0 };
+      st.n++;
+      if(st.n >= 2 && B.id === st.pid){ tmp = {}; fertig(); return; } // zurück am Start → geschlossen, fertig
+      tmp = { kette: { x: B.x, y: B.y, pid: B.id }, start: st };
+      fertig(); return;
     }
     if(tool === "zirkel"){
       if(tmp.bogen){
@@ -975,20 +1113,16 @@
   var GRUPPEN = { zeichnen: ["punkt", "lineal", "zirkel", "kreis", "geo", "rechteck", "vieleck"], konstr: ["mitte", "lot", "parallele", "msenk", "whalb", "kreis3"],
     messen: ["messen", "bemassung", "text"], bearb: ["auswahl", "trimmen", "kopieren", "radieren", "hand"] };
   var TOOLS = [].concat(GRUPPEN.zeichnen, GRUPPEN.konstr, GRUPPEN.messen, GRUPPEN.bearb), gruppe = "zeichnen";
-  function zeigeGruppe(g){
-    gruppe = g;
-    document.querySelectorAll(".kat").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.k === g ? "true" : "false"); });
-    document.querySelectorAll(".wz").forEach(function(b){ b.hidden = GRUPPEN[g].indexOf(b.dataset.t) < 0; });
-  }
+  function zeigeGruppe(g){ gruppe = g; } // alle Werkzeuge stehen jetzt in einer Leiste (keine Reiter mehr)
   var FELD = { lineal: ["fLaenge", "cm", "frei"], zirkel: ["fRadius", "cm", "frei"], kreis: ["fRadius", "cm", "frei"], geo: ["fWinkel", "°", "frei"], rechteck: ["fMasse", "cm", "frei2"], text: ["fText", "", "textPh"] };
   function feldTexte(){
-    var fc = FELD[tool]; if(!fc) return;
+    var fc = massEdit ? ["massWert", massEdit.art === "w" ? "°" : "cm", "massWert"] : FELD[tool]; if(!fc) return;
     document.getElementById("feldlabel").textContent = t(fc[0]);
     document.getElementById("einheit").textContent = fc[1];
     document.getElementById("feld").placeholder = t(fc[2]);
   }
   function waehle(tl){
-    tool = tl; reset(); tmp = {};
+    tool = tl; reset(); tmp = {}; massEdit = null;
     if(tl !== "auswahl") auswahl = null;
     for(var g in GRUPPEN) if(GRUPPEN[g].indexOf(tl) >= 0 && g !== gruppe) zeigeGruppe(g);
     document.querySelectorAll(".wz").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.t === tl ? "true" : "false"); });
@@ -1004,13 +1138,14 @@
   }
   function hinweis(key){
     var k = key;
+    if(!k && massEdit) k = "hMassEdit";
     if(!k){
       k = { punkt: "hPunkt", lineal: "hLineal", messen: "hMessen", radieren: "hRad", hand: "hHand", rechteck: "hRechteck", vieleck: "hVieleck", text: "hText", kopieren: "hKopie",
         bemassung: bemArt === "l" ? "hBemL" : "hBemW", kreis: step === 1 ? "hKreis1" : "hKreis0",
         mitte: "hMitte", lot: step === 1 ? "hLot1" : "hLot0", parallele: step === 1 ? "hPar1" : "hPar0", msenk: "hMsenk", whalb: "hWhalb", kreis3: "hKreis3", auswahl: "hAuswahl", trimmen: "hTrim" }[tool] || (tool === "zirkel" ? (step === 2 ? "hZ2" : step === 1 ? "hZ1" : "hZ0") : (step === 2 ? "hG2" : step === 1 ? "hG1" : "hG0"));
     }
     var h = document.getElementById("hinweis");
-    h.textContent = t(k);
+    h.textContent = t(k) + (!key && !massEdit && (tool === "auswahl" || tool === "bemassung" || tool === "messen") && (S.dims.length || dreiecke().length) ? " " + t("hMassTipp") + (tool === "auswahl" ? " " + t("hAuswahlDreieck") : "") : "");
     h.classList.toggle("warn", !!key);
     optionen();
   }
@@ -1018,6 +1153,13 @@
   function optionen(){
     var o = document.getElementById("optionen"), B = [];
     if(tool === "zirkel" && step === 2) B.push(["neuEinstich", t("neuEinstich"), function(){ reset(); zeichne(); hinweis(); }]);
+    if(massEdit){ B.push(["massOk", t("uebernehmen"), massUebernehmen]); B.push(["massAbbr", "✕", massSchliessen]); }
+    if(!massEdit && tool === "lineal" && tmp.kette) B.push(["linieEnde", t("linieEnde"), function(){ reset(); zeichne(); hinweis(); }]);
+    if(!massEdit && tool === "auswahl" && auswahl && auswahl.lines.length){
+      FARBEN.forEach(function(c, i){ B.push(["farbe" + i, "●", function(){ stilSetzen({ c: c }); }, null, t("farbe"), c]); });
+      var gestr = auswahl.lines.every(function(i){ return S.lines[i] && S.lines[i].d; });
+      B.push(["strich", gestr ? t("durchgezogen") : t("gestrichelt"), function(){ stilSetzen({ d: !gestr }); }]);
+    }
     if(tool === "vieleck" && tmp.poly && tmp.poly.length) B.push(["fertigV", t("fertig"), function(){ reset(); zeichne(); hinweis(); }]);
     if(tool === "bemassung"){
       B.push(["bemL", t("bemLaenge"), function(){ bemArt = "l"; tmp = {}; zeichne(); hinweis(); }, bemArt === "l"]);
@@ -1037,15 +1179,16 @@
       var e = document.createElement("button"); e.type = "button"; e.className = "knopf hell"; e.id = b[0]; e.textContent = b[1];
       if(b[3] != null) e.setAttribute("aria-pressed", b[3] ? "true" : "false");
       if(b[4]) e.title = b[4];
+      if(b[5]){ e.style.color = b[5]; e.className = "knopf hell farbknopf"; e.setAttribute("aria-label", b[4]); }
       e.addEventListener("click", b[2]); o.appendChild(e);
     });
   }
+  document.getElementById("feld").addEventListener("keydown", function(e){ if(e.key === "Enter" && massEdit){ e.preventDefault(); massUebernehmen(); } else if(e.key === "Escape" && massEdit){ e.preventDefault(); massSchliessen(); } });
   document.getElementById("feld").addEventListener("input", function(){ if(tool === "zirkel" && step === 2 && feldWert()){ tmp.r = feldWert() * 10; zeichne(); } });
   document.getElementById("rueck").addEventListener("click", rueck);
   document.getElementById("vor").addEventListener("click", vor);
   document.getElementById("bild").addEventListener("click", bildSpeichern);
   document.getElementById("raster").addEventListener("change", function(){ raster = this.checked; try{ localStorage.setItem("msDreieckRaster", raster ? "1" : "0"); }catch(e){} });
-  document.querySelectorAll(".kat").forEach(function(b){ b.addEventListener("click", function(){ zeigeGruppe(b.dataset.k); if(GRUPPEN[b.dataset.k].indexOf(tool) < 0) waehle(GRUPPEN[b.dataset.k][0]); }); });
   document.getElementById("leer").addEventListener("click", function(){ if(!S.pts.length && !S.lines.length && !S.arcs.length && !S.texte.length && !S.dims.length) return; merke(); S = leeresBlatt(); letzteKopie = null; reset(); fertig(); });
   document.getElementById("fit").addEventListener("click", einpassen);
   document.getElementById("zplus").addEventListener("click", function(){ zoom(1.3); });
@@ -1067,7 +1210,7 @@
     if(imFeld) return;
     if((e.ctrlKey || e.metaKey) && k === "a"){ e.preventDefault(); if(tool !== "auswahl") waehle("auswahl"); allesWaehlen(); return; }
     if((e.key === "Delete" || e.key === "Backspace") && auswahlZahl()){ e.preventDefault(); auswahlLoeschen(); return; }
-    if(e.key === "Escape"){ abbrechen(); reset(); if(tool === "auswahl") auswahl = null; zeichne(); hinweis(); }
+    if(e.key === "Escape"){ massEdit = null; feldZurueck(); abbrechen(); reset(); if(tool === "auswahl") auswahl = null; zeichne(); hinweis(); }
   });
   window.addEventListener("resize", function(){ zeichne(); });
 
@@ -1154,7 +1297,7 @@
     document.getElementById("tabFrei").textContent = t("tabFrei"); document.getElementById("tabAufg").textContent = t("tabAufg");
     TOOLS.forEach(function(tl){ var b = document.querySelector('.wz[data-t="' + tl + '"]'); b.querySelector("span").textContent = t("w_" + tl); b.title = t("w_" + tl); });
     ["rueck", "vor"].forEach(function(id){ var b = document.getElementById(id); b.title = t(id); b.setAttribute("aria-label", t(id)); });
-    document.querySelectorAll(".kat").forEach(function(b){ b.textContent = t("k_" + b.dataset.k); });
+    document.querySelectorAll(".wzgr").forEach(function(b){ b.textContent = t("k_" + b.dataset.k); });
     document.getElementById("bild").title = t("bild"); document.getElementById("bild").querySelector("span").textContent = t("bild");
     document.getElementById("tRaster").textContent = t("raster");
     document.getElementById("leer").title = t("leer"); document.getElementById("leer").querySelector("span").textContent = t("leer");

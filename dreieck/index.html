@@ -57,13 +57,12 @@
   .knopf { font: 700 15px system-ui, sans-serif; padding: 9px 16px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
   .knopf.hell { background: #e3eefc; color: var(--blue); }
   .meldung { margin: 8px 0 0; font-weight: 700; } .meldung.gut { color: #1d7a3f; } .meldung.schlecht { color: #b91c1c; }
-  .kats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 6px; background: #e3eefc; border-radius: 12px; padding: 4px; }
-  .kat { font: 700 14px system-ui, sans-serif; padding: 7px 4px; border: 0; border-radius: 9px; background: transparent; color: var(--blue); cursor: pointer; line-height: 1.15; }
-  .kat[aria-selected="true"] { background: var(--blue); color: #ffffff; }
   .undoknoepfe { position: absolute; bottom: 8px; inset-inline-start: 8px; display: flex; gap: 6px; }
   .undoknoepfe button { width: 42px; height: 42px; border-radius: 10px; border: 2px solid var(--line); background: rgba(255,255,255,0.92); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
   .undoknoepfe button:disabled { opacity: 0.35; cursor: default; }
-  .werkzeuge { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 8px; }
+  .werkzeuge { display: grid; grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)); gap: 6px; margin-bottom: 8px; }
+  .wz[data-k="konstr"] { background: #f2f7ff; } .wz[data-k="messen"] { background: #f1faf4; } .wz[data-k="bearb"] { background: #fdf6ec; }
+  .farbknopf { font-size: 22px; line-height: 1; padding: 4px 9px; }
   .wz { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border-radius: 12px; border: 2px solid var(--line); background: #ffffff; color: var(--text); cursor: pointer; font: 600 12px system-ui, sans-serif; min-width: 0; }
   .wz svg { width: 26px; height: 26px; }
   .wz span { max-width: 100%; white-space: normal; text-align: center; line-height: 1.15; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
@@ -133,8 +132,8 @@
   .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
   @media (max-width: 600px) {
     body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
-    .werkzeuge { grid-template-columns: repeat(4, 1fr); gap: 4px; } .kat { font-size: 12px; padding: 7px 2px; }
-    .wz { padding: 4px 3px; font-size: 11px; border-radius: 10px; } .wz span { white-space: normal; text-overflow: clip; text-align: center; line-height: 1.1; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; } .wz svg { width: 22px; height: 22px; }
+    .werkzeuge { grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 4px; }
+    .wz { padding: 4px 2px; font-size: 10px; border-radius: 10px; } .wz span { white-space: normal; text-overflow: clip; text-align: center; line-height: 1.1; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; } .wz svg { width: 22px; height: 22px; }
     #blatt { height: 56vh; height: 56dvh; }
   }
 </style>
@@ -148,15 +147,9 @@
     <button type="button" role="tab" id="tabAufg" aria-selected="false"></button>
   </div>
   <div class="aufgabe" id="aufgabe" hidden></div>
-  <div class="kats" role="tablist">
-    <button type="button" role="tab" class="kat" data-k="zeichnen"></button>
-    <button type="button" role="tab" class="kat" data-k="konstr"></button>
-    <button type="button" role="tab" class="kat" data-k="messen"></button>
-    <button type="button" role="tab" class="kat" data-k="bearb"></button>
-  </div>
   <div class="werkzeuge" role="toolbar">
     <button type="button" class="wz" data-k="zeichnen" data-t="punkt"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg><span></span></button>
-    <button type="button" class="wz" data-k="zeichnen" data-t="lineal"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4" stroke="currentColor" stroke-width="1.6"/></svg><span></span></button>
+    <button type="button" class="wz" data-k="zeichnen" data-t="lineal"><svg viewBox="0 0 24 24"><path d="M3 19L9 6l6 9 6-11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="3" cy="19" r="1.8" fill="currentColor"/><circle cx="9" cy="6" r="1.8" fill="currentColor"/><circle cx="15" cy="15" r="1.8" fill="currentColor"/></svg><span></span></button>
     <button type="button" class="wz" data-k="zeichnen" data-t="zirkel"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 6L6 20M12 6l6 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/><circle cx="12" cy="6" r="2" fill="currentColor"/></svg><span></span></button>
     <button type="button" class="wz" data-k="zeichnen" data-t="kreis"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg><span></span></button>
     <button type="button" class="wz" data-k="zeichnen" data-t="geo"><svg viewBox="0 0 24 24"><path d="M4 19h16M4 19L16 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 19a6 6 0 0 0-1.8-4.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span></span></button>

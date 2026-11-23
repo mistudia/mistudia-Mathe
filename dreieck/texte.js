@@ -636,3 +636,137 @@ pt: {
   };
   for(var l in X) for(var k in X[l]) DT[l][k] = X[l][k];
 })();
+
+// Ergänzung 23.11.2026: „Linie“ statt „Lineal“ (ohne Absetzen wie in einer CAD-Skizze),
+// Maße antippen und ändern, Farbe/Linienart für ausgewählte Dreiecke
+(function(){
+  var X = {
+ "de": {
+  "w_lineal": "Linie",
+  "hLineal": "Linie: Punkt für Punkt antippen (oder ziehen) – die Linie geht ohne Absetzen weiter. Fertig: auf den Startpunkt tippen (geschlossen), noch einmal auf den letzten Punkt tippen, Esc oder „Linie beenden“. Steht eine Länge im Feld, wird jede Strecke genau so lang.",
+  "linieEnde": "Linie beenden",
+  "massWert": "Neuer Wert",
+  "uebernehmen": "Übernehmen",
+  "hMassEdit": "Neuen Wert eintippen und Enter drücken – die Figur passt sich an.",
+  "hMassTipp": "Tipp: Ein Maß (Länge oder Winkel) antippen, um es zu ändern.",
+  "hMassFehler": "Dieser Wert geht nicht (Winkel zwischen 0° und 180°, Länge größer als 0).",
+  "farbe": "Farbe",
+  "gestrichelt": "gestrichelt",
+  "durchgezogen": "durchgezogen",
+  "hAuswahlDreieck": "Tipp: In ein Dreieck tippen wählt es aus – dann Farbe oder Linienart wählen."
+ },
+ "en": {
+  "w_lineal": "Line",
+  "hLineal": "Line: tap point after point (or drag) – the line continues without lifting. Finish: tap the start point (closed), tap the last point again, press Esc or “End line”. If a length is entered, every segment gets exactly that length.",
+  "linieEnde": "End line",
+  "massWert": "New value",
+  "uebernehmen": "Apply",
+  "hMassEdit": "Type a new value and press Enter – the figure adjusts.",
+  "hMassTipp": "Tip: tap a measurement (length or angle) to change it.",
+  "hMassFehler": "That value doesn’t work (angle between 0° and 180°, length greater than 0).",
+  "farbe": "Colour",
+  "gestrichelt": "dashed",
+  "durchgezogen": "solid",
+  "hAuswahlDreieck": "Tip: tapping inside a triangle selects it – then choose a colour or line style."
+ },
+ "es": {
+  "w_lineal": "Línea",
+  "hLineal": "Línea: toca punto tras punto (o arrastra); la línea sigue sin levantar el lápiz. Terminar: toca el punto inicial (cerrada), vuelve a tocar el último punto, pulsa Esc o «Terminar línea». Si hay una longitud escrita, cada segmento mide exactamente eso.",
+  "linieEnde": "Terminar línea",
+  "massWert": "Nuevo valor",
+  "uebernehmen": "Aplicar",
+  "hMassEdit": "Escribe un nuevo valor y pulsa Intro: la figura se adapta.",
+  "hMassTipp": "Consejo: toca una medida (longitud o ángulo) para cambiarla.",
+  "hMassFehler": "Ese valor no vale (ángulo entre 0° y 180°, longitud mayor que 0).",
+  "farbe": "Color",
+  "gestrichelt": "discontinua",
+  "durchgezogen": "continua",
+  "hAuswahlDreieck": "Consejo: tocar dentro de un triángulo lo selecciona; luego elige color o tipo de línea."
+ },
+ "zh": {
+  "w_lineal": "连线",
+  "hLineal": "连线：一个点一个点地点按（或拖动）——线条不断开地继续。结束：点按起点（闭合）、再次点按最后一个点、按 Esc 或“结束连线”。如果填了长度，每条线段都正好是这个长度。",
+  "linieEnde": "结束连线",
+  "massWert": "新数值",
+  "uebernehmen": "应用",
+  "hMassEdit": "输入新数值并按回车——图形会随之改变。",
+  "hMassTipp": "提示：点按一个量（长度或角度）就可以修改它。",
+  "hMassFehler": "这个数值不行（角度在 0° 到 180° 之间，长度大于 0）。",
+  "farbe": "颜色",
+  "gestrichelt": "虚线",
+  "durchgezogen": "实线",
+  "hAuswahlDreieck": "提示：点按三角形内部即可选中它，然后选择颜色或线型。"
+ },
+ "fr": {
+  "w_lineal": "Ligne",
+  "hLineal": "Ligne : touche point après point (ou glisse) – la ligne continue sans lever le crayon. Terminer : touche le point de départ (fermée), touche encore le dernier point, Échap ou « Terminer la ligne ». Si une longueur est saisie, chaque segment a exactement cette longueur.",
+  "linieEnde": "Terminer la ligne",
+  "massWert": "Nouvelle valeur",
+  "uebernehmen": "Appliquer",
+  "hMassEdit": "Tape une nouvelle valeur et appuie sur Entrée – la figure s’adapte.",
+  "hMassTipp": "Astuce : touche une mesure (longueur ou angle) pour la modifier.",
+  "hMassFehler": "Cette valeur ne va pas (angle entre 0° et 180°, longueur supérieure à 0).",
+  "farbe": "Couleur",
+  "gestrichelt": "pointillés",
+  "durchgezogen": "continu",
+  "hAuswahlDreieck": "Astuce : toucher l’intérieur d’un triangle le sélectionne – puis choisis une couleur ou un type de trait."
+ },
+ "ru": {
+  "w_lineal": "Линия",
+  "hLineal": "Линия: нажимай точку за точкой (или веди) – линия продолжается без отрыва. Закончить: нажми на начальную точку (замкнуть), ещё раз на последнюю точку, Esc или «Закончить линию». Если введена длина, каждый отрезок будет ровно такой длины.",
+  "linieEnde": "Закончить линию",
+  "massWert": "Новое значение",
+  "uebernehmen": "Применить",
+  "hMassEdit": "Введи новое значение и нажми Enter – фигура изменится.",
+  "hMassTipp": "Совет: нажми на размер (длину или угол), чтобы его изменить.",
+  "hMassFehler": "Такое значение не подходит (угол от 0° до 180°, длина больше 0).",
+  "farbe": "Цвет",
+  "gestrichelt": "пунктир",
+  "durchgezogen": "сплошная",
+  "hAuswahlDreieck": "Совет: нажатие внутри треугольника выделяет его – затем выбери цвет или тип линии."
+ },
+ "ar": {
+  "w_lineal": "خط",
+  "hLineal": "خط: اضغط نقطة بعد نقطة (أو اسحب) – يستمر الخط دون رفع القلم. للإنهاء: اضغط على نقطة البداية (مغلق)، أو على آخر نقطة مرة أخرى، أو Esc، أو «إنهاء الخط». إذا كُتب طول، تكون كل قطعة بهذا الطول تمامًا.",
+  "linieEnde": "إنهاء الخط",
+  "massWert": "قيمة جديدة",
+  "uebernehmen": "تطبيق",
+  "hMassEdit": "اكتب قيمة جديدة واضغط Enter – يتغير الشكل.",
+  "hMassTipp": "نصيحة: اضغط على قياس (طول أو زاوية) لتغييره.",
+  "hMassFehler": "هذه القيمة لا تصلح (الزاوية بين 0° و180°، والطول أكبر من 0).",
+  "farbe": "اللون",
+  "gestrichelt": "متقطع",
+  "durchgezogen": "متصل",
+  "hAuswahlDreieck": "نصيحة: الضغط داخل مثلث يحدده – ثم اختر اللون أو نوع الخط."
+ },
+ "ja": {
+  "w_lineal": "線",
+  "hLineal": "線：点を順にタップ（またはドラッグ）すると、ペンを離さずに線が続きます。終わり：始点をタップ（閉じる）、最後の点をもう一度タップ、Esc、または「線を終える」。長さを入力すると、各線分がちょうどその長さになります。",
+  "linieEnde": "線を終える",
+  "massWert": "新しい値",
+  "uebernehmen": "適用",
+  "hMassEdit": "新しい値を入力して Enter を押すと、図形が変わります。",
+  "hMassTipp": "ヒント：寸法（長さや角）をタップすると変更できます。",
+  "hMassFehler": "その値は使えません（角は 0° より大きく 180° より小さく、長さは 0 より大きく）。",
+  "farbe": "色",
+  "gestrichelt": "破線",
+  "durchgezogen": "実線",
+  "hAuswahlDreieck": "ヒント：三角形の中をタップすると選択できます。その後、色や線の種類を選んでください。"
+ },
+ "pt": {
+  "w_lineal": "Linha",
+  "hLineal": "Linha: toca ponto a ponto (ou arrasta) – a linha continua sem levantar. Terminar: toca no ponto inicial (fechada), toca outra vez no último ponto, Esc ou «Terminar linha». Se houver um comprimento escrito, cada segmento terá exatamente esse tamanho.",
+  "linieEnde": "Terminar linha",
+  "massWert": "Novo valor",
+  "uebernehmen": "Aplicar",
+  "hMassEdit": "Escreve um novo valor e carrega em Enter – a figura ajusta-se.",
+  "hMassTipp": "Dica: toca numa medida (comprimento ou ângulo) para a alterar.",
+  "hMassFehler": "Esse valor não serve (ângulo entre 0° e 180°, comprimento maior que 0).",
+  "farbe": "Cor",
+  "gestrichelt": "tracejada",
+  "durchgezogen": "contínua",
+  "hAuswahlDreieck": "Dica: tocar dentro de um triângulo seleciona-o – depois escolhe a cor ou o tipo de linha."
+ }
+};
+  for(var l in X) for(var k in X[l]) DT[l][k] = X[l][k];
+})();
