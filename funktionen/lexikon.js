@@ -98,7 +98,7 @@ var FB = (function(){
     ov = document.createElement("div");
     ov.className = "b-ov"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
     ov.dir = lang() === "ar" ? "rtl" : "ltr";
-    ov.innerHTML = '<div class="b-karte"><button type="button" class="b-zu" aria-label="' + esc(ui("zu")) + '">×</button><h2>' + titel + "</h2>" + html + "</div>";
+    ov.innerHTML = '<div class="b-karte"><button type="button" class="b-zu" aria-label="' + esc(ui("zu")) + '">✕</button><h2>' + titel + "</h2>" + html + "</div>";
     ov.addEventListener("click", function(e){ if(e.target === ov || e.target.closest(".b-zu")) zu(); });
     document.body.appendChild(ov);
     document.documentElement.classList.add("b-offen");

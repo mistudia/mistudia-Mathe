@@ -35,7 +35,7 @@
     ".ms-zl button:hover{background:#e8f1ff}.ms-zl svg{width:18px;height:18px}" +
     ".ms-zl input{writing-mode:vertical-lr;direction:rtl;-webkit-appearance:slider-vertical;width:22px;height:120px;margin:2px 0;accent-color:#1565c0;cursor:pointer}" +
     ".ms-zl b{font:700 10px system-ui,sans-serif;color:#1a2233}" +
-    "@media (max-height:420px){.ms-zl input{height:70px}}@media print{.ms-zl{display:none!important}}" +
+    "@media (hover:none) and (pointer:coarse){.ms-zl .ms-zl-kb{display:none}}@media (max-height:420px){.ms-zl input{height:70px}}@media print{.ms-zl{display:none!important}}" +
     ".ms-zoom-ov{position:fixed;inset:0;z-index:2147483100;background:rgba(15,23,42,.35);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:70px 12px 20px}" +
     ".ms-zoom-k{background:#fff;color:#1a2233;border-radius:14px;max-width:420px;width:100%;padding:16px 18px;box-shadow:0 8px 30px rgba(0,0,0,.3);font:16px/1.45 system-ui,sans-serif;max-height:90vh;max-height:90dvh;overflow-y:auto}" +
     ".ms-zoom-k h2{margin:0 0 8px;font-size:19px;color:#1565c0}.ms-zoom-k p{margin:6px 0}.ms-zoom-k kbd{display:inline-block;border:1px solid #b0b0b8;border-bottom-width:2px;border-radius:5px;padding:0 5px;font:600 14px system-ui,sans-serif;background:#f8fafc}" +
@@ -43,7 +43,16 @@
   document.head.appendChild(css);
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function kbd(s){ return s.replace(/(Ctrl|Strg|⌘|\+|−|0)(?=[ ,.(（）)、，]|$)/g, function(x){ return "<kbd>" + x + "</kbd>"; }); }
-  function hilfe(){
+  // ⌨ Tastenkürzel-Übersicht (/tastenkuerzel.js, auch in VocabBoss) – ersetzt den alten Zoom-Hinweis
+  function tkLaden(f){
+    if(window.TK_OEFFNEN) return f();
+    var sc = document.querySelector('script[src="/tastenkuerzel.js"]');
+    if(!sc){ sc = document.createElement("script"); sc.src = "/tastenkuerzel.js"; document.head.appendChild(sc); }
+    sc.addEventListener("load", f);
+  }
+  var TKT = { de: "Tastenkürzel", en: "Keyboard shortcuts", es: "Atajos de teclado", zh: "键盘快捷键", fr: "Raccourcis clavier", ru: "Сочетания клавиш", ar: "اختصارات لوحة المفاتيح", ja: "キーボードショートカット", pt: "Atalhos de teclado" };
+  function hilfe(){ tkLaden(function(){ window.TK_OEFFNEN({ lang: sprache(), reset: function(){ setze(100); } }); }); }
+  function hilfeAlt(){
     var T = TX[sprache()], ov = document.createElement("div"); ov.className = "ms-zoom-ov"; if(sprache() === "ar") ov.dir = "rtl";
     ov.innerHTML = '<div class="ms-zoom-k" role="dialog" aria-label="' + esc(T[0]) + '"><h2>' + esc(T[0]) + "</h2><p>" + kbd(esc(T[1])) + '</p><p><button type="button" class="ms-zoom-zu hell" data-n="1">' + esc(T[2]) + '</button><button type="button" class="ms-zoom-zu" data-x="1">' + esc(T[3]) + "</button></p></div>";
     document.body.appendChild(ov);
@@ -54,7 +63,8 @@
     var T = TX[sprache()];
     leiste = document.createElement("div"); leiste.className = "ms-zl"; leiste.setAttribute("role", "group"); leiste.setAttribute("aria-label", T[0]);
     leiste.innerHTML = '<button type="button" data-d="10" title="' + esc(T[4]) + '" aria-label="' + esc(T[4]) + '">+</button><input type="range" id="msZoomR" min="50" max="200" step="10" aria-label="' + esc(T[0]) + '" data-nofit data-nonav><button type="button" data-d="-10" title="' + esc(T[5]) + '" aria-label="' + esc(T[5]) + '">−</button><b id="msZoomZ"></b>' +
-      '<button type="button" data-h="1" title="' + esc(T[0]) + '" aria-label="' + esc(T[0]) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>';
+      '<button type="button" data-h="1" title="' + esc(T[0]) + '" aria-label="' + esc(T[0]) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>' +
+      '<button type="button" data-h="1" class="ms-zl-kb" title="' + esc(TKT[sprache()] || TKT.de) + '" aria-label="' + esc(TKT[sprache()] || TKT.de) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10h1.6M9.2 10h1.6M12.4 10h1.6M15.6 10h2.4M6 13.4h2M16 13.4h2M9.4 13.4h5.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>';
     document.body.appendChild(leiste);
     leiste.addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.getAttribute("data-h")) hilfe(); else setze(stufe + +b.getAttribute("data-d")); });
     document.getElementById("msZoomR").addEventListener("input", function(){ setze(+this.value); });

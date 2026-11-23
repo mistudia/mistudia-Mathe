@@ -27,3 +27,22 @@ select { max-width: 100%; text-overflow: ellipsis; }
 
 /* Platzhalter, der nicht ins Feld passt, wird kleiner geschrieben (home-button.js setzt --msPhFs) */
 input::placeholder { font-size: var(--msPhFs, inherit); }
+
+/* ============================================================
+   23.11.: EINHEITLICHER SCHLIESSEN-KNOPF (✕) in allen Popups der Mathe-App
+   (gleich wie in VocabBoss): rund, 36 px, oben rechts (RTL oben links),
+   weiß mit grauem Rand. Gilt für Alltag-, Lexikon-, Waage-Probe-, Pizza-Fenster
+   und alle künftigen Popups mit class="ms-x".
+   ============================================================ */
+.ms-x, .msa-zu, .b-zu, #probeClose, #pizzaSchliessen {
+  width: 36px !important; height: 36px !important; min-width: 0 !important; padding: 0 !important; margin: 0 !important;
+  border-radius: 50% !important; border: 2px solid #b0b0b8 !important; background: #ffffff !important; color: #1a2233 !important;
+  font: 700 18px/1 system-ui, -apple-system, "Segoe UI", sans-serif !important;
+  display: inline-flex !important; align-items: center; justify-content: center; cursor: pointer; flex: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,.12) !important; transform: none !important;
+}
+.ms-x:hover, .msa-zu:hover, .b-zu:hover, #probeClose:hover, #pizzaSchliessen:hover { background: #f0f0f5 !important; border-color: #64748b !important; }
+.ms-x:focus-visible, .msa-zu:focus-visible, .b-zu:focus-visible, #probeClose:focus-visible, #pizzaSchliessen:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+.ms-x, .b-zu, #probeClose, #pizzaSchliessen { position: absolute !important; top: 10px !important; right: 10px !important; left: auto !important; z-index: 5; }
+[dir="rtl"] .ms-x, [dir="rtl"] .b-zu, [dir="rtl"] #probeClose, [dir="rtl"] #pizzaSchliessen { right: auto !important; left: 10px !important; }
+#probeCard, #pizzaFenster { position: relative; }

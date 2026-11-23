@@ -32,7 +32,7 @@ var MS_ALLTAG = (function(){
   function zeigen(B){
     schliessen(); offen = B;
     var ov = document.createElement("div"); ov.className = "msa-ov"; ov.dir = lang === "ar" ? "rtl" : "ltr";
-    var h = '<div class="msa-karte" role="dialog" aria-modal="true"><div class="msa-kopf"><h2>' + esc(ui("titel")) + '</h2><button type="button" class="msa-zu" aria-label="' + esc(ui("zu")) + '">×</button></div><div class="msa-liste">';
+    var h = '<div class="msa-karte" role="dialog" aria-modal="true"><div class="msa-kopf"><h2>' + esc(ui("titel")) + '</h2><button type="button" class="msa-zu" aria-label="' + esc(ui("zu")) + '">✕</button></div><div class="msa-liste">';
     liste(B).forEach(function(e, i){
       h += '<div class="msa-bsp"><h3>' + esc(e[0]) + "</h3><p>" + text(e[1]) + "</p>";
       var bf = bilder(B); if(bf && bf[i]){ try { h += '<div class="msa-bild">' + bf[i]() + "</div>"; } catch(x){} }
