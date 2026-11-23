@@ -59,37 +59,65 @@
 
   // ---------- Messen ----------
   var MS = { w: 60, seite: "r", geprueft: false, ok: 0, n: 0 };
-  function messNeu(){ MS.w = zuf(12, 168); MS.seite = wahl(["r", "l"]); MS.geprueft = false; $("messEin").value = ""; $("messMeld").textContent = ""; $("messMeld").className = "meldung"; messZeichnen(); }
+  function messNeu(){ if(MS.probe) return; MS.w = zuf(12, 168); MS.seite = wahl(["r", "l"]); MS.geprueft = false; $("messEin").value = ""; $("messMeld").textContent = ""; $("messMeld").className = "meldung"; messZeichnen(); }
+  // Ganzes Geodreieck (Bild aus /dreieck/geodreieck.png: 1036 × 522 px, Nullpunkt bei (518, 2), Spitze unten).
+  // Der Winkel öffnet sich nach unten. Rechter Schenkel auf 0 → innere (graue) Skala, linker auf 0 → äußere (gelbe).
+  var GK = 0.5, GX = 41, GY = 46, GOX = GX + 518 * GK, GOY = GY + 2 * GK, GR = 300;
+  function messRichtung(w){ return MS.seite === "r" ? w : 180 - w; } // Bildschirmwinkel (nach unten positiv)
+  function PU(r, d){ return [GOX + r * Math.cos(d * RAD), GOY + r * Math.sin(d * RAD)]; }
   function messZeichnen(){
-    var sv = $("messSvg"); leer(sv); var cx = 260, cy = 262, R = 210;
-    sv.appendChild(el("path", { d: "M" + (cx - R) + " " + cy + " A" + R + " " + R + " 0 0 1 " + (cx + R) + " " + cy + " Z", fill: "rgba(219,234,254,0.75)", stroke: "#1d4ed8", "stroke-width": 2 }));
-    sv.appendChild(el("path", { d: "M" + (cx - 70) + " " + cy + " A70 70 0 0 1 " + (cx + 70) + " " + cy, fill: "none", stroke: "#93c5fd", "stroke-width": 1.5 }));
-    for(var d = 0; d <= 180; d++){
-      var l = d % 10 === 0 ? 16 : d % 5 === 0 ? 11 : 6, a = P(cx, cy, R, d), b = P(cx, cy, R - l, d);
-      sv.appendChild(el("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: "#1e3a8a", "stroke-width": d % 10 === 0 ? 1.6 : 1 }));
-      if(d % 10 === 0){
-        var o = P(cx, cy, R - 30, d), i = P(cx, cy, R - 52, d);
-        sv.appendChild(el("text", { x: o[0], y: o[1] + 5, "text-anchor": "middle", "font-family": "system-ui, sans-serif", "font-size": 13, "font-weight": 700, fill: "#1e3a8a", transform: "rotate(" + (90 - d) + " " + o[0] + " " + o[1] + ")" }, String(d)));
-        sv.appendChild(el("text", { x: i[0], y: i[1] + 4, "text-anchor": "middle", "font-family": "system-ui, sans-serif", "font-size": 11, "font-weight": 700, fill: "#b45309", transform: "rotate(" + (90 - d) + " " + i[0] + " " + i[1] + ")" }, String(180 - d)));
-      }
+    var sv = $("messSvg"); leer(sv); sv.setAttribute("viewBox", "0 0 600 " + (GY + GR + 12));
+    var d1 = MS.seite === "r" ? 0 : 180, d2 = messRichtung(MS.w), lo = Math.min(d1, d2), hi = Math.max(d1, d2);
+    // Körper des Geodreiecks (leicht getönt), dann die Schenkel, darüber das Bild
+    sv.appendChild(el("polygon", { points: GX + "," + GY + " " + (GX + 1036 * GK) + "," + GY + " " + GOX + "," + (GY + 518 * GK), fill: "rgba(186,230,253,0.28)", stroke: "#94a3b8", "stroke-width": 1 }));
+    var sk = function(a, b){ var p = [], n = 24; for(var i = 0; i <= n; i++){ var q = PU(44, a + (b - a) * i / n); p.push(q[0] + " " + q[1]); } return "M" + GOX + " " + GOY + " L" + p.join(" L") + "Z"; };
+    sv.appendChild(el("path", { d: sk(lo, hi), fill: "rgba(34,197,94,0.35)", stroke: "#15803d", "stroke-width": 2 }));
+    sv.appendChild(el("line", { x1: 4, y1: GOY, x2: 596, y2: GOY, stroke: "#94a3b8", "stroke-width": 1.2 }));
+    [d1, d2].forEach(function(d){ var e = PU(GR, d); sv.appendChild(el("line", { x1: GOX, y1: GOY, x2: e[0], y2: e[1], stroke: "#b91c1c", "stroke-width": 3.5, "stroke-linecap": "round" })); });
+    sv.appendChild(el("image", { href: "/dreieck/geodreieck.png", x: GX, y: GY, width: 1036 * GK, height: 522 * GK, opacity: 0.92 }));
+    sv.appendChild(el("circle", { cx: GOX, cy: GOY, r: 4.5, fill: "#b91c1c" }));
+    if(MS.probe){
+      var h = PU(GR - 24, d2);
+      sv.appendChild(el("circle", { cx: h[0], cy: h[1], r: 15, fill: "#b91c1c", "fill-opacity": 0.85, stroke: "#ffffff", "stroke-width": 3, "class": "griff" }));
+      $("messMeld").textContent = t("probWert", { w: MS.w, i: MS.seite === "r" ? MS.w : 180 - MS.w, a: MS.seite === "r" ? 180 - MS.w : MS.w });
+      $("messMeld").className = "meldung";
     }
-    sv.appendChild(el("line", { x1: cx - R - 20, y1: cy, x2: cx + R + 20, y2: cy, stroke: "#1e3a8a", "stroke-width": 1.5 }));
-    var d1 = MS.seite === "r" ? 0 : 180, d2 = MS.seite === "r" ? MS.w : 180 - MS.w, lo = Math.min(d1, d2), hi = Math.max(d1, d2);
-    sv.appendChild(el("path", { d: sektor(cx, cy, 44, lo, hi), fill: "rgba(34,197,94,0.35)", stroke: "#15803d", "stroke-width": 2 }));
-    [d1, d2].forEach(function(d){ var e = P(cx, cy, R + 22, d); sv.appendChild(el("line", { x1: cx, y1: cy, x2: e[0], y2: e[1], stroke: "#b91c1c", "stroke-width": 3.5, "stroke-linecap": "round" })); });
-    sv.appendChild(el("circle", { cx: cx, cy: cy, r: 4.5, fill: "#b91c1c" }));
-    if(MS.geprueft){ var m = P(cx, cy, 100, (lo + hi) / 2); txt(sv, m[0], m[1] + 6, MS.w + "°", { "font-size": 20, fill: "#15803d" }); }
+    if(MS.geprueft || MS.probe){ var m = PU(78, (lo + hi) / 2); txt(sv, m[0], m[1] + 6, MS.w + "°", { "font-size": 20, fill: "#15803d" }); }
+  }
+  function messWinkelAus(e){
+    var sv = $("messSvg"), r = sv.getBoundingClientRect(), vb = sv.viewBox.baseVal;
+    var x = vb.x + (e.clientX - r.left) / r.width * vb.width, y = vb.y + (e.clientY - r.top) / r.height * vb.height;
+    var d = Math.atan2(Math.max(0, y - GOY), x - GOX) / RAD;           // 0 … 180, nach unten
+    var w = MS.seite === "r" ? d : 180 - d;
+    return Math.max(1, Math.min(179, Math.round(w)));
+  }
+  (function(){
+    var sv = $("messSvg"), zieht = false;
+    sv.addEventListener("pointerdown", function(e){ if(!MS.probe) return; zieht = true; try { sv.setPointerCapture(e.pointerId); } catch(x){} MS.w = messWinkelAus(e); messZeichnen(); e.preventDefault(); });
+    sv.addEventListener("pointermove", function(e){ if(!zieht) return; MS.w = messWinkelAus(e); messZeichnen(); });
+    ["pointerup", "pointercancel"].forEach(function(n){ sv.addEventListener(n, function(){ zieht = false; }); });
+  })();
+  function messModus(probe){
+    MS.probe = probe;
+    $("messSvg").style.touchAction = probe ? "none" : ""; $("messSvg").style.cursor = probe ? "grab" : "";
+    ["messEin", "messPr", "messWeiter", "messEinL"].forEach(function(id){ var e = $(id); if(e) e.hidden = probe; });
+    var eh = $("messEin").nextElementSibling; if(eh && eh.classList.contains("einh")) eh.hidden = probe;
+    $("messSeite").hidden = !probe; $("messProbe").textContent = probe ? t("probAus") : t("probBtn");
+    $("messProbeHint").hidden = !probe;
+    if(!probe){ messNeu(); } else { MS.geprueft = false; messZeichnen(); }
   }
   function messPruefen(){
     if(MS.geprueft) return; var e = lies($("messEin").value); if(!isFinite(e)) return;
     MS.geprueft = true; MS.n++; var ok = Math.abs(e - MS.w) <= 1; if(ok) MS.ok++;
-    var sk = t(MS.seite === "r" ? "aussen" : "innen");
+    var sk = t(MS.seite === "r" ? "innen" : "aussen");   // Geodreieck: rechter Schenkel auf 0 → innere Skala
     $("messMeld").textContent = ok ? t("messOk", { s: sk }) : t("messFalsch", { w: MS.w, s: sk });
     $("messMeld").className = "meldung " + (ok ? "gut" : "schlecht"); $("messPunkte").textContent = MS.ok + " / " + MS.n; messZeichnen();
   }
   $("messPr").addEventListener("click", messPruefen);
   $("messEin").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(MS.geprueft){ messNeu(); } else messPruefen(); } });
   $("messWeiter").addEventListener("click", function(){ messNeu(); $("messEin").focus(); });
+  $("messProbe").addEventListener("click", function(){ messModus(!MS.probe); });
+  $("messSeite").addEventListener("click", function(){ MS.seite = MS.seite === "r" ? "l" : "r"; messZeichnen(); });
 
   // ---------- Winkelarten ----------
   var ARTEN = ["null", "spitz", "recht", "stumpf", "gestreckt", "ueber", "voll"];
@@ -106,11 +134,27 @@
   function artZeigen(){
     var w = +$("artR").value, a = artVon(w);
     $("artW").textContent = w + "°"; winkelBild($("artSvg"), w, 0, "α = " + w + "°");
+    var gp = P(160, 160, 128, w); $("artSvg").appendChild(el("circle", { cx: gp[0], cy: gp[1], r: 11, fill: "#1d4ed8", "fill-opacity": 0.85, stroke: "#ffffff", "stroke-width": 3 }));
     $("artName").textContent = t("a_" + a); $("artDef").textContent = "α " + t("d_" + a);
     $("artListe").innerHTML = ARTEN.map(function(k){ return '<button type="button" data-a="' + k + '" aria-pressed="' + (k === a) + '">' + t("a_" + k) + "</button>"; }).join("");
     $("artListe").querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ var k = b.dataset.a; $("artR").value = { null: 0, spitz: 45, recht: 90, stumpf: 130, gestreckt: 180, ueber: 250, voll: 360 }[k]; artZeigen(); }); });
   }
   $("artR").addEventListener("input", artZeigen);
+  (function(){ // am blauen Schenkel ziehen (Winkel 0 … 360)
+    var sv = $("artSvg"), zieht = false;
+    function setz(e){
+      var r = sv.getBoundingClientRect(), vb = sv.viewBox.baseVal;
+      var x = vb.x + (e.clientX - r.left) / r.width * vb.width, y = vb.y + (e.clientY - r.top) / r.height * vb.height;
+      var w = Math.atan2(160 - y, x - 160) / RAD; if(w < 0) w += 360;
+      var alt = +$("artR").value;
+      if(alt > 300 && w < 60) w = 360; else if(alt < 60 && alt > 0 && w > 300 && Math.abs(alt - w) > 180) w = 0;
+      $("artR").value = Math.round(w); artZeigen();
+    }
+    sv.style.touchAction = "none"; sv.style.cursor = "grab";
+    sv.addEventListener("pointerdown", function(e){ zieht = true; try { sv.setPointerCapture(e.pointerId); } catch(x){} setz(e); e.preventDefault(); });
+    sv.addEventListener("pointermove", function(e){ if(zieht) setz(e); });
+    ["pointerup", "pointercancel"].forEach(function(n){ sv.addEventListener(n, function(){ zieht = false; }); });
+  })();
   var QZ = { w: 0, s: 0, a: "", fertig: false, ok: 0, n: 0, gew: null };
   function quizNeu(){
     var a = wahl(ARTEN.concat(["spitz", "stumpf", "ueber"])), w = { null: 0, spitz: zuf(10, 80), recht: 90, stumpf: zuf(100, 170), gestreckt: 180, ueber: zuf(195, 345), voll: 360 }[a];
@@ -153,7 +197,7 @@
       });
       sv.appendChild(el("circle", { cx: S[0], cy: S[1], r: 4, fill: "#1a2233" }));
     });
-    sv.appendChild(el("text", { x: 16, y: 28, "font-family": "system-ui, sans-serif", "font-size": 16, "font-weight": 700, fill: "#475569" }, "g ∥ h"));
+    sv.appendChild(el("text", { x: 16, y: 28, "font-family": "system-ui, sans-serif", "font-size": 16, "font-weight": 700, fill: "#475569" }, "g || h"));
   }
   function parZeigen(){
     var phi = +$("parR").value; $("parW").textContent = phi + "°"; $("parWL").textContent = t("parWinkel");
@@ -166,7 +210,7 @@
   }
   $("parR").addEventListener("input", parZeigen);
   // ---------- Übung an Parallelen (3 Stufen) ----------
-  // 🆕 23.11.: Stufe 2 = drei Parallelen g ∥ h ∥ k (Winkel über zwei Schnittpunkte weitertragen),
+  // 🆕 23.11.: Stufe 2 = drei Parallelen g || h || k (Winkel über zwei Schnittpunkte weitertragen),
   // Stufe 3 = Dreieck zwischen zwei Parallelen (Wechselwinkel + gestreckter Winkel → Winkelsumme 180°)
   var PQ = { lv: 1, phi: 60, ziel: "β", st: 1, fertig: false, ok: 0, n: 0, ans: 0 };
   try { PQ.lv = +localStorage.getItem("msWinkelStufe") || 1; } catch(e){}
@@ -224,7 +268,7 @@
       txt(sv, p[0], p[1] + 6, m.t, { "font-size": 15 });
     });
     [A, B, P0].forEach(function(S){ sv.appendChild(el("circle", { cx: S[0], cy: S[1], r: 4, fill: "#1a2233" })); });
-    sv.appendChild(el("text", { x: 16, y: 28, "font-family": "system-ui, sans-serif", "font-size": 16, "font-weight": 700, fill: "#475569" }, "g ∥ h"));
+    sv.appendChild(el("text", { x: 16, y: 28, "font-family": "system-ui, sans-serif", "font-size": 16, "font-weight": 700, fill: "#475569" }, "g || h"));
   }
   function parZeichnen2(sv, phi, mark){   // drei Parallelen g, h, k mit einer Schnittgeraden
     leer(sv); var Y = [70, 165, 260], u = [Math.cos(phi * RAD), -Math.sin(phi * RAD)], ct = Math.cos(phi * RAD) / Math.sin(phi * RAD);
@@ -241,9 +285,9 @@
       });
       sv.appendChild(el("circle", { cx: Sp[0], cy: Sp[1], r: 4, fill: "#1a2233" }));
     });
-    sv.appendChild(el("text", { x: 16, y: 28, "font-family": "system-ui, sans-serif", "font-size": 16, "font-weight": 700, fill: "#475569" }, "g ∥ h ∥ k"));
+    sv.appendChild(el("text", { x: 16, y: 28, "font-family": "system-ui, sans-serif", "font-size": 16, "font-weight": 700, fill: "#475569" }, "g || h || k"));
   }
-  // 🆕 Stufe 4: f ∥ g (fallend), h ∥ i (waagerecht), s steigt und schneidet alle vier
+  // 🆕 Stufe 4: f || g (fallend), h || i (waagerecht), s steigt und schneidet alle vier
   var N4 = ["α", "β", "γ", "δ", "ε", "ζ"];
   function parZeichnen4(sv){
     leer(sv);
@@ -251,7 +295,7 @@
     var Si = 0, Fi = 112 * (ca + cb), Gi = 212 * (ca + cb);
     var xs = function(y){ return Si + (iY - y) * ca; }, xf = function(y, Q){ return Q - (iY - y) * cb; };
     var allX = [xs(y0), xs(y1), xf(y0, Fi), xf(y1, Fi), xf(y0, Gi), xf(y1, Gi)];
-    var mn = Math.min.apply(null, allX) - 30, mx = Math.max.apply(null, allX) + 40, dx = -mn;
+    var mn = Math.min.apply(null, allX) - 30, mx = Math.max.apply(null, allX) + 90, dx = -mn;
     var W = mx - mn; sv.setAttribute("viewBox", "0 0 " + W + " 384"); sv.style.maxWidth = Math.min(620, W * 1.1) + "px";
     function X(x){ return x + dx; }
     [[hY, "h"], [iY, "i"]].forEach(function(z){ sv.appendChild(el("line", { x1: 6, y1: z[0], x2: W - 6, y2: z[0], stroke: "#1a2233", "stroke-width": 3 })); txt(sv, 16, z[0] - 10, z[1], { "font-style": "italic", "font-size": 18 }); });
@@ -381,6 +425,7 @@
     document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
     $("schH").textContent = t("schH"); $("schText").textContent = t("schText"); $("schEinL").textContent = t("schEin"); $("schPr").textContent = t("pruefen");
     $("messH").textContent = t("messH"); $("messText").textContent = t("messText"); $("messEinL").textContent = t("messEin"); $("messPr").textContent = t("pruefen"); $("messWeiter").textContent = t("weiter"); $("messMerke").textContent = t("ueberstumpf");
+    $("messProbe").textContent = MS.probe ? t("probAus") : t("probBtn"); $("messSeite").textContent = t("seiteW"); $("messProbeHint").textContent = t("probHint"); if(MS.probe) messZeichnen();
     $("artH").textContent = t("artH"); $("artText").textContent = t("artText"); $("quizH").textContent = t("artQuiz"); $("quizWeiter").textContent = t("weiter");
     $("parH").textContent = t("parH"); $("parText").textContent = t("parText"); $("pqEinL").textContent = t("parEin"); $("pqPr").textContent = t("pruefen"); $("pqNeu").textContent = t("parNeu"); $("pqWegT").textContent = t("weg");
     schTexte();

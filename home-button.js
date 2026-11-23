@@ -121,6 +121,11 @@
   if(window.MS_FZ || document.querySelector('script[src="/fliesstext-formeln.js"]')) return;
   var s = document.createElement("script"); s.src = "/fliesstext-formeln.js"; document.head.appendChild(s);
 })();
+// ---------- Erklär-Blase für griechische Buchstaben (/griechisch-tipp.js) ----------
+(function(){
+  if(window.MS_GRTIPP || document.querySelector('script[src="/griechisch-tipp.js"]')) return;
+  var s = document.createElement("script"); s.src = "/griechisch-tipp.js"; s.defer = true; document.head.appendChild(s);
+})();
 // ---------- Rechenwege Zeile für Zeile, Brüche, Wurzeln (/formel.js) ----------
 (function(){
   if(window.MS_F || document.querySelector('script[src="/formel.js"]')) return;

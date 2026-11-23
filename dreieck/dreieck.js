@@ -113,7 +113,7 @@
   function modPi(d){ d %= Math.PI; if(d < 0) d += Math.PI; return Math.min(d, Math.PI - d); }
   function richtungen(){
     var r = [[0, "—", null], [Math.PI / 2, "|", null]];
-    S.lines.forEach(function(l){ var w = Math.atan2(l.y2 - l.y1, l.x2 - l.x1); r.push([w, "∥", l]); r.push([w + Math.PI / 2, "⊥", l]); });
+    S.lines.forEach(function(l){ var w = Math.atan2(l.y2 - l.y1, l.x2 - l.x1); r.push([w, "||", l]); r.push([w + Math.PI / 2, "⊥", l]); });
     return r;
   }
   function richtungsFang(a, b, festL){

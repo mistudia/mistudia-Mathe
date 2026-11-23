@@ -322,7 +322,7 @@
     $("neSchritte").innerHTML = h;
     // Buchstaben-Tabelle mit Werten aus dem Beispiel
     var xw = F.art === "z" ? b : w, zz2 = zs(xw);
-    var werte = [T[0], muS, sS, z(F.s * F.s, 1), "N(" + z(F.mu, 1) + "; " + z(F.s * F.s, 1) + ")", "", "z = " + z(zz2, 2), "Φ(" + z(zz2, 2) + ") ≈ " + z(Phi(zz2), 4), "P(X ≤ " + z(xw, 1) + ") ≈ " + z(Phi(zz2), 4), z(F.mu - F.s, 1) + " / " + z(F.mu + F.s, 1)];
+    var werte = [T[0], muS, sS, z(F.s * F.s, 1), "N(" + z(F.mu, 1) + "; " + z(F.s * F.s, 1) + ")", "", "z = " + z(zz2, 2), "Φ(" + z(zz2, 2) + ") ≈ " + z(Phi(zz2), 4), "P(X ≤ " + z(xw, 1) + ") ≈ " + z(Phi(zz2), 4), "[" + z(F.mu - F.s, 1) + "; " + z(F.mu + F.s, 1) + "]"];
     $("neZeichen").innerHTML = '<div class="ne-kopf"></div><div class="ne-kopf"></div><div class="ne-kopf">' + E().bspSpalte + "</div>" +
       E().zeichen.map(function(r, i){ return '<div class="ne-sym">' + bdi(r[0]) + "</div><div>" + r[1] + '</div><div class="ne-wert" data-l="' + (werte[i] ? E().bspSpalte : "") + '">' + bdi(werte[i]) + "</div>"; }).join("");
   }

@@ -222,5 +222,114 @@ var MS_F = (function(){
     }).observe(document.body, { childList: true, subtree: true, characterData: true });
   }
   if(document.body) wzStart(); else document.addEventListener("DOMContentLoaded", wzStart);
+
+  // ---------- global: Brüche mit Schrägstrich („h / AT“, „π/2“, „(a + b) / 2“) als Bruch mit Bruchstrich ----------
+  // Wunsch Markus 23.11.: in Gleichungen nirgends Schrägstriche als Bruchstrich. Ausgenommen: SVG, Eingabefelder,
+  // Auswahllisten, code/kbd, .msf-roh / data-roh (z. B. Eingabe-Hilfen, die zeigen, was man tippen soll),
+  // Einheiten ohne Leerzeichen (km/h, m/s², €/kg), Datumsangaben und Adressen.
+  var BR_NIE = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1, OPTION: 1, SELECT: 1, TITLE: 1, NOSCRIPT: 1, CODE: 1, KBD: 1, PRE: 1 };
+  var EINH = /^(?:m|s|h|km|kg|g|mg|t|l|ml|cl|cm|mm|dm|min|€|ct|kWh|Wh|W|V|A|N|Pa|Hz|°C|Std|Stück|Tag|d|a|ha|L|mi|ft|in|lb|oz|gal)[²³]?$/;
+  var FN = "(?:sin|cos|tan|log|ln|lg)(?:\\s?(?:[0-9]+(?:[.,][0-9]+)?°?|[A-Za-zα-ωΑ-Ω][′]*)|\\([^()]*\\))";
+  var OPD = "(?:" + FN + "|[A-Za-z]{1,2}′*\\((?:[^()]|\\([^()]*\\))*\\)|\\((?:[^()]|\\([^()]*\\))*\\)|[−-]?[0-9]*(?:[.,][0-9]+)?(?:[a-zα-ωπ][²³⁴-⁹ⁿ]*){1,4}(?![a-zA-Z])|[−-]?[0-9]+(?:[.,][0-9]+)?(?:[a-zA-Zπα-ω]{1,2}(?![a-zA-Z]))?|[a-zA-Zα-ωΑ-Ωπ][a-zA-Z₀-₉ₙₖα-ω]{0,2}′*)[²³⁰¹⁴-⁹ⁿ]*";
+  var BR_RE = new RegExp("(^|[\\s(=≈<>+−·:,;⇒→\\[{|])(" + OPD + ")(\\s?)\\/(\\s?)(" + OPD + ")(?=$|[\\s)=≈<>+−·:,;.!?⇒→\\]}|%])", "g");
+  var BR_VOR_FN = /(?:^|[^a-zA-Z])(?:sin|cos|tan|log|ln|lg)\s?$/;
+  function brAusgenommen(n){
+    for(var e = n.parentNode; e && e.nodeType === 1; e = e.parentNode){
+      if(BR_NIE[e.tagName] || e.namespaceURI === "http://www.w3.org/2000/svg" || e.isContentEditable) return true;
+      if(e.classList && (e.classList.contains("msf-br") || e.classList.contains("msf-roh"))) return true;
+      if(e.hasAttribute && (e.hasAttribute("data-roh") || e.hasAttribute("data-nobr"))) return true;
+    }
+    return false;
+  }
+  function ohneKlammer(x){
+    if(x.charAt(0) !== "(" || x.charAt(x.length - 1) !== ")") return x;
+    var t = 0; for(var i = 0; i < x.length - 1; i++){ if(x.charAt(i) === "(") t++; else if(x.charAt(i) === ")"){ t--; if(t === 0) return x; } }
+    return x.slice(1, -1);
+  }
+  // Eingabe-Hinweise („Brüche wie 3/2 eingeben“) zeigen, was man tippen soll → Schrägstrich bleibt
+  var BR_EINGABE = /eingeb|eintipp|tippe|schreib|Eingabe|Beispiel:|gehen auch|\btype\b|\benter\b|input|example:|also work|escrib|introduc|ejemplo:|\btape|saisi|écri|exemple\s?:|escrev|digit|exemplo:|ввод|введи|пиши|например|اكتب|أدخل|مثال|输入|例如|入力|例：/i;
+  function bruecheText(t){
+    if(t.indexOf("/") < 0 || /:\/\/|www\.|\.(?:com|de|html|js|png|webp)\b|[0-9]+\/[0-9]+\/[0-9]+/.test(t) || BR_EINGABE.test(t)) return null;
+    if(/^\s*\d+\s+\/\s+\d+\s*$/.test(t)) return null; // „3 / 5“ allein = Punktestand
+    var neu = false;
+    var r = t.replace(BR_RE, function(m, vor, z, s1, s2, n, pos){
+      var eng = !s1 && !s2;
+      if(eng && EINH.test(n) && (EINH.test(z) || /^[−-]?\d/.test(z))) return m;       // Einheiten: km/h, m/s, €/kg, 1/min
+      if(/^[a-zäöüß]+$/i.test(z) && /^[a-zäöüß]+$/i.test(n) && (/^[a-zäöüß]{2,}$/.test(z) || /^[a-zäöüß]{2,}$/.test(n)) && !/[A-Z]/.test(z + n)) return m; // „er/sie“: Wörter, keine Variablen
+      if(!s1 !== !s2) return m;                                                       // „a /b“ – lieber lassen
+      if(BR_VOR_FN.test(t.slice(0, pos + vor.length))) return m;                     // „sin α / …“ ohne Funktion im Zähler
+      neu = true;
+      return vor + "\u0001" + z + "\u0002" + n + "\u0003";
+    });
+    if(!neu) return null;
+    // escapen und Platzhalter durch Brüche ersetzen
+    return esc(r).replace(/\u0001([^\u0002]*)\u0002([^\u0003]*)\u0003/g, function(m, z, n){ return bruch(ohneKlammer(z), ohneKlammer(n)); });
+  }
+  function istZaehler(n){ // „40/40“ in einem Punkte-/Badge-Element
+    if(!/^\s*\d+\/\d+\s*$/.test(n.nodeValue)) return false;
+    for(var e = n.parentNode, k = 0; e && e.nodeType === 1 && k < 3; e = e.parentNode, k++) if(/badge|punkt|score|stand|zaehl|count|pts/i.test((e.id || "") + " " + (typeof e.className === "string" ? e.className : ""))) return true;
+    return false;
+  }
+  // SVG: Text, der nur aus einem Zahlenbruch besteht („1/4“ an einem Ast), bekommt Zähler, Strich und Nenner
+  function svgBruch(te){
+    if(te.getAttribute("data-msbr") || te.closest("[data-roh],[data-nobr]") || te.children.length) return;
+    var txt = te.textContent || "";
+    var m = txt.match(/^([\s\S]*?)(−?(?:\d+(?:[.,]\d+)?π?|π))\s?\/\s?(\d+(?:[.,]\d+)?)((?:\s[\s\S]*)?)$/); if(!m) return;
+    if(m[1] && !/[\s=≈(·]$/.test(m[1])) return;             // nur „… = 1/4“ oder „(1, 2) 1/16“, nicht „km/h“
+    var nach = m[4] || "";
+    var bb; try { bb = te.getBBox(); } catch(x){ return; } if(!bb || !bb.width) return;
+    var NS = "http://www.w3.org/2000/svg", fs = parseFloat(getComputedStyle(te).fontSize) || 14, cy = bb.y + bb.height / 2;
+    var vorW = 0, brX = bb.x, brW = bb.width;
+    var k = fs * 0.86, w = Math.max(m[2].length, m[3].length) * k * 0.6 + 2;
+    try { if(m[1]){ vorW = te.getSubStringLength(0, m[1].length); brX = bb.x + vorW; } } catch(x){ return; }
+    var y0 = te.getAttribute("y");
+    var cx = brX + (nach ? w / 2 + 2 : Math.max(bb.width - vorW, 1) / 2);
+    te.setAttribute("data-msbr", "1"); te.textContent = "";
+    te.removeAttribute("dx"); te.removeAttribute("dy");
+    te.setAttribute("text-anchor", "start"); te.style.textAnchor = "start";
+    if(m[1]){ var v = document.createElementNS(NS, "tspan"); v.setAttribute("x", bb.x); if(y0 != null) v.setAttribute("y", y0); v.textContent = m[1]; te.appendChild(v); }
+    var a = document.createElementNS(NS, "tspan"); a.setAttribute("x", cx); a.setAttribute("y", cy - fs * 0.16); a.setAttribute("text-anchor", "middle"); a.style.fontSize = k + "px"; a.textContent = m[2];
+    var b = document.createElementNS(NS, "tspan"); b.setAttribute("x", cx); b.setAttribute("y", cy + fs * 0.74); b.setAttribute("text-anchor", "middle"); b.style.fontSize = k + "px"; b.textContent = m[3];
+    te.appendChild(a); te.appendChild(b);
+    if(nach){ var na = document.createElementNS(NS, "tspan"); na.setAttribute("x", cx + w / 2 + 2); if(y0 != null) na.setAttribute("y", y0); na.setAttribute("text-anchor", "start"); na.textContent = nach; te.appendChild(na); }
+    var li = document.createElementNS(NS, "line");
+    li.setAttribute("x1", cx - w / 2); li.setAttribute("x2", cx + w / 2); li.setAttribute("y1", cy + fs * 0.06); li.setAttribute("y2", cy + fs * 0.06);
+    li.setAttribute("stroke", getComputedStyle(te).fill || "#1a2233"); li.setAttribute("stroke-width", Math.max(1, fs * 0.08)); li.setAttribute("data-msbr", "1");
+    if(te.parentNode) te.parentNode.insertBefore(li, te.nextSibling);
+  }
+  function svgBrueche(root){
+    var L = root.nodeType === 1 && root.tagName && root.tagName.toLowerCase() === "text" ? [root] : (root.querySelectorAll ? root.querySelectorAll("svg text") : []);
+    for(var i = 0; i < L.length; i++) if((L[i].textContent || "").indexOf("/") >= 0) svgBruch(L[i]);
+  }
+  function bruchText(n){
+    var t = n.nodeValue; if(!t || t.indexOf("/") < 0 || brAusgenommen(n) || istZaehler(n)) return;
+    var h = bruecheText(t); if(h == null) return;
+    if(window.MS_BR_DEBUG) (window.MS_BR_LOG = window.MS_BR_LOG || []).push(t);
+    var tpl = document.createElement("template"); tpl.innerHTML = h;
+    if(n.parentNode) n.parentNode.replaceChild(tpl.content, n);
+  }
+  function bruecheIn(root){
+    if(!root) return;
+    if(root.nodeType === 3){ bruchText(root); return; }
+    if(root.nodeType !== 1 || BR_NIE[root.tagName]) return;
+    if((root.textContent || "").indexOf("/") < 0) return;
+    try { svgBrueche(root); } catch(x){}
+    if(root.namespaceURI === "http://www.w3.org/2000/svg") return;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), L = [], x;
+    while((x = w.nextNode())) if(x.nodeValue.indexOf("/") >= 0) L.push(x);
+    L.forEach(bruchText);
+  }
+  // etwas später als /fliesstext-formeln.js und die Zeilen-Aufbereitung, damit die zuerst ihre Textabsätze bekommen
+  var brOffen = [], brT = null;
+  function brAbarbeiten(){ brT = null; var L = brOffen; brOffen = []; L.forEach(function(n){ if(n.isConnected) bruecheIn(n); }); }
+  function brMerken(n){ brOffen.push(n); if(!brT) brT = setTimeout(brAbarbeiten, 60); }
+  function brStart(){
+    brMerken(document.body);
+    if(window.MutationObserver) new MutationObserver(function(rec){
+      rec.forEach(function(r){ if(r.type === "characterData") brMerken(r.target.parentNode && r.target.parentNode.namespaceURI === "http://www.w3.org/2000/svg" ? r.target.parentNode : r.target); else r.addedNodes.forEach(brMerken); });
+    }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if(document.body) brStart(); else document.addEventListener("DOMContentLoaded", brStart);
+  window.MS_BR_TEST = bruecheText;
   return { bruch: bruch, wurzel: wurzel, c: c, zeilen: zeilen, kette: kette, mnf: mnf, esc: esc, FARBE: FARBE };
 })();
