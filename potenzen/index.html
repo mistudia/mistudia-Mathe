@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     potenzen/index.html – Potenzen & Wurzeln: Potenzen mit Reglern, Potenzleiter, Zehnerpotenzen, Potenzgesetze, Wurzeln (Quadrat/Würfel), Wurzelgesetze, Üben. Logik: app.js, Texte: texte.js (9 Sprachen).
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Potenzen & Wurzeln</title>
+<!-- SEO -->
+<meta name="description" content="Hochzahlen, Potenzleiter, Zehnerpotenzen, Potenzgesetze, Quadrat- und Kubikwurzeln – Klasse 5–10. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<link rel="alternate" hreflang="de" href="https://math.mistudia.com/potenzen/?lang=de">
+<link rel="alternate" hreflang="en" href="https://math.mistudia.com/potenzen/?lang=en">
+<link rel="alternate" hreflang="es" href="https://math.mistudia.com/potenzen/?lang=es">
+<link rel="alternate" hreflang="zh" href="https://math.mistudia.com/potenzen/?lang=zh">
+<link rel="alternate" hreflang="fr" href="https://math.mistudia.com/potenzen/?lang=fr">
+<link rel="alternate" hreflang="ru" href="https://math.mistudia.com/potenzen/?lang=ru">
+<link rel="alternate" hreflang="ar" href="https://math.mistudia.com/potenzen/?lang=ar">
+<link rel="alternate" hreflang="ja" href="https://math.mistudia.com/potenzen/?lang=ja">
+<link rel="alternate" hreflang="pt" href="https://math.mistudia.com/potenzen/?lang=pt">
+<link rel="alternate" hreflang="x-default" href="https://math.mistudia.com/potenzen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="miStudia Mathe">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Potenzen &amp; Wurzeln – miStudia Mathe">
+<meta property="og:description" content="Hochzahlen, Potenzleiter, Zehnerpotenzen, Potenzgesetze, Quadrat- und Kubikwurzeln – Klasse 5–10. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<meta property="og:url" content="https://math.mistudia.com/potenzen/">
+<meta property="og:image" content="https://math.mistudia.com/icons/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<script>var MS_SEO = {"de":["Potenzen & Wurzeln – miStudia Mathe","Hochzahlen, Potenzleiter, Zehnerpotenzen, Potenzgesetze, Quadrat- und Kubikwurzeln – Klasse 5–10. Kostenlos üben mit miStudia, in 9 Sprachen."],"en":["Powers & Roots – miStudia Mathe","Exponents, power ladder, powers of ten, laws of exponents, square and cube roots – Grade 5–10. Free practice with miStudia, in 9 languages."],"es":["Potencias y raíces – miStudia Mathe","Exponentes, escalera de potencias, potencias de diez, propiedades, raíces cuadradas y cúbicas – Curso 5–10. Practica gratis con miStudia, en 9 idiomas."],"zh":["乘方与开方 – miStudia Mathe","指数、乘方阶梯、10 的幂、幂的运算法则、平方根与立方根 – 5–10年级. 用 miStudia 免费练习，支持 9 种语言。"],"fr":["Puissances et racines – miStudia Mathe","Exposants, échelle des puissances, puissances de dix, règles de calcul, racines carrées et cubiques – CM2–2de. S’entraîner gratuitement avec miStudia, en 9 langues."],"ru":["Степени и корни – miStudia Mathe","Показатели, лестница степеней, степени десяти, свойства степеней, квадратные и кубические корни – 5–10 класс. Бесплатные упражнения с miStudia на 9 языках."],"ar":["القوى والجذور – miStudia Mathe","الأسس وسلّم القوى وقوى العشرة وقوانين القوى والجذور التربيعية والتكعيبية – الصف 5–10. تدرّب مجانًا مع miStudia بتسع لغات."],"ja":["累乗と平方根 – miStudia Mathe","指数・累乗のはしご・10 の累乗・指数法則・平方根と立方根 – 小5〜高1. miStudia で無料練習（9か国語）。"],"pt":["Potências e raízes – miStudia Mathe","Expoentes, escada das potências, potências de dez, regras, raízes quadradas e cúbicas – 5º–10º ano. Pratique grátis com o miStudia, em 9 idiomas."]};</script>
+<script src="/sprache-url.js"></script>
+<!-- /SEO -->
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; --basis: #ea580c; --exp: #7c3aed; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 19px; margin: 4px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 18px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  .regler { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 8px 0; }
+  .regler label { font-weight: 700; display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .regler input[type=range] { width: 170px; }
+  .regler output { display: inline-block; min-width: 2.2em; text-align: center; font-size: 19px; font-weight: 800; }
+  #paW, .lb { color: var(--basis); } #pnW, .le { color: var(--exp); }
+  input.zahl { width: 180px; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; font-variant-numeric: tabular-nums; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  input.zahl.breit { width: 260px; }
+  input.zahl.richtig { border-color: #16a34a; background: #dcfce7; } input.zahl.falsch { border-color: #dc2626; background: #fee2e2; }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; margin: 8px 0; }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .fehler { color: var(--schlecht); font-weight: 700; }
+  .chips { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font: 700 15px system-ui, sans-serif; padding: 6px 11px; border-radius: 999px; border: 2px solid #b0b0b8; background: #ffffff; color: var(--text); cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #ffffff; }
+  sup { font-size: 0.62em; }
+  .pb { color: var(--basis); font-weight: 700; } sup.pe { color: var(--exp); font-weight: 800; } sup.pe10 { color: var(--exp); font-weight: 800; }
+  .legende { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0; }
+  .chip-b, .chip-e { display: inline-block; font-weight: 700; font-size: 15px; padding: 3px 11px; border-radius: 999px; color: #fff; }
+  .chip-b { background: var(--basis); } .chip-e { background: var(--exp); }
+  /* Rechenkette: ein = pro Zeile */
+  .kette { display: grid; grid-template-columns: auto auto 1fr; gap: 4px 8px; align-items: center; margin: 10px 0; font-size: 22px; font-variant-numeric: tabular-nums; width: fit-content; max-width: 100%; }
+  .kz { display: contents; }
+  .kg { text-align: center; color: var(--muted); font-weight: 700; min-width: 1em; }
+  .ke { padding: 3px 0; overflow-wrap: anywhere; }
+  .kn:empty { visibility: hidden; padding: 0; }
+  .kn { font-size: 14px; color: #7c2d12; background: #ffedd5; border-radius: 999px; padding: 1px 10px; font-weight: 700; justify-self: start; }
+  .ke .kn { font-size: 15px; margin-inline-start: 6px; }
+  .klam { display: inline-flex; flex-direction: column; align-items: center; }
+  .klamT { font-size: 13px; color: var(--exp); border-top: 2px solid var(--exp); border-radius: 0 0 8px 8px; padding: 0 8px; margin-top: 2px; font-weight: 700; }
+  .weg { text-decoration: line-through; text-decoration-color: #dc2626; text-decoration-thickness: 2px; opacity: 0.55; }
+  .kasten { display: inline-block; min-width: 1.1em; border: 2px dashed #7c3aed; border-radius: 4px; color: #7c3aed; text-align: center; line-height: 1.1; padding: 0 2px; }
+  .potgrid { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: flex-start; }
+  .bild { display: block; max-width: 100%; height: auto; }
+  table.leiter { border-collapse: collapse; font-size: 21px; font-variant-numeric: tabular-nums; }
+  table.leiter td { padding: 4px 10px; } table.leiter tr.hl td { background: #f3e8ff; }
+  table.leiter tr.hl td:first-child { border-radius: 8px 0 0 8px; } table.leiter tr.hl td:last-child { border-radius: 0 8px 8px 0; }
+  td.lg { color: var(--muted); } td.lpf { font-size: 14px; }
+  .pfl { color: #0e7490; font-weight: 700; position: relative; top: 0.85em; white-space: nowrap; }
+  table.vz { border-collapse: collapse; font-size: 19px; } table.vz td { padding: 4px 8px; border-top: 1px solid #e2e8f0; white-space: nowrap; }
+  td.ger { color: var(--gut); font-weight: 700; font-size: 15px; } td.ung { color: var(--schlecht); font-weight: 700; font-size: 15px; }
+  .tabwrap { overflow-x: auto; max-width: 100%; }
+  .zwei, .drei { display: flex; flex-wrap: wrap; gap: 4px 40px; align-items: flex-start; }
+  .zgitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 6px 18px; font-size: 18px; margin: 8px 0; }
+  .regelzeile { font: 700 20px "Cambria Math", Cambria, "Times New Roman", serif; color: #0d3b78; background: #f4f8ff; border-radius: 8px; padding: 6px 12px; display: inline-block; margin: 4px 0; }
+  ol.galle { padding-inline-start: 22px; } ol.galle li { margin: 8px 0; font-size: 16px; }
+  .fkarte { border: 2px solid #fde68a; background: #fffbeb; border-radius: 12px; padding: 8px 12px; margin: 10px 0; }
+  .fz { font-size: 19px; margin: 6px 0; } .fl { font-size: 13px; font-weight: 800; padding: 1px 8px; border-radius: 999px; color: #fff; } .fl.f { background: var(--schlecht); }
+  .durch { text-decoration: line-through; text-decoration-color: var(--schlecht); text-decoration-thickness: 2px; color: #7f1d1d; }
+  .gitter2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 0 14px; }
+  .gitter2 .fkarte { border-color: #c9dcf2; background: #f8fbff; }
+  .zahlen { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 14px; }
+  .zahlen span { background: #fff7ed; border: 1px solid #fdba74; border-radius: 8px; padding: 3px 9px; font-size: 16px; font-variant-numeric: tabular-nums; }
+  .auftrag { font-size: 18px; line-height: 1.6; margin: 4px 0 10px; }
+  .tgross { display: inline-block; font-size: 28px; font-weight: 800; margin-top: 4px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  [dir=rtl] .kette, [dir=rtl] .bild { direction: ltr; }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .tabs button { padding: 8px 12px; font-size: 14px; }
+    .kette { font-size: 19px; grid-template-columns: auto 1fr; } .kn { grid-column: 2; } .kn:empty { display: none; } .tgross { font-size: 23px; }
+    table.leiter { font-size: 18px; } .regelzeile { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Potenzen &amp; Wurzeln</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="pot" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="ges" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="wur" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+  <section id="s_pot">
+    <div class="karte">
+      <h2 data-t="p_was"></h2>
+      <p class="zeile" data-t="p_wasT"></p>
+      <div class="regler">
+        <label><span class="lb" data-t="lblA"></span> <input type="range" id="pa" min="-5" max="12" step="1" value="3"> <output id="paW"></output></label>
+        <label><span class="le" data-t="lblN"></span> <input type="range" id="pn" min="-3" max="8" step="1" value="4"> <output id="pnW"></output></label>
+      </div>
+      <div class="potgrid"><div id="potAus"></div><div id="potBild"></div></div>
+    </div>
+    <div class="karte">
+      <h2 id="leiterT"></h2>
+      <p class="zeile" id="leiterH"></p>
+      <div id="leiterTab" class="tabwrap"></div>
+    </div>
+    <div class="karte">
+      <h2 data-t="p_vz"></h2>
+      <p class="zeile" data-t="p_vzT"></p>
+      <div id="vzTab"></div>
+      <div id="vzK"></div>
+    </div>
+    <div class="karte">
+      <h2 data-t="p_zehn"></h2>
+      <p class="zeile" data-t="p_zehnT"></p>
+      <div id="zListe"></div>
+      <div class="reihe"><label><b data-t="p_zEin"></b> <input class="zahl breit" id="zIn" inputmode="decimal" autocomplete="off" aria-label="Zahl" data-nofit></label></div>
+      <div class="reihe" id="zBsp"></div>
+      <div id="zAus"></div>
+      <p class="merke" data-t="z_merk"></p>
+    </div>
+  </section>
+  <section id="s_ges" hidden>
+    <div class="karte">
+      <h2 data-t="g_titel"></h2>
+      <div class="chips" id="gChips"></div>
+      <div class="regler">
+        <label><span class="lb">a</span> <input type="range" id="ga" min="2" max="9" step="1" value="2"> <output id="gaW"></output></label>
+        <label id="gbL"><span class="lb">b</span> <input type="range" id="gb" min="2" max="9" step="1" value="5"> <output id="gbW"></output></label>
+        <label id="gmL"><span class="le">m</span> <input type="range" id="gm" min="1" max="6" step="1" value="3"> <output id="gmW"></output></label>
+        <label><span class="le">n</span> <input type="range" id="gn" min="1" max="6" step="1" value="2"> <output id="gnW"></output></label>
+      </div>
+      <div id="gAus" class="tabwrap"></div>
+    </div>
+    <div class="karte" id="gAlle"></div>
+    <div class="karte" id="gFehler"></div>
+  </section>
+  <section id="s_wur" hidden>
+    <div class="karte">
+      <h2 data-t="w_was"></h2>
+      <p class="zeile" data-t="w_wasT"></p>
+      <div class="regler"><label>a <input type="range" id="wa" min="0" max="200" step="1" value="50"> <output id="waW"></output></label></div>
+      <div class="potgrid"><div id="wBild"></div><div id="wAus"></div></div>
+    </div>
+    <div class="karte">
+      <h2 data-t="w_n"></h2>
+      <p class="zeile" data-t="w_nT"></p>
+      <div class="regler"><label>a <input type="range" id="wk" min="1" max="1000" step="1" value="64"> <output id="wkW"></output></label></div>
+      <div class="potgrid"><div id="kBild"></div><div id="kAus"></div></div>
+      <div id="nAll"></div>
+    </div>
+    <div class="karte" id="wTab"></div>
+    <div class="karte" id="wGes"></div>
+  </section>
+  <section id="s_ueben" hidden>
+    <div class="karte" id="einst"></div>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <p class="auftrag" id="auftrag"></p>
+      <div class="antwortzeile" id="uZeile"><input class="zahl" id="uAntwort" inputmode="decimal" autocomplete="off" aria-label="="><button type="button" class="knopf" id="pruefen"></button></div>
+      <p class="zeile muted" id="hinweis" data-nobr hidden></p>
+      <p class="meldung" id="meldung"></p>
+      <div id="uWeg" hidden></div>
+      <p><button type="button" class="knopf hell" id="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>
