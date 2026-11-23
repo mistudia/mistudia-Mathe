@@ -43,6 +43,132 @@
     T: { viereck: "Trace a perpendicular de D a AB (pé F): no triângulo AFD ajudam seno e cosseno. Para c: a horizontal por D corta o prolongamento de BC em G – no triângulo retângulo DGC ajuda Pitágoras.", pyramide: "O triângulo MBS tem ângulo reto em M. MB é metade da diagonal do quadrado. Para a face BCS você precisa do apótema h_s (Pitágoras com h e a : 2).", rechteck: "O triângulo ABC tem ângulo reto em B. Para α₁ você conhece o cateto oposto BC e o adjacente AB – então use a tangente. Para ε: as diagonais se cortam ao meio, então MBC é isósceles.", trapez: "Trace a altura de C até AB (pé E). Assim surge o triângulo retângulo EBC com o ângulo β.", gleich: "A altura a partir de C divide o triângulo em dois triângulos retângulos iguais. A base fica dividida ao meio.", raute: "As diagonais são perpendiculares, cortam-se ao meio e dividem o ângulo α ao meio. Use o triângulo ABM.", erat: "Obelisco e sombra formam um triângulo retângulo: tan α = sombra : altura. Os raios de sol são paralelos – o mesmo ângulo aparece no centro da Terra." },
     L: { lot: "Linha auxiliar: perpendicular de D a AB com pé F", hilfdr: "Triângulo retângulo DGC: DG = AB − AF, GC = DF − BC", halbdiag: "MB é metade da diagonal do quadrado", hs: "Apótema h_s a partir de h e a : 2", flBCS: "Área do triângulo BCS:", dreieck: "Triângulo retângulo {d}:", pyth: "Teorema de Pitágoras:", hoehe: "Linha auxiliar: altura de C até AB com pé E", diag: "As diagonais se cortam ao meio: MB = MC, logo MBC é isósceles", wsum: "Soma dos ângulos", basis: "A altura divide a base ao meio: AM = c : 2", raute: "Diagonais perpendiculares, cortam-se ao meio e dividem α", flaeche: "Área do losango:", wechsel: "Raios de sol paralelos: o ângulo no centro da Terra é igual (ângulos alternos)", prop: "Proporção: 360° correspondem à circunferência inteira" } }
   };
+
+  // 🆕 23.11.: Turmhöhe aus zwei Peilpunkten (Texte je Sprache, in FG eingemischt)
+  var TURM = {
+ "de": {
+  "name": "Turmhöhe",
+  "desc": "Eine Turmspitze wird von zwei Punkten A und B am Boden angepeilt: von A unter {al}°, von B unter {be}°. A und B liegen {d} m auseinander, B ist näher am Turm. Wie hoch ist der Turm?",
+  "tipp": "Es gibt zwei rechtwinklige Dreiecke mit derselben Höhe h: BFT und AFT. Stelle für beide tan auf, löse jeweils nach h auf und setze gleich. Dann kannst du x berechnen.",
+  "zwei": "Zwei rechtwinklige Dreiecke mit derselben Höhe h:",
+  "gleich": "Gleichsetzen (beide sind h):",
+  "nachx": "x auf eine Seite bringen und ausklammern:",
+  "einsetzen": "x einsetzen:",
+  "sicht": "Im Dreieck AFT: sin α = h / AT",
+  "x": "x = BF (B bis Turm)",
+  "h": "Turmhöhe h",
+  "at": "Sichtlinie AT"
+ },
+ "en": {
+  "name": "Tower height",
+  "desc": "The top of a tower is sighted from two points A and B on the ground: from A at {al}°, from B at {be}°. A and B are {d} m apart, B is closer to the tower. How tall is the tower?",
+  "tipp": "There are two right-angled triangles with the same height h: BFT and AFT. Write tan for both, solve each for h and set them equal. Then you can work out x.",
+  "zwei": "Two right-angled triangles with the same height h:",
+  "gleich": "Set equal (both are h):",
+  "nachx": "Bring x to one side and factor it out:",
+  "einsetzen": "Substitute x:",
+  "sicht": "In triangle AFT: sin α = h / AT",
+  "x": "x = BF (B to tower)",
+  "h": "Tower height h",
+  "at": "Line of sight AT"
+ },
+ "es": {
+  "name": "Altura de la torre",
+  "desc": "Se observa la punta de una torre desde dos puntos A y B del suelo: desde A con {al}°, desde B con {be}°. A y B están a {d} m, B está más cerca de la torre. ¿Qué altura tiene la torre?",
+  "tipp": "Hay dos triángulos rectángulos con la misma altura h: BFT y AFT. Escribe la tangente en ambos, despeja h e iguala. Así puedes calcular x.",
+  "zwei": "Dos triángulos rectángulos con la misma altura h:",
+  "gleich": "Igualar (ambos son h):",
+  "nachx": "Pasar x a un lado y sacar factor común:",
+  "einsetzen": "Sustituir x:",
+  "sicht": "En el triángulo AFT: sen α = h / AT",
+  "x": "x = BF (de B a la torre)",
+  "h": "Altura h de la torre",
+  "at": "Línea de visión AT"
+ },
+ "zh": {
+  "name": "塔高",
+  "desc": "从地面上两点 A 和 B 观测塔顶：在 A 处仰角 {al}°，在 B 处仰角 {be}°。A、B 相距 {d} m，B 离塔更近。塔有多高？",
+  "tipp": "有两个高都是 h 的直角三角形：BFT 和 AFT。分别写出 tan，都解出 h，再令它们相等，就能求出 x。",
+  "zwei": "两个高都为 h 的直角三角形：",
+  "gleich": "令两式相等（都等于 h）：",
+  "nachx": "把 x 移到一边并提出公因式：",
+  "einsetzen": "代入 x：",
+  "sicht": "在三角形 AFT 中：sin α = h / AT",
+  "x": "x = BF（B 到塔）",
+  "h": "塔高 h",
+  "at": "视线 AT"
+ },
+ "fr": {
+  "name": "Hauteur d’une tour",
+  "desc": "On vise le sommet d’une tour depuis deux points A et B au sol : depuis A sous {al}°, depuis B sous {be}°. A et B sont à {d} m l’un de l’autre, B est plus près de la tour. Quelle est la hauteur de la tour ?",
+  "tipp": "Il y a deux triangles rectangles de même hauteur h : BFT et AFT. Écris la tangente dans les deux, isole h et égale. Tu peux alors calculer x.",
+  "zwei": "Deux triangles rectangles de même hauteur h :",
+  "gleich": "Égaler (les deux valent h) :",
+  "nachx": "Mettre x d’un côté et le factoriser :",
+  "einsetzen": "Remplacer x :",
+  "sicht": "Dans le triangle AFT : sin α = h / AT",
+  "x": "x = BF (de B à la tour)",
+  "h": "Hauteur h de la tour",
+  "at": "Ligne de visée AT"
+ },
+ "ru": {
+  "name": "Высота башни",
+  "desc": "Вершину башни наблюдают из двух точек A и B на земле: из A под углом {al}°, из B под углом {be}°. Между A и B {d} м, B ближе к башне. Какова высота башни?",
+  "tipp": "Есть два прямоугольных треугольника с одной и той же высотой h: BFT и AFT. Запиши для обоих tg, вырази h и приравняй. Так найдёшь x.",
+  "zwei": "Два прямоугольных треугольника с одинаковой высотой h:",
+  "gleich": "Приравнять (оба равны h):",
+  "nachx": "Перенести x в одну сторону и вынести за скобки:",
+  "einsetzen": "Подставить x:",
+  "sicht": "В треугольнике AFT: sin α = h / AT",
+  "x": "x = BF (от B до башни)",
+  "h": "Высота башни h",
+  "at": "Линия визирования AT"
+ },
+ "ar": {
+  "name": "ارتفاع البرج",
+  "desc": "تُرصد قمة برج من نقطتين A وB على الأرض: من A بزاوية {al}° ومن B بزاوية {be}°. المسافة بين A وB هي {d} م، وB أقرب إلى البرج. ما ارتفاع البرج؟",
+  "tipp": "يوجد مثلثان قائمان لهما الارتفاع نفسه h: ‏BFT و‏AFT. اكتب الظل في كليهما، وحلّ كلًّا منهما بالنسبة إلى h ثم ساوِ بينهما. بعدها تحسب x.",
+  "zwei": "مثلثان قائمان لهما الارتفاع نفسه h:",
+  "gleich": "المساواة (كلاهما يساوي h):",
+  "nachx": "انقل x إلى طرف واحد واستخرجه عاملًا مشتركًا:",
+  "einsetzen": "عوّض x:",
+  "sicht": "في المثلث AFT: ‏sin α = h / AT",
+  "x": "المسافة x = BF",
+  "h": "ارتفاع البرج h",
+  "at": "خط الرؤية AT"
+ },
+ "ja": {
+  "name": "塔の高さ",
+  "desc": "地面の2点 A と B から塔の先端を見上げます。A からは {al}°、B からは {be}° です。A と B は {d} m 離れていて、B のほうが塔に近いです。塔の高さは何 m ですか。",
+  "tipp": "高さ h が共通の直角三角形が2つあります：BFT と AFT。両方で tan を書き、それぞれ h について解いて等しいとおきます。そうすると x が求められます。",
+  "zwei": "高さ h が共通の2つの直角三角形：",
+  "gleich": "等しいとおく（どちらも h）：",
+  "nachx": "x を一方の辺に集めてくくり出す：",
+  "einsetzen": "x を代入：",
+  "sicht": "三角形 AFT で：sin α = h / AT",
+  "x": "x = BF（B から塔まで）",
+  "h": "塔の高さ h",
+  "at": "視線 AT"
+ },
+ "pt": {
+  "name": "Altura da torre",
+  "desc": "O topo de uma torre é avistado de dois pontos A e B no chão: de A sob {al}°, de B sob {be}°. A e B estão a {d} m um do outro, B está mais perto da torre. Qual é a altura da torre?",
+  "tipp": "Há dois triângulos retângulos com a mesma altura h: BFT e AFT. Escreve a tangente nos dois, isola h e iguala. Assim calculas x.",
+  "zwei": "Dois triângulos retângulos com a mesma altura h:",
+  "gleich": "Igualar (ambos são h):",
+  "nachx": "Passar x para um lado e pô-lo em evidência:",
+  "einsetzen": "Substituir x:",
+  "sicht": "No triângulo AFT: sen α = h / AT",
+  "x": "x = BF (de B à torre)",
+  "h": "Altura h da torre",
+  "at": "Linha de visão AT"
+ }
+};
+  for(var lt in TURM) if(FG[lt]){
+    var X = TURM[lt]; FG[lt].F.turm = [X.name, X.desc]; FG[lt].T.turm = X.tipp;
+    FG[lt].L.zwei = X.zwei; FG[lt].L.gleich = X.gleich; FG[lt].L.nachx = X.nachx; FG[lt].L.einsetzen = X.einsetzen; FG[lt].L.sicht = X.sicht;
+    FG[lt].tx = X.x; FG[lt].th = X.h; FG[lt].tat = X.at;
+  }
   if(window.TG) for(var l0 in FG) if(TG[l0]) TG[l0].tab_fig = FG[l0].tab;
 
   var lang = "de"; try { lang = localStorage.getItem("msMathLang") || "de"; } catch(e){}
@@ -158,7 +284,75 @@
             { id: "U", n: "umfang", e: "km", w: U, rel: 0.012, weg: [["wechsel", "α ≈ " + z(al) + "°"], ["prop", "360° : " + z(al) + "° = U : " + P.d + " km"], ["", "U = 360° : " + z(al) + "° · " + P.d + " km ≈ " + z(U, 0) + " km"]] }] };
       } }
   };
-  var REIHE = ["rechteck", "trapez", "gleich", "raute", "viereck", "pyramide", "erat"];
+  FIG.turm = {
+    gen: function(){
+      for(var i = 0; i < 100; i++){
+        var al = Math.round(zufR(18, 36)), be = Math.round(zufR(al + 12, Math.min(al + 35, 68))), d = Math.round(zufR(3, 9)) * 10;
+        var ta = Math.tan(al * RAD), tb = Math.tan(be * RAD), x = ta * d / (tb - ta), h = tb * x;
+        if(x > 8 && x < 2.6 * d && h > 12 && h < 140) return { al: al, be: be, d: d };
+      }
+      return { al: 25, be: 48, d: 50 };
+    },
+    bau: function(P){
+      var al = P.al, be = P.be, d = P.d, ta = Math.tan(al * RAD), tb = Math.tan(be * RAD), x = ta * d / (tb - ta), h = tb * x, at = h / Math.sin(al * RAD);
+      var ta4 = z(ta, 4), tb4 = z(tb, 4);
+      return { turm: true, P: P, x: x, h: h, dreiName: "BFT / AFT",
+        geg: "α = " + al + "°, β = " + be + "°, AB = " + d + " m",
+        fragen: [
+          { id: "x", n: "tx", e: "m", w: x, rel: 0.006, weg: [
+            ["zwei", "BFT: tan β = h / x  →  h = tan " + be + "° · x"],
+            ["", "AFT: tan α = h / (" + d + " + x)  →  h = tan " + al + "° · (" + d + " + x)"],
+            ["gleich", "tan " + be + "° · x = tan " + al + "° · (" + d + " + x)"],
+            ["", tb4 + " · x = " + ta4 + " · " + d + " + " + ta4 + " · x"],
+            ["nachx", "(" + tb4 + " − " + ta4 + ") · x = " + z(ta * d, 4)],
+            ["", "x = " + z(ta * d, 4) + " : " + z(tb - ta, 4) + " ≈ " + z(x) + " m"]] },
+          { id: "h", n: "th", e: "m", w: h, rel: 0.006, weg: [
+            ["einsetzen", "h = tan " + be + "° · x ≈ " + tb4 + " · " + z(x) + " ≈ " + z(h) + " m"],
+            ["", "h = tan " + al + "° · (" + d + " + " + z(x) + ") ≈ " + ta4 + " · " + z(d + x) + " ≈ " + z(h) + " m  ✓"]] },
+          { id: "at", n: "tat", e: "m", w: at, rel: 0.006, weg: [
+            ["sicht", "AT = h : sin α ≈ " + z(h) + " : sin " + al + "° ≈ " + z(at) + " m"]] }] };
+    } };
+  function svgTurm(G, gel){
+    var P0 = G.P, d = P0.d, x = G.x, h = G.h, W = 560, H = 330, L = 50, R = 70, B = 250, T0 = 50;
+    var m = Math.min((W - L - R) / (d + x), (B - T0) / h);
+    var Ax = L, Bx = L + d * m, Fx = L + (d + x) * m, Ty = B - h * m;
+    var s = '<svg class="fg-svg" viewBox="0 0 ' + W + " " + H + '" role="img" style="direction:ltr">';
+    s += '<rect x="0" y="' + B + '" width="' + W + '" height="' + (H - B) + '" fill="#e9f5d6"/>';
+    if(zeigDrei){
+      s += '<polygon points="' + Ax + "," + B + " " + Fx + "," + B + " " + Fx + "," + Ty + '" fill="rgba(37,99,235,.14)" stroke="#2563eb" stroke-width="2"/>';
+      s += '<polygon points="' + Bx + "," + B + " " + Fx + "," + B + " " + Fx + "," + Ty + '" class="fg-drei"/>';
+    }
+    // Turm (eigene einfache Zeichnung): Schaft, Zinnen, Dach, Fahne
+    var tw = Math.max(16, Math.min(34, (B - Ty) * 0.22)), tx0 = Fx - tw / 2, roof = Math.min(28, (B - Ty) * 0.25);
+    s += '<rect x="' + tx0 + '" y="' + (Ty + roof) + '" width="' + tw + '" height="' + (B - Ty - roof) + '" fill="#e5e7eb" stroke="#475569" stroke-width="1.6"/>';
+    for(var i = 0; i < 3; i++){ var wy = Ty + roof + 10 + i * (B - Ty - roof - 26) / 3; if(wy < B - 18) s += '<rect x="' + (Fx - 3) + '" y="' + wy + '" width="6" height="9" rx="3" fill="#f59e0b"/>'; }
+    s += '<path d="M' + (Fx - 5) + " " + B + " v-12 a5 5 0 0 1 10 0 v12z" + '" fill="#92400e"/>';
+    s += '<polygon points="' + (tx0 - 4) + "," + (Ty + roof) + " " + Fx + "," + Ty + " " + (tx0 + tw + 4) + "," + (Ty + roof) + '" fill="#b91c1c" stroke="#7f1d1d" stroke-width="1.4"/>';
+    s += '<line x1="' + Fx + '" y1="' + Ty + '" x2="' + Fx + '" y2="' + (Ty - 18) + '" stroke="#1a2233" stroke-width="1.6"/><path d="M' + Fx + " " + (Ty - 18) + " l16 4 l-16 4z" + '" fill="#db2777"/>';
+    // Boden, Sichtlinien, Höhe
+    s += '<line x1="' + (Ax - 20) + '" y1="' + B + '" x2="' + (Fx + 30) + '" y2="' + B + '" stroke="#1a2233" stroke-width="2.5"/>';
+    s += '<line x1="' + Ax + '" y1="' + B + '" x2="' + Fx + '" y2="' + Ty + '" class="fg-k"/><line x1="' + Bx + '" y1="' + B + '" x2="' + Fx + '" y2="' + Ty + '" class="fg-k"/>';
+    var hx = Fx + 34; s += '<line x1="' + hx + '" y1="' + Ty + '" x2="' + hx + '" y2="' + B + '" stroke="' + (gel.h ? "#1a2233" : "#dc2626") + '" stroke-width="2" stroke-dasharray="5 4"/><line x1="' + Fx + '" y1="' + Ty + '" x2="' + (hx + 6) + '" y2="' + Ty + '" stroke="#64748b" stroke-dasharray="3 3"/>';
+    s += '<text x="' + (hx + 8) + '" y="' + ((Ty + B) / 2 + 6) + '" class="fg-t' + (gel.h ? "" : " rot") + '">' + (gel.h ? "h ≈ " + z(gel.h) : "h") + "</text>";
+    // rechter Winkel bei F
+    s += '<path d="M' + (Fx - 14) + " " + B + " A14 14 0 0 1 " + Fx + " " + (B - 14) + '" class="fg-rw"/><circle cx="' + (Fx - 5) + '" cy="' + (B - 5) + '" r="1.8" fill="#1a2233"/>';
+    // Winkel
+    [[Ax, P0.al, 46], [Bx, P0.be, 34]].forEach(function(w){
+      var a = Math.atan2(Ty - B, Fx - w[0]), r = w[2];
+      s += '<path d="M' + w[0] + " " + B + " L" + (w[0] + r) + " " + B + " A" + r + " " + r + " 0 0 0 " + (w[0] + r * Math.cos(a)) + " " + (B + r * Math.sin(a)) + 'Z" class="fg-wb"/>';
+      s += '<text x="' + (w[0] + (r + 22) * Math.cos(a / 2)) + '" y="' + (B + (r + 22) * Math.sin(a / 2) + 6) + '" class="fg-t" text-anchor="middle">' + w[1] + "°</text>";
+    });
+    // Maßlinien unten
+    function mass(x1, x2, t, rot){ var y = B + 34; return '<line x1="' + x1 + '" y1="' + (B + 6) + '" x2="' + x1 + '" y2="' + (y + 6) + '" stroke="#64748b" stroke-dasharray="3 3"/><line x1="' + x2 + '" y1="' + (B + 6) + '" x2="' + x2 + '" y2="' + (y + 6) + '" stroke="#64748b" stroke-dasharray="3 3"/>' +
+      '<line x1="' + (x1 + 2) + '" y1="' + y + '" x2="' + (x2 - 2) + '" y2="' + y + '" stroke="' + (rot ? "#dc2626" : "#1a2233") + '" stroke-width="1.8" marker-start="url(#tmPf)" marker-end="url(#tmPf)"/>' +
+      '<text x="' + ((x1 + x2) / 2) + '" y="' + (y + 24) + '" class="fg-t' + (rot ? " rot" : "") + '" text-anchor="middle">' + esc(t) + "</text>"; }
+    s += '<defs><marker id="tmPf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 L10 5 L0 8.8 L2.4 5 Z" fill="#1a2233"/></marker></defs>';
+    s += mass(Ax, Bx, d + " m", false) + mass(Bx, Fx, gel.x ? "x ≈ " + z(gel.x) + " m" : "x", !gel.x);
+    s += '<text x="' + Ax + '" y="' + (B - 10) + '" class="fg-ecke" text-anchor="end" dx="-6">A</text><text x="' + Bx + '" y="' + (B - 10) + '" class="fg-ecke" text-anchor="end" dx="-6">B</text>';
+    s += '<text x="' + (Fx - 12) + '" y="' + (B + 22) + '" class="fg-ecke" text-anchor="end">F</text><text x="' + (Fx - 22) + '" y="' + (Ty - 2) + '" class="fg-ecke" text-anchor="end">T</text>';
+    return s + "</svg>";
+  }
+  var REIHE = ["rechteck", "trapez", "gleich", "raute", "viereck", "pyramide", "turm", "erat"];
   var akt = "rechteck", P = null, zust = {}, zeigDrei = false;
   function neu(){ P = FIG[akt].gen(); zust = {}; zeigDrei = false; }
 
@@ -291,13 +485,13 @@
     var FT = s.F[akt];
     var h = '<p class="zeile">' + esc(s.intro) + '</p><div class="sa-wahl" id="fgWahl">' +
       REIHE.map(function(k){ return '<button type="button" data-f="' + k + '" aria-pressed="' + (k === akt) + '">' + esc(s.F[k][0]) + "</button>"; }).join("") + "</div>";
-    h += '<div class="fg-grid"><div><p class="zeile">' + esc(fuell(FT[1], P)) + "</p>" + (G.erat ? svgErat(G, gel) + '<p class="zeile muted fg-leg">' + esc(E().leg) + '</p><p class="zeile"><a class="knopf hell" href="/beruehmt/#eratosthenes">' + esc(ERL[lang] || ERL.de) + (lang === "ar" ? " ←" : " →") + "</a></p>" : G.pyr ? svgPyr(G, gel) : svgFigur(G, gel)) +
+    h += '<div class="fg-grid"><div><p class="zeile">' + esc(fuell(FT[1], P)) + "</p>" + (G.erat ? svgErat(G, gel) + '<p class="zeile muted fg-leg">' + esc(E().leg) + '</p><p class="zeile"><a class="knopf hell" href="/beruehmt/#eratosthenes">' + esc(ERL[lang] || ERL.de) + (lang === "ar" ? " ←" : " →") + "</a></p>" : G.pyr ? svgPyr(G, gel) : G.turm ? svgTurm(G, gel) : svgFigur(G, gel)) +
       '<p class="zeile"><button type="button" class="knopf hell" id="fgDrei" aria-pressed="' + zeigDrei + '">◺ ' + esc(s.zeig) + "</button></p></div><div>";
-    h += '<p class="zeile"><b>' + esc(s.gegeben) + '</b> <bdi dir="ltr">' + esc(G.geg) + "</bdi>" + (G.erat ? "" : ' <span class="muted">(' + esc(s.laengen) + ")</span>") + "</p>";
+    h += '<p class="zeile"><b>' + esc(s.gegeben) + '</b> <bdi dir="ltr">' + esc(G.geg) + "</bdi>" + (G.erat || G.turm ? "" : ' <span class="muted">(' + esc(s.laengen) + ")</span>") + "</p>";
     h += '<p class="zeile"><b>' + esc(s.gesucht) + "</b></p>";
     G.fragen.forEach(function(f){
       var zz = zust[f.id] || {}, name = s[f.n] || f.n;
-      h += '<div class="sa-frage"><div class="sa-ein"><label class="fg-lab"><bdi dir="ltr">' + esc(name) + "</bdi> =</label> " +
+      h += '<div class="sa-frage"><div class="sa-ein"><label class="fg-lab"><bdi dir="auto">' + esc(name) + "</bdi> =</label> " +
         '<input class="zahl sa-inp" data-f="' + f.id + '" inputmode="decimal" autocomplete="off" placeholder="' + esc(s.ein) + '" value="' + esc(zz.e || "") + '"> <span class="fg-einh">' + esc(f.e) + "</span>" +
         ' <button type="button" class="knopf sa-pr" data-f="' + f.id + '">' + esc(s.pruefen) + "</button>" +
         ' <span class="meldung sa-m ' + (zz.ok === true ? "gut" : zz.ok === false ? "schlecht" : "") + '">' + (zz.ok === true ? esc(s.richtig) : zz.ok === false ? esc(s.falsch) : "") + "</span></div>" +

@@ -179,7 +179,12 @@
   }
   function pqNeu(){
     PQ.zw = false; PQ.fertig = false;
-    if(PQ.lv === 3){
+    if(PQ.lv === 4){
+      do { PQ.a = zuf(40, 72); PQ.b = zuf(45, 75); } while(PQ.a + PQ.b < 95 || PQ.a + PQ.b > 138 || Math.abs(PQ.a - PQ.b) < 4);
+      PQ.c = 180 - PQ.a - PQ.b;
+      PQ.w4 = { "α": PQ.b, "β": PQ.a + PQ.b, "γ": PQ.b, "δ": PQ.c, "ε": PQ.a, "ζ": 180 - PQ.b };
+      PQ.e4 = {}; PQ.ok4 = {};
+    } else if(PQ.lv === 3){
       do { PQ.a = zuf(38, 80); PQ.b = zuf(38, 80); } while(PQ.a + PQ.b > 150 || PQ.a + PQ.b < 85);
       PQ.c = 180 - PQ.a - PQ.b;
       PQ.typ = wahl(["c", "c", "b", "aS"]);   // gesucht: γ, β (aus α und γ) oder α′ an der Spitze
@@ -238,9 +243,85 @@
     });
     sv.appendChild(el("text", { x: 16, y: 28, "font-family": "system-ui, sans-serif", "font-size": 16, "font-weight": 700, fill: "#475569" }, "g ∥ h ∥ k"));
   }
+  // 🆕 Stufe 4: f ∥ g (fallend), h ∥ i (waagerecht), s steigt und schneidet alle vier
+  var N4 = ["α", "β", "γ", "δ", "ε", "ζ"];
+  function parZeichnen4(sv){
+    leer(sv);
+    var a = PQ.a, b = PQ.b, ca = 1 / Math.tan(a * RAD), cb = 1 / Math.tan(b * RAD), hY = 50, iY = 320, y0 = 14, y1 = 356;
+    var Si = 0, Fi = 112 * (ca + cb), Gi = 212 * (ca + cb);
+    var xs = function(y){ return Si + (iY - y) * ca; }, xf = function(y, Q){ return Q - (iY - y) * cb; };
+    var allX = [xs(y0), xs(y1), xf(y0, Fi), xf(y1, Fi), xf(y0, Gi), xf(y1, Gi)];
+    var mn = Math.min.apply(null, allX) - 30, mx = Math.max.apply(null, allX) + 40, dx = -mn;
+    var W = mx - mn; sv.setAttribute("viewBox", "0 0 " + W + " 384"); sv.style.maxWidth = Math.min(620, W * 1.1) + "px";
+    function X(x){ return x + dx; }
+    [[hY, "h"], [iY, "i"]].forEach(function(z){ sv.appendChild(el("line", { x1: 6, y1: z[0], x2: W - 6, y2: z[0], stroke: "#1a2233", "stroke-width": 3 })); txt(sv, 16, z[0] - 10, z[1], { "font-style": "italic", "font-size": 18 }); });
+    function gerade(xa, xb, farbe, name, nx){ sv.appendChild(el("line", { x1: X(xa), y1: y0, x2: X(xb), y2: y1, stroke: farbe, "stroke-width": 3 })); txt(sv, X(xb) + nx, y1 - 4, name, { "font-style": "italic", "font-size": 18, fill: farbe }); }
+    gerade(xf(y0, Fi), xf(y1, Fi), "#1a2233", "f", 14); gerade(xf(y0, Gi), xf(y1, Gi), "#1a2233", "g", 14); gerade(xs(y0), xs(y1), "#7c3aed", "s", -14);
+    var tf = iY - 112, tg = iY - 212;
+    var Pkt = { Si: [X(Si), iY], Fi: [X(Fi), iY], Gi: [X(Gi), iY], Fh: [X(xf(hY, Fi)), hY], Gh: [X(xf(hY, Gi)), hY], Sh: [X(xs(hY)), hY], Sf: [X(xs(tf)), tf], Sg: [X(xs(tg)), tg] };
+    var fe = PQ.fertig, BL = "#2563eb", RT = "#dc2626", GR = "#16a34a", OR = "#f59e0b";
+    var W4 = [
+      ["geg1", "Si", 0, a, BL, a + "°"], ["geg2", "Fi", 180 - b, 180, BL, b + "°"],
+      ["α", "Fh", 360 - b, 360], ["ζ", "Gh", 180, 360 - b], ["ε", "Sh", 0, a],
+      ["β", "Sf", 360 - b, 360 + a], ["δ", "Sg", 180 + a, 360 - b], ["γ", "Gi", 180 - b, 180]
+    ];
+    if(fe) W4.push(["τ", "Sf", 180 + a, 360 - b, OR, PQ.c + "°"]);
+    W4.forEach(function(w){
+      var p = Pkt[w[1]], farbe = w[4] || (PQ.ok4[w[0]] ? GR : RT), r = w[0] === "τ" || w[0] === "δ" ? 24 : 30;
+      var label = w[5] || (PQ.ok4[w[0]] || fe ? w[0] + " = " + PQ.w4[w[0]] + "°" : w[0]);
+      sv.appendChild(el("path", { d: sektor(p[0], p[1], r, w[2], w[3]), fill: farbe, "fill-opacity": 0.35, stroke: farbe, "stroke-width": 2 }));
+      var mid = (w[2] + w[3]) / 2, q = P(p[0], p[1], w[5] ? r + 12 : label.length > 4 ? r + 34 : r + 16, mid);
+      txt(sv, q[0], q[1] + 6, label, { "font-size": 15 });
+    });
+    for(var k in Pkt) sv.appendChild(el("circle", { cx: Pkt[k][0], cy: Pkt[k][1], r: 3.5, fill: "#1a2233" }));
+  }
+  function pq4Box(){
+    var box = $("pq4");
+    if(!box){ box = document.createElement("div"); box.id = "pq4"; box.className = "pq4"; $("pqSvg").parentNode.insertBefore(box, $("pqSvg").nextSibling); }
+    return box;
+  }
+  function pq4Render(){
+    var box = pq4Box(), fe = PQ.fertig;
+    box.innerHTML = '<div class="pq4-grid">' + N4.map(function(n){
+      var v = PQ.e4[n] != null ? PQ.e4[n] : "", ok = PQ.ok4[n], cls = ok ? "gut" : (PQ.zw || fe) && v !== "" ? "schlecht" : "";
+      return '<label class="pq4-f ' + cls + '"><span class="pq4-n">' + n + ' =</span><input class="zahl" data-nofit data-n="' + n + '" inputmode="numeric" autocomplete="off" value="' + (fe && !ok ? PQ.w4[n] : v) + '"' + (ok || fe ? " readonly" : "") + '><span class="einh">°</span></label>';
+    }).join("") + '</div><div class="reihe"><button type="button" class="knopf" id="pq4Pr">' + t("pruefen") + '</button> <button type="button" class="knopf hell" id="pq4Neu">' + t("parNeu") + "</button></div>";
+    box.querySelectorAll("input").forEach(function(inp, i, all){
+      inp.addEventListener("input", function(){ PQ.e4[inp.dataset.n] = inp.value; });
+      inp.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(PQ.fertig){ pqNeu(); return; } var nx = [].slice.call(all).filter(function(x, j){ return j > i && !x.readOnly; })[0]; if(nx) nx.focus(); else pq4Pruefen(); } });
+    });
+    $("pq4Pr").addEventListener("click", pq4Pruefen); $("pq4Pr").disabled = fe;
+    $("pq4Neu").addEventListener("click", function(){ pqNeu(); var f = box.querySelector("input"); if(f) f.focus(); });
+  }
+  function pq4Pruefen(){
+    if(PQ.fertig) return;
+    pq4Box().querySelectorAll("input").forEach(function(inp){ PQ.e4[inp.dataset.n] = inp.value; });
+    if(N4.every(function(n){ return !String(PQ.e4[n] || "").trim(); })) return;
+    var anz = 0;
+    N4.forEach(function(n){ var e = lies(PQ.e4[n] || ""); PQ.ok4[n] = isFinite(e) && Math.abs(e - PQ.w4[n]) < 0.5; if(PQ.ok4[n]) anz++; });
+    if(anz < 6 && !PQ.zw){ PQ.zw = true; $("pqMeld").textContent = t("teilOk", { n: anz }) + " " + t("nochmal6"); $("pqMeld").className = "meldung schlecht"; pqZeigen(); var r = pq4Box().querySelector("input:not([readonly])"); if(r) r.focus(); return; }
+    PQ.fertig = true; PQ.n += 6; PQ.ok += anz;
+    $("pqMeld").textContent = anz === 6 ? t("alleOk") : t("teilOk", { n: anz }); $("pqMeld").className = "meldung " + (anz === 6 ? "gut" : "schlecht");
+    $("pqWegBox").open = true; pqZeigen();
+  }
   function pqZeigen(){
     var L = [], fertig = PQ.fertig, BL = "#2563eb", RT = "#dc2626";
-    if(PQ.lv === 3){
+    var vier = PQ.lv === 4, rh = $("pqEin").closest(".reihe");
+    if(rh) rh.hidden = vier;
+    if($("pq4")) $("pq4").hidden = !vier;
+    if(!vier) $("pqSvg").setAttribute("viewBox", "0 0 520 330"), $("pqSvg").style.maxWidth = "560px";
+    if(vier){
+      parZeichnen4($("pqSvg")); pq4Render();
+      $("pqAuf").innerHTML = t("parQuiz4");
+      var a = PQ.a, b = PQ.b, c = PQ.c;
+      L.push(t("r_gleich", { x: "α", y: b + "°", p: t("p_wechsel") + ", " + t("paarHI") }));
+      L.push(t("r_gleich", { x: "γ", y: b + "°", p: t("p_stufen") + ", " + t("paarFG") }));
+      L.push(t("r_gleich", { x: "ε", y: a + "°", p: t("p_stufen") + ", " + t("paarHI") }));
+      L.push(t("r_summe", { x: "ζ", y: "α", p: t("p_neben") }) + " = 180° − " + b + "° = " + (180 - b) + "°");
+      L.push(t("r_drei", { a: a, b: b, c: c }));
+      L.push(t("r_summe", { x: "β", y: c + "°", p: t("p_neben") }) + " = " + (a + b) + "°");
+      L.push(t("r_gleich", { x: "δ", y: c + "°", p: t("p_stufen") + ", " + t("paarFG") }));
+    } else if(PQ.lv === 3){
       var mark = {}, ziel = PQ.typ === "c" ? "γP" : PQ.typ === "b" ? "βB" : "αP";
       mark.αA = { f: BL, t: "α = " + PQ.a + "°" };
       if(PQ.typ === "b") mark.γP = { f: BL, t: "γ = " + PQ.c + "°" }; else mark.βB = { f: BL, t: "β = " + PQ.b + "°" };
@@ -273,7 +354,7 @@
     $("pqPunkte").textContent = PQ.ok + " / " + PQ.n;
     $("pqWeg").innerHTML = L.map(function(s){ return '<li><bdi dir="ltr">' + s + "</bdi></li>"; }).join("");
     var sw = $("pqStufe");
-    if(sw){ sw.innerHTML = [1, 2, 3].map(function(k){ return '<button type="button" data-lv="' + k + '" aria-pressed="' + (k === PQ.lv) + '">' + t("lv" + k) + "</button>"; }).join("");
+    if(sw){ sw.innerHTML = [1, 2, 3, 4].map(function(k){ return '<button type="button" data-lv="' + k + '" aria-pressed="' + (k === PQ.lv) + '">' + t("lv" + k) + "</button>"; }).join("");
       sw.querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){ PQ.lv = +b.dataset.lv; try { localStorage.setItem("msWinkelStufe", PQ.lv); } catch(e){} pqNeu(); }); }); }
   }
   function pqPruefen(){
@@ -308,7 +389,8 @@
     artZeigen(); quizZeigen();
     if(QZ.fertig){ var ok2 = QZ.gew === QZ.a; $("quizMeld").textContent = ok2 ? t("artRichtig") : t("artFalsch", { a: t("a_" + QZ.a) }); }
     parZeigen(); pqZeigen();
-    if(PQ.fertig){ var w = PQ.ans, ok3 = $("pqMeld").classList.contains("gut"); $("pqMeld").textContent = ok3 ? t("parOk") : t("parFalsch", { w: w }); }
+    if(PQ.fertig && PQ.lv === 4){ var an = N4.filter(function(n){ return PQ.ok4[n]; }).length; $("pqMeld").textContent = an === 6 ? t("alleOk") : t("teilOk", { n: an }); }
+    else if(PQ.fertig){ var w = PQ.ans, ok3 = $("pqMeld").classList.contains("gut"); $("pqMeld").textContent = ok3 ? t("parOk") : t("parFalsch", { w: w }); }
   }
   window.MS_LANG = { apply: function(l){ if(WK[l]){ lang = l; alles(); } } };
   schNeu(); messNeu(); quizNeu(); pqNeu(); alles();

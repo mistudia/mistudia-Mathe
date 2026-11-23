@@ -1507,6 +1507,8 @@
   function grT(){ var a = 9.81 * Math.sin(gr.w * Math.PI / 180) * 5 / 7; return Math.sqrt(2 * 5 / a); }
   function grStart(){
     if(gr.an) cancelAnimationFrame(gr.an);
+    // Ton gleich beim Klick vorbereiten (sonst kommt der erste Klang am Handy verspätet)
+    if(gr.klang){ try { grAudio = grAudio || new (window.AudioContext || window.webkitAudioContext)(); if(grAudio.resume) grAudio.resume(); } catch(x){} }
     var T = grT(), t0 = performance.now(), k = 0;
     (function bild(){
       var tt = (performance.now() - t0) / 1000, q = Math.min(1, tt / T), kk = Math.floor(q * 5 + 1e-9);
@@ -1530,10 +1532,12 @@
       if(i > 1){ var f0 = (i - 1) * (i - 1) / 25, mx = x0 + (f + f0) / 2 * L * Math.cos(wz), my = y0 + (f + f0) / 2 * L * Math.sin(wz); schrift(s, mx + 12 * Math.sin(wz), my + 12 * Math.cos(wz) + 12, "+" + (2 * i - 1), "middle", "bk-klein", { fill: "#7c3aed" }); }
     }
     schrift(s, x0 + 0.02 * L * Math.cos(wz) + 12 * Math.sin(wz), y0 + 0.02 * L * Math.sin(wz) + 22, "+1", "start", "bk-klein", { fill: "#7c3aed" });
-    var bq = Math.max(0, q), cx = x0 + bq * L * Math.cos(wz) - 10 * Math.sin(wz), cy = y0 + bq * L * Math.sin(wz) - 10 * Math.cos(wz);
+    var bq = Math.max(0, q) * Math.max(0, q), cx = x0 + bq * L * Math.cos(wz) - 10 * Math.sin(wz), cy = y0 + bq * L * Math.sin(wz) - 10 * Math.cos(wz);
     s.appendChild(el("circle", { cx: cx, cy: cy, r: 10, fill: "#1565c0", stroke: "#0b3d91", "stroke-width": 2 }));
-    s.appendChild(el("path", { d: "M" + (ex - 50) + " " + ey + "A50 50 0 0 0 " + (ex - 50 * Math.cos(wz)) + " " + (ey - 50 * Math.sin(wz)), fill: "none", stroke: "#7c3aed", "stroke-width": 2 }));
-    schrift(s, ex - 58, ey - 4, gr.w + "°", "end", "bk-klein", { fill: "#5b21b6" });
+    // Neigungswinkel unten zwischen Boden und Rinne (Bogen im Uhrzeigersinn von der Bodenlinie zur Rinne)
+    var rB = 70;
+    s.appendChild(el("path", { d: "M" + ex + " " + ey + "L" + (ex - rB) + " " + ey + "A" + rB + " " + rB + " 0 0 1 " + (ex - rB * Math.cos(wz)) + " " + (ey - rB * Math.sin(wz)) + "Z", fill: "rgba(124,58,237,.15)", stroke: "#7c3aed", "stroke-width": 2 }));
+    schrift(s, ex - rB * 0.62, ey + 24, gr.w + "°", "middle", "bk-klein", { fill: "#5b21b6" });
     $("grSvg").innerHTML = ""; $("grSvg").appendChild(s);
     if(w < 6 * Math.PI / 180) $("grSvg").insertAdjacentHTML("beforeend", '<p class="leg muted">' + esc(t("ga_r_flach")) + "</p>");
     var T = grT(); $("grSvg").insertAdjacentHTML("beforeend", '<p class="leg">' + esc(t("ga_r_zeit", { T: z(T, 2), d: z(T / 5, 2) })) + "</p>");
