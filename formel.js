@@ -251,6 +251,7 @@ var MS_F = (function(){
   function bruecheText(t){
     if(t.indexOf("/") < 0 || /:\/\/|www\.|\.(?:com|de|html|js|png|webp)\b|[0-9]+\/[0-9]+\/[0-9]+/.test(t) || BR_EINGABE.test(t)) return null;
     if(/^\s*\d+\s+\/\s+\d+\s*$/.test(t)) return null; // „3 / 5“ allein = Punktestand
+    if(/:\s*\d+\s+\/\s+\d+(?:\s|$|·)/.test(t)) return null; // „Punkte: 3 / 5“
     var neu = false;
     var r = t.replace(BR_RE, function(m, vor, z, s1, s2, n, pos){
       var eng = !s1 && !s2;

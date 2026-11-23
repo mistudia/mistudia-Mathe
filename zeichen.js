@@ -85,6 +85,7 @@
     par: ["||", "ist parallel zu", "is parallel to", "es paralela a", "平行于", "est parallèle à", "параллельна", "يوازي", "平行である", "é paralela a"],
     wG: ["α, β, γ, δ", "Winkel an der Geraden g (alpha, beta, gamma, delta)", "angles at line g (alpha, beta, gamma, delta)", "ángulos en la recta g (alfa, beta, gamma, delta)", "直线 g 处的角（alpha、beta、gamma、delta）", "angles sur la droite g (alpha, bêta, gamma, delta)", "углы у прямой g (альфа, бета, гамма, дельта)", "الزوايا عند المستقيم g (ألفا، بيتا، غاما، دلتا)", "直線 g のところの角（アルファ・ベータ・ガンマ・デルタ）", "ângulos na reta g (alfa, beta, gama, delta)"],
     wH: ["α′, β′, γ′, δ′", "Winkel an der Geraden h (gelesen „alpha Strich“ …)", "angles at line h (read “alpha prime” …)", "ángulos en la recta h (se lee «alfa prima» …)", "直线 h 处的角（读作 alpha 撇 …）", "angles sur la droite h (lire « alpha prime » …)", "углы у прямой h (читается «альфа штрих» …)", "الزوايا عند المستقيم h (تُقرأ ألفا شرطة …)", "直線 h のところの角（アルファ ダッシュ …）", "ângulos na reta h (lê-se «alfa linha» …)"],
+    abcZahl: ["a, b, c", "beliebige Zahlen", "any numbers", "números cualesquiera", "任意的数", "nombres quelconques", "любые числа", "أي أعداد", "任意の数", "números quaisquer"],
     fgPar: ["f, g, i", "weitere Geraden (Stufe „Sehr schwer“: f || g, h || i)", "further lines (level “very hard”: f || g, h || i)", "otras rectas (nivel «muy difícil»: f || g, h || i)", "其他直线（“很难”：f || g，h || i）", "autres droites (niveau « très difficile » : f || g, h || i)", "другие прямые (уровень «очень сложно»: f || g, h || i)", "مستقيمات أخرى (المستوى الصعب جدًا: f || g، h || i)", "ほかの直線（「とても難しい」：f || g、h || i）", "outras retas (nível «muito difícil»: f || g, h || i)"],
     kPar: ["k", "dritte Parallele (Stufe „Mittel“)", "third parallel line (level “medium”)", "tercera paralela (nivel «medio»)", "第三条平行线（“中等”）", "troisième parallèle (niveau « moyen »)", "третья параллельная (уровень «средне»)", "المستقيم الموازي الثالث (المستوى المتوسط)", "3本目の平行線（「ふつう」）", "terceira paralela (nível «médio»)"],
     wK: ["α″, β″, γ″, δ″", "Winkel an der Geraden k (gelesen „alpha zwei Strich“ …)", "angles at line k (read “alpha double prime” …)", "ángulos en la recta k (se lee «alfa segunda» …)", "直线 k 处的角（读作 alpha 两撇 …）", "angles sur la droite k (lire « alpha seconde » …)", "углы у прямой k (читается «альфа два штриха» …)", "الزوايا عند المستقيم k (تُقرأ ألفا شرطتان …)", "直線 k のところの角（アルファ ツーダッシュ …）", "ângulos na reta k (lê-se «alfa duas linhas» …)"],
@@ -236,6 +237,7 @@
   // ---------- Zuordnung zu den Kacheln ----------
   var FUNK_E = "fx m t Sy N1 P12 alphaS Ddef Wwert R approx";
   var KA = {
+    rechengesetze: [{ in: "#gesetzeBox", k: "abcZahl" }],
     "grosses-einmaleins": [{ in: "#s_tricks", k: "mMitte dAbst" }],
     groessen: [{ in: "#eigenKarte", k: "u_km u_m u_dm u_cm u_mm u_hoch u_ha u_a u_hl u_t u_zeit", ende: true }],
     teilbarkeit: [{ in: "#s_regeln", k: "teilAB" }, { in: "#s_teiler", k: "Tn" }],
