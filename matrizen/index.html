@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     matrizen/index.html – Matrizen: Grundlagen, Transponieren, Addieren, Multiplikation (Falksches Schema), Determinante (Sarrus), Inverse (Gauß-Jordan), Abbildungen, Üben. Logik: app.js, Texte: texte.js (9 Sprachen).
+     ============================================================ -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miStudia – Matrizen</title>
+<!-- SEO -->
+<meta name="description" content="Rechnen mit Matrizen, Falksches Schema, Determinante, Inverse und Abbildungen – Klasse 11–13. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<link rel="alternate" hreflang="de" href="https://math.mistudia.com/matrizen/?lang=de">
+<link rel="alternate" hreflang="en" href="https://math.mistudia.com/matrizen/?lang=en">
+<link rel="alternate" hreflang="es" href="https://math.mistudia.com/matrizen/?lang=es">
+<link rel="alternate" hreflang="zh" href="https://math.mistudia.com/matrizen/?lang=zh">
+<link rel="alternate" hreflang="fr" href="https://math.mistudia.com/matrizen/?lang=fr">
+<link rel="alternate" hreflang="ru" href="https://math.mistudia.com/matrizen/?lang=ru">
+<link rel="alternate" hreflang="ar" href="https://math.mistudia.com/matrizen/?lang=ar">
+<link rel="alternate" hreflang="ja" href="https://math.mistudia.com/matrizen/?lang=ja">
+<link rel="alternate" hreflang="pt" href="https://math.mistudia.com/matrizen/?lang=pt">
+<link rel="alternate" hreflang="x-default" href="https://math.mistudia.com/matrizen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="miStudia Mathe">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Matrizen – miStudia Mathe">
+<meta property="og:description" content="Rechnen mit Matrizen, Falksches Schema, Determinante, Inverse und Abbildungen – Klasse 11–13. Kostenlos üben mit miStudia, in 9 Sprachen.">
+<meta property="og:url" content="https://math.mistudia.com/matrizen/">
+<meta property="og:image" content="https://math.mistudia.com/icons/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<script>var MS_SEO = {"de":["Matrizen – miStudia Mathe","Rechnen mit Matrizen, Falksches Schema, Determinante, Inverse und Abbildungen – Klasse 11–13. Kostenlos üben mit miStudia, in 9 Sprachen."],"en":["Matrices – miStudia Mathe","Matrix arithmetic, multiplication scheme, determinant, inverse and transformations – Grade 11–13. Free practice with miStudia, in 9 languages."],"es":["Matrices – miStudia Mathe","Operaciones con matrices, multiplicación, determinante, inversa y transformaciones – Curso 11–13. Practica gratis con miStudia, en 9 idiomas."],"zh":["矩阵 – miStudia Mathe","矩阵运算、乘法、行列式、逆矩阵与线性变换 – 11–13年级. 用 miStudia 免费练习，支持 9 种语言。"],"fr":["Matrices – miStudia Mathe","Calcul matriciel, produit, déterminant, inverse et transformations – 1re–Tle. S’entraîner gratuitement avec miStudia, en 9 langues."],"ru":["Матрицы – miStudia Mathe","Действия с матрицами, умножение, определитель, обратная матрица и преобразования – 11–13 класс. Бесплатные упражнения с miStudia на 9 языках."],"ar":["المصفوفات – miStudia Mathe","العمليات على المصفوفات والضرب والمحدِّد والمعكوس والتحويلات – الصف 11–13. تدرّب مجانًا مع miStudia بتسع لغات."],"ja":["行列 – miStudia Mathe","行列の計算・かけ算・行列式・逆行列・1次変換 – 高2〜高3. miStudia で無料練習（9か国語）。"],"pt":["Matrizes – miStudia Mathe","Cálculo com matrizes, multiplicação, determinante, inversa e transformações – 11º–12º ano. Pratique grátis com o miStudia, em 9 idiomas."]};</script>
+<script src="/sprache-url.js"></script>
+<!-- /SEO -->
+<link rel="icon" type="image/png" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/home-button.css">
+<style>
+  :root { --blue: #1565c0; --text: #1a2233; --muted: #4f5b6e; --line: #b0b0b8; --gut: #15803d; --schlecht: #b91c1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: #eef5ff; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app { max-width: 1000px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+  #logoOben { display: block; margin: 0 auto 10px; max-width: 320px; width: 100%; height: auto; }
+  h1 { text-align: center; color: var(--blue); margin: 0 0 10px; font-size: 28px; }
+  h2 { color: var(--blue); font-size: 19px; margin: 4px 0 8px; }
+  .tabs { display: flex; gap: 4px; justify-content: center; margin: 0 auto 14px; background: #e3eefc; border-radius: 999px; padding: 4px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tabs button { font: 700 15px system-ui, sans-serif; padding: 8px 16px; border-radius: 999px; border: 0; background: transparent; color: var(--blue); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--blue); color: #ffffff; }
+  .karte { border: 2px solid #c9dcf2; border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #ffffff; overflow-x: auto; }
+  .zeile { margin: 6px 0; font-size: 17px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .reihe { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+  .reihe2 { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin: 8px 0; }
+  .knopf { font: 700 16px system-ui, sans-serif; padding: 10px 18px; border-radius: 12px; border: 0; background: var(--blue); color: #ffffff; cursor: pointer; }
+  .knopf.hell { background: #e3eefc; color: var(--blue); }
+  .knopf.klein { font-size: 14px; padding: 7px 12px; }
+  .merke { border-inline-start: 5px solid var(--blue); background: #f4f8ff; padding: 8px 12px; border-radius: 8px; font-size: 16px; line-height: 1.45; margin: 8px 0; }
+  .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
+  .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  .fehler { color: var(--schlecht); font-weight: 700; }
+  .chips { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font: 700 15px system-ui, sans-serif; padding: 6px 11px; border-radius: 999px; border: 2px solid #b0b0b8; background: #ffffff; color: var(--text); cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #ffffff; }
+  /* Matrizen */
+  .mw { display: inline-block; position: relative; padding: 2px 8px; vertical-align: middle; }
+  .mw::before, .mw::after { content: ""; position: absolute; top: 0; bottom: 0; width: 8px; border: 2.5px solid #1a2233; }
+  .mw::before { left: 0; border-right: 0; border-radius: 9px 0 0 9px; } .mw::after { right: 0; border-left: 0; border-radius: 0 9px 9px 0; }
+  table.mat { border-collapse: separate; border-spacing: 4px 3px; }
+  table.mat td { text-align: center; min-width: 2em; padding: 3px 7px; font-size: 19px; border-radius: 7px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  table.mat td.tr { border-left: 2px solid #64748b; border-radius: 0; padding-left: 10px; }
+  .mname { font: 700 20px "Cambria Math", Cambria, "Times New Roman", serif; white-space: nowrap; }
+  input.mz { width: 3.4em; font: 18px system-ui, sans-serif; text-align: center; border: 2px solid var(--line); border-radius: 8px; padding: 5px 2px; color: var(--text); background: #ffffff; }
+  input.mz:focus { outline: none; border-color: var(--blue); }
+  input.mz.bad { border-color: #dc2626; background: #fee2e2; }
+  .hlR, input.mz.hlR { background: #ffe4e6; } .hlC, input.mz.hlC { background: #dbeafe; }
+  .hlX, input.mz.hlX { background: #fde68a !important; font-weight: 800; box-shadow: 0 0 0 2px #d97706; }
+  .rf0 { color: #e11d48; font-weight: 800; } .rf1 { color: #2563eb; font-weight: 800; } .rf2 { color: #16a34a; font-weight: 800; } .rf3 { color: #d97706; font-weight: 800; }
+  .diag { background: #dcfce7; font-weight: 800; } .d1 { background: #dcfce7; } .d2 { background: #fee2e2; }
+  .cD1 { color: #15803d; font-weight: 700; } .cD2 { color: #b91c1c; font-weight: 700; }
+  .cR { color: #be123c; font-weight: 700; } .cC { color: #1d4ed8; font-weight: 700; }
+  .cE1 { color: #e11d48; font-weight: 800; } .cE2 { color: #2563eb; font-weight: 800; }
+  .blass { opacity: 0.45; }
+  .sm1 { background: #bbf7d0 !important; opacity: 1; box-shadow: 0 0 0 2px #16a34a; } .sm2 { background: #fecaca !important; opacity: 1; box-shadow: 0 0 0 2px #dc2626; }
+  .st { cursor: pointer; border-radius: 6px; padding: 0 3px; } .st:hover { outline: 2px dashed currentColor; }
+  .st.sp { color: #15803d; } .st.sm { color: #b91c1c; }
+  .pfeil { font-size: 22px; color: var(--muted); font-weight: 700; margin: 0 4px; }
+  .gr { display: inline-flex; align-items: center; gap: 6px; margin-inline-end: 16px; font-weight: 700; }
+  .pm { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #b0b0b8; background: #ffffff; font: 800 17px system-ui, sans-serif; color: var(--blue); cursor: pointer; line-height: 1; }
+  .edbox { display: inline-flex; flex-direction: column; gap: 6px; margin: 6px 14px 6px 0; vertical-align: top; }
+  .falk { display: grid; grid-template-columns: auto auto; gap: 8px 10px; align-items: center; justify-items: start; margin: 8px 0; }
+  .falk .fA { justify-self: end; }
+  td.klick { cursor: pointer; } td.klick:hover { outline: 2px dashed #d97706; }
+  .gitter3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 10px 18px; }
+  .gj { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+  .gjs { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .gjs .kn:empty { display: none; }
+  /* Rechenkette */
+  .kette { display: grid; grid-template-columns: auto auto 1fr; gap: 6px 8px; align-items: center; margin: 10px 0; font-size: 20px; font-variant-numeric: tabular-nums; width: fit-content; max-width: 100%; }
+  .kz { display: contents; }
+  .kg { text-align: center; color: var(--muted); font-weight: 700; min-width: 1em; }
+  .ke { padding: 3px 0; }
+  .kn { font-size: 14px; color: #7c2d12; background: #ffedd5; border-radius: 999px; padding: 1px 10px; font-weight: 700; justify-self: start; }
+  .kn:empty { visibility: hidden; padding: 0; }
+  sup { font-size: 0.62em; } sub { font-size: 0.62em; }
+  /* Abbildungen */
+  .abbgrid { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: flex-start; }
+  .bild { display: block; max-width: 100%; height: auto; border: 1px solid #c9dcf2; border-radius: 10px; }
+  .abR { display: grid; grid-template-columns: auto auto; gap: 8px 16px; padding: 6px 12px; border-inline: 3px solid #1a2233; border-radius: 10px; width: fit-content; }
+  .abR label { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
+  .abR input[type=range] { width: 120px; } .abR output { min-width: 3em; font-variant-numeric: tabular-nums; }
+  .abR .s1 { color: #e11d48; } .abR .s2 { color: #2563eb; }
+  #aWL { font-weight: 700; display: inline-flex; gap: 8px; align-items: center; }
+  /* Üben */
+  .auftrag { font-size: 18px; line-height: 1.6; margin: 4px 0 10px; }
+  .antwortzeile { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  input.zahl { width: 180px; font: 22px system-ui, sans-serif; padding: 6px 8px; border: 2px solid var(--line); border-radius: 10px; color: var(--text); background: #ffffff; text-align: center; }
+  input.zahl:focus { outline: none; border-color: var(--blue); }
+  input.zahl.richtig { border-color: #16a34a; background: #dcfce7; } input.zahl.falsch { border-color: #dc2626; background: #fee2e2; }
+  #gWahl { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px; }
+  .knopf.gw { border: 2px solid transparent; font-size: 18px; }
+  .knopf.gw.ok { border-color: #16a34a; background: #dcfce7; color: #14532d; opacity: 1; } .knopf.gw.nein { border-color: #dc2626; background: #fee2e2; color: #7f1d1d; opacity: 1; }
+  .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
+  .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
+  [dir=rtl] .kette, [dir=rtl] .falk, [dir=rtl] .gj, [dir=rtl] .reihe2, [dir=rtl] .abR { direction: ltr; }
+  @media (max-width: 600px) {
+    body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
+    .tabs button { padding: 7px 10px; font-size: 13px; }
+    .kette { font-size: 17px; grid-template-columns: auto 1fr; } .kn { grid-column: 2; } .kn:empty { display: none; }
+    table.mat td { font-size: 16px; padding: 2px 4px; min-width: 1.6em; } input.mz { width: 2.9em; font-size: 16px; }
+    .abR input[type=range] { width: 90px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <img id="logoOben" src="/img/mistudia-logo-learnbygame.png" alt="miStudia – Learn by Game">
+  <h1 id="titel">Matrizen</h1>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="grund" aria-selected="true"></button>
+    <button type="button" role="tab" data-tab="mult" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="det" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="abb" aria-selected="false"></button>
+    <button type="button" role="tab" data-tab="ueben" aria-selected="false"></button>
+  </div>
+  <section id="s_grund">
+    <div class="karte">
+      <h2 data-t="g_was"></h2>
+      <p class="zeile" data-t="g_wasT"></p>
+      <div class="reihe" id="gaGr"></div>
+      <div id="gaEd"></div>
+      <p class="zeile" id="gaTyp"></p>
+      <p class="zeile" id="gaInfo"></p>
+      <h2 data-t="g_trans"></h2>
+      <p class="zeile" data-t="g_transT"></p>
+      <div id="gaTrans"></div>
+    </div>
+    <div class="karte" id="gBes"></div>
+    <div class="karte">
+      <h2 data-t="g_rech"></h2>
+      <p class="zeile" data-t="g_rechT"></p>
+      <div class="reihe"><span class="chips" id="rOps"></span><label id="rZL" class="gr"><span data-t="g_r"></span> <input class="mz" id="rZ" inputmode="decimal" autocomplete="off" data-nofit></label><button type="button" class="knopf hell klein" id="rZuf" data-t="zufall"></button></div>
+      <div><span class="edbox"><span id="r1Gr"></span><span id="r1Ed"></span></span><span class="edbox" id="r2Box"><span id="r2Gr"></span><span id="r2Ed"></span></span></div>
+      <div id="rAus"></div>
+    </div>
+  </section>
+  <section id="s_mult" hidden>
+    <div class="karte">
+      <h2 data-t="m_titel"></h2>
+      <p class="zeile" data-t="m_T"></p>
+      <p class="merke" data-t="m_bed"></p>
+      <div><span class="edbox"><span id="maGr"></span><span id="maEd"></span></span><span class="edbox"><span id="mbGr"></span><span id="mbEd"></span></span></div>
+      <p><button type="button" class="knopf hell klein" id="mZuf" data-t="zufall"></button></p>
+      <p class="zeile" id="mFormat"></p>
+      <div id="mFalk"></div>
+      <p><button type="button" class="knopf hell" id="mWeiter" data-t="m_weiter"></button></p>
+      <div id="mRech"></div>
+      <div id="mBA"></div>
+    </div>
+  </section>
+  <section id="s_det" hidden>
+    <div class="karte">
+      <h2 data-t="d_titel"></h2>
+      <div class="reihe" id="dGr"></div>
+      <div class="reihe"><span id="dEd"></span><button type="button" class="knopf hell klein" id="dZuf" data-t="zufall"></button></div>
+      <div id="dAus"></div>
+    </div>
+    <div class="karte" id="iAus"></div>
+  </section>
+  <section id="s_abb" hidden>
+    <div class="karte">
+      <h2 data-t="a_titel"></h2>
+      <p class="zeile" data-t="a_T"></p>
+      <div class="reihe" id="aVor"></div>
+      <div class="reihe"><label id="aWL"><span data-t="a_winkel"></span> <input type="range" id="aW" min="0" max="360" step="15"> <output id="aWW"></output></label></div>
+      <div class="abbgrid">
+        <div id="aBild"></div>
+        <div>
+          <div class="abR">
+            <label class="s1">a <input type="range" id="aba" min="-3" max="3" step="0.1"> <output id="abaW"></output></label>
+            <label class="s2">b <input type="range" id="abb" min="-3" max="3" step="0.1"> <output id="abbW"></output></label>
+            <label class="s1">c <input type="range" id="abc" min="-3" max="3" step="0.1"> <output id="abcW"></output></label>
+            <label class="s2">d <input type="range" id="abd" min="-3" max="3" step="0.1"> <output id="abdW"></output></label>
+          </div>
+          <div id="aMat"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="s_ueben" hidden>
+    <div class="karte" id="einst"></div>
+    <div class="karte">
+      <span class="punkte" id="punkte"></span>
+      <div class="auftrag" id="auftrag"></div>
+      <div id="gWahl" hidden></div>
+      <div class="antwortzeile" id="uZeile"><input class="zahl" id="uAntwort" inputmode="decimal" autocomplete="off" aria-label="="><button type="button" class="knopf" id="pruefen"></button></div>
+      <p class="zeile muted" id="hinweis" data-nobr hidden></p>
+      <p class="meldung" id="meldung"></p>
+      <div id="uWeg" hidden></div>
+      <p><button type="button" class="knopf hell" id="weiter"></button></p>
+    </div>
+  </section>
+  <div class="footer">© 2026 miStudia – <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a></div>
+</div>
+<script src="texte.js"></script>
+<script src="app.js"></script>
+<script src="/home-button.js"></script>
+</body>
+</html>
