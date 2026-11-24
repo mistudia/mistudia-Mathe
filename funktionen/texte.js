@@ -4,7 +4,7 @@ var FT = {
 de: {
   draw:"Zeichnen", bsp:"Beispiele:", eingabe:"Funktion eingeben",
   errParse:"Das verstehe ich nicht. Beispiel: 2x^3 − x + 4", errDiv:"Bitte nur Polynome eingeben – durch x teilen geht hier nicht.", errExp:"Hochzahlen müssen ganze Zahlen von 0 bis 10 sein.", errBig:"Die Zahlen sind zu groß.", div0:"Durch 0 teilen geht nicht.", errDeg6:"Bitte höchstens Grad 6.", errLin:"Das ist keine lineare Funktion (höchste Hochzahl darf 1 sein).", errQuad:"Das ist keine quadratische Funktion (x² muss vorkommen, höchste Hochzahl 2).",
-  zin:"Vergrößern", zout:"Verkleinern", fit:"Ganzen Graphen zeigen", tipp:"Verschieben mit Finger oder Maus, zoomen mit zwei Fingern oder Mausrad. Mit der Maus darüberfahren oder auf den Graphen tippen zeigt die Werte an.",
+  zin:"Vergrößern", zout:"Verkleinern", fit:"Ganzen Graphen zeigen", tipp:"Verschieben mit Finger oder Maus, zoomen mit zwei Fingern oder Mausrad. Auf den Graphen klicken oder tippen zeigt die Werte an (nochmal klicken entfernt sie).",
   wtTitel:"Wertetabelle", wtHinweis:"Eigene x-Werte eingeben – f(x) wird sofort berechnet.", wtNeu:"+ Zeile", wtAuto:"Werte aus dem Ausschnitt", wtPunkte:"Punkte im Graph zeigen", wtZiel:"Zum Punkt springen", wtWeg:"Zeile löschen", wtX:"x-Wert eingeben",
   dom:"Definitionsbereich", rng:"Wertebereich", sym:"Symmetrie", symY:"achsensymmetrisch zur y-Achse (nur gerade Hochzahlen)", symO:"punktsymmetrisch zum Ursprung (nur ungerade Hochzahlen)", symN:"keine einfache Symmetrie (gerade und ungerade Hochzahlen)",
   inf:"Verhalten im Unendlichen", unendl:"für x → {r} gilt f(x) → {g}",
@@ -29,7 +29,7 @@ de: {
 en: {
   draw:"Plot", bsp:"Examples:", eingabe:"Enter a function",
   errParse:"I don't understand that. Example: 2x^3 − x + 4", errDiv:"Please enter polynomials only – dividing by x is not possible here.", errExp:"Exponents must be whole numbers from 0 to 10.", errBig:"The numbers are too large.", div0:"You can't divide by 0.", errDeg6:"Please use degree 6 at most.", errLin:"That is not a linear function (the highest exponent may be 1).", errQuad:"That is not a quadratic function (x² must appear, highest exponent 2).",
-  zin:"Zoom in", zout:"Zoom out", fit:"Show whole graph", tipp:"Drag with finger or mouse, zoom with two fingers or the mouse wheel. Hover with the mouse or tap the graph to read off values.",
+  zin:"Zoom in", zout:"Zoom out", fit:"Show whole graph", tipp:"Drag with finger or mouse, zoom with two fingers or the mouse wheel. Click or tap the graph to read off values (click again to remove them).",
   wtTitel:"Table of values", wtHinweis:"Type your own x-values – f(x) is calculated at once.", wtNeu:"+ Row", wtAuto:"Values from the current view", wtPunkte:"Show points in the graph", wtZiel:"Jump to point", wtWeg:"Delete row", wtX:"Enter x-value",
   dom:"Domain", rng:"Range", sym:"Symmetry", symY:"symmetric about the y-axis (even exponents only)", symO:"point-symmetric about the origin (odd exponents only)", symN:"no simple symmetry (even and odd exponents)",
   inf:"End behaviour", unendl:"as x → {r}, f(x) → {g}",
@@ -54,7 +54,7 @@ en: {
 es: {
   draw:"Dibujar", bsp:"Ejemplos:", eingabe:"Escribe una función",
   errParse:"No lo entiendo. Ejemplo: 2x^3 − x + 4", errDiv:"Escribe solo polinomios – aquí no se puede dividir entre x.", errExp:"Los exponentes deben ser números enteros de 0 a 10.", errBig:"Los números son demasiado grandes.", div0:"No se puede dividir entre 0.", errDeg6:"Como máximo grado 6, por favor.", errLin:"No es una función lineal (el exponente más alto puede ser 1).", errQuad:"No es una función cuadrática (debe aparecer x², exponente más alto 2).",
-  zin:"Acercar", zout:"Alejar", fit:"Ver toda la gráfica", tipp:"Desplaza con el dedo o el ratón, haz zoom con dos dedos o la rueda. Pasa el ratón o toca la gráfica para leer valores.",
+  zin:"Acercar", zout:"Alejar", fit:"Ver toda la gráfica", tipp:"Desplaza con el dedo o el ratón, haz zoom con dos dedos o la rueda. Haz clic o toca la gráfica para leer valores (otro clic los quita).",
   wtTitel:"Tabla de valores", wtHinweis:"Escribe tus propios valores de x: f(x) se calcula al instante.", wtNeu:"+ Fila", wtAuto:"Valores de la vista actual", wtPunkte:"Mostrar puntos en la gráfica", wtZiel:"Ir al punto", wtWeg:"Borrar fila", wtX:"Escribe un valor de x",
   dom:"Dominio", rng:"Recorrido", sym:"Simetría", symY:"simétrica respecto al eje y (solo exponentes pares)", symO:"simétrica respecto al origen (solo exponentes impares)", symN:"sin simetría sencilla (exponentes pares e impares)",
   inf:"Comportamiento en el infinito", unendl:"si x → {r}, entonces f(x) → {g}",
@@ -79,7 +79,7 @@ es: {
 zh: {
   draw:"画图", bsp:"例子：", eingabe:"输入函数",
   errParse:"看不懂。例如：2x^3 − x + 4", errDiv:"这里只能输入多项式——不能除以 x。", errExp:"指数必须是 0 到 10 的整数。", errBig:"数字太大了。", div0:"不能除以 0。", errDeg6:"次数最多为 6。", errLin:"这不是一次函数（最高次数只能是 1）。", errQuad:"这不是二次函数（必须有 x²，最高次数为 2）。",
-  zin:"放大", zout:"缩小", fit:"显示整个图像", tipp:"用手指或鼠标拖动，用两指或滚轮缩放。用鼠标悬停或点按图像可读取数值。",
+  zin:"放大", zout:"缩小", fit:"显示整个图像", tipp:"用手指或鼠标拖动，用两指或滚轮缩放。点击或点按图像可读取数值（再点一次即可取消）。",
   wtTitel:"数值表", wtHinweis:"输入你自己的 x 值，f(x) 会立即算出。", wtNeu:"+ 行", wtAuto:"取当前视图中的值", wtPunkte:"在图像中显示点", wtZiel:"跳到该点", wtWeg:"删除此行", wtX:"输入 x 值",
   dom:"定义域", rng:"值域", sym:"对称性", symY:"关于 y 轴对称（只有偶次项）", symO:"关于原点中心对称（只有奇次项）", symN:"没有简单的对称性（既有奇次项又有偶次项）",
   inf:"无穷远处的趋势", unendl:"当 x → {r} 时，f(x) → {g}",
@@ -104,7 +104,7 @@ zh: {
 fr: {
   draw:"Tracer", bsp:"Exemples :", eingabe:"Saisir une fonction",
   errParse:"Je ne comprends pas. Exemple : 2x^3 − x + 4", errDiv:"Uniquement des polynômes – diviser par x n’est pas possible ici.", errExp:"Les exposants doivent être des entiers de 0 à 10.", errBig:"Les nombres sont trop grands.", div0:"On ne peut pas diviser par 0.", errDeg6:"Degré 6 au maximum, s’il te plaît.", errLin:"Ce n’est pas une fonction affine (l’exposant le plus grand peut être 1).", errQuad:"Ce n’est pas une fonction du second degré (x² doit apparaître, exposant maximal 2).",
-  zin:"Agrandir", zout:"Réduire", fit:"Afficher toute la courbe", tipp:"Déplace avec le doigt ou la souris, zoome avec deux doigts ou la molette. Survole avec la souris ou touche la courbe pour lire les valeurs.",
+  zin:"Agrandir", zout:"Réduire", fit:"Afficher toute la courbe", tipp:"Déplace avec le doigt ou la souris, zoome avec deux doigts ou la molette. Clique ou touche la courbe pour lire les valeurs (un nouveau clic les enlève).",
   wtTitel:"Tableau de valeurs", wtHinweis:"Saisis tes propres valeurs de x : f(x) est calculé aussitôt.", wtNeu:"+ Ligne", wtAuto:"Valeurs de la vue actuelle", wtPunkte:"Afficher les points sur la courbe", wtZiel:"Aller au point", wtWeg:"Supprimer la ligne", wtX:"Saisir une valeur de x",
   dom:"Ensemble de définition", rng:"Ensemble image", sym:"Symétrie", symY:"symétrique par rapport à l’axe des y – fonction paire (exposants pairs)", symO:"symétrique par rapport à l’origine – fonction impaire (exposants impairs)", symN:"pas de symétrie simple (exposants pairs et impairs)",
   inf:"Limites à l’infini", unendl:"quand x → {r}, f(x) → {g}",
@@ -129,7 +129,7 @@ fr: {
 ru: {
   draw:"Построить", bsp:"Примеры:", eingabe:"Введи функцию",
   errParse:"Не понимаю. Пример: 2x^3 − x + 4", errDiv:"Здесь только многочлены – делить на x нельзя.", errExp:"Показатели степени – целые числа от 0 до 10.", errBig:"Слишком большие числа.", div0:"На 0 делить нельзя.", errDeg6:"Пожалуйста, степень не выше 6.", errLin:"Это не линейная функция (наибольшая степень может быть 1).", errQuad:"Это не квадратичная функция (должен быть x², наибольшая степень 2).",
-  zin:"Увеличить", zout:"Уменьшить", fit:"Показать весь график", tipp:"Двигай пальцем или мышью, масштабируй двумя пальцами или колёсиком. Наведи мышь или коснись графика, чтобы прочитать значения.",
+  zin:"Увеличить", zout:"Уменьшить", fit:"Показать весь график", tipp:"Двигай пальцем или мышью, масштабируй двумя пальцами или колёсиком. Щёлкни или коснись графика, чтобы прочитать значения (повторный щелчок убирает их).",
   wtTitel:"Таблица значений", wtHinweis:"Вводи свои значения x — f(x) считается сразу.", wtNeu:"+ Строка", wtAuto:"Значения из текущего вида", wtPunkte:"Показать точки на графике", wtZiel:"Перейти к точке", wtWeg:"Удалить строку", wtX:"Введи значение x",
   dom:"Область определения", rng:"Множество значений", sym:"Симметрия", symY:"чётная: симметрична относительно оси y (только чётные степени)", symO:"нечётная: симметрична относительно начала координат (только нечётные степени)", symN:"нет простой симметрии (чётные и нечётные степени)",
   inf:"Поведение на бесконечности", unendl:"при x → {r}: f(x) → {g}",
@@ -154,7 +154,7 @@ ru: {
 ar: {
   draw:"ارسم", bsp:"أمثلة:", eingabe:"أدخل دالة",
   errParse:"لم أفهم ذلك. مثال: 2x^3 − x + 4", errDiv:"أدخل كثيرات حدود فقط – لا يمكن القسمة على x هنا.", errExp:"يجب أن تكون الأسس أعدادًا صحيحة من 0 إلى 10.", errBig:"الأعداد كبيرة جدًا.", div0:"لا يمكن القسمة على 0.", errDeg6:"الدرجة 6 على الأكثر من فضلك.", errLin:"هذه ليست دالة خطية (أعلى أس يمكن أن يكون 1).", errQuad:"هذه ليست دالة تربيعية (يجب أن يظهر x²، وأعلى أس 2).",
-  zin:"تكبير", zout:"تصغير", fit:"عرض المنحنى كاملًا", tipp:"حرّك بالإصبع أو الفأرة، وكبّر بإصبعين أو بعجلة الفأرة. مرّر الفأرة أو المس المنحنى لقراءة القيم.",
+  zin:"تكبير", zout:"تصغير", fit:"عرض المنحنى كاملًا", tipp:"حرّك بالإصبع أو الفأرة، وكبّر بإصبعين أو بعجلة الفأرة. انقر على المنحنى أو المسه لقراءة القيم (نقرة أخرى تزيلها).",
   wtTitel:"جدول القيم", wtHinweis:"اكتب قيم x الخاصة بك – تُحسب f(x) فورًا.", wtNeu:"+ صف", wtAuto:"قيم من العرض الحالي", wtPunkte:"إظهار النقاط على المنحنى", wtZiel:"الانتقال إلى النقطة", wtWeg:"حذف الصف", wtX:"أدخل قيمة x",
   dom:"مجال التعريف", rng:"المدى", sym:"التناظر", symY:"متناظرة حول محور y (أسس زوجية فقط)", symO:"متناظرة حول نقطة الأصل (أسس فردية فقط)", symN:"لا يوجد تناظر بسيط (أسس زوجية وفردية)",
   inf:"السلوك عند اللانهاية", unendl:"عندما x → {r} فإن f(x) → {g}",
@@ -179,7 +179,7 @@ ar: {
 ja: {
   draw:"グラフをかく", bsp:"例：", eingabe:"関数を入力",
   errParse:"読み取れません。例：2x^3 − x + 4", errDiv:"ここでは多項式だけ – x でわることはできません。", errExp:"指数は 0〜10 の整数にしてね。", errBig:"数が大きすぎます。", div0:"0 でわることはできません。", errDeg6:"次数は 6 までにしてね。", errLin:"1次関数ではありません（いちばん大きい指数は 1）。", errQuad:"2次関数ではありません（x² が必要、いちばん大きい指数は 2）。",
-  zin:"拡大", zout:"縮小", fit:"グラフ全体を表示", tipp:"指やマウスで動かし、2本の指かホイールで拡大・縮小。マウスを重ねるかグラフをタップすると値が読めます。",
+  zin:"拡大", zout:"縮小", fit:"グラフ全体を表示", tipp:"指やマウスで動かし、2本の指かホイールで拡大・縮小。グラフをクリックかタップすると値が読めます（もう一度で消えます）。",
   wtTitel:"値の表", wtHinweis:"自分で x の値を入力すると、f(x) がすぐに計算されます。", wtNeu:"+ 行", wtAuto:"今の表示範囲から値を入れる", wtPunkte:"グラフに点を表示", wtZiel:"その点へ移動", wtWeg:"行を削除", wtX:"x の値を入力",
   dom:"定義域", rng:"値域", sym:"対称性", symY:"y軸について対称（偶数次の項だけ）", symO:"原点について対称（奇数次の項だけ）", symN:"かんたんな対称性はない（偶数次と奇数次の項がある）",
   inf:"x → ±∞ のときのようす", unendl:"x → {r} のとき f(x) → {g}",
@@ -204,7 +204,7 @@ ja: {
 pt: {
   draw:"Desenhar", bsp:"Exemplos:", eingabe:"Digite uma função",
   errParse:"Não entendi. Exemplo: 2x^3 − x + 4", errDiv:"Digite só polinômios – aqui não dá para dividir por x.", errExp:"Os expoentes devem ser números inteiros de 0 a 10.", errBig:"Os números são grandes demais.", div0:"Não se pode dividir por 0.", errDeg6:"No máximo grau 6, por favor.", errLin:"Isso não é uma função afim (o maior expoente pode ser 1).", errQuad:"Isso não é uma função quadrática (x² precisa aparecer, maior expoente 2).",
-  zin:"Aproximar", zout:"Afastar", fit:"Mostrar o gráfico todo", tipp:"Arraste com o dedo ou o mouse, faça zoom com dois dedos ou a roda do mouse. Passe o mouse ou toque no gráfico para ler os valores.",
+  zin:"Aproximar", zout:"Afastar", fit:"Mostrar o gráfico todo", tipp:"Arraste com o dedo ou o mouse, faça zoom com dois dedos ou a roda do mouse. Clique ou toque no gráfico para ler os valores (outro clique os remove).",
   wtTitel:"Tabela de valores", wtHinweis:"Digite seus próprios valores de x – f(x) é calculado na hora.", wtNeu:"+ Linha", wtAuto:"Valores da vista atual", wtPunkte:"Mostrar pontos no gráfico", wtZiel:"Ir até o ponto", wtWeg:"Excluir linha", wtX:"Digite um valor de x",
   dom:"Domínio", rng:"Imagem", sym:"Simetria", symY:"simétrica em relação ao eixo y (só expoentes pares)", symO:"simétrica em relação à origem (só expoentes ímpares)", symN:"sem simetria simples (expoentes pares e ímpares)",
   inf:"Comportamento no infinito", unendl:"quando x → {r}, f(x) → {g}",

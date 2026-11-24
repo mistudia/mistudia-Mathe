@@ -344,7 +344,7 @@ var FK = (function(){
     });
     svg.addEventListener("pointermove", function(e){
       if(!self.ptr.has(e.pointerId)){
-        if(e.pointerType === "mouse"){ var r0 = svg.getBoundingClientRect(); self.hover = { px: e.clientX - r0.left, py: e.clientY - r0.top }; self.zeichneAblesen(); }
+        if(e.pointerType === "mouse" && self.hover){ self.hover = null; self.zeichneAblesen(); } // 🆕 24.11.2026: kein Ablesen beim bloßen Überfahren
         return;
       }
       if(self.tipp0 && Math.hypot(e.clientX - self.tipp0.x, e.clientY - self.tipp0.y) > 6) self.tipp0 = null;
