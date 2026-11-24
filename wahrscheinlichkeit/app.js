@@ -622,4 +622,6 @@
   $("versuch").innerHTML = '<option value="muenze">muenze</option>';
   sicht($("eingabe"), false); gSetzeEv("gerade");
   alles();
+  // 🆕 24.11.2026: Sprung von außen (z. B. aus Kombinatorik) direkt auf einen Reiter: /wahrscheinlichkeit/#baum
+  (function(){ var h = (location.hash || "").slice(1); if(/^(grund|begr|baum|vergl|vier|sim|sach|ueben)$/.test(h)) zeigeTab(h); })();
 })();

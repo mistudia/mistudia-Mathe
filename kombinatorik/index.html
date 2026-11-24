@@ -119,6 +119,31 @@
   .punkte { float: inline-end; font-weight: 700; color: var(--muted); }
   .meldung { font-weight: 700; font-size: 17px; margin: 10px 0 0; min-height: 1em; }
   .meldung.gut { color: var(--gut); } .meldung.schlecht { color: var(--schlecht); }
+  /* 🆕 24.11.2026 (l): Bilder, Baum, Abzähl-Tabellen, Regeln */
+  .wkBildBox { text-align: center; margin: 4px 0 2px; }
+  .wkBild { max-height: 110px; max-width: 100%; height: auto; }
+  .wkBaum { width: 100%; max-width: 420px; height: auto; display: block; margin: 6px 0; }
+  .wkH { font-size: 18px; color: var(--blue); margin: 16px 0 4px; padding-top: 10px; border-top: 2px solid #c9dcf2; }
+  #uLoesung > .wkH:first-child { border-top: 0; padding-top: 0; margin-top: 8px; }
+  .wkTab { border-collapse: collapse; margin: 6px 0; font-size: 14px; }
+  .wkTab th, .wkTab td { border: 1.5px solid #b0b0b8; min-width: 30px; height: 28px; padding: 1px 4px; text-align: center; color: #1a2233; }
+  .wkTab th { background: #e8f1ff; font-weight: 800; white-space: nowrap; }
+  .wkTab td.an { background: #ffd54f; font-weight: 800; color: #6d1b3a; }
+  .wkTab td.x { background: #eceff1; color: #78909c; }
+  .wkTab td.ges { color: #5b6b80; }
+  .wkTab.eng th, .wkTab.eng td { min-width: 22px; height: 22px; padding: 0 2px; font-size: 12px; }
+  .wkTab.vier th, .wkTab.vier td { min-width: 70px; height: 34px; font-size: 16px; }
+  .wkTab .kp { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-inline-end: 2px; vertical-align: middle; border: 1px solid #1a2233; }
+  .wkTab .qOk { color: #2e7d32; }
+  .wkFolgen { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .wkFolgen span { border: 1.5px solid #b0b0b8; border-radius: 8px; padding: 3px 8px; font-weight: 700; background: #fff; color: #1a2233; }
+  .wkFolgen span.an { background: #ffd54f; border-color: #b8860b; color: #6d1b3a; }
+  .wkMeth { margin: 14px 0 4px; padding: 10px 12px; border-radius: 10px; background: #f3e5f5; border: 1.5px solid #ab47bc; color: #2a1236; line-height: 1.5; }
+  .regelLink { font: 700 13px system-ui, sans-serif; border: 1.5px solid #8e24aa; color: #6a1b9a; background: #fff; border-radius: 999px; padding: 1px 9px; margin-inline-start: 6px; cursor: pointer; vertical-align: middle; }
+  .regelLink:hover { background: #f3e5f5; }
+  table.regeln tr.blink td { animation: wkBlink 2.4s ease-out; }
+  @keyframes wkBlink { 0%, 40% { background: #ffd54f; } 100% { background: transparent; } }
+  a.lk { display: inline-block; text-decoration: none; margin: 4px 4px 0 0; }
   .footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; } .footer a { color: var(--blue); }
   @media (max-width: 600px) {
     body { padding: 6px; } #logoOben { max-width: 210px; } .app { padding: 10px; border-radius: 14px; } h1 { font-size: 22px; }
@@ -163,6 +188,14 @@
       <p class="merke" id="erkl"></p>
     </div>
 
+    <div class="karte" id="regelKarte">
+      <h2 id="regelH"></h2>
+      <p class="zeile" id="regelT"></p>
+      <table class="zeichen regeln" id="regeln"></table>
+      <p class="zeile" style="margin-top:10px"><span id="lkText"></span> <a class="knopf hell lk" id="lkBaum" href="/wahrscheinlichkeit/#baum"></a> <a class="knopf hell lk" id="lkVier" href="/wahrscheinlichkeit/#vier"></a></p>
+      <p><button type="button" class="knopf" id="zurAuf" hidden></button></p>
+    </div>
+
     <div class="karte">
       <h2 id="buchH"></h2>
       <table class="zeichen" id="buch"></table>
@@ -185,6 +218,7 @@
       <span class="punkte" id="punkte"></span>
       <h2 id="uNr"></h2>
       <p class="zeile"><label for="uArt" id="uArtL" style="font-weight:700"></label> <select id="uArt"></select></p>
+      <div class="wkBildBox" id="uBild" hidden></div>
       <p class="auftrag" id="auftrag"></p>
       <div class="antwortzeile"><label for="uAntwort" id="antwortL" style="font-weight:700"></label> <input class="zahl" id="uAntwort" inputmode="numeric" autocomplete="off"> <button type="button" class="knopf" id="pruefen"></button></div>
       <p class="muted" id="tipp"></p>
