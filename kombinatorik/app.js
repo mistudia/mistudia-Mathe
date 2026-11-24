@@ -134,20 +134,35 @@
   }
 
   // ---------- Beispiele ----------
-  var BSP = {
-    pin:    { gross: [10, 4], klein: [3, 2], items: ["1", "2", "3"] },
-    podest: { gross: [8, 3],  klein: [4, 2], items: ["A", "B", "C", "D"] },
-    lotto:  { gross: [49, 6], klein: [4, 2], items: ["A", "B", "C", "D"] },
-    eis:    { gross: [8, 3],  klein: [3, 2], items: ["V", "S", "E"] },
-    perm:   { gross: [6, 6],  klein: [3, 3], items: ["A", "B", "C"] }
-  };
+  // 🆕 24.11.2026: je Fall mehrere Beispiele (id → Texte b_<id>), Auswahl nach Fall gruppiert
+  var BSP = [
+    { id: "pin",       fall: "pin",    gross: [10, 4],  klein: [3, 2], items: ["1", "2", "3"] },
+    { id: "schloss",   fall: "pin",    gross: [10, 3],  klein: [2, 2], items: ["0", "1"] },
+    { id: "muenze",    fall: "pin",    gross: [2, 5],   klein: [2, 3], items: { de: ["K", "Z"], en: ["H", "T"], es: ["C", "X"], zh: ["Z", "F"], fr: ["P", "F"], ru: ["О", "Р"], ar: ["ص", "ك"], ja: ["O", "U"], pt: ["C", "K"] } },
+    { id: "toto",      fall: "pin",    gross: [3, 13],  klein: [3, 2], items: { de: ["1", "0", "2"], es: ["1", "X", "2"], fr: ["1", "N", "2"], pt: ["1", "X", "2"], _: ["1", "0", "2"] } },
+    { id: "podest",    fall: "podest", gross: [8, 3],   klein: [4, 2], items: ["A", "B", "C", "D"] },
+    { id: "sprecher",  fall: "podest", gross: [25, 2],  klein: [3, 2], items: ["A", "B", "C"] },
+    { id: "vorstand",  fall: "podest", gross: [10, 3],  klein: [4, 2], items: ["A", "B", "C", "D"] },
+    { id: "lotto",     fall: "lotto",  gross: [49, 6],  klein: [4, 2], items: ["A", "B", "C", "D"] },
+    { id: "haende",    fall: "lotto",  gross: [10, 2],  klein: [4, 2], items: ["A", "B", "C", "D"] },
+    { id: "pizza",     fall: "lotto",  gross: [8, 3],   klein: [4, 2], items: ["T", "S", "P", "O"] },
+    { id: "team",      fall: "lotto",  gross: [12, 5],  klein: [4, 2], items: ["A", "B", "C", "D"] },
+    { id: "eis",       fall: "eis",    gross: [8, 3],   klein: [3, 2], items: ["V", "S", "E"] },
+    { id: "gummi",     fall: "eis",    gross: [6, 5],   klein: [3, 2], items: ["R", "G", "Y"] },
+    { id: "wuerfel2",  fall: "eis",    gross: [6, 2],   klein: [3, 2], items: ["1", "2", "3"] },
+    { id: "perm",      fall: "perm",   gross: [6, 6],   klein: [3, 3], items: ["A", "B", "C"] },
+    { id: "regal",     fall: "perm",   gross: [5, 5],   klein: [3, 3], items: ["A", "B", "C"] },
+    { id: "anagramm",  fall: "perm",   gross: [5, 5],   klein: [3, 3], items: ["O", "M", "A"] }
+  ];
+  function bspVon(id){ for(var i = 0; i < BSP.length; i++) if(BSP[i].id === id) return BSP[i]; return BSP[0]; }
+  function bspItems(B){ var it = B.items; return Array.isArray(it) ? it : (it[lang] || it._ || it.de); }
   function fragenTxt(fall){
     var r = fall === "pin" || fall === "podest" || fall === "perm", w = fall === "pin" || fall === "eis";
     return esc(t("f1")) + " <b>" + t(r ? "ja" : "nein") + "</b> · " + esc(t("f2")) + " <b>" + t(w ? "ja" : "nein") + "</b>";
   }
   function gegeben(fall, n, k){ return fall === "perm" ? tp("n = " + n, "tip_nPerm", { n: n }) : tp("n = " + n, "tip_n", { n: n }) + ", " + tp("k = " + k, "tip_k", { k: k }); }
   function beispiele(){
-    var fall = $("bsp").value || "pin", B = BSP[fall], T = t("b_" + fall);
+    var B = bspVon($("bsp").value || "pin"), fall = B.fall, T = t("b_" + B.id);
     $("bTitel").textContent = T[0];
     function teil(titel, text, nk, liste){
       var n = nk[0], k = nk[1], h = "<h3>" + esc(titel) + "</h3><p class=\"zeile\">" + esc(text) + "</p>" +
@@ -155,7 +170,7 @@
         '<p class="zeile"><b>' + esc(t("fragen")) + "</b> " + fragenTxt(fall) + "</p>" +
         '<p class="zeile"><b>' + esc(t("rechnung")) + "</b></p><p class=\"wert\">" + rechnung(fall, n, k) + "</p>";
       if(liste){
-        var E = aufzaehlen(B.items, k, fall === "pin" || fall === "podest" || fall === "perm", fall === "pin" || fall === "eis");
+        var E = aufzaehlen(bspItems(B), k, fall === "pin" || fall === "podest" || fall === "perm", fall === "pin" || fall === "eis");
         var trenn = fall === "lotto" ? ", " : "";
         h += '<p class="zeile muted">' + esc(t("alle", { z: E.length })) + '</p><div class="liste">' +
           E.map(function(e){ return "<span>" + (fall === "lotto" ? "{" + e.join(trenn) + "}" : e.join(fall === "podest" ? " " : "")) + "</span>"; }).join("") + "</div>";
@@ -231,7 +246,10 @@
     $("permFormel").innerHTML = tp("P<sub>n</sub>", "tip_Pn") + " = " + tp("n!", "tip_fak") + " = n · (n − 1) · … · 2 · 1";
     $("buch").innerHTML = t("buch").map(function(z){ return '<tr><td><span class="f">' + esc(z[0]).replace("^k", "<sup>k</sup>") + "</span></td><td>" + esc(z[1]) + "</td></tr>"; }).join("");
     var bv = $("bsp").value || "pin";
-    $("bsp").innerHTML = Object.keys(BSP).map(function(k){ return '<option value="' + k + '">' + esc(t("b_" + k)[0]) + "</option>"; }).join("");
+    $("bsp").innerHTML = ["pin", "podest", "lotto", "eis", "perm"].map(function(fa){
+      var lab = fa === "perm" ? t("b_perm")[0] : t(fa === "pin" || fa === "podest" ? "mitR" : "ohneR") + ", " + t(fa === "pin" || fa === "eis" ? "mitW" : "ohneW");
+      return '<optgroup label="' + esc(lab).replace(/"/g, "&quot;") + '">' + BSP.filter(function(b){ return b.fall === fa; }).map(function(b){ return '<option value="' + b.id + '">' + esc(t("b_" + b.id)[0]) + "</option>"; }).join("") + "</optgroup>";
+    }).join("");
     $("bsp").value = bv;
     uebersicht(); beispiele(); zeigeAufgabe();
   }
