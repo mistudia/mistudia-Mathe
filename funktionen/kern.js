@@ -546,6 +546,7 @@ var FK = (function(){
   };
   Graph.prototype.tippen = function(px, py){
     if(!this.kurven.length || !this.X) return;
+    var pb = this.pin && this.pinBox; if(pb && px >= pb.x0 && px <= pb.x1 && py >= pb.y0 && py <= pb.y1){ this.pin = null; this.pinBox = null; this.zeichneAblesen(); return; }
     if(this.pin){ var k = this.kurven[Math.min(this.pin.k, this.kurven.length - 1)], y = k.f(this.pin.x);
       if(Math.abs(this.X(this.pin.x) - px) < 16 && (!isFinite(y) || Math.abs(klemm(this.Y(y), 0, this.H) - py) < 16)){ this.pin = null; this.zeichneAblesen(); return; } }
     var st = this.ablSchritt(), x = Math.round(this.weltX(px) / st.s) * st.s;
@@ -553,7 +554,7 @@ var FK = (function(){
     this.hover = null; this.zeichneAblesen();
   };
   Graph.prototype.zeichneAblesen = function(){
-    if(this.ablG){ this.ablG.remove(); this.ablG = null; }
+    if(this.ablG){ this.ablG.remove(); this.ablG = null; } this.pinBox = null;
     if(!this.X || !this.kurven.length) return;
     var self = this, g = E("g", { "pointer-events": "none" });
     var R = this.rand || {}, W = this.W, H = this.H;
@@ -583,6 +584,12 @@ var FK = (function(){
       if(ly + h > unten) ly = unten - h;
       g.appendChild(E("rect", { x: lx, y: ly, width: w, height: h, rx: 7, fill: "#ffffff", stroke: farbe, "stroke-width": 2, opacity: stark ? 1 : 0.92 }));
       g.appendChild(E("text", { x: lx + w / 2, y: ly + 16.5, "text-anchor": "middle", fill: "#1a2233", "font-size": 14, "font-weight": 700, "font-family": "system-ui, sans-serif", direction: "ltr", "unicode-bidi": "embed" }, txt));
+      if(stark){ // ✕ zum Entfernen (Tippen aufs Etikett oder den Punkt entfernt ihn)
+        var xx = lx + w + 4; if(xx + 22 > W) xx = lx - 26;
+        g.appendChild(E("circle", { cx: xx + 11, cy: ly + h / 2, r: 11, fill: "#ffffff", stroke: "#b0b0b8", "stroke-width": 2 }));
+        g.appendChild(E("text", { x: xx + 11, y: ly + h / 2 + 5, "text-anchor": "middle", fill: "#1a2233", "font-size": 14, "font-weight": 700, "font-family": "system-ui, sans-serif" }, "✕"));
+        self.pinBox = { x0: Math.min(lx, xx) - 4, x1: Math.max(lx + w, xx + 22) + 4, y0: ly - 4, y1: ly + h + 4 };
+      }
     }
     if(this.hover){
       var st = this.ablSchritt(), x = Math.round(this.weltX(this.hover.px) / st.s) * st.s;
@@ -602,13 +609,37 @@ var FK = (function(){
     if(m) return +m[2] ? +m[1] / +m[2] : NaN;
     return /^-?(\d+\.?\d*|\.\d+)$/.test(s) ? +s : NaN;
   }
+
+  // 🆕 24.11.2026: alle x mit f(x) = c im Bereich [a; b] (Vorzeichenwechsel + Berührstellen), höchstens 12
+  function xFuerY(f, c, a, b){
+    var N = 1600, h = (b - a) / N, res = [], g = function(x){ var v = f(x); return isFinite(v) ? v - c : NaN; };
+    var vals = []; for(var i = 0; i <= N; i++) vals.push(g(a + i * h));
+    var gleich = vals.every(function(v){ return isFinite(v) && Math.abs(v) < 1e-12; }); if(gleich) return "alle";
+    function dazu(x){ for(var j = 0; j < res.length; j++) if(Math.abs(res[j] - x) < h * 1.5) return; res.push(x); }
+    for(i = 1; i <= N && res.length < 13; i++){
+      var x0 = a + (i - 1) * h, x1 = a + i * h, g0 = vals[i - 1], g1 = vals[i];
+      if(!isFinite(g0) || !isFinite(g1)) continue;
+      if(g0 === 0){ dazu(x0); continue; }
+      if(g0 * g1 < 0){ var lo = x0, hi = x1, glo = g0; if(Math.abs(g0 - g1) > 1e6 * (1 + Math.abs(c))) continue; // Pol, keine Lösung
+        for(var it = 0; it < 60; it++){ var m = (lo + hi) / 2, gm = g(m); if(!isFinite(gm)) break; if(glo * gm <= 0) hi = m; else { lo = m; glo = gm; } }
+        dazu((lo + hi) / 2); continue; }
+      var g2 = vals[i + 1];
+      if(isFinite(g2) && Math.abs(g1) <= Math.abs(g0) && Math.abs(g1) <= Math.abs(g2) && g1 * g2 > 0){ // Berührstelle?
+        var L = x0, R = x1 + h; for(it = 0; it < 80; it++){ var m1 = L + (R - L) / 3, m2 = R - (R - L) / 3; if(Math.abs(g(m1)) < Math.abs(g(m2))) R = m2; else L = m1; }
+        var xm = (L + R) / 2; if(Math.abs(g(xm)) < 1e-7 * (1 + Math.abs(c))) dazu(xm);
+      }
+    }
+    return res.sort(function(p, q){ return p - q; });
+  }
+  function xRund(x){ var r = Math.round(x); return Math.abs(x - r) < 1e-7 ? r : x; }
   var ZIEL_SVG = '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 1v5M10 14v5M1 10h5M14 10h5" stroke="currentColor" stroke-width="2"/></svg>';
   Graph.prototype.tabelleBauen = function(){
     var wrap = this.svg.closest(".graph-wrap"); if(!wrap) return;
     var self = this, det = document.createElement("details");
     det.className = "wt";
     det.innerHTML = '<summary></summary><p class="wt-h"></p><div class="wt-scroll" dir="ltr"><table><thead><tr><th class="m">x</th><th class="m">f(x)</th><th></th></tr></thead><tbody></tbody></table></div>' +
-      '<div class="wt-knoepfe"><button type="button" class="wt-neu"></button><button type="button" class="wt-auto"></button><label><input type="checkbox" class="wt-zeig" checked> <span></span></label></div>';
+      '<div class="wt-knoepfe"><button type="button" class="wt-neu"></button><button type="button" class="wt-auto"></button><label><input type="checkbox" class="wt-zeig" checked> <span></span></label></div>' +
+      '<div class="wt-umk"><label><span class="wt-umk-l"></span> <span class="wt-umk-f" dir="ltr">f(x) =</span> <input type="text" inputmode="decimal" autocomplete="off" class="wt-yin" placeholder="y"></label><div class="wt-xs" dir="ltr"></div></div>';
     var ref = wrap.nextElementSibling && wrap.nextElementSibling.classList.contains("legende") ? wrap.nextElementSibling : wrap;
     ref.parentNode.insertBefore(det, ref.nextSibling);
     var T = this.tab = { det: det, body: det.querySelector("tbody"), xs: [], lang: null };
@@ -621,6 +652,7 @@ var FK = (function(){
       var inp = T.body.querySelectorAll("input"); if(inp.length){ inp[inp.length - 1].focus(); inp[inp.length - 1].select(); }
     });
     det.querySelector(".wt-zeig").addEventListener("change", function(){ self.zeichne(); });
+    det.querySelector(".wt-yin").addEventListener("input", function(){ T.yc = xLesen(this.value); this.classList.toggle("wt-falsch", !isFinite(T.yc) && this.value.trim() !== ""); self.zeichne(); });
     T.body.addEventListener("input", function(e){
       var i = +e.target.dataset.i; if(isNaN(i)) return;
       T.xs[i] = xLesen(e.target.value); e.target.classList.toggle("wt-falsch", !isFinite(T.xs[i]) && e.target.value.trim() !== "");
@@ -660,6 +692,7 @@ var FK = (function(){
       T.det.querySelector(".wt-neu").textContent = t("wtNeu");
       T.det.querySelector(".wt-auto").textContent = t("wtAuto");
       T.det.querySelector(".wt-zeig + span").textContent = t("wtPunkte");
+      T.det.querySelector(".wt-umk-l").textContent = t("wtUmk");
       T.body.querySelectorAll(".wt-ziel").forEach(function(b){ b.title = t("wtZiel"); b.setAttribute("aria-label", t("wtZiel")); });
       T.body.querySelectorAll(".wt-weg").forEach(function(b){ b.title = t("wtWeg"); b.setAttribute("aria-label", t("wtWeg")); });
       T.body.querySelectorAll("input").forEach(function(e){ e.setAttribute("aria-label", t("wtX")); e.placeholder = "x"; });
@@ -675,6 +708,16 @@ var FK = (function(){
         self.inhalt.appendChild(E("circle", { cx: px, cy: py, r: 5.5, fill: "#7c3aed", stroke: "#ffffff", "stroke-width": 2 }));
       }
     });
+    // y → x: alle Stellen mit f(x) = c (orange), waagerechte Hilfslinie
+    var box = T.det.querySelector(".wt-xs"), c = T.yc;
+    if(!k || !isFinite(c)){ box.textContent = ""; return; }
+    var v = this.v, w = v.x1 - v.x0, L = xFuerY(k.f, c, v.x0 - w, v.x1 + w);
+    if(L === "alle"){ box.textContent = t("wtAlle"); return; }
+    if(!L.length){ box.textContent = t("wtKein"); return; }
+    box.innerHTML = L.slice(0, 12).map(function(x, i){ x = xRund(x); return '<span class="wt-xr">x' + (L.length > 1 ? "<sub>" + (i + 1) + "</sub>" : "") + (x === Math.round(x) ? " = " : " ≈ ") + zahl(x, 3) + "</span>"; }).join("") + (L.length > 12 ? " …" : "");
+    var cy = this.Y(c);
+    if(cy >= 0 && cy <= this.H) this.inhalt.appendChild(E("line", { x1: 0, y1: cy, x2: this.W, y2: cy, stroke: "#ea580c", "stroke-width": 1.5, "stroke-dasharray": "6 4" }));
+    L.forEach(function(x){ var px = self.X(x); if(cy >= 0 && cy <= self.H) self.inhalt.appendChild(E("circle", { cx: px, cy: cy, r: 6, fill: "#ea580c", stroke: "#ffffff", "stroke-width": 2 })); });
   };
 
 

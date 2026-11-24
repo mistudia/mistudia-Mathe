@@ -219,21 +219,23 @@
   }
 
   // ---------- Reiter: Zahlenmengen ----------
-  // 🆕 24.11.: neu gestaltet – jede Menge mit Symbol, Namen und Herkunft des Buchstabens im Bild,
-  // Beispielzahlen jeweils im eigenen „Ring“ (Teil der Menge, der nicht in der kleineren liegt)
+  // 🆕 24.11.2026 (2): Ovale wie im Schulbuch – ℕ ⊂ ℕ₀ ⊂ ℤ ⊂ ℚ ⊂ ℝ, daneben die irrationalen Zahlen
+  // (ℝ \ ℚ) als eigenes graues Oval. Jede Menge hat ein Schild auf ihrem Rand: Symbol, Name, Herkunft des Buchstabens.
+  // Beispielzahlen stehen im Teil der Menge, der nicht in der kleineren liegt.
   var MENG = [
-    { k: "R", s: "ℝ", i: 4, x: 10, y: 10, w: 730, h: 418, f: "#f3effe", c: "#6d28d9" },
-    { k: "Q", s: "ℚ", i: 3, x: 26, y: 62, w: 564, h: 354, f: "#e3eeff", c: "#1d4ed8" },
-    { k: "Z", s: "ℤ", i: 2, x: 42, y: 114, w: 408, h: 290, f: "#e2f8e9", c: "#15803d" },
-    { k: "N0", s: "ℕ₀", i: 1, x: 58, y: 166, w: 282, h: 226, f: "#fff4d6", c: "#b45309" },
-    { k: "N", s: "ℕ", i: 0, x: 74, y: 218, w: 206, h: 162, f: "#ffe9d9", c: "#c2410c" }
+    { k: "R",  s: "ℝ",  i: 4, cx: 450, cy: 260, rx: 440, ry: 250, f: "#fff1e3", c: "#c2410c", tag: [700, 466] },
+    { k: "I",  s: "",   i: -1, cx: 770, cy: 228, rx: 98, ry: 122, f: "#eceef2", c: "#4b5563", tag: [775, 94] },
+    { k: "Q",  s: "ℚ",  i: 3, cx: 360, cy: 250, rx: 300, ry: 215, f: "#ddf4ff", c: "#0369a1", tag: [370, 35] },
+    { k: "Z",  s: "ℤ",  i: 2, cx: 290, cy: 265, rx: 210, ry: 165, f: "#ffe1e3", c: "#be123c", tag: [270, 100] },
+    { k: "N0", s: "ℕ₀", i: 1, cx: 360, cy: 285, rx: 130, ry: 105, f: "#fff3c4", c: "#a16207", tag: [348, 180] },
+    { k: "N",  s: "ℕ",  i: 0, cx: 395, cy: 300, rx: 85,  ry: 62,  f: "#e3e1ff", c: "#4338ca", tag: [410, 238] }
   ];
   // [x, y, Text] oder [x, y, Zähler, Nenner, Vorzeichen]
-  var ZM_BSP = { N: [[120, 302, "1"], [177, 302, "2"], [234, 302, "3"], [142, 348, "17"], [214, 348, "100"]], N0: [[310, 300, "0"]],
-    Z: [[395, 225, "−1"], [395, 290, "−7"], [395, 355, "−50"]],
-    Q: [[520, 192, "1", "2", ""], [520, 258, "3", "4", "−"], [520, 322, "0,25"], [520, 378, "0,333…"]],
-    R: [[665, 160, "√2"], [665, 225, "π"], [665, 290, "e"], [665, 355, "−√5"]] };
-  var ZM_MARK = { N: [177, 262], N0: [310, 222], Z: [395, 168], Q: [520, 118], R: [665, 108] };
+  var ZM_BSP = { N: [[338, 302, "1"], [452, 302, "2"], [358, 345, "17"], [432, 345, "100"]], N0: [[268, 318, "0"]],
+    Z: [[150, 268, "−1"], [125, 330, "−7"], [195, 395, "−50"]],
+    Q: [[568, 198, "1", "2", ""], [585, 268, "3", "4", "−"], [575, 345, "0,25"], [515, 412, "0,333…"]],
+    R: [[732, 205, "√2"], [808, 215, "π"], [742, 268, "e"], [800, 292, "−√5"]] };
+  var ZM_MARK = { N: [395, 312], N0: [282, 262], Z: [160, 215], Q: [545, 140], R: [770, 160] };
   function svgBruch(g, x, y, z, n, vz, cls, fill){
     var w = Math.max(String(z).length, String(n).length) * 11 + 6, dx = vz ? 8 : 0;
     if(vz) g.appendChild(el("text", { x: x + dx - w / 2 - 3, y: y + 7, "text-anchor": "end", "class": cls, fill: fill, "data-roh": "1" }, vz));
@@ -241,22 +243,33 @@
     g.appendChild(el("line", { x1: x + dx - w / 2, y1: y + 2, x2: x + dx + w / 2, y2: y + 2, stroke: fill, "stroke-width": 2 }));
     g.appendChild(el("text", { x: x + dx, y: y + 22, "text-anchor": "middle", "class": cls, fill: fill, "data-roh": "1" }, n));
   }
+  function zmBreite(s, px){ var w = 0; for(var i = 0; i < s.length; i++){ var c = s.charCodeAt(i); w += c > 0x2e80 ? px * 1.05 : c >= 0x400 && c < 0x700 ? px * 0.64 : px * 0.57; } return w; }
   function zmBild(hl, marker){
-    var s = el("svg", { viewBox: "0 0 750 438", "class": "bild zm", role: "img", dir: "ltr", "data-roh": "1" });
+    var s = el("svg", { viewBox: "0 -6 900 524", "class": "bild zm", role: "img", dir: "ltr", "data-roh": "1" });
     var NA = tA("zm_name"), WI = tA("zm_wie");
+    var mark = hl === "R" ? "I" : hl;
     MENG.forEach(function(m){
-      s.appendChild(el("rect", { x: m.x, y: m.y, width: m.w, height: m.h, rx: 64, fill: m.f, stroke: m.c, "stroke-width": hl === m.k ? 5 : 2.5 }));
-      if(hl === m.k) s.appendChild(el("rect", { x: m.x - 5, y: m.y - 5, width: m.w + 10, height: m.h + 10, rx: 69, fill: "none", stroke: m.c, "stroke-opacity": .25, "stroke-width": 6 }));
-      // Kopf: Symbol in einem Kreis, daneben Name und Herkunft des Buchstabens
-      s.appendChild(el("circle", { cx: m.x + 38, cy: m.y + 32, r: 18, fill: "#ffffff", stroke: m.c, "stroke-width": 2.5 }));
-      s.appendChild(el("text", { x: m.x + 38, y: m.y + 41, "text-anchor": "middle", "class": "zmS", fill: m.c, "font-size": m.k === "N0" ? 17 : 22 }, m.s));
-      var na = NA[m.i] || "", wi = WI[m.i] || "", fs = m.k === "N" ? (na.length > 15 ? 12.5 : 13.5) * (/[\u0400-\u04ff]/.test(na) ? 0.88 : 1) : 14;
-      s.appendChild(el("text", { x: m.x + 62, y: m.y + 26, "class": "zmName", fill: m.c, "font-size": fs }, na));
-      s.appendChild(el("text", { x: m.x + 62, y: m.y + 43, "class": "zmWie", fill: "#3b4556", "font-size": m.k === "N" && wi.length > 20 ? 10 : 11.5 }, wi));
+      if(mark === m.k) s.appendChild(el("ellipse", { cx: m.cx, cy: m.cy, rx: m.rx + 5, ry: m.ry + 5, fill: "none", stroke: m.c, "stroke-opacity": .25, "stroke-width": 7 }));
+      s.appendChild(el("ellipse", { cx: m.cx, cy: m.cy, rx: m.rx, ry: m.ry, fill: m.f, stroke: m.c, "stroke-width": mark === m.k ? 5 : 2.5 }));
     });
-    var irr = el("text", { x: 665, y: 84, "text-anchor": "middle", "class": "zmIrr", fill: "#6d28d9" });
-    irr.appendChild(el("tspan", { x: 665, dy: 0 }, "ℝ \\ ℚ")); irr.appendChild(el("tspan", { x: 665, dy: 17 }, t("zm_irrK")));
-    s.appendChild(irr);
+    // Schilder (nach den Flächen, damit sie über allen Rändern liegen)
+    MENG.forEach(function(m){
+      var irr = m.k === "I", na = irr ? t("zm_irr") : (NA[m.i] || ""), wi = irr ? "ℝ \\ ℚ · " + t("zm_irrK") : (WI[m.i] || "");
+      var fsN = 14, fsW = 11.5, sym = irr ? 0 : 34;
+      var w = Math.max(zmBreite(na, fsN) * 1.02, zmBreite(wi, fsW)) + sym + 24, h = 40, x = m.tag[0] - w / 2, y = m.tag[1] - h / 2;
+      if(x < 4) x = 4; if(x + w > 896) x = 896 - w;
+      var g = el("g", {});
+      g.appendChild(el("rect", { x: x, y: y, width: w, height: h, rx: 20, fill: "#ffffff", stroke: m.c, "stroke-width": mark === m.k ? 3.5 : 2.5 }));
+      if(!irr){
+        g.appendChild(el("circle", { cx: x + 22, cy: y + h / 2, r: 15, fill: m.c }));
+        g.appendChild(el("text", { x: x + 22, y: y + h / 2 + 6.5, "text-anchor": "middle", "class": "zmS", fill: "#ffffff", "font-size": m.k === "N0" ? 15 : 19 }, m.s));
+      }
+      // Arabisch: zentriert (eine RTL-Zeile mit Anker „start“ läuft sonst aus dem Schild)
+      var ar = lang === "ar", tx0 = ar ? x + sym + (w - sym) / 2 : x + 12 + sym, an = ar ? "middle" : "start";
+      g.appendChild(el("text", { x: tx0, y: y + 17, "class": "zmName", fill: m.c, "font-size": fsN, "text-anchor": an }, na));
+      g.appendChild(el("text", { x: tx0, y: y + 32, "class": "zmWie", fill: "#3b4556", "font-size": fsW, "text-anchor": an }, wi));
+      s.appendChild(g);
+    });
     for(var k in ZM_BSP) ZM_BSP[k].forEach(function(p){
       if(p.length > 3){ svgBruch(s, p[0], p[1], p[2], p[3], p[4], "zmZ", "#1a2233"); return; }
       var tx = p[2]; if(!komma()) tx = tx.replace(",", ".");

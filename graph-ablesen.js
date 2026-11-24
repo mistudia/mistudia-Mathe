@@ -15,15 +15,15 @@ var MS_ABL = (function(){
   "use strict";
   var NS = "http://www.w3.org/2000/svg";
   var TX = {
-    de: { rein: "Vergrößern", raus: "Verkleinern", fit: "Ganzen Graphen zeigen", titel: "Wertetabelle", hinweis: "Eigene x-Werte eingeben – die Funktionswerte werden sofort berechnet. Werte ablesen: auf den Graphen klicken oder tippen (nochmal klicken entfernt den Punkt).", neu: "+ Zeile", auto: "Werte aus dem Bild", punkte: "Punkte im Graph zeigen", ziel: "Punkt im Graph markieren", weg: "Zeile löschen", x: "x-Wert eingeben" },
-    en: { rein: "Zoom in", raus: "Zoom out", fit: "Show whole graph", titel: "Table of values", hinweis: "Type your own x-values – the function values are calculated at once. Read off values: click or tap the graph (click again to remove the point).", neu: "+ Row", auto: "Values from the picture", punkte: "Show points in the graph", ziel: "Mark point in the graph", weg: "Delete row", x: "Enter x-value" },
-    es: { rein: "Acercar", raus: "Alejar", fit: "Ver toda la gráfica", titel: "Tabla de valores", hinweis: "Escribe tus propios valores de x: los valores de la función se calculan al instante. Leer valores: haz clic o toca la gráfica (otro clic quita el punto).", neu: "+ Fila", auto: "Valores de la imagen", punkte: "Mostrar puntos en la gráfica", ziel: "Marcar el punto en la gráfica", weg: "Borrar fila", x: "Escribe un valor de x" },
-    zh: { rein: "放大", raus: "缩小", fit: "显示整个图像", titel: "数值表", hinweis: "输入你自己的 x 值，函数值会立即算出。读取数值：点击或点按图像（再点一次即可取消）。", neu: "+ 行", auto: "取图中的值", punkte: "在图像中显示点", ziel: "在图像中标出该点", weg: "删除此行", x: "输入 x 值" },
-    fr: { rein: "Agrandir", raus: "Réduire", fit: "Afficher toute la courbe", titel: "Tableau de valeurs", hinweis: "Saisis tes propres valeurs de x : les valeurs de la fonction sont calculées aussitôt. Lire des valeurs : clique ou touche la courbe (un nouveau clic enlève le point).", neu: "+ Ligne", auto: "Valeurs de l’image", punkte: "Afficher les points sur la courbe", ziel: "Marquer le point sur la courbe", weg: "Supprimer la ligne", x: "Saisir une valeur de x" },
-    ru: { rein: "Увеличить", raus: "Уменьшить", fit: "Показать весь график", titel: "Таблица значений", hinweis: "Вводи свои значения x — значения функции считаются сразу. Чтобы прочитать значения, щёлкни или коснись графика (повторный щелчок убирает точку).", neu: "+ Строка", auto: "Значения с рисунка", punkte: "Показать точки на графике", ziel: "Отметить точку на графике", weg: "Удалить строку", x: "Введи значение x" },
-    ar: { rein: "تكبير", raus: "تصغير", fit: "عرض المنحنى كاملًا", titel: "جدول القيم", hinweis: "اكتب قيم x الخاصة بك – تُحسب قيم الدالة فورًا. لقراءة القيم: انقر على المنحنى أو المسه (نقرة أخرى تزيل النقطة).", neu: "+ صف", auto: "قيم من الرسم", punkte: "إظهار النقاط على المنحنى", ziel: "تحديد النقطة على المنحنى", weg: "حذف الصف", x: "أدخل قيمة x" },
-    ja: { rein: "拡大", raus: "縮小", fit: "グラフ全体を表示", titel: "値の表", hinweis: "自分で x の値を入力すると、関数の値がすぐに計算されます。値を読むには、グラフをクリックかタップします（もう一度で消えます）。", neu: "+ 行", auto: "図から値を入れる", punkte: "グラフに点を表示", ziel: "グラフに点を示す", weg: "行を削除", x: "x の値を入力" },
-    pt: { rein: "Aproximar", raus: "Afastar", fit: "Mostrar o gráfico todo", titel: "Tabela de valores", hinweis: "Digite seus próprios valores de x – os valores da função são calculados na hora. Ler valores: clique ou toque no gráfico (outro clique remove o ponto).", neu: "+ Linha", auto: "Valores da imagem", punkte: "Mostrar pontos no gráfico", ziel: "Marcar o ponto no gráfico", weg: "Excluir linha", x: "Digite um valor de x" }
+    de: { umk: "Umgekehrt: y-Wert eingeben → x-Wert(e)", kein: "Kein passendes x in der Nähe des Ausschnitts.", alle: "Gilt für alle x.", rein: "Vergrößern", raus: "Verkleinern", fit: "Ganzen Graphen zeigen", titel: "Wertetabelle", hinweis: "Eigene x-Werte eingeben – die Funktionswerte werden sofort berechnet. Werte ablesen: auf den Graphen klicken oder tippen (nochmal klicken entfernt den Punkt).", neu: "+ Zeile", auto: "Werte aus dem Bild", punkte: "Punkte im Graph zeigen", ziel: "Punkt im Graph markieren", weg: "Zeile löschen", x: "x-Wert eingeben" },
+    en: { umk: "The other way round: enter a y-value → x-value(s)", kein: "No matching x near the current view.", alle: "True for every x.", rein: "Zoom in", raus: "Zoom out", fit: "Show whole graph", titel: "Table of values", hinweis: "Type your own x-values – the function values are calculated at once. Read off values: click or tap the graph (click again to remove the point).", neu: "+ Row", auto: "Values from the picture", punkte: "Show points in the graph", ziel: "Mark point in the graph", weg: "Delete row", x: "Enter x-value" },
+    es: { umk: "Al revés: escribe un valor de y → valor(es) de x", kein: "Ningún x adecuado cerca de la vista.", alle: "Se cumple para todo x.", rein: "Acercar", raus: "Alejar", fit: "Ver toda la gráfica", titel: "Tabla de valores", hinweis: "Escribe tus propios valores de x: los valores de la función se calculan al instante. Leer valores: haz clic o toca la gráfica (otro clic quita el punto).", neu: "+ Fila", auto: "Valores de la imagen", punkte: "Mostrar puntos en la gráfica", ziel: "Marcar el punto en la gráfica", weg: "Borrar fila", x: "Escribe un valor de x" },
+    zh: { umk: "反过来：输入 y 值 → 得到 x 值", kein: "当前视图附近没有对应的 x。", alle: "对所有 x 都成立。", rein: "放大", raus: "缩小", fit: "显示整个图像", titel: "数值表", hinweis: "输入你自己的 x 值，函数值会立即算出。读取数值：点击或点按图像（再点一次即可取消）。", neu: "+ 行", auto: "取图中的值", punkte: "在图像中显示点", ziel: "在图像中标出该点", weg: "删除此行", x: "输入 x 值" },
+    fr: { umk: "À l’inverse : saisis une valeur de y → valeur(s) de x", kein: "Aucun x correspondant près de la vue.", alle: "Vrai pour tout x.", rein: "Agrandir", raus: "Réduire", fit: "Afficher toute la courbe", titel: "Tableau de valeurs", hinweis: "Saisis tes propres valeurs de x : les valeurs de la fonction sont calculées aussitôt. Lire des valeurs : clique ou touche la courbe (un nouveau clic enlève le point).", neu: "+ Ligne", auto: "Valeurs de l’image", punkte: "Afficher les points sur la courbe", ziel: "Marquer le point sur la courbe", weg: "Supprimer la ligne", x: "Saisir une valeur de x" },
+    ru: { umk: "Наоборот: введи значение y → значения x", kein: "Рядом с видимой областью нет подходящего x.", alle: "Верно для любого x.", rein: "Увеличить", raus: "Уменьшить", fit: "Показать весь график", titel: "Таблица значений", hinweis: "Вводи свои значения x — значения функции считаются сразу. Чтобы прочитать значения, щёлкни или коснись графика (повторный щелчок убирает точку).", neu: "+ Строка", auto: "Значения с рисунка", punkte: "Показать точки на графике", ziel: "Отметить точку на графике", weg: "Удалить строку", x: "Введи значение x" },
+    ar: { umk: "بالعكس: أدخل قيمة y ← قيم x", kein: "لا توجد قيمة x مناسبة قرب الجزء المعروض.", alle: "صحيح لكل x.", rein: "تكبير", raus: "تصغير", fit: "عرض المنحنى كاملًا", titel: "جدول القيم", hinweis: "اكتب قيم x الخاصة بك – تُحسب قيم الدالة فورًا. لقراءة القيم: انقر على المنحنى أو المسه (نقرة أخرى تزيل النقطة).", neu: "+ صف", auto: "قيم من الرسم", punkte: "إظهار النقاط على المنحنى", ziel: "تحديد النقطة على المنحنى", weg: "حذف الصف", x: "أدخل قيمة x" },
+    ja: { umk: "逆に：y の値を入れる → x の値", kein: "表示範囲の近くに合う x はありません。", alle: "すべての x で成り立ちます。", rein: "拡大", raus: "縮小", fit: "グラフ全体を表示", titel: "値の表", hinweis: "自分で x の値を入力すると、関数の値がすぐに計算されます。値を読むには、グラフをクリックかタップします（もう一度で消えます）。", neu: "+ 行", auto: "図から値を入れる", punkte: "グラフに点を表示", ziel: "グラフに点を示す", weg: "行を削除", x: "x の値を入力" },
+    pt: { umk: "Ao contrário: digite um valor de y → valor(es) de x", kein: "Nenhum x correspondente perto da área visível.", alle: "Vale para todo x.", rein: "Aproximar", raus: "Afastar", fit: "Mostrar o gráfico todo", titel: "Tabela de valores", hinweis: "Digite seus próprios valores de x – os valores da função são calculados na hora. Ler valores: clique ou toque no gráfico (outro clique remove o ponto).", neu: "+ Linha", auto: "Valores da imagem", punkte: "Mostrar pontos no gráfico", ziel: "Marcar o ponto no gráfico", weg: "Excluir linha", x: "Digite um valor de x" }
   };
   var lang = "de"; try { lang = localStorage.getItem("msMathLang") || document.documentElement.lang || "de"; } catch(e){}
   if(!TX[lang]) lang = "de";
@@ -179,6 +179,7 @@ var MS_ABL = (function(){
   }
   function tippen(Z, p){
     var o = Z.o; if(!o || !p || !o.kurven.length) return;
+    var pb = Z.pin && Z.pinBox; if(pb && p.px >= pb.x0 && p.px <= pb.x1 && p.py >= pb.y0 && p.py <= pb.y1){ Z.pin = null; Z.pinBox = null; zeichneAbl(Z); return; }
     if(Z.pin){
       var k = o.kurven[Math.min(Z.pin.k, o.kurven.length - 1)], y = k.f(Z.pin.x);
       if(Math.abs(X(o, Z.pin.x) - p.px) < 16 && (!isFinite(y) || Math.abs(klemm(Y(o, y), o.T, o.B) - p.py) < 16)){ Z.pin = null; zeichneAbl(Z); return; }
@@ -190,7 +191,7 @@ var MS_ABL = (function(){
   // ---------- Ablesepunkt zeichnen ----------
   function zeichneAbl(Z){
     if(Z.g && Z.g.parentNode) Z.g.parentNode.removeChild(Z.g);
-    Z.g = null; var o = Z.o; if(!o || !o.kurven.length) return;
+    Z.g = null; Z.pinBox = null; var o = Z.o; if(!o || !o.kurven.length) return;
     var g = E("g", { "pointer-events": "none", "class": "msabl" });
     var achseY = klemm(Y(o, 0), o.T, o.B), achseX = klemm(X(o, 0), o.L, o.R);
     // wird die Grafik verkleinert angezeigt (Handy), Kästchen und Schrift mitwachsen lassen
@@ -219,6 +220,12 @@ var MS_ABL = (function(){
       if(ly + h > o.B) ly = o.B - h;
       g.appendChild(E("rect", { x: lx, y: ly, width: w, height: h, rx: 7 * m, fill: "#ffffff", stroke: farbe, "stroke-width": 2 * m }));
       g.appendChild(E("text", { x: lx + w / 2, y: ly + 16.5 * m, "text-anchor": "middle", fill: "#1a2233", "font-size": 14 * m, "font-weight": 700, "font-family": "system-ui, sans-serif", direction: "ltr", "unicode-bidi": "embed", style: "font-style:normal" }, txt));
+      if(stark){ // ✕ zum Entfernen (Tippen aufs Etikett oder den Punkt entfernt ihn)
+        var xx = lx + w + 4 * m; if(xx + 22 * m > o.R) xx = lx - 26 * m;
+        g.appendChild(E("circle", { cx: xx + 11 * m, cy: ly + h / 2, r: 11 * m, fill: "#ffffff", stroke: "#b0b0b8", "stroke-width": 2 * m }));
+        g.appendChild(E("text", { x: xx + 11 * m, y: ly + h / 2 + 5 * m, "text-anchor": "middle", fill: "#1a2233", "font-size": 14 * m, "font-weight": 700, "font-family": "system-ui, sans-serif", style: "font-style:normal" }, "✕"));
+        Z.pinBox = { x0: Math.min(lx, xx) - 4, x1: Math.max(lx + w, xx + 22 * m) + 4, y0: ly - 4, y1: ly + h + 4 };
+      }
     }
     if(Z.hover){ var s = stelle(o, Z.hover); if(s) ziel(s, false); }
     if(Z.pin) ziel(Z.pin, true);
@@ -226,12 +233,36 @@ var MS_ABL = (function(){
   }
 
   // ---------- Wertetabelle ----------
+
+  // 🆕 24.11.2026: alle x mit f(x) = c im Bereich [a; b] (Vorzeichenwechsel + Berührstellen), höchstens 12
+  function xFuerY(f, c, a, b){
+    var N = 1600, h = (b - a) / N, res = [], g = function(x){ var v = f(x); return isFinite(v) ? v - c : NaN; };
+    var vals = []; for(var i = 0; i <= N; i++) vals.push(g(a + i * h));
+    var gleich = vals.every(function(v){ return isFinite(v) && Math.abs(v) < 1e-12; }); if(gleich) return "alle";
+    function dazu(x){ for(var j = 0; j < res.length; j++) if(Math.abs(res[j] - x) < h * 1.5) return; res.push(x); }
+    for(i = 1; i <= N && res.length < 13; i++){
+      var x0 = a + (i - 1) * h, x1 = a + i * h, g0 = vals[i - 1], g1 = vals[i];
+      if(!isFinite(g0) || !isFinite(g1)) continue;
+      if(g0 === 0){ dazu(x0); continue; }
+      if(g0 * g1 < 0){ var lo = x0, hi = x1, glo = g0; if(Math.abs(g0 - g1) > 1e6 * (1 + Math.abs(c))) continue; // Pol, keine Lösung
+        for(var it = 0; it < 60; it++){ var m = (lo + hi) / 2, gm = g(m); if(!isFinite(gm)) break; if(glo * gm <= 0) hi = m; else { lo = m; glo = gm; } }
+        dazu((lo + hi) / 2); continue; }
+      var g2 = vals[i + 1];
+      if(isFinite(g2) && Math.abs(g1) <= Math.abs(g0) && Math.abs(g1) <= Math.abs(g2) && g1 * g2 > 0){ // Berührstelle?
+        var L = x0, R = x1 + h; for(it = 0; it < 80; it++){ var m1 = L + (R - L) / 3, m2 = R - (R - L) / 3; if(Math.abs(g(m1)) < Math.abs(g(m2))) R = m2; else L = m1; }
+        var xm = (L + R) / 2; if(Math.abs(g(xm)) < 1e-7 * (1 + Math.abs(c))) dazu(xm);
+      }
+    }
+    return res.sort(function(p, q){ return p - q; });
+  }
+  function xRund(x){ var r = Math.round(x); return Math.abs(x - r) < 1e-7 ? r : x; }
   var ZIEL_SVG = '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 1v5M10 14v5M1 10h5M14 10h5" stroke="currentColor" stroke-width="2"/></svg>';
   function tabelleBauen(Z){
     var svg = Z.svg, det = document.createElement("details");
     det.className = "msabl-wt";
     det.innerHTML = '<summary></summary><p class="msabl-h"></p><div class="msabl-scroll" dir="ltr"><table><thead><tr></tr></thead><tbody></tbody></table></div>' +
-      '<div class="msabl-knoepfe"><button type="button" class="msabl-neu"></button><button type="button" class="msabl-auto"></button><label><input type="checkbox" class="msabl-zeig" checked> <span></span></label></div>';
+      '<div class="msabl-knoepfe"><button type="button" class="msabl-neu"></button><button type="button" class="msabl-auto"></button><label><input type="checkbox" class="msabl-zeig" checked> <span></span></label></div>' +
+      '<div class="msabl-umk"><label><span class="msabl-umk-l"></span> <span class="msabl-umk-f" dir="ltr"></span> <input type="text" inputmode="decimal" autocomplete="off" class="msabl-yin" placeholder="y"></label><div class="msabl-xs" dir="ltr"></div></div>';
     var par = svg.parentNode, ref = svg;
     if(par.classList.contains("graph-wrap")){ ref = par; par = par.parentNode; }
     else if(par.classList.contains("zwei") && svg.nextElementSibling){ par = svg.nextElementSibling; ref = null; }
@@ -248,6 +279,7 @@ var MS_ABL = (function(){
       var inp = Z.body.querySelectorAll("input"); if(inp.length){ inp[inp.length - 1].focus(); inp[inp.length - 1].select(); }
     });
     det.querySelector(".msabl-zeig").addEventListener("change", function(){ neu(Z); });
+    det.querySelector(".msabl-yin").addEventListener("input", function(){ Z.yc = xLesen(this.value); this.classList.toggle("msabl-falsch", !isFinite(Z.yc) && this.value.trim() !== ""); neu(Z); });
     Z.body.addEventListener("input", function(e){
       var i = +e.target.dataset.i; if(isNaN(i)) return;
       Z.xs[i] = xLesen(e.target.value); e.target.classList.toggle("msabl-falsch", !isFinite(Z.xs[i]) && e.target.value.trim() !== "");
@@ -280,6 +312,7 @@ var MS_ABL = (function(){
     Z.det.querySelector(".msabl-neu").textContent = tx("neu");
     Z.det.querySelector(".msabl-auto").textContent = tx("auto");
     Z.det.querySelector(".msabl-zeig + span").textContent = tx("punkte");
+    Z.det.querySelector(".msabl-umk-l").textContent = tx("umk");
     Z.body.querySelectorAll(".msabl-ziel").forEach(function(b){ b.title = tx("ziel"); b.setAttribute("aria-label", tx("ziel")); });
     Z.body.querySelectorAll(".msabl-weg").forEach(function(b){ b.title = tx("weg"); b.setAttribute("aria-label", tx("weg")); });
     Z.body.querySelectorAll("input").forEach(function(e){ e.setAttribute("aria-label", tx("x")); e.placeholder = Z.o.xName || "x"; });
@@ -304,6 +337,23 @@ var MS_ABL = (function(){
           g.appendChild(E("circle", { cx: X(o, x), cy: Y(o, y), r: 5.5 * mm, fill: "#7c3aed", stroke: "#ffffff", "stroke-width": 2 * mm }));
       });
     });
+    // y → x (erste Kurve): alle Stellen mit f(x) = c, orange Punkte + Hilfslinie
+    var k0 = o.kurven[0], xsBox = Z.det.querySelector(".msabl-xs"), c = Z.yc;
+    Z.det.querySelector(".msabl-umk-f").textContent = (k0 && k0.name ? k0.name : "f(x)") + " =";
+    if(!k0 || !isFinite(c)) xsBox.textContent = "";
+    else {
+      var ww = o.x1 - o.x0, L = xFuerY(k0.f, c, o.x0 - ww, o.x1 + ww);
+      if(L === "alle") xsBox.textContent = tx("alle");
+      else if(!L.length) xsBox.textContent = tx("kein");
+      else {
+        var xn = o.xName || "x";
+        xsBox.innerHTML = L.slice(0, 12).map(function(x, i){ x = xRund(x); return '<span class="msabl-xr">' + xn + (L.length > 1 ? "<sub>" + (i + 1) + "</sub>" : "") + (x === Math.round(x) ? " = " : " ≈ ") + zahl(x, 3) + "</span>"; }).join("") + (L.length > 12 ? " …" : "");
+        if(c >= o.y0 && c <= o.y1){
+          var cy = Y(o, c); g.appendChild(E("line", { x1: o.L, y1: cy, x2: o.R, y2: cy, stroke: "#ea580c", "stroke-width": 1.5 * mm, "stroke-dasharray": "6 4" }));
+          L.forEach(function(x){ if(x >= o.x0 && x <= o.x1) g.appendChild(E("circle", { cx: X(o, x), cy: cy, r: 6 * mm, fill: "#ea580c", stroke: "#ffffff", "stroke-width": 2 * mm })); });
+        }
+      }
+    }
     var vor = Z.g && Z.g.parentNode === Z.svg ? Z.g : null;
     Z.svg.insertBefore(g, vor); Z.pg = g;
   }
@@ -348,6 +398,10 @@ var MS_ABL = (function(){
     ".msabl-akt button{width:32px;height:32px;border-radius:8px;border:2px solid #b0b0b8;background:#ffffff;color:#1a2233;font:700 18px system-ui;cursor:pointer;padding:0;margin:0 2px;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;box-shadow:none}" +
     ".msabl-akt .msabl-ziel{color:#6d28d9}" +
     ".msabl-knoepfe{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:8px 0 6px;font-size:14px}" +
+    ".msabl-umk{margin:6px 0 8px;padding-top:8px;border-top:1px dashed #b0b0b8}.msabl-umk label{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-weight:700;color:#1a2233;font-size:15px}" +
+    ".msabl-umk-f{font:italic 700 17px 'Cambria Math',Cambria,'Times New Roman',serif}.msabl-yin{width:110px;font:17px system-ui,sans-serif;padding:5px 8px;border:2px solid #b0b0b8;border-radius:8px;text-align:center;color:#1a2233;background:#ffffff;margin:0}" +
+    ".msabl-yin:focus{outline:none;border-color:#ea580c}.msabl-yin.msabl-falsch{border-color:#b91c1c;background:#fef2f2}" +
+    ".msabl-xs{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;font:700 17px system-ui,sans-serif;color:#c2410c}.msabl-xr{white-space:nowrap}" +
     ".msabl-knoepfe button{font:700 14px system-ui,sans-serif;padding:7px 12px;border-radius:10px;border:2px solid #1565c0;background:#ffffff;color:#1565c0;cursor:pointer;margin:0;box-shadow:none}" +
     ".msabl-knoepfe label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#1a2233;font-size:14px}";
   document.head.appendChild(css);

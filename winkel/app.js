@@ -64,21 +64,30 @@
   // Der Winkel öffnet sich nach unten. Rechter Schenkel auf 0 → innere (graue) Skala, linker auf 0 → äußere (gelbe).
   var GK = 0.5, GX = 41, GY = 46, GOX = GX + 518 * GK, GOY = GY + 2 * GK, GR = 300;
   function messRichtung(w){ return MS.seite === "r" ? w : 180 - w; } // Bildschirmwinkel (nach unten positiv)
+  // 🆕 24.11.2026: beim Ausprobieren ist auch Schenkel 1 frei drehbar (MS.a1) – z. B. 10° oben messen
+  function arme(){
+    var d1 = MS.probe && MS.a1 != null ? MS.a1 : (MS.seite === "r" ? 0 : 180), d2 = d1 + (MS.seite === "r" ? MS.w : -MS.w);
+    var lo = MS.seite === "r" ? d1 : d1 - MS.w; return { d1: d1, d2: d2, lo: lo, hi: lo + MS.w };
+  }
+  function norm360(d){ return ((d % 360) + 360) % 360; }
+  // beim Ziehen zählt zuerst der kleinere Winkel (bis 180°); „0-Schenkel wechseln“ zeigt dann den Winkel auf der anderen Seite (überstumpf)
+  function kleinerWinkel(){ if(MS.probe && !MS.seiteFest && MS.w > 180){ MS.seite = MS.seite === "r" ? "l" : "r"; MS.w = 360 - MS.w; } }
+  function grundlage(){ return !MS.rot && MS.w <= 180 && (MS.a1 == null || norm360(MS.a1) === (MS.seite === "r" ? 0 : 180)); }
   function PU(r, d){ return [GOX + r * Math.cos(d * RAD), GOY + r * Math.sin(d * RAD)]; }
   function messZeichnen(){
     var sv = $("messSvg"); leer(sv);
     // beim Ausprobieren kann das Geodreieck gedreht sein → Bild nach oben erweitern (nur wachsen, damit nichts springt)
-    if(MS.probe){ var top = 0; [[-259, 0], [259, 0], [0, 259], [230, 0]].forEach(function(q){ var c = Math.cos(MS.rot * RAD), s2 = Math.sin(MS.rot * RAD); top = Math.min(top, GOY + q[0] * s2 + q[1] * c - 24); }); top = Math.min(top, GOY + GR * Math.sin(messRichtung(MS.w) * RAD) - 14); MS.vbTop = Math.min(MS.vbTop, Math.floor(top)); } else MS.vbTop = 0;
+    if(MS.probe){ var top = 0; [[-259, 0], [259, 0], [0, 259], [230, 0]].forEach(function(q){ var c = Math.cos(MS.rot * RAD), s2 = Math.sin(MS.rot * RAD); top = Math.min(top, GOY + q[0] * s2 + q[1] * c - 24); }); var AA = arme(); [AA.d1, AA.d2].forEach(function(d){ top = Math.min(top, GOY + GR * Math.sin(d * RAD) - 14); }); MS.vbTop = Math.min(MS.vbTop, Math.floor(top)); } else MS.vbTop = 0;
     sv.setAttribute("viewBox", "0 " + MS.vbTop + " 600 " + (GY + GR + 12 - MS.vbTop));
     var dreh = MS.probe && MS.rot ? "rotate(" + MS.rot + " " + GOX + " " + GOY + ")" : null;
-    var d1 = MS.seite === "r" ? 0 : 180, d2 = messRichtung(MS.w), lo = Math.min(d1, d2), hi = Math.max(d1, d2);
+    var AR = arme(), d1 = AR.d1, d2 = AR.d2, lo = AR.lo, hi = AR.hi;
     // Körper des Geodreiecks (leicht getönt), dann die Schenkel, darüber das Bild
     sv.appendChild(el("polygon", { points: GX + "," + GY + " " + (GX + 1036 * GK) + "," + GY + " " + GOX + "," + (GY + 518 * GK), fill: "rgba(186,230,253,0.28)", stroke: "#94a3b8", "stroke-width": 1, transform: dreh }));
     var sk = function(a, b){ var p = [], n = 24; for(var i = 0; i <= n; i++){ var q = PU(44, a + (b - a) * i / n); p.push(q[0] + " " + q[1]); } return "M" + GOX + " " + GOY + " L" + p.join(" L") + "Z"; };
     sv.appendChild(el("path", { d: sk(lo, hi), fill: "rgba(34,197,94,0.35)", stroke: "#15803d", "stroke-width": 2 }));
     sv.appendChild(el("line", { x1: 4, y1: GOY, x2: 596, y2: GOY, stroke: "#94a3b8", "stroke-width": 1.2 }));
     [d1, d2].forEach(function(d, j){ var e = PU(GR, d); sv.appendChild(el("line", { x1: GOX, y1: GOY, x2: e[0], y2: e[1], stroke: "#b91c1c", "stroke-width": 3.5, "stroke-linecap": "round" }));
-      if(MS.probe && MS.rot){ var n = PU(GR - 58, d); sv.appendChild(el("circle", { cx: n[0], cy: n[1], r: 12, fill: "#ffffff", stroke: "#b91c1c", "stroke-width": 2.5 })); txt(sv, n[0], n[1] + 5.5, String(j + 1), { "font-size": 15, fill: "#b91c1c", "stroke-width": 0 }); } });
+      if(MS.probe){ var n = PU(GR - 62, d); sv.appendChild(el("circle", { cx: n[0], cy: n[1], r: 12, fill: "#ffffff", stroke: "#b91c1c", "stroke-width": 2.5 })); txt(sv, n[0], n[1] + 5.5, String(j + 1), { "font-size": 15, fill: "#b91c1c", "stroke-width": 0 }); } });
     sv.appendChild(el("image", { href: "/dreieck/geodreieck.png", x: GX, y: GY, width: 1036 * GK, height: 522 * GK, opacity: 0.92, transform: dreh }));
     sv.appendChild(el("circle", { cx: GOX, cy: GOY, r: 4.5, fill: "#b91c1c" }));
     if(MS.probe){ // blauer Dreh-Griff am rechten Ende der 0-Linie
@@ -89,9 +98,10 @@
       sv.appendChild(gg);
     }
     if(MS.probe){
-      var h = PU(GR - 24, d2);
+      var h = PU(GR - 24, d2), h1 = PU(GR - 24, d1);
       sv.appendChild(el("circle", { cx: h[0], cy: h[1], r: 15, fill: "#b91c1c", "fill-opacity": 0.85, stroke: "#ffffff", "stroke-width": 3, "class": "griff" }));
-      $("messMeld").textContent = (MS.rot || MS.w > 180) ? "α = " + MS.w + "°" : t("probWert", { w: MS.w, i: MS.seite === "r" ? MS.w : 180 - MS.w, a: MS.seite === "r" ? 180 - MS.w : MS.w });
+      sv.appendChild(el("circle", { cx: h1[0], cy: h1[1], r: 13, fill: "#ffffff", "fill-opacity": 0.9, stroke: "#b91c1c", "stroke-width": 3.5, "class": "griff" })); // Schenkel 1 ziehen
+      $("messMeld").textContent = !grundlage() ? "α = " + MS.w + "°" : t("probWert", { w: MS.w, i: MS.seite === "r" ? MS.w : 180 - MS.w, a: MS.seite === "r" ? 180 - MS.w : MS.w });
       $("messMeld").className = "meldung";
       messAblesen(d1, d2);
     }
@@ -102,7 +112,7 @@
   function skala(d){ var r = winkelNorm(d - MS.rot); if(r < -0.5 || r > 180.5) return null; r = Math.max(0, Math.min(180, Math.round(r))); return { i: r, a: 180 - r }; }
   function messAblesen(d1, d2){
     var A = [skala(d1), skala(d2)], h = "";
-    if(!MS.rot && MS.w <= 180){ $("messAblesen").hidden = true; return; }
+    if(grundlage()){ $("messAblesen").hidden = true; return; }
     A.forEach(function(q, j){ h += '<p class="zeile">' + (q ? t("ablesen", { n: j + 1, i: q.i, a: q.a }) : t("nichtSkala", { n: j + 1 })) + "</p>"; });
     var auf = [0, 1].filter(function(j){ return A[j] && (A[j].i === 0 || A[j].a === 0); });
     if(auf.length) h += '<p class="zeile"><b>' + t("passt", { n: auf[0] + 1 }) + "</b></p>";
@@ -112,7 +122,7 @@
   }
   function messDrehen(r, einrasten){
     r = Math.round(winkelNorm(r));
-    if(einrasten){ var d1 = MS.seite === "r" ? 0 : 180, d2 = messRichtung(MS.w); [d1, d2, d1 - 180, d2 - 180].forEach(function(z){ if(Math.abs(winkelNorm(r - z)) <= 3) r = Math.round(winkelNorm(z)); }); }
+    if(einrasten){ var AR = arme(), d1 = AR.d1, d2 = AR.d2; [d1, d2, d1 - 180, d2 - 180].forEach(function(z){ if(Math.abs(winkelNorm(r - z)) <= 3) r = Math.round(winkelNorm(z)); }); }
     MS.rot = r === -180 ? 180 : r; $("messDrehR").value = MS.rot; $("messDrehW").textContent = MS.rot + "°"; messZeichnen();
   }
   function svgPkt(e){ var sv = $("messSvg"), r = sv.getBoundingClientRect(), vb = sv.viewBox.baseVal; return [vb.x + (e.clientX - r.left) / r.width * vb.width, vb.y + (e.clientY - r.top) / r.height * vb.height]; }
@@ -120,16 +130,23 @@
     var sv = $("messSvg"), r = sv.getBoundingClientRect(), vb = sv.viewBox.baseVal;
     var x = vb.x + (e.clientX - r.left) / r.width * vb.width, y = vb.y + (e.clientY - r.top) / r.height * vb.height;
     // 🆕 24.11.2026: beim Ausprobieren ringsum (auch nach oben) – Winkel bis 359°
-    var d = Math.atan2(y - GOY, x - GOX) / RAD;
-    var w = MS.seite === "r" ? d : 180 - d; w = ((w % 360) + 360) % 360;
+    var d = Math.atan2(y - GOY, x - GOX) / RAD, d1 = arme().d1;
+    var w = norm360(MS.seite === "r" ? d - d1 : d1 - d);
     return Math.max(1, Math.min(359, Math.round(w)));
   }
   (function(){
     var sv = $("messSvg"), zieht = false;
     function amGriff(e){ var p = svgPkt(e), g = [GOX + 230 * Math.cos(MS.rot * RAD), GOY + 230 * Math.sin(MS.rot * RAD)]; return Math.hypot(p[0] - g[0], p[1] - g[1]) < 30; }
     function drehAus(e){ var p = svgPkt(e); messDrehen(Math.atan2(p[1] - GOY, p[0] - GOX) / RAD, true); }
-    sv.addEventListener("pointerdown", function(e){ if(!MS.probe) return; zieht = amGriff(e) ? "dreh" : "arm"; try { sv.setPointerCapture(e.pointerId); } catch(x){} if(zieht === "dreh") drehAus(e); else { MS.w = messWinkelAus(e); messZeichnen(); } e.preventDefault(); });
-    sv.addEventListener("pointermove", function(e){ if(!zieht) return; if(zieht === "dreh") drehAus(e); else { MS.w = messWinkelAus(e); messZeichnen(); } });
+    function amArm1(e){ var p = svgPkt(e), h = PU(GR - 24, arme().d1); return Math.hypot(p[0] - h[0], p[1] - h[1]) < 26; }
+    function arm1Aus(e){ // Schenkel 1 drehen, Schenkel 2 bleibt liegen; rastet an der 0-Linie des Geodreiecks ein
+      var p = svgPkt(e), AR = arme(), a = Math.atan2(p[1] - GOY, p[0] - GOX) / RAD;
+      [MS.rot, MS.rot + 180].forEach(function(z){ if(Math.abs(winkelNorm(a - z)) <= 3) a = z; });
+      a = Math.round(a); var w = Math.round(norm360(MS.seite === "r" ? AR.d2 - a : a - AR.d2));
+      if(w < 1 || w > 359) return; MS.a1 = a; MS.w = w; kleinerWinkel(); messZeichnen();
+    }
+    sv.addEventListener("pointerdown", function(e){ if(!MS.probe) return; zieht = amGriff(e) ? "dreh" : amArm1(e) ? "arm1" : "arm"; try { sv.setPointerCapture(e.pointerId); } catch(x){} if(zieht === "dreh") drehAus(e); else if(zieht === "arm1") arm1Aus(e); else { MS.w = messWinkelAus(e); kleinerWinkel(); messZeichnen(); } e.preventDefault(); });
+    sv.addEventListener("pointermove", function(e){ if(!zieht) return; if(zieht === "dreh") drehAus(e); else if(zieht === "arm1") arm1Aus(e); else { MS.w = messWinkelAus(e); kleinerWinkel(); messZeichnen(); } });
     ["pointerup", "pointercancel"].forEach(function(n){ sv.addEventListener(n, function(){ zieht = false; }); });
   })();
   function messModus(probe){
@@ -139,6 +156,7 @@
     var eh = $("messEin").nextElementSibling; if(eh && eh.classList.contains("einh")) eh.hidden = probe;
     $("messSeite").hidden = !probe; $("messProbe").textContent = probe ? t("probAus") : t("probBtn");
     $("messProbeHint").hidden = !probe; $("messDreh").hidden = !probe; if(!probe){ $("messAblesen").hidden = true; MS.rot = 0; $("messDrehR").value = 0; $("messDrehW").textContent = "0°"; }
+    MS.a1 = probe ? (MS.seite === "r" ? 0 : 180) : null; MS.seiteFest = false;
     if(!probe){ messNeu(); } else { MS.geprueft = false; messZeichnen(); }
   }
   function messPruefen(){
@@ -152,7 +170,11 @@
   $("messEin").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(MS.geprueft){ messNeu(); } else messPruefen(); } });
   $("messWeiter").addEventListener("click", function(){ messNeu(); $("messEin").focus(); });
   $("messProbe").addEventListener("click", function(){ messModus(!MS.probe); });
-  $("messSeite").addEventListener("click", function(){ MS.seite = MS.seite === "r" ? "l" : "r"; messZeichnen(); });
+  $("messSeite").addEventListener("click", function(){
+    if(MS.probe) MS.seiteFest = true;
+    if(MS.probe && MS.a1 != null){ MS.seite = MS.seite === "r" ? "l" : "r"; MS.w = Math.max(1, Math.min(359, 360 - MS.w)); } // Schenkel bleiben liegen, gemessen wird andersherum
+    else MS.seite = MS.seite === "r" ? "l" : "r";
+    messZeichnen(); });
   $("messDrehR").addEventListener("input", function(){ messDrehen(+this.value, false); });
   $("messGerade").addEventListener("click", function(){ messDrehen(0, false); });
 
@@ -462,7 +484,7 @@
     document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
     $("schH").textContent = t("schH"); $("schText").textContent = t("schText"); $("schEinL").textContent = t("schEin"); $("schPr").textContent = t("pruefen");
     $("messH").textContent = t("messH"); $("messText").textContent = t("messText"); $("messEinL").textContent = t("messEin"); $("messPr").textContent = t("pruefen"); $("messWeiter").textContent = t("weiter"); $("messMerke").textContent = t("ueberstumpf");
-    $("messProbe").textContent = MS.probe ? t("probAus") : t("probBtn"); $("messSeite").textContent = t("seiteW"); $("messProbeHint").textContent = t("probHint") + " " + t("drehHint") + " " + t("obenHint"); $("messDrehL").textContent = t("drehL"); $("messGerade").textContent = t("gerade"); $("messDrehW").textContent = MS.rot + "°"; if(MS.probe) messZeichnen();
+    $("messProbe").textContent = MS.probe ? t("probAus") : t("probBtn"); $("messSeite").textContent = t("seiteW"); $("messProbeHint").textContent = t("probHint") + " " + t("drehHint") + " " + t("obenHint") + " " + t("arm1Hint"); $("messDrehL").textContent = t("drehL"); $("messGerade").textContent = t("gerade"); $("messDrehW").textContent = MS.rot + "°"; if(MS.probe) messZeichnen();
     $("artH").textContent = t("artH"); $("artText").textContent = t("artText"); $("quizH").textContent = t("artQuiz"); $("quizWeiter").textContent = t("weiter");
     $("parH").textContent = t("parH"); $("parText").textContent = t("parText"); $("pqEinL").textContent = t("parEin"); $("pqPr").textContent = t("pruefen"); $("pqNeu").textContent = t("parNeu"); $("pqWegT").textContent = t("weg");
     schTexte();

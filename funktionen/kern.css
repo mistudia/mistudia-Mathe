@@ -149,3 +149,13 @@ h1 { text-align: center; color: var(--blue); margin: 0 0 14px; font-size: 28px; 
 .wt-knoepfe label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text); }
 /* offene Tabelle: Graph-Box nicht mehr „kleben“ lassen, sonst wäre ihr unteres Ende nicht erreichbar */
 .graph-box:has(.wt[open]) { position: static; }
+
+/* 🆕 24.11.2026: Wertetabelle umgekehrt (y → x) */
+.wt-umk { margin: 6px 0 8px; padding-top: 8px; border-top: 1px dashed #b0b0b8; }
+.wt-umk label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-weight: 700; color: #1a2233; }
+.wt-umk-f { font: italic 700 17px "Cambria Math", Cambria, "Times New Roman", serif; }
+.wt-yin { width: 110px; font: 17px system-ui, sans-serif; padding: 5px 8px; border: 2px solid #b0b0b8; border-radius: 8px; text-align: center; color: #1a2233; background: #ffffff; }
+.wt-yin:focus { outline: none; border-color: #ea580c; }
+.wt-yin.wt-falsch { border-color: #b91c1c; background: #fef2f2; }
+.wt-xs { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; font: 700 17px system-ui, sans-serif; color: #c2410c; }
+.wt-xr { white-space: nowrap; }

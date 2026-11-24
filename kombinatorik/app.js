@@ -191,9 +191,85 @@
     perm:   [{ n: [3, 8] }, { n: [3, 9] }]
   };
   function bereich(v){ return Array.isArray(v) ? zuf(v[0], v[1]) : v; }
+  // ---------- 🆕 24.11.2026: Wahrscheinlichkeitsaufgaben (Laplace, Pfadregel, Gegenereignis) ----------
+  function ggt(a, b){ a = Math.abs(a); b = Math.abs(b); while(b){ var r = a % b; a = b; b = r; } return a || 1; }
+  function fak(n){ var r = 1; for(var i = 2; i <= n; i++) r *= i; return r; }
+  function kurz(z, n){ var g = ggt(z, n); return [z / g, n / g]; }
+  function br(z, n){ return z + "/" + n; }
+  function komma(){ return /^(de|es|fr|ru|pt)$/.test(lang); }
+  function dz(x, d){ var s = x.toFixed(d == null ? 4 : d).replace(/0+$/, "").replace(/\.$/, ""); return komma() ? s.replace(".", ",") : s; }
+  function pTxt(P){ var k = kurz(P[0], P[1]); return k[1] === 1 ? String(k[0]) : br(k[0], k[1]); }
+  // Kette: „P = a = b = c ≈ d“ – formel.js setzt daraus Zeilen und Bruchstriche
+  function kette2(start, schritte, P){
+    var k = kurz(P[0], P[1]), L = [start].concat(schritte), letzt = L[L.length - 1].replace(/^P = /, ""), kb = k[1] === 1 ? String(k[0]) : br(k[0], k[1]);
+    if(letzt !== kb) L.push(kb);
+    var w = k[0] / k[1], s = L.join(" = ");
+    if(k[1] === 1) return s;
+    var ex4 = Math.abs(w * 1e4 - Math.round(w * 1e4)) < 1e-9, ex2 = Math.abs(w * 1e4 - Math.round(w * 1e4)) < 1e-9;
+    s += (ex4 ? " = " : " ≈ ") + dz(w);
+    return s + (ex2 ? " = " : " ≈ ") + dz(w * 100, 2) + " %";
+  }
+  var WK_GEN = {
+    stifte: function(r){ var n = r(4, 7), f = fak(n), pr = []; for(var i = n; i >= 1; i--) pr.push(i);
+      return { v: { n: n }, P: [1, f], weg: [["wMoegl", n + "! = " + pr.join(" · ") + " = " + gz(f)], ["wGuen", "1"], ["wErg", kette2("P = " + br(1, f), [], [1, f])]] }; },
+    karten: function(r){ var N = [20, 32, 52][r(0, 2)];
+      return { v: { N: N }, P: [12, N * (N - 1)], weg: [["wPfad", kette2("P = " + br(4, N) + " · " + br(3, N - 1), [br(12, N * (N - 1))], [12, N * (N - 1)])]] }; },
+    summe: function(r){ var s = r(3, 11), g = 6 - Math.abs(s - 7), L = [];
+      for(var a = 1; a <= 6; a++){ var b = s - a; if(b >= 1 && b <= 6) L.push("(" + a + "|" + b + ")"); }
+      return { v: { s: s }, P: [g, 36], weg: [["wMoegl", "6 · 6 = 36"], ["wGuen", L.join(", ") + " → " + g], ["wErg", kette2("P = " + br(g, 36), [], [g, 36])]] }; },
+    teil: function(r){ var d = r(3, 5), g = 0, T = [];
+      for(var s = 2; s <= 12; s++) if(s % d === 0){ var c = 6 - Math.abs(s - 7); g += c; T.push(c); }
+      var sums = []; for(s = 2; s <= 12; s++) if(s % d === 0) sums.push(s);
+      return { v: { d: d }, P: [g, 36], weg: [["wMoegl", "6 · 6 = 36"], ["wGuen", sums.join(", ") + ": " + T.join(" + ") + " = " + g], ["wErg", kette2("P = " + br(g, 36), [], [g, 36])]] }; },
+    pruef: function(r){ var N = r(6, 10), m = r(2, N - 2), z = m * (m - 1), n = N * (N - 1);
+      return { v: { N: N, m: m }, P: [z, n], weg: [["wPfad", kette2("P = " + br(m, N) + " · " + br(m - 1, N - 1), [br(z, n)], [z, n])]] }; },
+    pruef2: function(r){ var N = r(6, 10), m = r(2, N - 2), u = N - m, zn = u * (u - 1), n = N * (N - 1), z = n - zn;
+      return { v: { N: N, m: m }, P: [z, n], weg: [["wGegen", "P(…) = " + br(u, N) + " · " + br(u - 1, N - 1) + " = " + br(zn, n)], ["wErg", kette2("P = 1 − " + br(zn, n), [br(z, n)], [z, n])]] }; },
+    paare: function(r){ var p = r(4, 7), N = 2 * p;
+      return { v: { p: p, N: N }, P: [1, N - 1], weg: [["wPfad", kette2("P = " + br(N, N) + " · " + br(1, N - 1), [], [1, N - 1])]] }; },
+    monate: function(r){ var k = r(2, 5), z = 1, f = []; for(var i = 0; i < k; i++){ z *= 12 - i; f.push(br(12 - i, 12)); } var n = Math.pow(12, k);
+      return { v: { k: k }, P: [z, n], weg: [["wPfad", kette2("P = " + f.join(" · "), [br(z, n)], [z, n])]] }; },
+    reihe: function(r){ var b = r(2, 4), g = b + r(0, 1), n = b + g, gu = (g === b ? 2 : 1) * fak(b) * fak(g), mo = fak(n);
+      return { v: { b: b, g: g }, P: [gu, mo], weg: [["wMoegl", n + "! = " + gz(mo)], ["wGuen", (g === b ? "2 · " : "") + b + "! · " + g + "! = " + gz(gu)], ["wErg", kette2("P = " + br(gu, mo), [], [gu, mo])]] }; },
+    kontr: function(r){ var N = r(10, 20), s = r(1, 3), k = r(2, 4), z = 1, n = 1, f = [];
+      for(var i = 0; i < k; i++){ z *= N - s - i; n *= N - i; f.push(br(N - s - i, N - i)); }
+      return { v: { N: N, s: s, k: k }, P: [z, n], weg: [["wPfad", kette2("P = " + f.join(" · "), [br(z, n)], [z, n])]] }; },
+    socken: function(r){ var a = r(2, 6), b = r(2, 6), n = a + b, z1 = a * (a - 1), z2 = b * (b - 1), N = n * (n - 1);
+      return { v: { r: a, b: b }, P: [z1 + z2, N], weg: [["wSumme", kette2("P = " + br(a, n) + " · " + br(a - 1, n - 1) + " + " + br(b, n) + " · " + br(b - 1, n - 1), [br(z1, N) + " + " + br(z2, N), br(z1 + z2, N)], [z1 + z2, N])]] }; },
+    urneMit: function(r){ var a = r(2, 6), b = r(2, 6), n = a + b;
+      return { v: { r: a, b: b }, P: [a * b, n * n], weg: [["wPfad", kette2("P = " + br(b, n) + " · " + br(a, n), [br(a * b, n * n)], [a * b, n * n])]] }; },
+    urneOhne: function(r){ var a = r(2, 6), b = r(2, 6), n = a + b;
+      return { v: { r: a, b: b }, P: [a * b, n * (n - 1)], weg: [["wPfad", kette2("P = " + br(b, n) + " · " + br(a, n - 1), [br(a * b, n * (n - 1))], [a * b, n * (n - 1)])]] }; },
+    muenze: function(r){ var k = r(2, 7), n = Math.pow(2, k), f = []; for(var i = 0; i < k; i++) f.push(br(1, 2));
+      return { v: { k: k }, P: [1, n], weg: [["wPfad", kette2("P = " + f.join(" · "), [br(1, n)], [1, n])]] }; }
+  };
+  var WK_IDS = Object.keys(WK_GEN);
+  function zufall(seed){ var x = seed >>> 0 || 1; return function(a, b){ x ^= x << 13; x >>>= 0; x ^= x >> 17; x ^= x << 5; x >>>= 0; return a + x % (b - a + 1); }; }
+  function wkBau(a){ return WK_GEN[a.id](zufall(a.seed)); }
+  // Eingabe lesen: Bruch, Dezimalzahl oder Prozent → { z, n } (Bruch) bzw. { w } (Zahl)
+  function liesP(s){
+    s = String(s).trim().replace(/\s+/g, "").replace(/[−–]/g, "-"); if(!s) return null;
+    var pz = /%$/.test(s); if(pz) s = s.slice(0, -1);
+    var m = s.match(/^(\d+)\/(\d+)$/); if(m && !pz){ return +m[2] ? { z: +m[1], n: +m[2], w: +m[1] / +m[2] } : null; }
+    s = s.replace(",", "."); if(!/^\d*\.?\d+$/.test(s)) return null;
+    return { w: pz ? +s / 100 : +s };
+  }
+  function wkRichtig(e, P){
+    var w = P[0] / P[1];
+    if(e.z != null) return e.z * P[1] === e.n * P[0];
+    return Math.abs(e.w - w) <= Math.max(w * 0.01, 0.00005);
+  }
+  window.MS_KOMB_TEST = { gen: WK_GEN, auf: function(){ return auf; } };
+  var uArt = "mix"; try { uArt = localStorage.getItem("msKombArt") || "mix"; } catch(e){}
+
   var auf = null, nr = 0, punkte = 0, gemacht = 0, status = null; // status: {gut, eingabe}
   function neueAufgabe(){
     var faelle = Object.keys(VORL), fall, i, n, k;
+    if(uArt === "wk" || (uArt === "mix" && Math.random() < 0.5)){
+      var id; do { id = wahl(WK_IDS); } while(auf && auf.id === id && WK_IDS.length > 1);
+      auf = { wk: true, id: id, seed: Math.floor(Math.random() * 4e9) + 1 }; nr++; status = null; $("uAntwort").value = ""; zeigeAufgabe();
+      $("uAntwort").focus({ preventScroll: true }); return;
+    }
     do { fall = wahl(faelle); i = zuf(0, VORL[fall].length - 1); n = bereich(VORL[fall][i].n); k = fall === "perm" ? n : bereich(VORL[fall][i].k); }
     while(auf && auf.fall === fall && auf.i === i && auf.n === n && auf.k === k);
     auf = { fall: fall, i: i, n: n, k: k }; nr++; status = null; $("uAntwort").value = ""; zeigeAufgabe();
@@ -202,6 +278,20 @@
   function zeigeAufgabe(){
     if(!auf) return;
     $("uNr").textContent = t("aufgabe", { i: nr });
+    $("antwortL").textContent = t(auf.wk ? "antwortP" : "antwortL"); $("tipp").textContent = t(auf.wk ? "tippP" : "tipp");
+    $("uAntwort").setAttribute("inputmode", auf.wk ? "text" : "numeric");
+    if(auf.wk){
+      var W = wkBau(auf); auf.P = W.P;
+      $("auftrag").textContent = t("p_" + auf.id, W.v);
+      $("punkte").textContent = t("punkte", { p: punkte, n: gemacht });
+      var m0 = $("meldung");
+      if(!status){ m0.textContent = ""; m0.className = "meldung"; sicht($("uLoesung"), false); $("pruefen").disabled = false; return; }
+      if(status.leer){ m0.textContent = t("keinWert"); m0.className = "meldung schlecht"; return; }
+      if(status.nochmal){ msNochmal(m0); return; }
+      m0.textContent = status.gut ? t("richtig") : t("falsch", { erg: pTxt(W.P) + " ≈ " + dz(W.P[0] / W.P[1] * 100, 2) + " %" }); m0.className = "meldung " + (status.gut ? "gut" : "schlecht");
+      $("uLoesung").innerHTML = W.weg.map(function(z){ return '<p class="zeile"><b>' + esc(t(z[0])) + '</b></p><p class="rechnung wert" dir="ltr">' + esc(z[1]) + "</p>"; }).join("");
+      sicht($("uLoesung"), true); $("pruefen").disabled = true; return;
+    }
     $("auftrag").textContent = t("u_" + auf.fall)[auf.i].split("{n}").join(auf.n).split("{k}").join(auf.k);
     $("punkte").textContent = t("punkte", { p: punkte, n: gemacht });
     var m = $("meldung");
@@ -215,6 +305,12 @@
   }
   function pruefe(){
     if(!auf || (status && !status.leer && !status.nochmal)) return;
+    if(auf.wk){
+      var e = liesP($("uAntwort").value); if(!e){ status = { leer: true }; zeigeAufgabe(); return; }
+      var ok = wkRichtig(e, auf.P);
+      if(!ok && !(status && status.nochmal)){ status = { nochmal: true }; msNochmal($("meldung")); return; }
+      status = { gut: ok }; gemacht++; if(ok) punkte++; zeigeAufgabe(); return;
+    }
     var s = $("uAntwort").value.replace(/[\s.,'’  ]/g, "");
     if(!/^\d+$/.test(s)){ status = { leer: true }; zeigeAufgabe(); return; }
     var gut = Number(s) === anzahl(auf.fall, auf.n, auf.k);
@@ -224,6 +320,7 @@
   $("pruefen").addEventListener("click", pruefe);
   $("uAntwort").addEventListener("keydown", function(e){ if(e.key === "Enter"){ if(status && !status.leer && !status.nochmal) neueAufgabe(); else pruefe(); } });
   $("weiter").addEventListener("click", neueAufgabe);
+  $("uArt").addEventListener("change", function(){ uArt = this.value; try { localStorage.setItem("msKombArt", uArt); } catch(e){} neueAufgabe(); });
 
   // ---------- Reiter & Texte ----------
   var tab = "uebersicht", TABS = ["uebersicht", "beispiele", "ueben"];
@@ -243,6 +340,7 @@
     document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
     ["permH", "permT", "permListe", "tabH", "tabT", "f1", "f2", "buchH", "wahlL", "antwortL", "tipp"].forEach(function(id){ $(id).textContent = t(id); });
     $("pruefen").textContent = t("pruefen"); $("weiter").textContent = t("weiter");
+    $("uArtL").textContent = t("artL"); $("uArt").innerHTML = ["mix", "anz", "wk"].map(function(v){ return '<option value="' + v + '"' + (v === uArt ? " selected" : "") + ">" + esc(t("art_" + v)) + "</option>"; }).join("");
     $("permFormel").innerHTML = tp("P<sub>n</sub>", "tip_Pn") + " = " + tp("n!", "tip_fak") + " = n · (n − 1) · … · 2 · 1";
     $("buch").innerHTML = t("buch").map(function(z){ return '<tr><td><span class="f">' + esc(z[0]).replace("^k", "<sup>k</sup>") + "</span></td><td>" + esc(z[1]) + "</td></tr>"; }).join("");
     var bv = $("bsp").value || "pin";

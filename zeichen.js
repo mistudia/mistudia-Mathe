@@ -205,6 +205,7 @@
     thS: ["S", "Schatten der Pyramide, ab ihrer Mitte gemessen", "shadow of the pyramid, measured from its centre", "sombra de la pirámide, medida desde su centro", "金字塔的影长（从中心量起）", "ombre de la pyramide, mesurée depuis son centre", "тень пирамиды от её центра", "ظل الهرم مقيسًا من مركزه", "ピラミッドの影（中心から）", "sombra da pirâmide, a partir do centro"],
     thh: ["h", "Höhe des Stabs", "height of the stick", "altura del palo", "木杆的高", "hauteur du bâton", "высота палки", "ارتفاع العصا", "棒の高さ", "altura da vara"],
     ths: ["s", "Schatten des Stabs", "shadow of the stick", "sombra del palo", "木杆的影长", "ombre du bâton", "тень палки", "ظل العصا", "棒の影", "sombra da vara"],
+    kwP: ["P", "Wahrscheinlichkeit (als Bruch, Dezimalzahl oder in %)", "probability (as a fraction, decimal or in %)", "probabilidad (como fracción, decimal o en %)", "概率（分数、小数或百分数）", "probabilité (fraction, décimal ou en %)", "вероятность (дробью, десятичной дробью или в %)", "الاحتمال (كسر أو عدد عشري أو نسبة مئوية)", "確率（分数・小数・%）", "probabilidade (fração, decimal ou em %)"],
     Pw: ["P( … )", "Wahrscheinlichkeit für das Ereignis in der Klammer", "probability of the event in brackets", "probabilidad del suceso entre paréntesis", "括号中事件的概率", "probabilité de l’événement entre parenthèses", "вероятность события в скобках", "احتمال الحدث بين القوسين", "かっこの中のことが起こる確率", "probabilidade do acontecimento entre parênteses"],
     nm: ["m", "Masse (in kg) – überall gleich", "mass (in kg) – the same everywhere", "masa (en kg): igual en todas partes", "质量（kg）——到哪里都一样", "masse (en kg) – la même partout", "масса (в кг) – везде одинакова", "الكتلة (بالكيلوغرام) – نفسها في كل مكان", "質量（kg）――どこでも同じ", "massa (em kg) – igual em todo o lado"],
     ng: ["g", "Ortsfaktor: wie stark der Himmelskörper zieht (N pro kg)", "gravitational field strength: how strongly the body pulls (N per kg)", "intensidad de la gravedad: cuánto atrae el astro (N por kg)", "重力加速度：天体吸引的强弱（每 kg 多少 N）", "intensité de la pesanteur : force d’attraction de l’astre (N par kg)", "ускорение свободного падения: насколько сильно притягивает тело (Н на кг)", "شدة الجاذبية: مقدار جذب الجرم (نيوتن لكل كيلوغرام)", "重力の強さ（1 kg あたり何 N）", "intensidade da gravidade: quanto o astro atrai (N por kg)"],
@@ -268,6 +269,7 @@
   var FUNK_E = "fx m t Sy N1 P12 alphaS Ddef Wwert R approx";
   var KA = {
     rechengesetze: [{ in: "#gesetzeBox", k: "abcZahl" }],
+    kombinatorik: [{ in: "#s_ueben", k: "kwP", ende: true }],
     geschichte: [{ in: "#zahlenBox", k: "zmN zmZ zmQ R zmOhne pi e wurzel" }, { in: "#quellenBox", k: "gsAB h gsV xUnb wurzel approx" }, { in: "#zahnradBox", k: "zrZ zrN approx" }],
     matrizen: [{ in: "#s_grund", k: "mxA mxAij mxMN mxT mxE" }, { in: "#s_mult", k: "mxA mxAij mxMN" }, { in: "#s_det", k: "mxDet mxInv mxE mxZ" }, { in: "#s_abb", k: "mxDet" }, { in: "#s_ueben", k: "mxAij mxDet mxInv" }],
     potenzen: [{ in: "#s_pot", k: "potA potN" }, { in: "#s_ges", k: "potA potN" }, { in: "#s_wur", k: "wurzel wurzelN potN betrag approx" }],
