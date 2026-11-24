@@ -1,6 +1,6 @@
 // ============================================================
 // beruehmt/app.js – Kachel „Berühmte Aufgaben“
-// Übersicht (Karten) → Detail je Person (Direktlink #gauss, #archimedes, #thales, #davinci, #demere, #eratosthenes):
+// Übersicht (Karten) → Detail je Person (Direktlink #gauss, #rubik, #archimedes, #thales, #davinci, #demere, #eratosthenes):
 // Geschichte, Ausprobieren (interaktiv), eigene Aufgabe (2 Versuche, dann Lösungsweg), Links zu passenden Kacheln.
 // Texte: texte.js (BA). Zeichen-Legende über /zeichen.js (MS_ZEICHEN.html).
 // ============================================================
@@ -2074,6 +2074,88 @@
     if(!gs.luft) e.textContent = t("gs_ohneErg", { t: z(gsZeit(0, false), 2) });
     else e.textContent = [gs.a, gs.b].map(function(i){ return t("gs_unten", { o: O[i], t: z(gsZeit(i, true), 2) }); }).join(" · ");
   }
+
+  // ---------- Runde 11: Zauberwürfel (Rubik’s Cube) ----------
+  P.push({ k: "rubik", p: "rb", sym: "3³", col: "#dc2626", leg: "fak", link: [["kombinatorik", "link_komb"]] });
+  // Würfel als 54 Aufkleber: Position p (x, y, z ∈ {−1, 0, 1}), Blickrichtung n, Farbe c
+  var RB_F = { U: "#ffffff", D: "#facc15", F: "#16a34a", B: "#2563eb", R: "#dc2626", L: "#f97316" };
+  var RB_N = { U: [0, 1, 0], D: [0, -1, 0], F: [0, 0, 1], B: [0, 0, -1], R: [1, 0, 0], L: [-1, 0, 0] };
+  var rb = { s: null, z: 0, T: null };
+  function rbNeu(){
+    var S = [];
+    for(var f in RB_N){ var n = RB_N[f];
+      for(var a = -1; a <= 1; a++) for(var b = -1; b <= 1; b++){
+        var p = n[0] ? [n[0], a, b] : n[1] ? [a, n[1], b] : [a, b, n[2]];
+        S.push({ p: p, n: n.slice(), c: f });
+      } }
+    rb.s = S; rb.z = 0;
+  }
+  // Drehung um Achse ax (0 = x, 1 = y, 2 = z), Schicht v, um +90° (gegen den Uhrzeigersinn von +Achse aus) oder −90°
+  function rbRot(v3, ax, plus){
+    var x = v3[0], y = v3[1], zz = v3[2];
+    if(ax === 0) return plus ? [x, -zz, y] : [x, zz, -y];
+    if(ax === 1) return plus ? [zz, y, -x] : [-zz, y, x];
+    return plus ? [-y, x, zz] : [y, -x, zz];
+  }
+  var RB_Z = { U: [1, 1, false], D: [1, -1, true], R: [0, 1, false], L: [0, -1, true], F: [2, 1, false], B: [2, -1, true] };
+  function rbZug(m){
+    var f = m[0], inv = m.length > 1, d = RB_Z[f], ax = d[0], v = d[1], plus = inv ? !d[2] : d[2];
+    rb.s.forEach(function(st){ if(st.p[ax] === v){ st.p = rbRot(st.p, ax, plus); st.n = rbRot(st.n, ax, plus); } });
+  }
+  function rbGeloest(){
+    var M = {}; for(var i = 0; i < rb.s.length; i++){ var k = rb.s[i].n.join(","); if(M[k] && M[k] !== rb.s[i].c) return false; M[k] = rb.s[i].c; } return true;
+  }
+  // Netz: Spalte/Zeile je Seite
+  function rbNetz(st){
+    var p = st.p, n = st.n;
+    if(n[1] === 1) return [3 + p[0] + 1, 0 + p[2] + 1];
+    if(n[2] === 1) return [3 + p[0] + 1, 3 + 1 - p[1]];
+    if(n[1] === -1) return [3 + p[0] + 1, 6 + 1 - p[2]];
+    if(n[0] === -1) return [0 + p[2] + 1, 3 + 1 - p[1]];
+    if(n[0] === 1) return [6 + 1 - p[2], 3 + 1 - p[1]];
+    return [9 + 1 - p[0], 3 + 1 - p[1]];
+  }
+  function rbZeichnen(){
+    var box = $("rbSvg"); if(!box) return;
+    var a = 34, s = svgNeu(12 * a + 8, 9 * a + 8);
+    s.appendChild(el("rect", { x: 0, y: 0, width: 12 * a + 8, height: 9 * a + 8, rx: 10, fill: "#f1f5f9" }));
+    rb.s.forEach(function(st){ var q = rbNetz(st); s.appendChild(el("rect", { x: 4 + q[0] * a + 1.5, y: 4 + q[1] * a + 1.5, width: a - 3, height: a - 3, rx: 5, fill: RB_F[st.c], stroke: "#1a2233", "stroke-width": 1.5 })); });
+    [["U", 4.5, 1.5], ["L", 1.5, 4.5], ["F", 4.5, 4.5], ["R", 7.5, 4.5], ["B", 10.5, 4.5], ["D", 4.5, 7.5]].forEach(function(l){ s.appendChild(el("text", { x: 4 + l[1] * a, y: 4 + l[2] * a + 6, "text-anchor": "middle", "font-size": 15, "font-weight": 800, fill: l[0] === "U" ? "#475569" : "#1a2233", opacity: 0.55 }, l[0])); });
+    box.innerHTML = ""; box.appendChild(s);
+    $("rbZ").textContent = t("rb_zuege", { z: rb.z });
+    var g = rbGeloest(), m = $("rbM");
+    m.className = "zeile" + (g && rb.z ? " gut" : ""); m.textContent = g && rb.z ? t("rb_geloest") : "";
+    if(g && rb.z && !rb.gelobt && !rb.gemischtAuto){ rb.gelobt = true; if(typeof msRichtig === "function") try { msRichtig(); } catch(x){} }
+  }
+  function gzS(s){ var sep = ["en", "zh", "ja", "ar"].indexOf(lang) >= 0 ? "," : " "; return s.replace(/\B(?=(\d{3})+(?!\d))/g, sep); }
+  PROBE.rubik = function(){
+    if(!rb.s) rbNeu();
+    var b = $("probe"), Z = ["U", "U′", "D", "D′", "L", "L′", "R", "R′", "F", "F′", "B", "B′"];
+    b.innerHTML = absatz("rb_anl") + '<div id="rbSvg"></div><div class="chips rbKn" dir="ltr">' + Z.map(function(m){ return '<button type="button" class="chip" data-m="' + m + '">' + m + "</button>"; }).join("") + "</div>" +
+      '<p><button type="button" class="knopf hell" id="rbMisch">' + esc(t("rb_mischen")) + '</button> <button type="button" class="knopf hell" id="rbReset">' + esc(t("rb_reset")) + '</button> <b id="rbZ"></b></p><p class="zeile" id="rbM"></p><p class="zeile muted">' + esc(t("rb_not")) + "</p>" +
+      karteH("rb_zahl_h") + absatz("rb_zahl") + '<ol class="weg">' + weg([{ lbl: t("rb_l1") }, "8! = " + gz(40320), { lbl: t("rb_l2") }, "3⁷ = " + gz(2187), { lbl: t("rb_l3") }, "12! = " + gz(479001600), { lbl: t("rb_l4") }, "2¹¹ = " + gz(2048), { lbl: t("rb_l5") }, "N = 8! · 3⁷ · 12! · 2¹¹ : 2", "N = " + gzS("43252003274489856000"), "N ≈ 4" + (["de", "es", "fr", "ru", "pt"].indexOf(lang) >= 0 ? "," : ".") + "3 · 10¹⁹"]) + "</ol>" +
+      karteH("rb_gott_h") + absatz("rb_gott") + merkeP("rb_sek");
+    b.querySelectorAll("[data-m]").forEach(function(k){ k.addEventListener("click", function(){ if(rb.T) return; rbZug(k.dataset.m.replace("′", "'")); rb.z++; rb.gemischtAuto = false; rbZeichnen(); }); });
+    $("rbMisch").addEventListener("click", function(){
+      if(rb.T) return; var i = 0, last = "";
+      rb.gelobt = false;
+      rb.T = setInterval(function(){
+        if(i >= 25 || !$("rbSvg")){ clearInterval(rb.T); rb.T = null; rb.z = 0; rbZeichnen(); return; }
+        var m; do { m = "UDLRFB"[Math.floor(Math.random() * 6)]; } while(m === last); last = m;
+        rbZug(Math.random() < 0.5 ? m : m + "'"); i++; rb.gemischtAuto = true; rbZeichnen();
+      }, 60);
+    });
+    $("rbReset").addEventListener("click", function(){ if(rb.T) return; rbNeu(); rb.gelobt = false; rbZeichnen(); });
+    rbZeichnen();
+  };
+  function fak(n){ var r = 1; for(var i = 2; i <= n; i++) r *= i; return r; }
+  GEN.rubik = function(){
+    var v = zuf(0, 3);
+    if(v === 0){ var n = zuf(4, 8), L = []; for(var i = 1; i <= n; i++) L.push(i); return { q: t("rb_q1", { n: n }), w: fak(n), tol: 0, l: gz(fak(n)), weg: [n + "! = " + L.join(" · "), n + "! = " + gz(fak(n))] }; }
+    if(v === 1){ var k = zuf(3, 7), A = []; for(var j = 0; j < k; j++) A.push(3); return { q: t("rb_q2", { k: k }), w: Math.pow(3, k), tol: 0, l: gz(Math.pow(3, k)), weg: ["3" + hoch(k) + " = " + A.join(" · "), "3" + hoch(k) + " = " + gz(Math.pow(3, k))] }; }
+    if(v === 2){ var k2 = zuf(4, 11); return { q: t("rb_q3", { k: k2 }), w: Math.pow(2, k2), tol: 0, l: gz(Math.pow(2, k2)), weg: ["2" + hoch(k2) + " = " + gz(Math.pow(2, k2))] }; }
+    return { q: t("rb_q4"), w: 3674160, tol: 0, l: gz(3674160), weg: ["7! = " + gz(5040), "3⁶ = " + gz(729), "N = " + gz(5040) + " · " + gz(729), "N = " + gz(3674160)] };
+  };
 
   function neueAufgabe(){ auf = GEN[akt.k](); auf.k = akt.k; auf.fertig = false; auf.versuch = 0; $("antw").value = ""; zeigeAufgabe(); }
   function zeigeAufgabe(){
