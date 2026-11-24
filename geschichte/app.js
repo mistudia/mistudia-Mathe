@@ -254,20 +254,18 @@
     });
     // Schilder (nach den Flächen, damit sie über allen Rändern liegen)
     MENG.forEach(function(m){
-      var irr = m.k === "I", na = irr ? t("zm_irr") : (NA[m.i] || ""), wi = irr ? "ℝ \\ ℚ · " + t("zm_irrK") : (WI[m.i] || "");
-      var fsN = 14, fsW = 11.5, sym = irr ? 0 : 34;
+      var irr = m.k === "I", na = irr ? t("zm_irr") : (NA[m.i] || ""), wi = irr ? t("zm_ohne") : (WI[m.i] || "");
+      var fsN = 14, fsW = 11.5, sym = 34;
       var w = Math.max(zmBreite(na, fsN) * 1.02, zmBreite(wi, fsW)) + sym + 24, h = 40, x = m.tag[0] - w / 2, y = m.tag[1] - h / 2;
       if(x < 4) x = 4; if(x + w > 896) x = 896 - w;
       var g = el("g", {});
       g.appendChild(el("rect", { x: x, y: y, width: w, height: h, rx: 20, fill: "#ffffff", stroke: m.c, "stroke-width": mark === m.k ? 3.5 : 2.5 }));
-      if(!irr){
-        g.appendChild(el("circle", { cx: x + 22, cy: y + h / 2, r: 15, fill: m.c }));
-        g.appendChild(el("text", { x: x + 22, y: y + h / 2 + 6.5, "text-anchor": "middle", "class": "zmS", fill: "#ffffff", "font-size": m.k === "N0" ? 15 : 19 }, m.s));
-      }
+      g.appendChild(el("circle", { cx: x + 22, cy: y + h / 2, r: 15, fill: m.c }));
+      g.appendChild(el("text", { x: x + 22, y: y + h / 2 + 6.5, "text-anchor": "middle", "class": "zmS", fill: "#ffffff", "font-size": m.k === "N0" ? 15 : 19 }, irr ? "𝕀" : m.s));
       // Arabisch: zentriert (eine RTL-Zeile mit Anker „start“ läuft sonst aus dem Schild)
       var ar = lang === "ar", tx0 = ar ? x + sym + (w - sym) / 2 : x + 12 + sym, an = ar ? "middle" : "start";
       g.appendChild(el("text", { x: tx0, y: y + 17, "class": "zmName", fill: m.c, "font-size": fsN, "text-anchor": an }, na));
-      g.appendChild(el("text", { x: tx0, y: y + 32, "class": "zmWie", fill: "#3b4556", "font-size": fsW, "text-anchor": an }, wi));
+      g.appendChild(el("text", { x: tx0, y: y + 32, "class": "zmWie", fill: "#3b4556", "font-size": fsW, "text-anchor": an, style: irr ? "font-style:normal" : null }, wi));
       s.appendChild(g);
     });
     for(var k in ZM_BSP) ZM_BSP[k].forEach(function(p){

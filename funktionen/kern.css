@@ -159,3 +159,11 @@ h1 { text-align: center; color: var(--blue); margin: 0 0 14px; font-size: 28px; 
 .wt-yin.wt-falsch { border-color: #b91c1c; background: #fef2f2; }
 .wt-xs { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; font: 700 17px system-ui, sans-serif; color: #c2410c; }
 .wt-xr { white-space: nowrap; }
+
+/* 🆕 24.11.2026: eigene Punkte */
+.wt-eig { margin: 6px 0 8px; padding-top: 8px; border-top: 1px dashed #b0b0b8; }
+.wt-eig-t { margin: 0 0 2px; font-weight: 800; color: #15803d; }
+.wt-eig-l { display: flex; gap: 6px; align-items: center; font-size: 14px; margin: 4px 0 6px; color: #1a2233; }
+.wt-fit { border-color: #16a34a !important; color: #15803d !important; }
+.wt-fiterg { margin-top: 6px; font-size: 16px; color: #14532d; }
+.wt-fiterg b { display: block; margin-top: 4px; font: 700 18px "Cambria Math", Cambria, "Times New Roman", serif; }

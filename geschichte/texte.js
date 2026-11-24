@@ -336,6 +336,7 @@ var GS = {
 "zr_uhr_p1": "1. Paar: 8 Zähne treiben 24 Zähne",
 "zr_uhr_p2": "2. Paar: 8 Zähne treiben 32 Zähne",
 "zr_uhr_z": "Zeitraffer:",
+"zm_ohne": "ℝ \\ ℚ heißt „ℝ ohne ℚ“ · manchmal auch 𝕀",
 "zm_name": [
 "natürliche Zahlen",
 "natürliche Zahlen mit Null",
@@ -787,6 +788,7 @@ var GS = {
 "zr_uhr_p1": "1st pair: 8 teeth drive 24 teeth",
 "zr_uhr_p2": "2nd pair: 8 teeth drive 32 teeth",
 "zr_uhr_z": "Time-lapse:",
+"zm_ohne": "ℝ \\ ℚ means “ℝ without ℚ” · sometimes also 𝕀",
 "zm_name": [
 "natural numbers",
 "natural numbers with zero",
@@ -1238,6 +1240,7 @@ var GS = {
 "zr_uhr_p1": "1.er par: 8 dientes mueven 24 dientes",
 "zr_uhr_p2": "2.º par: 8 dientes mueven 32 dientes",
 "zr_uhr_z": "Cámara rápida:",
+"zm_ohne": "ℝ \\ ℚ significa «ℝ sin ℚ» · a veces también 𝕀",
 "zm_name": [
 "números naturales",
 "naturales con el cero",
@@ -1689,6 +1692,7 @@ var GS = {
 "zr_uhr_p1": "第 1 对：8 齿带动 24 齿",
 "zr_uhr_p2": "第 2 对：8 齿带动 32 齿",
 "zr_uhr_z": "快进：",
+"zm_ohne": "ℝ \\ ℚ 表示“ℝ 去掉 ℚ” · 有时也写作 𝕀",
 "zm_name": [
 "自然数",
 "含零的自然数",
@@ -2140,6 +2144,7 @@ var GS = {
 "zr_uhr_p1": "1ʳᵉ paire : 8 dents entraînent 24 dents",
 "zr_uhr_p2": "2ᵉ paire : 8 dents entraînent 32 dents",
 "zr_uhr_z": "Accéléré :",
+"zm_ohne": "ℝ \\ ℚ signifie « ℝ privé de ℚ » · parfois aussi 𝕀",
 "zm_name": [
 "entiers naturels",
 "naturels avec zéro",
@@ -2591,6 +2596,7 @@ var GS = {
 "zr_uhr_p1": "1-я пара: 8 зубьев вращают 24 зуба",
 "zr_uhr_p2": "2-я пара: 8 зубьев вращают 32 зуба",
 "zr_uhr_z": "Ускоренно:",
+"zm_ohne": "ℝ \\ ℚ значит «ℝ без ℚ» · иногда также 𝕀",
 "zm_name": [
 "натуральные числа",
 "натуральные с нулём",
@@ -3042,6 +3048,7 @@ var GS = {
 "zr_uhr_p1": "الزوج الأول: 8 أسنان تدير 24 سنًّا",
 "zr_uhr_p2": "الزوج الثاني: 8 أسنان تدير 32 سنًّا",
 "zr_uhr_z": "عرض مسرّع:",
+"zm_ohne": "ℝ \\ ℚ تعني «ℝ بدون ℚ» · وأحيانًا 𝕀",
 "zm_name": [
 "الأعداد الطبيعية",
 "الطبيعية مع الصفر",
@@ -3493,6 +3500,7 @@ var GS = {
 "zr_uhr_p1": "1組目：8歯で24歯を回す",
 "zr_uhr_p2": "2組目：8歯で32歯を回す",
 "zr_uhr_z": "早回し：",
+"zm_ohne": "ℝ \\ ℚ は「ℝ から ℚ をのぞく」· 𝕀 と書くことも",
 "zm_name": [
 "自然数",
 "0 をふくむ自然数",
@@ -3944,6 +3952,7 @@ var GS = {
 "zr_uhr_p1": "1.º par: 8 dentes movem 24 dentes",
 "zr_uhr_p2": "2.º par: 8 dentes movem 32 dentes",
 "zr_uhr_z": "Acelerado:",
+"zm_ohne": "ℝ \\ ℚ significa “ℝ sem ℚ” · às vezes também 𝕀",
 "zm_name": [
 "números naturais",
 "naturais com o zero",

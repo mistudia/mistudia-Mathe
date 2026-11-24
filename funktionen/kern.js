@@ -422,6 +422,7 @@ var FK = (function(){
     var roh = spanne / ziel, p = Math.pow(10, Math.floor(Math.log10(roh))), f = roh / p;
     return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p;
   }
+  function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function E(name, a, txt){ var e = document.createElementNS("http://www.w3.org/2000/svg", name); for(var k in a) e.setAttribute(k, a[k]); if(txt != null) e.textContent = txt; return e; }
   Graph.prototype.zeichne = function(){
     var svg = this.svg, r = svg.getBoundingClientRect(), W = Math.max(280, Math.round(r.width || 600)), H = Math.max(220, Math.round(r.height || 400));
@@ -545,7 +546,18 @@ var FK = (function(){
     return best < 0 ? 0 : best;
   };
   Graph.prototype.tippen = function(px, py){
-    if(!this.kurven.length || !this.X) return;
+    if(!this.X) return;
+    var T = this.tab;
+    if(T && T.det.open && T.det.querySelector(".wt-tap").checked){
+      var self = this, hit = -1; T.eig.forEach(function(q, i){ if(isFinite(q.x) && isFinite(q.y) && Math.hypot(self.X(q.x) - px, self.Y(q.y) - py) < 14) hit = i; });
+      if(hit >= 0) T.eig.splice(hit, 1);
+      else { // auf ein grobes Raster einrasten (meist 0,5er-Schritte), damit glatte Werte entstehen
+        var st = this.ablSchritt(), gs = st.s * 5, v = this.v;
+        var wx = Math.round(this.weltX(px) / gs) * gs, wy = Math.round((v.y1 - py / this.H * (v.y1 - v.y0)) / gs) * gs;
+        T.eig.push({ x: Number(wx.toFixed(st.d)), y: Number(wy.toFixed(st.d)) }); }
+      T.fit = null; this.eigZeilen(); this.zeichne(); return;
+    }
+    if(!this.kurven.length) return;
     var pb = this.pin && this.pinBox; if(pb && px >= pb.x0 && px <= pb.x1 && py >= pb.y0 && py <= pb.y1){ this.pin = null; this.pinBox = null; this.zeichneAblesen(); return; }
     if(this.pin){ var k = this.kurven[Math.min(this.pin.k, this.kurven.length - 1)], y = k.f(this.pin.x);
       if(Math.abs(this.X(this.pin.x) - px) < 16 && (!isFinite(y) || Math.abs(klemm(this.Y(y), 0, this.H) - py) < 16)){ this.pin = null; this.zeichneAblesen(); return; } }
@@ -639,7 +651,10 @@ var FK = (function(){
     det.className = "wt";
     det.innerHTML = '<summary></summary><p class="wt-h"></p><div class="wt-scroll" dir="ltr"><table><thead><tr><th class="m">x</th><th class="m">f(x)</th><th></th></tr></thead><tbody></tbody></table></div>' +
       '<div class="wt-knoepfe"><button type="button" class="wt-neu"></button><button type="button" class="wt-auto"></button><label><input type="checkbox" class="wt-zeig" checked> <span></span></label></div>' +
-      '<div class="wt-umk"><label><span class="wt-umk-l"></span> <span class="wt-umk-f" dir="ltr">f(x) =</span> <input type="text" inputmode="decimal" autocomplete="off" class="wt-yin" placeholder="y"></label><div class="wt-xs" dir="ltr"></div></div>';
+      '<div class="wt-umk"><label><span class="wt-umk-l"></span> <span class="wt-umk-f" dir="ltr">f(x) =</span> <input type="text" inputmode="decimal" autocomplete="off" class="wt-yin" placeholder="y"></label><div class="wt-xs" dir="ltr"></div></div>' +
+      '<div class="wt-eig"><p class="wt-eig-t"></p><p class="wt-h wt-eig-h"></p><label class="wt-eig-l"><input type="checkbox" class="wt-tap"> <span></span></label>' +
+      '<div class="wt-scroll" dir="ltr"><table><thead><tr><th class="m">x</th><th class="m">y</th><th></th></tr></thead><tbody class="wt-eb"></tbody></table></div>' +
+      '<div class="wt-knoepfe"><button type="button" class="wt-eneu"></button><label><input type="checkbox" class="wt-verb"> <span></span></label><button type="button" class="wt-fit"></button></div><div class="wt-fiterg" dir="auto"></div></div>';
     var ref = wrap.nextElementSibling && wrap.nextElementSibling.classList.contains("legende") ? wrap.nextElementSibling : wrap;
     ref.parentNode.insertBefore(det, ref.nextSibling);
     var T = this.tab = { det: det, body: det.querySelector("tbody"), xs: [], lang: null };
@@ -652,6 +667,15 @@ var FK = (function(){
       var inp = T.body.querySelectorAll("input"); if(inp.length){ inp[inp.length - 1].focus(); inp[inp.length - 1].select(); }
     });
     det.querySelector(".wt-zeig").addEventListener("change", function(){ self.zeichne(); });
+    // 🆕 24.11.2026: eigene Punkte (liegen auf keinem Graphen) – verbinden oder passende Funktion suchen
+    T.eig = []; T.fit = null;
+    var eb = det.querySelector(".wt-eb");
+    det.querySelector(".wt-eneu").addEventListener("click", function(){ T.eig.push({ x: NaN, y: NaN }); T.fit = null; self.eigZeilen(); self.zeichne(); var ins = eb.querySelectorAll("input"); if(ins.length >= 2) ins[ins.length - 2].focus(); });
+    det.querySelector(".wt-verb").addEventListener("change", function(){ self.zeichne(); });
+    det.querySelector(".wt-tap").addEventListener("change", function(){ self.zeichne(); });
+    det.querySelector(".wt-fit").addEventListener("click", function(){ self.eigFit(); self.zeichne(); });
+    eb.addEventListener("input", function(e){ var i = +e.target.dataset.i, k = e.target.dataset.k; if(isNaN(i)) return; T.eig[i][k] = xLesen(e.target.value); T.fit = null; e.target.classList.toggle("wt-falsch", !isFinite(T.eig[i][k]) && e.target.value.trim() !== ""); self.zeichne(); });
+    eb.addEventListener("click", function(e){ var b = e.target.closest(".wt-eweg"); if(!b) return; T.eig.splice(+b.dataset.i, 1); T.fit = null; self.eigZeilen(); self.zeichne(); });
     det.querySelector(".wt-yin").addEventListener("input", function(){ T.yc = xLesen(this.value); this.classList.toggle("wt-falsch", !isFinite(T.yc) && this.value.trim() !== ""); self.zeichne(); });
     T.body.addEventListener("input", function(e){
       var i = +e.target.dataset.i; if(isNaN(i)) return;
@@ -669,6 +693,45 @@ var FK = (function(){
         self.zeichne();
       }
     });
+  };
+  Graph.prototype.eigZeilen = function(){
+    var T = this.tab, eb = T.det.querySelector(".wt-eb"), h = "";
+    T.eig.forEach(function(q, i){
+      h += '<tr><td><input type="text" inputmode="decimal" autocomplete="off" data-i="' + i + '" data-k="x" placeholder="x" value="' + (isFinite(q.x) ? zahl(q.x, 6) : "") + '"></td>' +
+        '<td><input type="text" inputmode="decimal" autocomplete="off" data-i="' + i + '" data-k="y" placeholder="y" value="' + (isFinite(q.y) ? zahl(q.y, 6) : "") + '"></td>' +
+        '<td class="wt-akt"><button type="button" class="wt-eweg" data-i="' + i + '" title="' + t("wtWeg") + '" aria-label="' + t("wtWeg") + '">×</button></td></tr>';
+    });
+    eb.innerHTML = h;
+  };
+  Graph.prototype.eigPunkte = function(){ return this.tab.eig.filter(function(q){ return isFinite(q.x) && isFinite(q.y); }); };
+  // Polynom durch alle Punkte (exakt mit Brüchen, Grad = Anzahl − 1, höchstens 6 Punkte)
+  Graph.prototype.eigFit = function(){
+    var T = this.tab, P = this.eigPunkte(), box = T.det.querySelector(".wt-fiterg");
+    T.fit = null;
+    if(P.length < 2){ box.textContent = t("eigWenig"); return; }
+    if(P.length > 6){ box.textContent = t("eigZuViel"); return; }
+    for(var i = 0; i < P.length; i++) for(var j = i + 1; j < P.length; j++) if(Math.abs(P[i].x - P[j].x) < 1e-9){ box.textContent = t("eigGleichX"); return; }
+    var fr = function(v){ return B(Math.round(v * 1000), 1000); }, n = P.length;
+    var A = P.map(function(q){ var r = [], xb = fr(q.x), pw = B(1); for(var c = 0; c < n; c++){ r.push(pw); pw = Bz.mul(pw, xb); } r.push(fr(q.y)); return r; });
+    try {
+      for(var c = 0; c < n; c++){
+        var piv = c; while(piv < n && Bz.null(A[piv][c])) piv++; if(piv === n) throw 0;
+        var tmp = A[c]; A[c] = A[piv]; A[piv] = tmp;
+        for(var r = 0; r < n; r++){ if(r === c || Bz.null(A[r][c])) continue; var fk = Bz.div(A[r][c], A[c][c]); for(var k = c; k <= n; k++) A[r][k] = Bz.sub(A[r][k], Bz.mul(fk, A[c][k])); }
+      }
+      var p = []; for(c = 0; c < n; c++) p.push(Bz.div(A[c][n], A[c][c]));
+      p = trim(p); T.fit = p;
+      box.innerHTML = esc(t("eigFitErg", { g: Math.max(0, p.length - 1) })) + ' <b dir="ltr">f(x) = ' + esc(ptxt(p)) + "</b>";
+    } catch(e){ box.textContent = t("eigGleichX"); }
+  };
+  Graph.prototype.eigZeichnen = function(){
+    var T = this.tab, P = this.eigPunkte(), self = this, G = "#16a34a";
+    if(T.det.querySelector(".wt-verb").checked && P.length >= 2){
+      var Q = P.slice().sort(function(a, b){ return a.x - b.x; });
+      this.inhalt.appendChild(E("polyline", { points: Q.map(function(q){ return self.X(q.x).toFixed(1) + "," + self.Y(q.y).toFixed(1); }).join(" "), fill: "none", stroke: G, "stroke-width": 2.5, "stroke-linejoin": "round" }));
+    }
+    if(T.fit){ var p = T.fit; this.kurve(function(x){ return wertN(p, x); }, G, 2.5, "8 5"); }
+    P.forEach(function(q){ self.inhalt.appendChild(E("rect", { x: self.X(q.x) - 6, y: self.Y(q.y) - 6, width: 12, height: 12, rx: 2, fill: G, stroke: "#ffffff", "stroke-width": 2, transform: "rotate(45 " + self.X(q.x) + " " + self.Y(q.y) + ")" })); });
   };
   Graph.prototype.tabAuto = function(){
     var v = this.v, st = schoen(v.x1 - v.x0, 6), xs = [];
@@ -693,11 +756,16 @@ var FK = (function(){
       T.det.querySelector(".wt-auto").textContent = t("wtAuto");
       T.det.querySelector(".wt-zeig + span").textContent = t("wtPunkte");
       T.det.querySelector(".wt-umk-l").textContent = t("wtUmk");
+      T.det.querySelector(".wt-eig-t").textContent = t("eigT"); T.det.querySelector(".wt-eig-h").textContent = t("eigH");
+      T.det.querySelector(".wt-tap + span").textContent = t("eigTap"); T.det.querySelector(".wt-eneu").textContent = t("eigNeu");
+      T.det.querySelector(".wt-verb + span").textContent = t("eigVerb"); T.det.querySelector(".wt-fit").textContent = t("eigFit");
+      this.eigZeilen();
       T.body.querySelectorAll(".wt-ziel").forEach(function(b){ b.title = t("wtZiel"); b.setAttribute("aria-label", t("wtZiel")); });
       T.body.querySelectorAll(".wt-weg").forEach(function(b){ b.title = t("wtWeg"); b.setAttribute("aria-label", t("wtWeg")); });
       T.body.querySelectorAll("input").forEach(function(e){ e.setAttribute("aria-label", t("wtX")); e.placeholder = "x"; });
     }
     if(!T.det.open) return;
+    this.eigZeichnen();
     var k = this.hauptKurve(), self = this, zeig = T.det.querySelector(".wt-zeig").checked;
     var zellen = T.body.querySelectorAll(".wt-y");
     T.xs.forEach(function(x, i){
