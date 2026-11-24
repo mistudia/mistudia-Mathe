@@ -121,7 +121,7 @@
       })
       .catch(function(){ meldeLauf = false; });
   }
-  window.msRichtig = richtig;
+  window.msRichtig = function(){ richtig(); if(window.MS_FS) MS_FS.richtig(); };
 
   // ---- Rückmeldungen erkennen (nur kurz nach einer Eingabe) ----
   var letzteEingabe = 0;
@@ -136,14 +136,16 @@
   function istFalsch(el){ var c = el && el.classList; return !!c && (c.contains("falsch") || c.contains("schlecht") || c.contains("bad")); }
   function pruefe(liste){
     if(Date.now() - letzteEingabe > 4000) return;
-    var gut = false, falsch = false;
+    var gut = false, falsch = false, gutEl = null, falschEl = null;
     liste.forEach(function(m){
       var els = [];
       if(m.type === "attributes") els.push(m.target);
       else m.addedNodes.forEach(function(n){ if(n.nodeType === 1){ els.push(n); n.querySelectorAll && n.querySelectorAll(".gut,.u-ok,.richtig,.ok,.falsch,.schlecht,.bad").forEach(function(x){ els.push(x); }); } });
-      els.forEach(function(el){ if(istFalsch(el)) falsch = true; else if(istGut(el)) gut = true; });
+      els.forEach(function(el){ if(istFalsch(el)){ falsch = true; falschEl = falschEl || el; } else if(istGut(el)){ gut = true; gutEl = gutEl || el; } });
     });
     if(gut && !falsch) richtig();
+    // Übungs-Statistik (fortschritt.js)
+    if(window.MS_FS && (gut || falsch)) MS_FS.melde(!falsch, falsch ? falschEl : gutEl);
   }
   if(location.pathname !== "/" && location.pathname !== "/index.html" && window.MutationObserver){
     var mo = new MutationObserver(pruefe);
@@ -249,6 +251,9 @@
   })();
   window.MS_KONTO = {
     istApp: IST_APP,
+    client: client,
+    // Verbindung für den Fortschritts-Abgleich: { sitzung: true } bzw. { code } oder null
+    verbindung: function(){ if(hatSitzung()) return { sitzung: true }; var c = meinCode(); return c ? { code: c } : null; },
     box: function(el){ var neu = el !== boxEl; boxEl = el; if(neu) laden(); else zeichne(); },
     richtig: richtig
   };

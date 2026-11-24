@@ -132,6 +132,7 @@
   <div class="suche" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="7"/><line x1="16" y1="16" x2="22" y2="22"/></svg><input type="search" id="suche" autocomplete="off" spellcheck="false"></div>
   <p class="treffer-info" id="trefferInfo" hidden></p>
   <nav class="grid" id="treffer" hidden></nav>
+  <div id="fsKnopf"></div>
   <div id="stufen"></div>
   <div id="konto"></div>
   <!-- Businessplan: Verknüpfung zu VocabBoss (Sprachen) -->
@@ -142,6 +143,7 @@
     <a href="https://mistudia.com" target="_blank" rel="noopener">mistudia.com</a>
   </footer>
 </main>
+<script src="/fortschritt.js"></script>
 <script src="/konto.js"></script>
 <script src="/seitenzoom.js" defer></script>
 <script src="/bereichslink.js" defer></script>
@@ -360,8 +362,11 @@ function render(){
   if(window.MS_KONTO) MS_KONTO.box(document.getElementById("konto"));
   document.querySelectorAll(".langs button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.l === lang ? "true" : "false"); });
   document.getElementById("suche").placeholder = u.such; document.getElementById("suche").setAttribute("aria-label", u.such);
-  stufenZeichnen(); suchen();
+  stufenZeichnen(); suchen(); fsKnopf();
 }
+// ---------- Übungs-Statistik (fortschritt.js): Knopf „Mein Fortschritt“ + Abzeichen an den Kacheln ----------
+function fsKnopf(){ var b = document.getElementById("fsKnopf"); if(b) b.innerHTML = window.MS_FS ? MS_FS.knopf() : ""; }
+document.addEventListener("ms-fortschritt", function(e){ if(e.detail && e.detail.sync){ stufenZeichnen(); suchen(); fsKnopf(); } });
 // ---------- Klassenstufen (aufklappbar) ----------
 var STUFEN = [[1, 4, "#f59e0b"], [5, 6, "#16a34a"], [7, 8, "#0ea5e9"], [9, 10, "#7c3aed"], [11, 13, "#db2777"]];
 function klassen(a){ var m = a.grade.de.match(/(\d+)\s*[–-]\s*(\d+)/) || a.grade.de.match(/(\d+)/); return m ? [+m[1], +(m[2] || m[1])] : [1, 13]; }
@@ -369,7 +374,7 @@ function kachel(a, extra){
   return '<a class="tile" href="/' + a.slug + '/' + (window.MS_URL_LANG ? "?lang=" + window.MS_URL_LANG : "") + (extra && extra.ziel || "") + '">' +
     '<span class="badge" style="background:' + a.color + ';font-size:' + (a.badge.length > 4 ? 15 : a.badge.length > 2 ? 19 : 26) + 'px">' + esc(a.badge) + '</span>' +
     '<span><b>' + (extra && extra.name || esc(a.name[lang])) + '</b><span class="desc">' + (extra && extra.desc || esc(a.desc[lang])) + '</span>' +
-    '<span class="grade">' + esc(a.grade[lang]) + '</span>' + (extra && extra.hit ? '<span class="hit">' + extra.hit + "</span>" : "") + '</span></a>';
+    '<span class="grade">' + esc(a.grade[lang]) + '</span>' + (window.MS_FS ? MS_FS.abzeichen(a.slug) : "") + (extra && extra.hit ? '<span class="hit">' + extra.hit + "</span>" : "") + '</span></a>';
 }
 var OFFEN = {};
 try { OFFEN = JSON.parse(localStorage.getItem("msMathStufen") || "{}") || {}; } catch(e){}

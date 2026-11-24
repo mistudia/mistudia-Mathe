@@ -1824,6 +1824,9 @@ function zeigeDiplom(){
     const gesamt = aufgaben.length;
     const benutzteSekunden = GESAMTZEIT - timerSekunden;
 
+    // Bestzeit für „Mein Fortschritt“ (fortschritt.js): ee-<Modus> bzw. ge-<Modus> beim großen Einmaleins
+    try { if(window.MS_FS) MS_FS.bestZeit((/[?&]gross=1/.test(location.search) ? "ge-" : "ee-") + aktivModus, benutzteSekunden); } catch(e){}
+
     const m = Math.floor(benutzteSekunden / 60);
     const s = benutzteSekunden % 60;
 

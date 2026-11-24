@@ -41,6 +41,7 @@
     return false;
   };
   window.msNochmal = function(m){
+    if(window.MS_FS) MS_FS.falsch();
     if(m){ m.className = "meldung schlecht"; m.textContent = NOCH[lang] || NOCH.de; }
     var f = document.activeElement && document.activeElement.tagName === "INPUT" ? document.activeElement : null;
     if(!f){ var ins = document.querySelectorAll("input"); for(var i = ins.length - 1; i >= 0; i--){ if(ins[i].offsetParent && !ins[i].disabled && /^(text|number|)$/i.test(ins[i].type || "") && ins[i].value){ f = ins[i]; break; } } }
@@ -49,6 +50,8 @@
 
   // VocabBoss-Konto: richtige Aufgaben → Dogdex-Karte (konto.js)
   var kj = document.createElement("script"); kj.src = "/konto.js"; kj.defer = true; document.head.appendChild(kj);
+  // Übungs-Statistik (richtig/falsch je Kachel, Serien, Bestzeiten)
+  if(!window.MS_FS){ var fj = document.createElement("script"); fj.src = "/fortschritt.js"; document.head.appendChild(fj); }
 
   var A = window.MS_LANG;
   if(A){
