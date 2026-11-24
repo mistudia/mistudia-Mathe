@@ -1,7 +1,8 @@
 // ============================================================
 // seitenzoom.js – immer sichtbare Zoom-Leiste am rechten Rand (alle Seiten der Mathe-App):
-// + oben, senkrechter Regler 50–200 %, − unten, Prozentanzeige; Lupe öffnet einen kurzen Hinweis
-// zu den Tastenkürzeln (Strg + / Strg − / Strg 0, ⌘ am Mac, Strg + Mausrad).
+// + oben, senkrechter Regler 50–200 %, − unten, Prozentanzeige.
+// 🆕 24.11.2026: Lupe → nur das Vergrößern (Knöpfe − / + / 100 % und die Zoom-Kürzel Strg + / Strg − / Strg 0);
+// die Tastatur darunter öffnet die ganze Tastenkürzel-Übersicht (/tastenkuerzel.js) – vorher zeigten beide dasselbe.
 // CSS zoom am <body>, gemerkt in localStorage "msZoom"; die Leiste selbst wird gegenskaliert,
 // damit sie immer gleich groß bleibt. 9 Sprachen.
 // ============================================================
@@ -39,6 +40,7 @@
     ".ms-zoom-ov{position:fixed;inset:0;z-index:2147483100;background:rgba(15,23,42,.35);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:70px 12px 20px}" +
     ".ms-zoom-k{background:#fff;color:#1a2233;border-radius:14px;max-width:420px;width:100%;padding:16px 18px;box-shadow:0 8px 30px rgba(0,0,0,.3);font:16px/1.45 system-ui,sans-serif;max-height:90vh;max-height:90dvh;overflow-y:auto}" +
     ".ms-zoom-k h2{margin:0 0 8px;font-size:19px;color:#1565c0}.ms-zoom-k p{margin:6px 0}.ms-zoom-k kbd{display:inline-block;border:1px solid #b0b0b8;border-bottom-width:2px;border-radius:5px;padding:0 5px;font:600 14px system-ui,sans-serif;background:#f8fafc}" +
+    ".ms-zoom-st{display:flex;align-items:center;justify-content:center;gap:16px;margin:4px 0 10px}.ms-zoom-st button{width:44px;height:44px;border-radius:50%;border:2px solid #1565c0;background:#fff;color:#1565c0;font:800 24px/1 system-ui,sans-serif;cursor:pointer;padding:0}.ms-zoom-st button:hover{background:#e8f1ff}.ms-zoom-st b{font:800 20px system-ui,sans-serif;min-width:70px;text-align:center;color:#1a2233}" +
     ".ms-zoom-k .ms-zoom-zu{font:700 16px system-ui,sans-serif;width:100%;margin-top:8px;height:38px;border-radius:999px;cursor:pointer;border:2px solid #1565c0;background:#1565c0;color:#fff}.ms-zoom-k .ms-zoom-zu.hell{background:#fff;color:#1565c0}";
   document.head.appendChild(css);
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -54,19 +56,19 @@
   function hilfe(){ tkLaden(function(){ window.TK_OEFFNEN({ lang: sprache(), reset: function(){ setze(100); } }); }); }
   function hilfeAlt(){
     var T = TX[sprache()], ov = document.createElement("div"); ov.className = "ms-zoom-ov"; if(sprache() === "ar") ov.dir = "rtl";
-    ov.innerHTML = '<div class="ms-zoom-k" role="dialog" aria-label="' + esc(T[0]) + '"><h2>' + esc(T[0]) + "</h2><p>" + kbd(esc(T[1])) + '</p><p><button type="button" class="ms-zoom-zu hell" data-n="1">' + esc(T[2]) + '</button><button type="button" class="ms-zoom-zu" data-x="1">' + esc(T[3]) + "</button></p></div>";
+    ov.innerHTML = '<div class="ms-zoom-k" role="dialog" aria-label="' + esc(T[0]) + '"><h2>' + esc(T[0]) + '</h2><div class="ms-zoom-st"><button type="button" data-d="-10" aria-label="' + esc(T[5]) + '">−</button><b id="msZoomZ2">' + stufe + ' %</b><button type="button" data-d="10" aria-label="' + esc(T[4]) + '">+</button></div><p>' + kbd(esc(T[1])) + '</p><p><button type="button" class="ms-zoom-zu hell" data-n="1">' + esc(T[2]) + '</button><button type="button" class="ms-zoom-zu" data-x="1">' + esc(T[3]) + "</button></p></div>";
     document.body.appendChild(ov);
-    ov.addEventListener("click", function(e){ var t = e.target; if(t === ov || t.getAttribute("data-x")) ov.remove(); else if(t.getAttribute("data-n")) setze(100); });
+    ov.addEventListener("click", function(e){ var t = e.target.closest ? (e.target.closest("button") || e.target) : e.target; if(t === ov || t.getAttribute("data-x")) ov.remove(); else if(t.getAttribute("data-n")) setze(100); else if(t.getAttribute("data-d")) setze(stufe + +t.getAttribute("data-d")); var z2 = document.getElementById("msZoomZ2"); if(z2) z2.textContent = stufe + " %"; });
     document.addEventListener("keydown", function weg(e){ if(e.key === "Escape"){ ov.remove(); document.removeEventListener("keydown", weg); } });
   }
   function bauen(){
     var T = TX[sprache()];
     leiste = document.createElement("div"); leiste.className = "ms-zl"; leiste.setAttribute("role", "group"); leiste.setAttribute("aria-label", T[0]);
     leiste.innerHTML = '<button type="button" data-d="10" title="' + esc(T[4]) + '" aria-label="' + esc(T[4]) + '">+</button><input type="range" id="msZoomR" min="50" max="200" step="10" aria-label="' + esc(T[0]) + '" data-nofit data-nonav><button type="button" data-d="-10" title="' + esc(T[5]) + '" aria-label="' + esc(T[5]) + '">−</button><b id="msZoomZ"></b>' +
-      '<button type="button" data-h="1" title="' + esc(T[0]) + '" aria-label="' + esc(T[0]) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>' +
+      '<button type="button" data-h="z" title="' + esc(T[0]) + '" aria-label="' + esc(T[0]) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>' +
       '<button type="button" data-h="1" class="ms-zl-kb" title="' + esc(TKT[sprache()] || TKT.de) + '" aria-label="' + esc(TKT[sprache()] || TKT.de) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10h1.6M9.2 10h1.6M12.4 10h1.6M15.6 10h2.4M6 13.4h2M16 13.4h2M9.4 13.4h5.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>';
     document.body.appendChild(leiste);
-    leiste.addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.getAttribute("data-h")) hilfe(); else setze(stufe + +b.getAttribute("data-d")); });
+    leiste.addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.getAttribute("data-h") === "z") hilfeAlt(); else if(b.getAttribute("data-h")) hilfe(); else setze(stufe + +b.getAttribute("data-d")); });
     document.getElementById("msZoomR").addEventListener("input", function(){ setze(+this.value); });
     setze(stufe);
   }

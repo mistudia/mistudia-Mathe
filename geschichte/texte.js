@@ -336,6 +336,29 @@ var GS = {
 "zr_uhr_p1": "1. Paar: 8 Zähne treiben 24 Zähne",
 "zr_uhr_p2": "2. Paar: 8 Zähne treiben 32 Zähne",
 "zr_uhr_z": "Zeitraffer:",
+"zm_name": [
+"natürliche Zahlen",
+"natürliche Zahlen mit Null",
+"ganze Zahlen",
+"rationale Zahlen",
+"reelle Zahlen"
+],
+"zm_wie": [
+"„N“ wie natürlich",
+"Index 0: mit der Null",
+"„Z“ wie Zahlen (deutsch)",
+"„Q“ wie Quotient (Bruch)",
+"„R“ wie reell"
+],
+"zm_irrK": "irrational",
+"zr_uhr_leg": "Rot: Das kleine Rad mit 8 Zähnen sitzt auf der Achse des Minutenzeigers. Blau: Das große Rad mit 32 Zähnen trägt den Stundenzeiger. Dazwischen (orange) sitzen ein Rad mit 24 Zähnen und ein kleines Rad mit 8 Zähnen fest auf derselben Achse – sie drehen sich immer gemeinsam.",
+"zr_uhr_um": "Umdrehungen – Minutenzeiger: {m} · Zwischenrad: {z} · Stundenzeiger: {h}",
+"zr_uhr_tempo": "Tempo:",
+"zr_uhr_n": [
+"Minutenzeiger",
+"Zwischenrad",
+"Stundenzeiger"
+],
 "zr_anti_h": "Wie rechnete der Mechanismus von Antikythera?",
 "zr_anti_i": "Die Griechen wussten: In 19 Jahren umrundet der Mond die Erde (gegenüber den Sternen) 254-mal. Der Mechanismus macht aus einer Umdrehung des Jahresrads mit drei Räderpaaren genau 254/19 Mondumläufe. Die Zähnezahlen kennt man aus Röntgenaufnahmen:",
 "zr_anti_m": "Ein Rad hat 127 Zähne – 127 ist eine Primzahl, und 254 = 2 · 127. Ohne dieses Rad ginge die Rechnung nicht auf.",
@@ -424,7 +447,8 @@ var GS = {
 "beruehmt/#pijagd": "Die Jagd nach π",
 "beruehmt/#primzahlen": "Riesige Primzahlen",
 "beruehmt/#hanoi": "Die Türme von Hanoi",
-"beruehmt/#euklid": "Euklids ggT-Spiel"
+"beruehmt/#euklid": "Euklids ggT-Spiel",
+"beruehmt/#rubik": "Zauberwürfel (Rubik’s Cube)"
 }
 },
 "en": {
@@ -763,6 +787,29 @@ var GS = {
 "zr_uhr_p1": "1st pair: 8 teeth drive 24 teeth",
 "zr_uhr_p2": "2nd pair: 8 teeth drive 32 teeth",
 "zr_uhr_z": "Time-lapse:",
+"zm_name": [
+"natural numbers",
+"natural numbers with zero",
+"integers",
+"rational numbers",
+"real numbers"
+],
+"zm_wie": [
+"“N” for natural",
+"index 0: with zero",
+"“Z” for Zahlen (German: numbers)",
+"“Q” for quotient (fraction)",
+"“R” for real"
+],
+"zm_irrK": "irrational",
+"zr_uhr_leg": "Red: the small wheel with 8 teeth sits on the axle of the minute hand. Blue: the big wheel with 32 teeth carries the hour hand. In between (orange) a wheel with 24 teeth and a small wheel with 8 teeth are fixed on the same axle – they always turn together.",
+"zr_uhr_um": "Turns – minute hand: {m} · middle wheel: {z} · hour hand: {h}",
+"zr_uhr_tempo": "Speed:",
+"zr_uhr_n": [
+"Minute hand",
+"Middle wheel",
+"Hour hand"
+],
 "zr_anti_h": "How did the Antikythera mechanism calculate?",
 "zr_anti_i": "The Greeks knew: in 19 years the moon goes round the Earth (relative to the stars) 254 times. With three pairs of wheels the mechanism turns one turn of the year wheel into exactly 254/19 moon orbits. The numbers of teeth are known from X-ray images:",
 "zr_anti_m": "One wheel has 127 teeth – 127 is a prime number, and 254 = 2 · 127. Without this wheel the calculation would not work.",
@@ -851,7 +898,8 @@ var GS = {
 "beruehmt/#pijagd": "The hunt for π",
 "beruehmt/#primzahlen": "Giant primes",
 "beruehmt/#hanoi": "The Tower of Hanoi",
-"beruehmt/#euklid": "Euclid’s GCD game"
+"beruehmt/#euklid": "Euclid’s GCD game",
+"beruehmt/#rubik": "Rubik’s Cube"
 }
 },
 "es": {
@@ -1190,6 +1238,29 @@ var GS = {
 "zr_uhr_p1": "1.er par: 8 dientes mueven 24 dientes",
 "zr_uhr_p2": "2.º par: 8 dientes mueven 32 dientes",
 "zr_uhr_z": "Cámara rápida:",
+"zm_name": [
+"números naturales",
+"naturales con el cero",
+"números enteros",
+"números racionales",
+"números reales"
+],
+"zm_wie": [
+"«N» de natural",
+"subíndice 0: con el cero",
+"«Z» de Zahlen (alemán: números)",
+"«Q» de quotient (cociente)",
+"«R» de real"
+],
+"zm_irrK": "irracionales",
+"zr_uhr_leg": "Rojo: la rueda pequeña de 8 dientes está en el eje del minutero. Azul: la rueda grande de 32 dientes lleva la aguja de las horas. En medio (naranja) hay una rueda de 24 dientes y una pequeña de 8 dientes fijas en el mismo eje: siempre giran juntas.",
+"zr_uhr_um": "Vueltas – minutero: {m} · rueda intermedia: {z} · horario: {h}",
+"zr_uhr_tempo": "Velocidad:",
+"zr_uhr_n": [
+"Minutero",
+"Rueda intermedia",
+"Horario"
+],
 "zr_anti_h": "¿Cómo calculaba el mecanismo de Anticitera?",
 "zr_anti_i": "Los griegos sabían que en 19 años la luna da 254 vueltas a la Tierra (respecto a las estrellas). Con tres pares de ruedas, el mecanismo convierte una vuelta de la rueda del año en exactamente 254/19 vueltas de la luna. El número de dientes se conoce por radiografías:",
 "zr_anti_m": "Una rueda tiene 127 dientes: 127 es un número primo y 254 = 2 · 127. Sin esa rueda el cálculo no saldría.",
@@ -1278,7 +1349,8 @@ var GS = {
 "beruehmt/#pijagd": "La caza de π",
 "beruehmt/#primzahlen": "Números primos gigantes",
 "beruehmt/#hanoi": "Las torres de Hanói",
-"beruehmt/#euklid": "El juego del mcd de Euclides"
+"beruehmt/#euklid": "El juego del mcd de Euclides",
+"beruehmt/#rubik": "Cubo de Rubik"
 }
 },
 "zh": {
@@ -1617,6 +1689,29 @@ var GS = {
 "zr_uhr_p1": "第 1 对：8 齿带动 24 齿",
 "zr_uhr_p2": "第 2 对：8 齿带动 32 齿",
 "zr_uhr_z": "快进：",
+"zm_name": [
+"自然数",
+"含零的自然数",
+"整数",
+"有理数",
+"实数"
+],
+"zm_wie": [
+"N：natural（自然）",
+"下标 0：包含零",
+"Z：德语 Zahlen（数）",
+"Q：quotient（商）",
+"R：real（实）"
+],
+"zm_irrK": "无理数",
+"zr_uhr_leg": "红色：8 齿小齿轮装在分针的轴上。蓝色：32 齿大齿轮带动时针。中间（橙色）是一个 24 齿的齿轮和一个 8 齿的小齿轮，牢牢装在同一根轴上——它们总是一起转动。",
+"zr_uhr_um": "转数——分针：{m} · 中间轮：{z} · 时针：{h}",
+"zr_uhr_tempo": "速度：",
+"zr_uhr_n": [
+"分针",
+"中间轮",
+"时针"
+],
 "zr_anti_h": "安提基特拉机械是怎样计算的？",
 "zr_anti_i": "希腊人知道：19 年里月亮（相对恒星）绕地球 254 圈。这台机械用三对齿轮，把年轮转 1 圈正好变成月亮转 254/19 圈。齿数是通过 X 光照片得知的：",
 "zr_anti_m": "有一个齿轮有 127 个齿——127 是质数，而 254 = 2 · 127。没有这个齿轮，计算就对不上。",
@@ -1705,7 +1800,8 @@ var GS = {
 "beruehmt/#pijagd": "追寻 π",
 "beruehmt/#primzahlen": "巨大的质数",
 "beruehmt/#hanoi": "汉诺塔",
-"beruehmt/#euklid": "欧几里得的最大公约数游戏"
+"beruehmt/#euklid": "欧几里得的最大公约数游戏",
+"beruehmt/#rubik": "魔方（鲁比克方块）"
 }
 },
 "fr": {
@@ -2044,6 +2140,29 @@ var GS = {
 "zr_uhr_p1": "1ʳᵉ paire : 8 dents entraînent 24 dents",
 "zr_uhr_p2": "2ᵉ paire : 8 dents entraînent 32 dents",
 "zr_uhr_z": "Accéléré :",
+"zm_name": [
+"entiers naturels",
+"naturels avec zéro",
+"entiers relatifs",
+"nombres rationnels",
+"nombres réels"
+],
+"zm_wie": [
+"« N » pour naturel",
+"indice 0 : avec le zéro",
+"« Z » pour Zahlen (allemand : nombres)",
+"« Q » pour quotient",
+"« R » pour réel"
+],
+"zm_irrK": "irrationnels",
+"zr_uhr_leg": "Rouge : la petite roue de 8 dents est sur l’axe de l’aiguille des minutes. Bleu : la grande roue de 32 dents porte l’aiguille des heures. Entre les deux (orange), une roue de 24 dents et une petite roue de 8 dents sont fixées sur le même axe – elles tournent toujours ensemble.",
+"zr_uhr_um": "Tours – aiguille des minutes : {m} · roue intermédiaire : {z} · aiguille des heures : {h}",
+"zr_uhr_tempo": "Vitesse :",
+"zr_uhr_n": [
+"Aiguille des minutes",
+"Roue intermédiaire",
+"Aiguille des heures"
+],
 "zr_anti_h": "Comment calculait la machine d’Anticythère ?",
 "zr_anti_i": "Les Grecs savaient qu’en 19 ans la lune fait 254 fois le tour de la Terre (par rapport aux étoiles). Avec trois paires de roues, la machine transforme un tour de la roue de l’année en exactement 254/19 tours de la lune. Les nombres de dents sont connus grâce à des radiographies :",
 "zr_anti_m": "Une roue a 127 dents – 127 est un nombre premier, et 254 = 2 · 127. Sans cette roue, le calcul ne tomberait pas juste.",
@@ -2132,7 +2251,8 @@ var GS = {
 "beruehmt/#pijagd": "La chasse à π",
 "beruehmt/#primzahlen": "Nombres premiers géants",
 "beruehmt/#hanoi": "Les tours de Hanoï",
-"beruehmt/#euklid": "Le jeu du PGCD d’Euclide"
+"beruehmt/#euklid": "Le jeu du PGCD d’Euclide",
+"beruehmt/#rubik": "Rubik’s Cube"
 }
 },
 "ru": {
@@ -2471,6 +2591,29 @@ var GS = {
 "zr_uhr_p1": "1-я пара: 8 зубьев вращают 24 зуба",
 "zr_uhr_p2": "2-я пара: 8 зубьев вращают 32 зуба",
 "zr_uhr_z": "Ускоренно:",
+"zm_name": [
+"натуральные числа",
+"натуральные с нулём",
+"целые числа",
+"рациональные числа",
+"действительные числа"
+],
+"zm_wie": [
+"N – natural (натуральный)",
+"индекс 0: с нулём",
+"Z – Zahlen (нем. «числа»)",
+"Q – quotient (частное)",
+"R – real (действительный)"
+],
+"zm_irrK": "иррациональные",
+"zr_uhr_leg": "Красное: маленькое колесо с 8 зубьями сидит на оси минутной стрелки. Синее: большое колесо с 32 зубьями несёт часовую стрелку. Между ними (оранжевое) колесо с 24 зубьями и маленькое колесо с 8 зубьями закреплены на одной оси – они всегда вращаются вместе.",
+"zr_uhr_um": "Обороты – минутная стрелка: {m} · промежуточное колесо: {z} · часовая стрелка: {h}",
+"zr_uhr_tempo": "Скорость:",
+"zr_uhr_n": [
+"Минутная стрелка",
+"Промежуточное колесо",
+"Часовая стрелка"
+],
 "zr_anti_h": "Как считал Антикитерский механизм?",
 "zr_anti_i": "Греки знали: за 19 лет Луна 254 раза обходит Землю (относительно звёзд). С помощью трёх пар колёс механизм превращает один оборот колеса года ровно в 254/19 оборота Луны. Числа зубьев известны по рентгеновским снимкам:",
 "zr_anti_m": "У одного колеса 127 зубьев – 127 простое число, а 254 = 2 · 127. Без этого колеса расчёт бы не сошёлся.",
@@ -2559,7 +2702,8 @@ var GS = {
 "beruehmt/#pijagd": "Охота за π",
 "beruehmt/#primzahlen": "Гигантские простые числа",
 "beruehmt/#hanoi": "Ханойская башня",
-"beruehmt/#euklid": "Игра Евклида: НОД"
+"beruehmt/#euklid": "Игра Евклида: НОД",
+"beruehmt/#rubik": "Кубик Рубика"
 }
 },
 "ar": {
@@ -2898,6 +3042,29 @@ var GS = {
 "zr_uhr_p1": "الزوج الأول: 8 أسنان تدير 24 سنًّا",
 "zr_uhr_p2": "الزوج الثاني: 8 أسنان تدير 32 سنًّا",
 "zr_uhr_z": "عرض مسرّع:",
+"zm_name": [
+"الأعداد الطبيعية",
+"الطبيعية مع الصفر",
+"الأعداد الصحيحة",
+"الأعداد النسبية",
+"الأعداد الحقيقية"
+],
+"zm_wie": [
+"N من natural (طبيعي)",
+"الدليل 0: مع الصفر",
+"Z من الألمانية Zahlen (أعداد)",
+"Q من quotient (خارج القسمة)",
+"R من real (حقيقي)"
+],
+"zm_irrK": "غير نسبية",
+"zr_uhr_leg": "الأحمر: الترس الصغير ذو 8 أسنان مثبّت على محور عقرب الدقائق. الأزرق: الترس الكبير ذو 32 سنًّا يحمل عقرب الساعات. وبينهما (البرتقالي) ترس ذو 24 سنًّا وترس صغير ذو 8 أسنان مثبّتان على المحور نفسه – يدوران دائمًا معًا.",
+"zr_uhr_um": "الدورات – عقرب الدقائق: {m} · الترس الأوسط: {z} · عقرب الساعات: {h}",
+"zr_uhr_tempo": "السرعة:",
+"zr_uhr_n": [
+"عقرب الدقائق",
+"الترس الأوسط",
+"عقرب الساعات"
+],
 "zr_anti_h": "كيف كانت آلية أنتيكيثيرا تحسب؟",
 "zr_anti_i": "عرف الإغريق أن القمر يدور حول الأرض (بالنسبة إلى النجوم) 254 مرة في 19 سنة. بثلاثة أزواج من التروس تحوّل الآلية دورة واحدة لعجلة السنة إلى 254/19 دورة للقمر بالضبط. أعداد الأسنان معروفة من صور الأشعة السينية:",
 "zr_anti_m": "أحد التروس له 127 سنًّا – و127 عدد أولي، و254 = 2 · 127. من دون هذا الترس لا يستقيم الحساب.",
@@ -2986,7 +3153,8 @@ var GS = {
 "beruehmt/#pijagd": "مطاردة π",
 "beruehmt/#primzahlen": "أعداد أولية عملاقة",
 "beruehmt/#hanoi": "أبراج هانوي",
-"beruehmt/#euklid": "لعبة إقليدس للقاسم المشترك الأكبر"
+"beruehmt/#euklid": "لعبة إقليدس للقاسم المشترك الأكبر",
+"beruehmt/#rubik": "مكعب روبيك"
 }
 },
 "ja": {
@@ -3325,6 +3493,29 @@ var GS = {
 "zr_uhr_p1": "1組目：8歯で24歯を回す",
 "zr_uhr_p2": "2組目：8歯で32歯を回す",
 "zr_uhr_z": "早回し：",
+"zm_name": [
+"自然数",
+"0 をふくむ自然数",
+"整数",
+"有理数",
+"実数"
+],
+"zm_wie": [
+"N：natural（自然）",
+"添字 0：0 をふくむ",
+"Z：ドイツ語 Zahlen（数）",
+"Q：quotient（商）",
+"R：real（実）"
+],
+"zm_irrK": "無理数",
+"zr_uhr_leg": "赤：8 歯の小さな歯車は分針の軸についています。青：32 歯の大きな歯車が時針を動かします。その間（オレンジ）には 24 歯の歯車と 8 歯の小さな歯車が同じ軸に固定されていて、いつもいっしょに回ります。",
+"zr_uhr_um": "回転数 — 分針：{m} · 中間の歯車：{z} · 時針：{h}",
+"zr_uhr_tempo": "速さ：",
+"zr_uhr_n": [
+"分針",
+"中間の歯車",
+"時針"
+],
 "zr_anti_h": "アンティキティラ島の機械はどう計算した？",
 "zr_anti_i": "ギリシャ人は知っていました：19年の間に月は（星に対して）地球のまわりを254回まわります。この機械は3組の歯車で、年の歯車の1回転をちょうど 254/19 回の月の公転に変えます。歯の数はX線写真からわかっています：",
 "zr_anti_m": "ある歯車は歯が127個 ― 127は素数で、254 = 2 · 127。この歯車がなければ計算は合いません。",
@@ -3413,7 +3604,8 @@ var GS = {
 "beruehmt/#pijagd": "π を追いかけて",
 "beruehmt/#primzahlen": "巨大な素数",
 "beruehmt/#hanoi": "ハノイの塔",
-"beruehmt/#euklid": "ユークリッドの最大公約数ゲーム"
+"beruehmt/#euklid": "ユークリッドの最大公約数ゲーム",
+"beruehmt/#rubik": "ルービックキューブ"
 }
 },
 "pt": {
@@ -3752,6 +3944,29 @@ var GS = {
 "zr_uhr_p1": "1.º par: 8 dentes movem 24 dentes",
 "zr_uhr_p2": "2.º par: 8 dentes movem 32 dentes",
 "zr_uhr_z": "Acelerado:",
+"zm_name": [
+"números naturais",
+"naturais com o zero",
+"números inteiros",
+"números racionais",
+"números reais"
+],
+"zm_wie": [
+"“N” de natural",
+"índice 0: com o zero",
+"“Z” de Zahlen (alemão: números)",
+"“Q” de quociente",
+"“R” de real"
+],
+"zm_irrK": "irracionais",
+"zr_uhr_leg": "Vermelho: a roda pequena de 8 dentes fica no eixo do ponteiro dos minutos. Azul: a roda grande de 32 dentes leva o ponteiro das horas. No meio (laranja), uma roda de 24 dentes e uma roda pequena de 8 dentes estão fixas no mesmo eixo – giram sempre juntas.",
+"zr_uhr_um": "Voltas – ponteiro dos minutos: {m} · roda do meio: {z} · ponteiro das horas: {h}",
+"zr_uhr_tempo": "Velocidade:",
+"zr_uhr_n": [
+"Ponteiro dos minutos",
+"Roda do meio",
+"Ponteiro das horas"
+],
 "zr_anti_h": "Como calculava o mecanismo de Anticítera?",
 "zr_anti_i": "Os gregos sabiam: em 19 anos a lua dá 254 voltas em torno da Terra (em relação às estrelas). Com três pares de rodas, o mecanismo transforma uma volta da roda do ano em exatamente 254/19 voltas da lua. Os números de dentes são conhecidos por radiografias:",
 "zr_anti_m": "Uma roda tem 127 dentes – 127 é um número primo, e 254 = 2 · 127. Sem essa roda a conta não fecharia.",
@@ -3840,7 +4055,8 @@ var GS = {
 "beruehmt/#pijagd": "A caça ao π",
 "beruehmt/#primzahlen": "Números primos gigantes",
 "beruehmt/#hanoi": "As torres de Hanói",
-"beruehmt/#euklid": "O jogo do mdc de Euclides"
+"beruehmt/#euklid": "O jogo do mdc de Euclides",
+"beruehmt/#rubik": "Cubo mágico (cubo de Rubik)"
 }
 }
 };

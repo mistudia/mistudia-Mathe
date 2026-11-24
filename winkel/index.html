@@ -125,6 +125,8 @@
       <svg class="bild" id="messSvg" viewBox="0 0 520 300"></svg>
       <div class="reihe"><label for="messEin" id="messEinL"></label> <input class="zahl" id="messEin" inputmode="numeric" autocomplete="off"> <span class="einh">°</span> <button type="button" class="knopf" id="messPr"></button> <button type="button" class="knopf hell" id="messWeiter"></button> <button type="button" class="knopf hell" id="messSeite" hidden></button> <button type="button" class="knopf hell" id="messProbe"></button></div>
       <p class="zeile muted" id="messProbeHint" hidden></p>
+      <div class="reihe" id="messDreh" hidden><label for="messDrehR" id="messDrehL"></label> <input type="range" id="messDrehR" min="-180" max="180" step="1" value="0"> <output id="messDrehW" dir="ltr"></output> <button type="button" class="knopf hell" id="messGerade"></button></div>
+      <div class="zeile" id="messAblesen" dir="auto" hidden></div>
       <p class="meldung" id="messMeld"></p>
       <p class="merke" id="messMerke"></p>
     </div>

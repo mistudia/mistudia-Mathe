@@ -219,31 +219,58 @@
   }
 
   // ---------- Reiter: Zahlenmengen ----------
+  // 🆕 24.11.: neu gestaltet – jede Menge mit Symbol, Namen und Herkunft des Buchstabens im Bild,
+  // Beispielzahlen jeweils im eigenen „Ring“ (Teil der Menge, der nicht in der kleineren liegt)
   var MENG = [
-    { k: "R", s: "ℝ", x: 10, y: 10, w: 620, h: 330, f: "#ede9fe", c: "#6d28d9" },
-    { k: "Q", s: "ℚ", x: 26, y: 46, w: 456, h: 280, f: "#dbeafe", c: "#1d4ed8" },
-    { k: "Z", s: "ℤ", x: 42, y: 82, w: 318, h: 230, f: "#dcfce7", c: "#15803d" },
-    { k: "N0", s: "ℕ₀", x: 58, y: 118, w: 214, h: 180, f: "#fef3c7", c: "#b45309" },
-    { k: "N", s: "ℕ", x: 74, y: 154, w: 140, h: 130, f: "#ffedd5", c: "#c2410c" }
+    { k: "R", s: "ℝ", i: 4, x: 10, y: 10, w: 730, h: 418, f: "#f3effe", c: "#6d28d9" },
+    { k: "Q", s: "ℚ", i: 3, x: 26, y: 62, w: 564, h: 354, f: "#e3eeff", c: "#1d4ed8" },
+    { k: "Z", s: "ℤ", i: 2, x: 42, y: 114, w: 408, h: 290, f: "#e2f8e9", c: "#15803d" },
+    { k: "N0", s: "ℕ₀", i: 1, x: 58, y: 166, w: 282, h: 226, f: "#fff4d6", c: "#b45309" },
+    { k: "N", s: "ℕ", i: 0, x: 74, y: 218, w: 192, h: 162, f: "#ffe9d9", c: "#c2410c" }
   ];
-  var ZM_BSP = { N: [[100, 200, "1"], [150, 200, "2"], [125, 240, "3"], [140, 268, "100"]], N0: [[243, 210, "0"]], Z: [[316, 160, "−1"], [316, 220, "−7"], [316, 275, "−50"]],
-    Q: [[420, 120, "½"], [420, 190, "−0,75"], [420, 260, "0,3̅"]], R: [[555, 130, "√2"], [555, 200, "π"], [555, 270, "e"]] };
+  // [x, y, Text] oder [x, y, Zähler, Nenner, Vorzeichen]
+  var ZM_BSP = { N: [[115, 302, "1"], [170, 302, "2"], [225, 302, "3"], [135, 350, "17"], [205, 350, "100"]], N0: [[303, 300, "0"]],
+    Z: [[395, 225, "−1"], [395, 290, "−7"], [395, 355, "−50"]],
+    Q: [[520, 192, "1", "2", ""], [520, 258, "3", "4", "−"], [520, 322, "0,25"], [520, 378, "0,333…"]],
+    R: [[665, 160, "√2"], [665, 225, "π"], [665, 290, "e"], [665, 355, "−√5"]] };
+  var ZM_MARK = { N: [170, 250], N0: [303, 222], Z: [395, 168], Q: [520, 118], R: [665, 108] };
+  function svgBruch(g, x, y, z, n, vz, cls, fill){
+    var w = Math.max(String(z).length, String(n).length) * 11 + 6, dx = vz ? 8 : 0;
+    if(vz) g.appendChild(el("text", { x: x + dx - w / 2 - 3, y: y + 7, "text-anchor": "end", "class": cls, fill: fill, "data-roh": "1" }, vz));
+    g.appendChild(el("text", { x: x + dx, y: y - 4, "text-anchor": "middle", "class": cls, fill: fill, "data-roh": "1" }, z));
+    g.appendChild(el("line", { x1: x + dx - w / 2, y1: y + 2, x2: x + dx + w / 2, y2: y + 2, stroke: fill, "stroke-width": 2 }));
+    g.appendChild(el("text", { x: x + dx, y: y + 22, "text-anchor": "middle", "class": cls, fill: fill, "data-roh": "1" }, n));
+  }
   function zmBild(hl, marker){
-    var s = el("svg", { viewBox: "0 0 640 350", "class": "bild zm", role: "img", dir: "ltr" });
+    var s = el("svg", { viewBox: "0 0 750 438", "class": "bild zm", role: "img", dir: "ltr", "data-roh": "1" });
+    var NA = tA("zm_name"), WI = tA("zm_wie");
     MENG.forEach(function(m){
-      s.appendChild(el("rect", { x: m.x, y: m.y, width: m.w, height: m.h, rx: 22, fill: m.f, stroke: m.c, "stroke-width": hl === m.k ? 5 : 2.5 }));
-      s.appendChild(el("text", { x: m.x + 14, y: m.y + 26, "class": "zmS", fill: m.c }, m.s));
+      s.appendChild(el("rect", { x: m.x, y: m.y, width: m.w, height: m.h, rx: 20, fill: m.f, stroke: m.c, "stroke-width": hl === m.k ? 5 : 2.5 }));
+      if(hl === m.k) s.appendChild(el("rect", { x: m.x - 5, y: m.y - 5, width: m.w + 10, height: m.h + 10, rx: 25, fill: "none", stroke: m.c, "stroke-opacity": .25, "stroke-width": 6 }));
+      // Kopf: Symbol in einem Kreis, daneben Name und Herkunft des Buchstabens
+      s.appendChild(el("circle", { cx: m.x + 26, cy: m.y + 26, r: 18, fill: "#ffffff", stroke: m.c, "stroke-width": 2.5 }));
+      s.appendChild(el("text", { x: m.x + 26, y: m.y + 35, "text-anchor": "middle", "class": "zmS", fill: m.c, "font-size": m.k === "N0" ? 17 : 22 }, m.s));
+      var na = NA[m.i] || "", wi = WI[m.i] || "", fs = m.k === "N" ? (na.length > 15 ? 12.5 : 13.5) : 14;
+      s.appendChild(el("text", { x: m.x + 52, y: m.y + 22, "class": "zmName", fill: m.c, "font-size": fs }, na));
+      s.appendChild(el("text", { x: m.x + 52, y: m.y + 40, "class": "zmWie", fill: "#3b4556", "font-size": m.k === "N" && wi.length > 20 ? 10 : 11.5 }, wi));
     });
-    var irr = el("text", { x: 556, y: 42, "text-anchor": "middle", "class": "bt", fill: "#6d28d9", direction: lang === "ar" ? "rtl" : "ltr" });
-    t("zm_irr").split(/ (?=\()/).forEach(function(teil, i){ irr.appendChild(el("tspan", { x: 556, dy: i ? 16 : 0 }, teil)); });
+    var irr = el("text", { x: 665, y: 84, "text-anchor": "middle", "class": "zmIrr", fill: "#6d28d9" });
+    irr.appendChild(el("tspan", { x: 665, dy: 0 }, "ℝ \\ ℚ")); irr.appendChild(el("tspan", { x: 665, dy: 17 }, t("zm_irrK")));
     s.appendChild(irr);
     for(var k in ZM_BSP) ZM_BSP[k].forEach(function(p){
+      if(p.length > 3){ svgBruch(s, p[0], p[1], p[2], p[3], p[4], "zmZ", "#1a2233"); return; }
       var tx = p[2]; if(!komma()) tx = tx.replace(",", ".");
-      s.appendChild(el("text", { x: p[0], y: p[1], "text-anchor": "middle", "class": "zmZ", fill: "#1a2233" }, tx));
+      s.appendChild(el("text", { x: p[0], y: p[1], "text-anchor": "middle", "class": "zmZ", fill: "#1a2233", "data-roh": "1" }, tx));
     });
-    if(marker){ var p = { N: [170, 175], N0: [243, 150], Z: [316, 115], Q: [420, 80], R: [555, 95] }[marker.k];
-      var g = el("g", {}); g.appendChild(el("rect", { x: p[0] - 46, y: p[1] - 19, width: 92, height: 28, rx: 14, fill: "#1a2233" }));
-      g.appendChild(el("text", { x: p[0], y: p[1], "text-anchor": "middle", "class": "zmM", fill: "#ffffff" }, marker.t)); s.appendChild(g); }
+    if(marker){
+      var q = ZM_MARK[marker.k], g = el("g", { "data-roh": "1" }), mt = String(marker.t), fr = mt.match(/^(−?)(\d+)\/(\d+)$/);
+      var w = fr ? Math.max(fr[2].length, fr[3].length) * 11 + 46 : Math.max(56, mt.length * 11 + 26), h = fr ? 54 : 32;
+      g.appendChild(el("rect", { x: q[0] - w / 2, y: q[1] - h / 2, width: w, height: h, rx: 14, fill: "#1a2233" }));
+      g.appendChild(el("path", { d: "M" + (q[0] - 7) + " " + (q[1] + h / 2) + " l7 8 l7 -8 z", fill: "#1a2233" }));
+      if(fr) svgBruch(g, q[0] - (fr[1] ? 4 : 0), q[1] - 4, fr[2], fr[3], fr[1], "zmM", "#ffffff");
+      else g.appendChild(el("text", { x: q[0], y: q[1] + 6, "text-anchor": "middle", "class": "zmM", fill: "#ffffff" }, mt));
+      s.appendChild(g);
+    }
     return s;
   }
   // Zahl lesen → { k: kleinste Menge, t: Anzeige, v: Wert-Hinweis } oder null
@@ -309,7 +336,8 @@
   }
 
   // ---------- Reiter: Zahnräder & Uhr ----------
-  var zr = { a: EIN.za || 12, b: EIN.zb || 36, w: 0, lauf: true, T: null, last: 0, uhr: 0 };
+  var zr = { a: EIN.za || 12, b: EIN.zb || 36, w: 0, lauf: true, T: null, last: 0, uhr: 0, uhrLauf: true };
+  var UHR_TEMPO = [1, 5, 15, 60, 240]; // Uhr-Minuten je echter Sekunde
   function zahnPfad(n, r){
     var ra = r + 4.5, ri = r - 5, d = "";
     for(var i = 0; i < n; i++){
@@ -321,7 +349,9 @@
   }
   function zahnrad(){
     var h = '<div class="karte"><h2>' + esc(t("zr_h")) + '</h2><p class="zeile">' + esc(t("zr_i")) + '</p><div class="regler"><label>' + esc(t("zr_a")) + ' <input type="range" id="zrA" min="6" max="40" value="' + zr.a + '"> <output id="zrAW"></output></label><label>' + esc(t("zr_b")) + ' <input type="range" id="zrB" min="6" max="40" value="' + zr.b + '"> <output id="zrBW"></output></label><button type="button" class="knopf hell" id="zrLauf"></button></div><div id="zrBild"></div><p class="zeile" id="zrErg"></p><div id="zrK"></div><p class="merke">' + esc(t("zr_regel")) + "</p></div>";
-    h += '<div class="karte"><h2>' + esc(t("zr_uhr_h")) + '</h2><p class="zeile">' + esc(t("zr_uhr_i")) + '</p><ul><li>' + esc(t("zr_uhr_p1")) + "</li><li>" + esc(t("zr_uhr_p2")) + "</li></ul>" + kette([br(24, 8) + " · " + br(32, 8), "3 · 4", "12"]) + '<div class="potgrid"><div id="uhrBild"></div><p class="zeile"><b>' + esc(t("zr_uhr_z")) + '</b> <span id="uhrZeit" dir="ltr"></span></p></div></div>';
+    h += '<div class="karte"><h2>' + esc(t("zr_uhr_h")) + '</h2><p class="zeile">' + esc(t("zr_uhr_i")) + '</p><ul><li>' + esc(t("zr_uhr_p1")) + "</li><li>" + esc(t("zr_uhr_p2")) + "</li></ul>" + kette([br(24, 8) + " · " + br(32, 8), "3 · 4", "12"]) + '<div id="uhrBild"></div><p class="uhrLeg"><span class="ul ulM">' + esc(tA("zr_uhr_n")[0]) + ': 8</span><span class="ul ulZ">' + esc(tA("zr_uhr_n")[1]) + ': 24 + 8</span><span class="ul ulS">' + esc(tA("zr_uhr_n")[2]) + ': 32</span></p>' +
+      '<div class="regler"><label>' + esc(t("zr_uhr_tempo")) + ' <input type="range" id="uhrT" min="0" max="4" value="' + (EIN.ut == null ? 2 : EIN.ut) + '"> <output id="uhrTW" dir="ltr"></output></label><button type="button" class="knopf hell" id="uhrLauf"></button></div>' +
+      '<p class="zeile"><b>' + esc(t("zr_uhr_z")) + '</b> <span id="uhrZeit" dir="ltr"></span></p><p class="zeile" id="uhrUm"></p><p class="merke">' + esc(t("zr_uhr_leg")) + "</p></div>";
     h += '<div class="karte" id="q_zanti"><h2>' + esc(t("zr_anti_h")) + '</h2><p class="zeile">' + esc(t("zr_anti_i")) + "</p>" + kette([br(64, 38) + " · " + br(48, 24) + " · " + br(127, 32), br("64 · 48 · 127", "38 · 24 · 32"), br(gz(390144), gz(29184)), br(254, 19), { r: "≈", h: z(13.368, 3) }]) + '<p class="zeile">' + esc(t("zr_anti_m")) + '</p><p class="zeile">' + esc(t("zr_anti_s")) + "</p>" + fotoBox("anti").replace('<figure class="foto"', '<figure class="foto" data-cap="' + esc(t("s_anti_h")) + '"') + "</div>";
     h += '<div class="karte"><h2>' + esc(t("auf_h")) + '</h2><span class="punkte" id="zgP"></span><p class="auftrag" id="zgQ"></p><div class="antwortzeile"><input class="zahl" id="zgIn" inputmode="decimal" autocomplete="off" aria-label="="><button type="button" class="knopf" id="zgPr">' + esc(t("pruefen")) + '</button></div><p class="meldung" id="zgM"></p><div id="zgW"></div><p><button type="button" class="knopf hell" id="zgNeu">' + esc(t("neu")) + "</button></p></div>";
     $("zahnradBox").innerHTML = h;
@@ -329,10 +359,12 @@
     $("zrA").addEventListener("input", function(){ zr.a = +this.value; EIN.za = zr.a; merken(); zrText(); zrZeichnen(); });
     $("zrB").addEventListener("input", function(){ zr.b = +this.value; EIN.zb = zr.b; merken(); zrText(); zrZeichnen(); });
     $("zrLauf").addEventListener("click", function(){ zr.lauf = !zr.lauf; zrText(); });
+    $("uhrT").addEventListener("input", function(){ EIN.ut = +this.value; merken(); uhrText(); });
+    $("uhrLauf").addEventListener("click", function(){ zr.uhrLauf = !zr.uhrLauf; uhrText(); });
     $("zgPr").addEventListener("click", zgPruefen);
     $("zgIn").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(zg && zg.fertig){ zg = null; zgZeigen(); } else zgPruefen(); } });
     $("zgNeu").addEventListener("click", function(){ zg = null; zgZeigen(); });
-    zrText(); zrZeichnen(); uhrZeichnen(); zgZeigen();
+    zrText(); zrZeichnen(); uhrText(); uhrZeichnen(); zgZeigen();
     if(!zr.T) zr.T = requestAnimationFrame(tick);
   }
   function bruchKurz(a, b){ var g = ggT(a, b); a /= g; b /= g; return b === 1 ? String(a) : br(a, b); }
@@ -359,26 +391,54 @@
     s.appendChild(el("text", { x: cB, y: H - 4, "text-anchor": "middle", "class": "bt" }, "↺ " + z(rundB, 1)));
     box.innerHTML = ""; box.appendChild(s);
   }
+  // 🆕 24.11.: Uhr mit sichtbarem Räderwerk (Zeigerwerk): Minutenrad 8 → 24 | 8 → Stundenrad 32 (3 · 4 = 12)
+  function uhrText(){
+    var i = EIN.ut == null ? 2 : EIN.ut; $("uhrTW").textContent = "1 s = " + UHR_TEMPO[i] + " min";
+    $("uhrLauf").textContent = zr.uhrLauf ? t("zr_stopp") : t("zr_start");
+  }
+  function rad(s, x, y, n, r, w, farbe, opa){
+    var g = el("g", { transform: "translate(" + x.toFixed(1) + "," + y.toFixed(1) + ") rotate(" + (w * 180 / Math.PI).toFixed(2) + ")" });
+    g.appendChild(el("path", { d: zahnPfad(n, r), fill: farbe, stroke: "#1a2233", "stroke-width": 1.3, "fill-opacity": opa || 1 }));
+    for(var k = 0; k < (r > 20 ? 4 : 0); k++){ var a = k * Math.PI / 2; g.appendChild(el("line", { x1: 0, y1: 0, x2: (r - 7) * Math.cos(a), y2: (r - 7) * Math.sin(a), stroke: "#1a2233", "stroke-opacity": .35, "stroke-width": 3 })); }
+    s.appendChild(g);
+  }
+  function zeiger(s, x, y, l, grad, farbe, dicke){ var a = grad * Math.PI / 180; s.appendChild(el("line", { x1: x, y1: y, x2: x + l * Math.sin(a), y2: y - l * Math.cos(a), stroke: farbe, "stroke-width": dicke, "stroke-linecap": "round" })); }
   function uhrZeichnen(){
     var box = $("uhrBild"); if(!box) return;
-    var s = el("svg", { viewBox: "0 0 200 200", "class": "bild uhr", role: "img", dir: "ltr" });
-    s.appendChild(el("circle", { cx: 100, cy: 100, r: 92, fill: "#ffffff", stroke: "#1a2233", "stroke-width": 4 }));
-    for(var i = 0; i < 60; i++){ var a = i * Math.PI / 30, l = i % 5 ? 6 : 13; s.appendChild(el("line", { x1: 100 + 84 * Math.sin(a), y1: 100 - 84 * Math.cos(a), x2: 100 + (84 - l) * Math.sin(a), y2: 100 - (84 - l) * Math.cos(a), stroke: "#1a2233", "stroke-width": i % 5 ? 1.2 : 3 })); }
-    for(var hh = 1; hh <= 12; hh++){ var b = hh * Math.PI / 6; s.appendChild(el("text", { x: 100 + 60 * Math.sin(b), y: 100 - 60 * Math.cos(b) + 6, "text-anchor": "middle", "class": "bt" }, String(hh))); }
-    var min = zr.uhr % 720, wm = (min % 60) * 6, wh = (min / 60) * 30;
-    s.appendChild(el("line", { x1: 100, y1: 100, x2: 100 + 45 * Math.sin(wh * Math.PI / 180), y2: 100 - 45 * Math.cos(wh * Math.PI / 180), stroke: "#1d4ed8", "stroke-width": 7, "stroke-linecap": "round" }));
-    s.appendChild(el("line", { x1: 100, y1: 100, x2: 100 + 74 * Math.sin(wm * Math.PI / 180), y2: 100 - 74 * Math.cos(wm * Math.PI / 180), stroke: "#b91c1c", "stroke-width": 4, "stroke-linecap": "round" }));
-    s.appendChild(el("circle", { cx: 100, cy: 100, r: 6, fill: "#1a2233" }));
+    var s = el("svg", { viewBox: "0 0 486 244", "class": "bild uhr", role: "img", dir: "ltr" });
+    var min = zr.uhr % 720, wm = (min % 60) * 6, wh = (min / 60) * 30, cx = 102, cy = 122;
+    // Zifferblatt
+    s.appendChild(el("circle", { cx: cx, cy: cy, r: 96, fill: "#ffffff", stroke: "#1a2233", "stroke-width": 4 }));
+    for(var i = 0; i < 60; i++){ var a = i * Math.PI / 30, l = i % 5 ? 6 : 13; s.appendChild(el("line", { x1: cx + 88 * Math.sin(a), y1: cy - 88 * Math.cos(a), x2: cx + (88 - l) * Math.sin(a), y2: cy - (88 - l) * Math.cos(a), stroke: "#1a2233", "stroke-width": i % 5 ? 1.2 : 3 })); }
+    for(var hh = 1; hh <= 12; hh++){ var bw = hh * Math.PI / 6; s.appendChild(el("text", { x: cx + 63 * Math.sin(bw), y: cy - 63 * Math.cos(bw) + 6, "text-anchor": "middle", "class": "bt" }, String(hh))); }
+    zeiger(s, cx, cy, 48, wh, "#1d4ed8", 8);
+    zeiger(s, cx, cy, 78, wm, "#dc2626", 4.5);
+    s.appendChild(el("circle", { cx: cx, cy: cy, r: 6, fill: "#1a2233" }));
+    // Räderwerk: A (8, Minutenwelle) → B (24) | C (8, gleiche Achse) → D (32, Stundenrad)
+    var m = 2.2, rA = 8 * m, rB = 24 * m, rD = 32 * m, A = [262, 84], B = [A[0] + rA + rB, 84], psi = 62 * Math.PI / 180, D = [B[0] + (rA + rD) * Math.cos(psi), B[1] + (rA + rD) * Math.sin(psi)];
+    var aA = wm * Math.PI / 180, aB = -aA * 8 / 24 + Math.PI - Math.PI / 24, aC = aB, aD = -(aC - psi) * 8 / 32 + psi + Math.PI - Math.PI / 32;
+    rad(s, D[0], D[1], 32, rD, aD, "#60a5fa");
+    rad(s, B[0], B[1], 24, rB, aB, "#fbbf24", .92);
+    rad(s, B[0], B[1], 8, rA, aC, "#f97316");
+    rad(s, A[0], A[1], 8, rA, aA, "#f87171");
+    // Zeiger auf den Achsen: rot = Minutenzeiger (sitzt auf Rad A), blau = Stundenzeiger (sitzt auf Rad D)
+    zeiger(s, D[0], D[1], rD - 6, wh, "#1d4ed8", 6);
+    zeiger(s, A[0], A[1], rA + 20, wm, "#dc2626", 4.5);
+    [A, B, D].forEach(function(p){ s.appendChild(el("circle", { cx: p[0], cy: p[1], r: 3.5, fill: "#1a2233" })); });
+    s.appendChild(el("text", { x: A[0] - rA - 10, y: A[1] + 5, "text-anchor": "end", "class": "bt" }, "8"));
+    s.appendChild(el("text", { x: B[0], y: B[1] - rB - 9, "text-anchor": "middle", "class": "bt" }, "24 + 8"));
+    s.appendChild(el("text", { x: D[0] + rD + 9, y: D[1] + 5, "text-anchor": "start", "class": "bt" }, "32"));
     box.innerHTML = ""; box.appendChild(s);
     var hhh = Math.floor(min / 60), mm = Math.floor(min % 60);
     $("uhrZeit").textContent = (hhh === 0 ? 12 : hhh) + ":" + (mm < 10 ? "0" : "") + mm;
+    $("uhrUm").innerHTML = esc(t("zr_uhr_um", { m: "§1", z: "§2", h: "§3" })).replace("§1", bdi(z(zr.uhr / 60, 2))).replace("§2", bdi(z(zr.uhr / 180, 2))).replace("§3", bdi(z(zr.uhr / 720, 2)));
   }
   function tick(ts){
     zr.T = requestAnimationFrame(tick);
     var dt = zr.last ? Math.min(0.1, (ts - zr.last) / 1000) : 0; zr.last = ts;
     if($("s_zahnrad").hidden) return;
     if(zr.lauf){ zr.w += dt * 2 * Math.PI / 4; zrZeichnen(); }
-    zr.uhr += dt * 60; uhrZeichnen();
+    if(zr.uhrLauf){ zr.uhr += dt * UHR_TEMPO[EIN.ut == null ? 2 : EIN.ut]; uhrZeichnen(); }
   }
   var zg = null, zgR = 0, zgN = 0;
   function zgErzeuge(sd){

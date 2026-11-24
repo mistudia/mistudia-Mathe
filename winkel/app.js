@@ -58,7 +58,7 @@
   $("schWeiter").addEventListener("click", function(){ if(SCH.n >= 10){ SCH.n = 1; SCH.p = 0; } else SCH.n++; $("schWeiter").hidden = true; schNeu(); $("schEin").focus(); });
 
   // ---------- Messen ----------
-  var MS = { w: 60, seite: "r", geprueft: false, ok: 0, n: 0 };
+  var MS = { w: 60, seite: "r", geprueft: false, ok: 0, n: 0, rot: 0, vbTop: 0 };
   function messNeu(){ if(MS.probe) return; MS.w = zuf(12, 168); MS.seite = wahl(["r", "l"]); MS.geprueft = false; $("messEin").value = ""; $("messMeld").textContent = ""; $("messMeld").className = "meldung"; messZeichnen(); }
   // Ganzes Geodreieck (Bild aus /dreieck/geodreieck.png: 1036 × 522 px, Nullpunkt bei (518, 2), Spitze unten).
   // Der Winkel öffnet sich nach unten. Rechter Schenkel auf 0 → innere (graue) Skala, linker auf 0 → äußere (gelbe).
@@ -66,24 +66,55 @@
   function messRichtung(w){ return MS.seite === "r" ? w : 180 - w; } // Bildschirmwinkel (nach unten positiv)
   function PU(r, d){ return [GOX + r * Math.cos(d * RAD), GOY + r * Math.sin(d * RAD)]; }
   function messZeichnen(){
-    var sv = $("messSvg"); leer(sv); sv.setAttribute("viewBox", "0 0 600 " + (GY + GR + 12));
+    var sv = $("messSvg"); leer(sv);
+    // beim Ausprobieren kann das Geodreieck gedreht sein → Bild nach oben erweitern (nur wachsen, damit nichts springt)
+    if(MS.probe){ var top = 0; [[-259, 0], [259, 0], [0, 259], [230, 0]].forEach(function(q){ var c = Math.cos(MS.rot * RAD), s2 = Math.sin(MS.rot * RAD); top = Math.min(top, GOY + q[0] * s2 + q[1] * c - 24); }); MS.vbTop = Math.min(MS.vbTop, Math.floor(top)); } else MS.vbTop = 0;
+    sv.setAttribute("viewBox", "0 " + MS.vbTop + " 600 " + (GY + GR + 12 - MS.vbTop));
+    var dreh = MS.probe && MS.rot ? "rotate(" + MS.rot + " " + GOX + " " + GOY + ")" : null;
     var d1 = MS.seite === "r" ? 0 : 180, d2 = messRichtung(MS.w), lo = Math.min(d1, d2), hi = Math.max(d1, d2);
     // Körper des Geodreiecks (leicht getönt), dann die Schenkel, darüber das Bild
-    sv.appendChild(el("polygon", { points: GX + "," + GY + " " + (GX + 1036 * GK) + "," + GY + " " + GOX + "," + (GY + 518 * GK), fill: "rgba(186,230,253,0.28)", stroke: "#94a3b8", "stroke-width": 1 }));
+    sv.appendChild(el("polygon", { points: GX + "," + GY + " " + (GX + 1036 * GK) + "," + GY + " " + GOX + "," + (GY + 518 * GK), fill: "rgba(186,230,253,0.28)", stroke: "#94a3b8", "stroke-width": 1, transform: dreh }));
     var sk = function(a, b){ var p = [], n = 24; for(var i = 0; i <= n; i++){ var q = PU(44, a + (b - a) * i / n); p.push(q[0] + " " + q[1]); } return "M" + GOX + " " + GOY + " L" + p.join(" L") + "Z"; };
     sv.appendChild(el("path", { d: sk(lo, hi), fill: "rgba(34,197,94,0.35)", stroke: "#15803d", "stroke-width": 2 }));
     sv.appendChild(el("line", { x1: 4, y1: GOY, x2: 596, y2: GOY, stroke: "#94a3b8", "stroke-width": 1.2 }));
-    [d1, d2].forEach(function(d){ var e = PU(GR, d); sv.appendChild(el("line", { x1: GOX, y1: GOY, x2: e[0], y2: e[1], stroke: "#b91c1c", "stroke-width": 3.5, "stroke-linecap": "round" })); });
-    sv.appendChild(el("image", { href: "/dreieck/geodreieck.png", x: GX, y: GY, width: 1036 * GK, height: 522 * GK, opacity: 0.92 }));
+    [d1, d2].forEach(function(d, j){ var e = PU(GR, d); sv.appendChild(el("line", { x1: GOX, y1: GOY, x2: e[0], y2: e[1], stroke: "#b91c1c", "stroke-width": 3.5, "stroke-linecap": "round" }));
+      if(MS.probe && MS.rot){ var n = PU(GR - 58, d); sv.appendChild(el("circle", { cx: n[0], cy: n[1], r: 12, fill: "#ffffff", stroke: "#b91c1c", "stroke-width": 2.5 })); txt(sv, n[0], n[1] + 5.5, String(j + 1), { "font-size": 15, fill: "#b91c1c", "stroke-width": 0 }); } });
+    sv.appendChild(el("image", { href: "/dreieck/geodreieck.png", x: GX, y: GY, width: 1036 * GK, height: 522 * GK, opacity: 0.92, transform: dreh }));
     sv.appendChild(el("circle", { cx: GOX, cy: GOY, r: 4.5, fill: "#b91c1c" }));
+    if(MS.probe){ // blauer Dreh-Griff am rechten Ende der 0-Linie
+      var gg = el("g", { "class": "griff", transform: "rotate(" + MS.rot + " " + GOX + " " + GOY + ")" });
+      gg.appendChild(el("circle", { cx: GOX + 230, cy: GOY, r: 15, fill: "#1d4ed8", "fill-opacity": 0.9, stroke: "#ffffff", "stroke-width": 3 }));
+      gg.appendChild(el("path", { d: "M" + (GOX + 224) + " " + (GOY - 5) + " A7 7 0 1 1 " + (GOX + 223) + " " + (GOY + 3), fill: "none", stroke: "#ffffff", "stroke-width": 2.4, "stroke-linecap": "round" }));
+      gg.appendChild(el("path", { d: "M" + (GOX + 220) + " " + (GOY - 9) + " l4 4.5 l-5.5 2 z", fill: "#ffffff" }));
+      sv.appendChild(gg);
+    }
     if(MS.probe){
       var h = PU(GR - 24, d2);
       sv.appendChild(el("circle", { cx: h[0], cy: h[1], r: 15, fill: "#b91c1c", "fill-opacity": 0.85, stroke: "#ffffff", "stroke-width": 3, "class": "griff" }));
-      $("messMeld").textContent = t("probWert", { w: MS.w, i: MS.seite === "r" ? MS.w : 180 - MS.w, a: MS.seite === "r" ? 180 - MS.w : MS.w });
+      $("messMeld").textContent = MS.rot ? "α = " + MS.w + "°" : t("probWert", { w: MS.w, i: MS.seite === "r" ? MS.w : 180 - MS.w, a: MS.seite === "r" ? 180 - MS.w : MS.w });
       $("messMeld").className = "meldung";
+      messAblesen(d1, d2);
     }
     if(MS.geprueft || MS.probe){ var m = PU(78, (lo + hi) / 2); txt(sv, m[0], m[1] + 6, MS.w + "°", { "font-size": 20, fill: "#15803d" }); }
   }
+  // Ablesen am (gedrehten) Geodreieck: Richtung d (Bildschirm, nach unten positiv) → innere/äußere Skala oder null
+  function winkelNorm(d){ d = ((d % 360) + 360) % 360; return d > 180 ? d - 360 : d; }
+  function skala(d){ var r = winkelNorm(d - MS.rot); if(r < -0.5 || r > 180.5) return null; r = Math.max(0, Math.min(180, Math.round(r))); return { i: r, a: 180 - r }; }
+  function messAblesen(d1, d2){
+    var A = [skala(d1), skala(d2)], h = "";
+    if(!MS.rot){ $("messAblesen").hidden = true; return; }
+    A.forEach(function(q, j){ h += '<p class="zeile">' + (q ? t("ablesen", { n: j + 1, i: q.i, a: q.a }) : t("nichtSkala", { n: j + 1 })) + "</p>"; });
+    var auf = [0, 1].filter(function(j){ return A[j] && (A[j].i === 0 || A[j].a === 0); });
+    if(auf.length) h += '<p class="zeile"><b>' + t("passt", { n: auf[0] + 1 }) + "</b></p>";
+    else if(A[0] && A[1]){ var g = Math.max(A[0].i, A[1].i), k = Math.min(A[0].i, A[1].i); h += '<p class="zeile"><b dir="ltr">' + t("diff", { g: g, k: k, w: g - k }) + "</b></p>"; }
+    $("messAblesen").innerHTML = h; $("messAblesen").hidden = false;
+  }
+  function messDrehen(r, einrasten){
+    r = Math.round(winkelNorm(r));
+    if(einrasten){ var d1 = MS.seite === "r" ? 0 : 180, d2 = messRichtung(MS.w); [d1, d2, d1 - 180, d2 - 180].forEach(function(z){ if(Math.abs(winkelNorm(r - z)) <= 3) r = Math.round(winkelNorm(z)); }); }
+    MS.rot = r === -180 ? 180 : r; $("messDrehR").value = MS.rot; $("messDrehW").textContent = MS.rot + "°"; messZeichnen();
+  }
+  function svgPkt(e){ var sv = $("messSvg"), r = sv.getBoundingClientRect(), vb = sv.viewBox.baseVal; return [vb.x + (e.clientX - r.left) / r.width * vb.width, vb.y + (e.clientY - r.top) / r.height * vb.height]; }
   function messWinkelAus(e){
     var sv = $("messSvg"), r = sv.getBoundingClientRect(), vb = sv.viewBox.baseVal;
     var x = vb.x + (e.clientX - r.left) / r.width * vb.width, y = vb.y + (e.clientY - r.top) / r.height * vb.height;
@@ -93,8 +124,10 @@
   }
   (function(){
     var sv = $("messSvg"), zieht = false;
-    sv.addEventListener("pointerdown", function(e){ if(!MS.probe) return; zieht = true; try { sv.setPointerCapture(e.pointerId); } catch(x){} MS.w = messWinkelAus(e); messZeichnen(); e.preventDefault(); });
-    sv.addEventListener("pointermove", function(e){ if(!zieht) return; MS.w = messWinkelAus(e); messZeichnen(); });
+    function amGriff(e){ var p = svgPkt(e), g = [GOX + 230 * Math.cos(MS.rot * RAD), GOY + 230 * Math.sin(MS.rot * RAD)]; return Math.hypot(p[0] - g[0], p[1] - g[1]) < 30; }
+    function drehAus(e){ var p = svgPkt(e); messDrehen(Math.atan2(p[1] - GOY, p[0] - GOX) / RAD, true); }
+    sv.addEventListener("pointerdown", function(e){ if(!MS.probe) return; zieht = amGriff(e) ? "dreh" : "arm"; try { sv.setPointerCapture(e.pointerId); } catch(x){} if(zieht === "dreh") drehAus(e); else { MS.w = messWinkelAus(e); messZeichnen(); } e.preventDefault(); });
+    sv.addEventListener("pointermove", function(e){ if(!zieht) return; if(zieht === "dreh") drehAus(e); else { MS.w = messWinkelAus(e); messZeichnen(); } });
     ["pointerup", "pointercancel"].forEach(function(n){ sv.addEventListener(n, function(){ zieht = false; }); });
   })();
   function messModus(probe){
@@ -103,7 +136,7 @@
     ["messEin", "messPr", "messWeiter", "messEinL"].forEach(function(id){ var e = $(id); if(e) e.hidden = probe; });
     var eh = $("messEin").nextElementSibling; if(eh && eh.classList.contains("einh")) eh.hidden = probe;
     $("messSeite").hidden = !probe; $("messProbe").textContent = probe ? t("probAus") : t("probBtn");
-    $("messProbeHint").hidden = !probe;
+    $("messProbeHint").hidden = !probe; $("messDreh").hidden = !probe; if(!probe){ $("messAblesen").hidden = true; MS.rot = 0; $("messDrehR").value = 0; $("messDrehW").textContent = "0°"; }
     if(!probe){ messNeu(); } else { MS.geprueft = false; messZeichnen(); }
   }
   function messPruefen(){
@@ -118,6 +151,8 @@
   $("messWeiter").addEventListener("click", function(){ messNeu(); $("messEin").focus(); });
   $("messProbe").addEventListener("click", function(){ messModus(!MS.probe); });
   $("messSeite").addEventListener("click", function(){ MS.seite = MS.seite === "r" ? "l" : "r"; messZeichnen(); });
+  $("messDrehR").addEventListener("input", function(){ messDrehen(+this.value, false); });
+  $("messGerade").addEventListener("click", function(){ messDrehen(0, false); });
 
   // ---------- Winkelarten ----------
   var ARTEN = ["null", "spitz", "recht", "stumpf", "gestreckt", "ueber", "voll"];
@@ -425,12 +460,12 @@
     document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
     $("schH").textContent = t("schH"); $("schText").textContent = t("schText"); $("schEinL").textContent = t("schEin"); $("schPr").textContent = t("pruefen");
     $("messH").textContent = t("messH"); $("messText").textContent = t("messText"); $("messEinL").textContent = t("messEin"); $("messPr").textContent = t("pruefen"); $("messWeiter").textContent = t("weiter"); $("messMerke").textContent = t("ueberstumpf");
-    $("messProbe").textContent = MS.probe ? t("probAus") : t("probBtn"); $("messSeite").textContent = t("seiteW"); $("messProbeHint").textContent = t("probHint"); if(MS.probe) messZeichnen();
+    $("messProbe").textContent = MS.probe ? t("probAus") : t("probBtn"); $("messSeite").textContent = t("seiteW"); $("messProbeHint").textContent = t("probHint") + " " + t("drehHint"); $("messDrehL").textContent = t("drehL"); $("messGerade").textContent = t("gerade"); $("messDrehW").textContent = MS.rot + "°"; if(MS.probe) messZeichnen();
     $("artH").textContent = t("artH"); $("artText").textContent = t("artText"); $("quizH").textContent = t("artQuiz"); $("quizWeiter").textContent = t("weiter");
     $("parH").textContent = t("parH"); $("parText").textContent = t("parText"); $("pqEinL").textContent = t("parEin"); $("pqPr").textContent = t("pruefen"); $("pqNeu").textContent = t("parNeu"); $("pqWegT").textContent = t("weg");
     schTexte();
     if(SCH.fertig){ var d = Math.round(Math.abs(SCH.est - SCH.w)), pk = d <= 5 ? 3 : d <= 10 ? 2 : d <= 20 ? 1 : 0; $("schMeld").textContent = t("sch" + pk, { d: d }) + " " + t("istL", { w: SCH.w }) + (SCH.n >= 10 ? " " + t("ende", { p: SCH.p }) : ""); }
-    if(MS.geprueft){ var ok = $("messMeld").classList.contains("gut"), sk = t(MS.seite === "r" ? "aussen" : "innen"); $("messMeld").textContent = ok ? t("messOk", { s: sk }) : t("messFalsch", { w: MS.w, s: sk }); }
+    if(MS.geprueft){ var ok = $("messMeld").classList.contains("gut"), sk = t(MS.seite === "r" ? "innen" : "aussen"); $("messMeld").textContent = ok ? t("messOk", { s: sk }) : t("messFalsch", { w: MS.w, s: sk }); }
     artZeigen(); quizZeigen();
     if(QZ.fertig){ var ok2 = QZ.gew === QZ.a; $("quizMeld").textContent = ok2 ? t("artRichtig") : t("artFalsch", { a: t("a_" + QZ.a) }); }
     parZeigen(); pqZeigen();

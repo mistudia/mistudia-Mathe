@@ -32,6 +32,7 @@
   var NOCH = { de: "Noch nicht richtig – versuch es noch einmal.", en: "Not quite – try once more.", es: "Todavía no – inténtalo otra vez.",
     zh: "还不对——再试一次。", fr: "Pas encore – essaie encore une fois.", ru: "Пока неверно – попробуй ещё раз.",
     ar: "ليست صحيحة بعد – حاول مرة أخرى.", ja: "まだちがいます。もう一度やってみよう。", pt: "Ainda não – tente mais uma vez." };
+  window.MS_NOCH = NOCH;
   window.msTippbar = function(e){
     if(window.MS_LEER_LOES) return false;   // „Prüfen“ ohne Eingabe: gleich die Lösung, kein zweiter Versuch
     if(Array.isArray(e)) return true;
@@ -100,6 +101,12 @@
 (function(){
   if(window.MS_VERSCHIEBEN || document.querySelector('script[src="/verschieben.js"]')) return;
   var s = document.createElement("script"); s.src = "/verschieben.js"; document.head.appendChild(s);
+})();
+
+// ---------- Übungsaufgaben: „Aufgabe 4 von 10“, Zurück zu früheren Aufgaben (/aufgaben-verlauf.js) ----------
+(function(){
+  if(window.MS_EMBED || window.MS_AV || location.pathname === "/" || document.querySelector('script[src="/aufgaben-verlauf.js"]')) return;
+  var s = document.createElement("script"); s.src = "/aufgaben-verlauf.js"; s.defer = true; document.head.appendChild(s);
 })();
 
 // ---------- Lupen-Knopf: Seite vergrößern/verkleinern (/seitenzoom.js) ----------
