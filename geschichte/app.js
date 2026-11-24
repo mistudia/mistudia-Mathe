@@ -226,14 +226,14 @@
     { k: "Q", s: "ℚ", i: 3, x: 26, y: 62, w: 564, h: 354, f: "#e3eeff", c: "#1d4ed8" },
     { k: "Z", s: "ℤ", i: 2, x: 42, y: 114, w: 408, h: 290, f: "#e2f8e9", c: "#15803d" },
     { k: "N0", s: "ℕ₀", i: 1, x: 58, y: 166, w: 282, h: 226, f: "#fff4d6", c: "#b45309" },
-    { k: "N", s: "ℕ", i: 0, x: 74, y: 218, w: 192, h: 162, f: "#ffe9d9", c: "#c2410c" }
+    { k: "N", s: "ℕ", i: 0, x: 74, y: 218, w: 206, h: 162, f: "#ffe9d9", c: "#c2410c" }
   ];
   // [x, y, Text] oder [x, y, Zähler, Nenner, Vorzeichen]
-  var ZM_BSP = { N: [[115, 302, "1"], [170, 302, "2"], [225, 302, "3"], [135, 350, "17"], [205, 350, "100"]], N0: [[303, 300, "0"]],
+  var ZM_BSP = { N: [[120, 302, "1"], [177, 302, "2"], [234, 302, "3"], [142, 348, "17"], [214, 348, "100"]], N0: [[310, 300, "0"]],
     Z: [[395, 225, "−1"], [395, 290, "−7"], [395, 355, "−50"]],
     Q: [[520, 192, "1", "2", ""], [520, 258, "3", "4", "−"], [520, 322, "0,25"], [520, 378, "0,333…"]],
     R: [[665, 160, "√2"], [665, 225, "π"], [665, 290, "e"], [665, 355, "−√5"]] };
-  var ZM_MARK = { N: [170, 250], N0: [303, 222], Z: [395, 168], Q: [520, 118], R: [665, 108] };
+  var ZM_MARK = { N: [177, 262], N0: [310, 222], Z: [395, 168], Q: [520, 118], R: [665, 108] };
   function svgBruch(g, x, y, z, n, vz, cls, fill){
     var w = Math.max(String(z).length, String(n).length) * 11 + 6, dx = vz ? 8 : 0;
     if(vz) g.appendChild(el("text", { x: x + dx - w / 2 - 3, y: y + 7, "text-anchor": "end", "class": cls, fill: fill, "data-roh": "1" }, vz));
@@ -245,14 +245,14 @@
     var s = el("svg", { viewBox: "0 0 750 438", "class": "bild zm", role: "img", dir: "ltr", "data-roh": "1" });
     var NA = tA("zm_name"), WI = tA("zm_wie");
     MENG.forEach(function(m){
-      s.appendChild(el("rect", { x: m.x, y: m.y, width: m.w, height: m.h, rx: 20, fill: m.f, stroke: m.c, "stroke-width": hl === m.k ? 5 : 2.5 }));
-      if(hl === m.k) s.appendChild(el("rect", { x: m.x - 5, y: m.y - 5, width: m.w + 10, height: m.h + 10, rx: 25, fill: "none", stroke: m.c, "stroke-opacity": .25, "stroke-width": 6 }));
+      s.appendChild(el("rect", { x: m.x, y: m.y, width: m.w, height: m.h, rx: 64, fill: m.f, stroke: m.c, "stroke-width": hl === m.k ? 5 : 2.5 }));
+      if(hl === m.k) s.appendChild(el("rect", { x: m.x - 5, y: m.y - 5, width: m.w + 10, height: m.h + 10, rx: 69, fill: "none", stroke: m.c, "stroke-opacity": .25, "stroke-width": 6 }));
       // Kopf: Symbol in einem Kreis, daneben Name und Herkunft des Buchstabens
-      s.appendChild(el("circle", { cx: m.x + 26, cy: m.y + 26, r: 18, fill: "#ffffff", stroke: m.c, "stroke-width": 2.5 }));
-      s.appendChild(el("text", { x: m.x + 26, y: m.y + 35, "text-anchor": "middle", "class": "zmS", fill: m.c, "font-size": m.k === "N0" ? 17 : 22 }, m.s));
-      var na = NA[m.i] || "", wi = WI[m.i] || "", fs = m.k === "N" ? (na.length > 15 ? 12.5 : 13.5) : 14;
-      s.appendChild(el("text", { x: m.x + 52, y: m.y + 22, "class": "zmName", fill: m.c, "font-size": fs }, na));
-      s.appendChild(el("text", { x: m.x + 52, y: m.y + 40, "class": "zmWie", fill: "#3b4556", "font-size": m.k === "N" && wi.length > 20 ? 10 : 11.5 }, wi));
+      s.appendChild(el("circle", { cx: m.x + 38, cy: m.y + 32, r: 18, fill: "#ffffff", stroke: m.c, "stroke-width": 2.5 }));
+      s.appendChild(el("text", { x: m.x + 38, y: m.y + 41, "text-anchor": "middle", "class": "zmS", fill: m.c, "font-size": m.k === "N0" ? 17 : 22 }, m.s));
+      var na = NA[m.i] || "", wi = WI[m.i] || "", fs = m.k === "N" ? (na.length > 15 ? 12.5 : 13.5) * (/[\u0400-\u04ff]/.test(na) ? 0.88 : 1) : 14;
+      s.appendChild(el("text", { x: m.x + 62, y: m.y + 26, "class": "zmName", fill: m.c, "font-size": fs }, na));
+      s.appendChild(el("text", { x: m.x + 62, y: m.y + 43, "class": "zmWie", fill: "#3b4556", "font-size": m.k === "N" && wi.length > 20 ? 10 : 11.5 }, wi));
     });
     var irr = el("text", { x: 665, y: 84, "text-anchor": "middle", "class": "zmIrr", fill: "#6d28d9" });
     irr.appendChild(el("tspan", { x: 665, dy: 0 }, "ℝ \\ ℚ")); irr.appendChild(el("tspan", { x: 665, dy: 17 }, t("zm_irrK")));
@@ -416,7 +416,8 @@
     s.appendChild(el("circle", { cx: cx, cy: cy, r: 6, fill: "#1a2233" }));
     // Räderwerk: A (8, Minutenwelle) → B (24) | C (8, gleiche Achse) → D (32, Stundenrad)
     var m = 2.2, rA = 8 * m, rB = 24 * m, rD = 32 * m, A = [262, 84], B = [A[0] + rA + rB, 84], psi = 62 * Math.PI / 180, D = [B[0] + (rA + rD) * Math.cos(psi), B[1] + (rA + rD) * Math.sin(psi)];
-    var aA = wm * Math.PI / 180, aB = -aA * 8 / 24 + Math.PI - Math.PI / 24, aC = aB, aD = -(aC - psi) * 8 / 32 + psi + Math.PI - Math.PI / 32;
+    var aA = zr.uhr * 6 * Math.PI / 180,  // 🆕 durchgehend (nicht mod 60), sonst springt das Räderwerk zur vollen Stunde
+       aB = -aA * 8 / 24 + Math.PI - Math.PI / 24, aC = aB, aD = -(aC - psi) * 8 / 32 + psi + Math.PI - Math.PI / 32;
     rad(s, D[0], D[1], 32, rD, aD, "#60a5fa");
     rad(s, B[0], B[1], 24, rB, aB, "#fbbf24", .92);
     rad(s, B[0], B[1], 8, rA, aC, "#f97316");

@@ -68,7 +68,7 @@
   function messZeichnen(){
     var sv = $("messSvg"); leer(sv);
     // beim Ausprobieren kann das Geodreieck gedreht sein → Bild nach oben erweitern (nur wachsen, damit nichts springt)
-    if(MS.probe){ var top = 0; [[-259, 0], [259, 0], [0, 259], [230, 0]].forEach(function(q){ var c = Math.cos(MS.rot * RAD), s2 = Math.sin(MS.rot * RAD); top = Math.min(top, GOY + q[0] * s2 + q[1] * c - 24); }); MS.vbTop = Math.min(MS.vbTop, Math.floor(top)); } else MS.vbTop = 0;
+    if(MS.probe){ var top = 0; [[-259, 0], [259, 0], [0, 259], [230, 0]].forEach(function(q){ var c = Math.cos(MS.rot * RAD), s2 = Math.sin(MS.rot * RAD); top = Math.min(top, GOY + q[0] * s2 + q[1] * c - 24); }); top = Math.min(top, GOY + GR * Math.sin(messRichtung(MS.w) * RAD) - 14); MS.vbTop = Math.min(MS.vbTop, Math.floor(top)); } else MS.vbTop = 0;
     sv.setAttribute("viewBox", "0 " + MS.vbTop + " 600 " + (GY + GR + 12 - MS.vbTop));
     var dreh = MS.probe && MS.rot ? "rotate(" + MS.rot + " " + GOX + " " + GOY + ")" : null;
     var d1 = MS.seite === "r" ? 0 : 180, d2 = messRichtung(MS.w), lo = Math.min(d1, d2), hi = Math.max(d1, d2);
@@ -91,7 +91,7 @@
     if(MS.probe){
       var h = PU(GR - 24, d2);
       sv.appendChild(el("circle", { cx: h[0], cy: h[1], r: 15, fill: "#b91c1c", "fill-opacity": 0.85, stroke: "#ffffff", "stroke-width": 3, "class": "griff" }));
-      $("messMeld").textContent = MS.rot ? "α = " + MS.w + "°" : t("probWert", { w: MS.w, i: MS.seite === "r" ? MS.w : 180 - MS.w, a: MS.seite === "r" ? 180 - MS.w : MS.w });
+      $("messMeld").textContent = (MS.rot || MS.w > 180) ? "α = " + MS.w + "°" : t("probWert", { w: MS.w, i: MS.seite === "r" ? MS.w : 180 - MS.w, a: MS.seite === "r" ? 180 - MS.w : MS.w });
       $("messMeld").className = "meldung";
       messAblesen(d1, d2);
     }
@@ -102,11 +102,12 @@
   function skala(d){ var r = winkelNorm(d - MS.rot); if(r < -0.5 || r > 180.5) return null; r = Math.max(0, Math.min(180, Math.round(r))); return { i: r, a: 180 - r }; }
   function messAblesen(d1, d2){
     var A = [skala(d1), skala(d2)], h = "";
-    if(!MS.rot){ $("messAblesen").hidden = true; return; }
+    if(!MS.rot && MS.w <= 180){ $("messAblesen").hidden = true; return; }
     A.forEach(function(q, j){ h += '<p class="zeile">' + (q ? t("ablesen", { n: j + 1, i: q.i, a: q.a }) : t("nichtSkala", { n: j + 1 })) + "</p>"; });
     var auf = [0, 1].filter(function(j){ return A[j] && (A[j].i === 0 || A[j].a === 0); });
     if(auf.length) h += '<p class="zeile"><b>' + t("passt", { n: auf[0] + 1 }) + "</b></p>";
     else if(A[0] && A[1]){ var g = Math.max(A[0].i, A[1].i), k = Math.min(A[0].i, A[1].i); h += '<p class="zeile"><b dir="ltr">' + t("diff", { g: g, k: k, w: g - k }) + "</b></p>"; }
+    if(MS.w > 180 && A[0] && A[1]) h += '<p class="zeile"><b dir="ltr">α = 360° − ' + (360 - MS.w) + "° = " + MS.w + "°</b></p>"; // überstumpf: Rest bis 360°
     $("messAblesen").innerHTML = h; $("messAblesen").hidden = false;
   }
   function messDrehen(r, einrasten){
@@ -118,9 +119,10 @@
   function messWinkelAus(e){
     var sv = $("messSvg"), r = sv.getBoundingClientRect(), vb = sv.viewBox.baseVal;
     var x = vb.x + (e.clientX - r.left) / r.width * vb.width, y = vb.y + (e.clientY - r.top) / r.height * vb.height;
-    var d = Math.atan2(Math.max(0, y - GOY), x - GOX) / RAD;           // 0 … 180, nach unten
-    var w = MS.seite === "r" ? d : 180 - d;
-    return Math.max(1, Math.min(179, Math.round(w)));
+    // 🆕 24.11.2026: beim Ausprobieren ringsum (auch nach oben) – Winkel bis 359°
+    var d = Math.atan2(y - GOY, x - GOX) / RAD;
+    var w = MS.seite === "r" ? d : 180 - d; w = ((w % 360) + 360) % 360;
+    return Math.max(1, Math.min(359, Math.round(w)));
   }
   (function(){
     var sv = $("messSvg"), zieht = false;
@@ -460,7 +462,7 @@
     document.querySelectorAll(".tabs button").forEach(function(b){ b.textContent = t("tab_" + b.dataset.tab); });
     $("schH").textContent = t("schH"); $("schText").textContent = t("schText"); $("schEinL").textContent = t("schEin"); $("schPr").textContent = t("pruefen");
     $("messH").textContent = t("messH"); $("messText").textContent = t("messText"); $("messEinL").textContent = t("messEin"); $("messPr").textContent = t("pruefen"); $("messWeiter").textContent = t("weiter"); $("messMerke").textContent = t("ueberstumpf");
-    $("messProbe").textContent = MS.probe ? t("probAus") : t("probBtn"); $("messSeite").textContent = t("seiteW"); $("messProbeHint").textContent = t("probHint") + " " + t("drehHint"); $("messDrehL").textContent = t("drehL"); $("messGerade").textContent = t("gerade"); $("messDrehW").textContent = MS.rot + "°"; if(MS.probe) messZeichnen();
+    $("messProbe").textContent = MS.probe ? t("probAus") : t("probBtn"); $("messSeite").textContent = t("seiteW"); $("messProbeHint").textContent = t("probHint") + " " + t("drehHint") + " " + t("obenHint"); $("messDrehL").textContent = t("drehL"); $("messGerade").textContent = t("gerade"); $("messDrehW").textContent = MS.rot + "°"; if(MS.probe) messZeichnen();
     $("artH").textContent = t("artH"); $("artText").textContent = t("artText"); $("quizH").textContent = t("artQuiz"); $("quizWeiter").textContent = t("weiter");
     $("parH").textContent = t("parH"); $("parText").textContent = t("parText"); $("pqEinL").textContent = t("parEin"); $("pqPr").textContent = t("pruefen"); $("pqNeu").textContent = t("parNeu"); $("pqWegT").textContent = t("weg");
     schTexte();

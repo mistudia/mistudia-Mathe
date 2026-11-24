@@ -1,7 +1,7 @@
 // ============================================================
 // seitenzoom.js – immer sichtbare Zoom-Leiste am rechten Rand (alle Seiten der Mathe-App):
 // + oben, senkrechter Regler 50–200 %, − unten, Prozentanzeige.
-// 🆕 24.11.2026: Lupe → nur das Vergrößern (Knöpfe − / + / 100 % und die Zoom-Kürzel Strg + / Strg − / Strg 0);
+// 🆕 24.11.2026: Lupe → zurück auf 100 % (Normalansicht);
 // die Tastatur darunter öffnet die ganze Tastenkürzel-Übersicht (/tastenkuerzel.js) – vorher zeigten beide dasselbe.
 // CSS zoom am <body>, gemerkt in localStorage "msZoom"; die Leiste selbst wird gegenskaliert,
 // damit sie immer gleich groß bleibt. 9 Sprachen.
@@ -65,10 +65,10 @@
     var T = TX[sprache()];
     leiste = document.createElement("div"); leiste.className = "ms-zl"; leiste.setAttribute("role", "group"); leiste.setAttribute("aria-label", T[0]);
     leiste.innerHTML = '<button type="button" data-d="10" title="' + esc(T[4]) + '" aria-label="' + esc(T[4]) + '">+</button><input type="range" id="msZoomR" min="50" max="200" step="10" aria-label="' + esc(T[0]) + '" data-nofit data-nonav><button type="button" data-d="-10" title="' + esc(T[5]) + '" aria-label="' + esc(T[5]) + '">−</button><b id="msZoomZ"></b>' +
-      '<button type="button" data-h="z" title="' + esc(T[0]) + '" aria-label="' + esc(T[0]) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>' +
+      '<button type="button" data-h="z" title="' + esc(T[2]) + '" aria-label="' + esc(T[2]) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>' +
       '<button type="button" data-h="1" class="ms-zl-kb" title="' + esc(TKT[sprache()] || TKT.de) + '" aria-label="' + esc(TKT[sprache()] || TKT.de) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10h1.6M9.2 10h1.6M12.4 10h1.6M15.6 10h2.4M6 13.4h2M16 13.4h2M9.4 13.4h5.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>';
     document.body.appendChild(leiste);
-    leiste.addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.getAttribute("data-h") === "z") hilfeAlt(); else if(b.getAttribute("data-h")) hilfe(); else setze(stufe + +b.getAttribute("data-d")); });
+    leiste.addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.getAttribute("data-h") === "z") setze(100); else if(b.getAttribute("data-h")) hilfe(); else setze(stufe + +b.getAttribute("data-d")); });
     document.getElementById("msZoomR").addEventListener("input", function(){ setze(+this.value); });
     setze(stufe);
   }

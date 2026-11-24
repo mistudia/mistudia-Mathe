@@ -1,7 +1,8 @@
 // ============================================================
 // /aufgaben-verlauf.js – Leiste über den Übungsaufgaben (alle Kacheln mit „Üben“):
 //   „Aufgabe 4 von 10“ (Runden zu je 10 Aufgaben), Punkte-Reihe ✓ / ✗ / – je Aufgabe,
-//   ‹ Zurück / › Vor: frühere Aufgaben noch einmal ansehen – mit eigener Antwort und Lösungsweg.
+//   ‹ Zurück / › Vor: frühere Aufgaben noch einmal ansehen – mit eigener Antwort und Lösungsweg;
+//   › bei der aktuellen Aufgabe = nächste Aufgabe (überspringen, löst den Weiter-Knopf der Kachel aus).
 // Funktioniert ohne Änderung an den Kacheln: erkennt die neue Aufgabe am Klick auf „Weiter“
 // (#weiter / #uWeiter / #neuAuf), an Enter nach einer Antwort oder an einem neuen Aufgabentext.
 // Kurz vor dem Wechsel wird der Übungsbereich kopiert (Eingaben eingefroren) und im Rückblick
@@ -16,15 +17,15 @@
   if(!K || /^(fortschritt|geschichte|einmaleins|graphen|linear|berufe|werkzeuge)$/.test(K)) return;
   var RUNDE = 10, MAX = 60;
   var TX = {
-    de: { nr: "Aufgabe {i} von {n}", runde: "Runde {r}", zur: "Vorherige Aufgabe", vor: "Nächste Aufgabe", jetzt: "Zur aktuellen Aufgabe", blick: "Rückblick", fertig: "Runde {r} geschafft: {k} von {n} richtig", ok: "richtig", nein: "falsch", offen: "ohne Antwort", liste: "Aufgaben dieser Runde" },
-    en: { nr: "Task {i} of {n}", runde: "Round {r}", zur: "Previous task", vor: "Next task", jetzt: "Back to the current task", blick: "Looking back", fertig: "Round {r} done: {k} of {n} correct", ok: "correct", nein: "wrong", offen: "not answered", liste: "Tasks in this round" },
-    es: { nr: "Ejercicio {i} de {n}", runde: "Ronda {r}", zur: "Ejercicio anterior", vor: "Ejercicio siguiente", jetzt: "Volver al ejercicio actual", blick: "Repaso", fertig: "Ronda {r} terminada: {k} de {n} correctas", ok: "correcto", nein: "incorrecto", offen: "sin respuesta", liste: "Ejercicios de esta ronda" },
-    zh: { nr: "第 {i} 题，共 {n} 题", runde: "第 {r} 轮", zur: "上一题", vor: "下一题", jetzt: "回到当前题目", blick: "回顾", fertig: "第 {r} 轮完成：{n} 题中答对 {k} 题", ok: "正确", nein: "错误", offen: "未作答", liste: "本轮题目" },
-    fr: { nr: "Exercice {i} sur {n}", runde: "Manche {r}", zur: "Exercice précédent", vor: "Exercice suivant", jetzt: "Revenir à l’exercice actuel", blick: "Retour en arrière", fertig: "Manche {r} terminée : {k} sur {n} justes", ok: "juste", nein: "faux", offen: "sans réponse", liste: "Exercices de cette manche" },
-    ru: { nr: "Задание {i} из {n}", runde: "Раунд {r}", zur: "Предыдущее задание", vor: "Следующее задание", jetzt: "К текущему заданию", blick: "Просмотр", fertig: "Раунд {r} пройден: {k} из {n} верно", ok: "верно", nein: "неверно", offen: "без ответа", liste: "Задания этого раунда" },
-    ar: { nr: "التمرين {i} من {n}", runde: "الجولة {r}", zur: "التمرين السابق", vor: "التمرين التالي", jetzt: "العودة إلى التمرين الحالي", blick: "مراجعة", fertig: "انتهت الجولة {r}: {k} من {n} صحيحة", ok: "صحيح", nein: "خطأ", offen: "بلا إجابة", liste: "تمارين هذه الجولة" },
-    ja: { nr: "{n} 問中 {i} 問目", runde: "第 {r} ラウンド", zur: "前の問題", vor: "次の問題", jetzt: "いまの問題にもどる", blick: "ふりかえり", fertig: "第 {r} ラウンド終了：{n} 問中 {k} 問正解", ok: "正解", nein: "不正解", offen: "未回答", liste: "このラウンドの問題" },
-    pt: { nr: "Exercício {i} de {n}", runde: "Rodada {r}", zur: "Exercício anterior", vor: "Próximo exercício", jetzt: "Voltar ao exercício atual", blick: "Revisão", fertig: "Rodada {r} concluída: {k} de {n} certas", ok: "certo", nein: "errado", offen: "sem resposta", liste: "Exercícios desta rodada" }
+    de: { skip: "Weiter zur nächsten Aufgabe", nr: "Aufgabe {i} von {n}", runde: "Runde {r}", zur: "Vorherige Aufgabe", vor: "Nächste Aufgabe", jetzt: "Zur aktuellen Aufgabe", blick: "Rückblick", fertig: "Runde {r} geschafft: {k} von {n} richtig", ok: "richtig", nein: "falsch", offen: "ohne Antwort", liste: "Aufgaben dieser Runde" },
+    en: { skip: "Skip to the next task", nr: "Task {i} of {n}", runde: "Round {r}", zur: "Previous task", vor: "Next task", jetzt: "Back to the current task", blick: "Looking back", fertig: "Round {r} done: {k} of {n} correct", ok: "correct", nein: "wrong", offen: "not answered", liste: "Tasks in this round" },
+    es: { skip: "Pasar al siguiente ejercicio", nr: "Ejercicio {i} de {n}", runde: "Ronda {r}", zur: "Ejercicio anterior", vor: "Ejercicio siguiente", jetzt: "Volver al ejercicio actual", blick: "Repaso", fertig: "Ronda {r} terminada: {k} de {n} correctas", ok: "correcto", nein: "incorrecto", offen: "sin respuesta", liste: "Ejercicios de esta ronda" },
+    zh: { skip: "跳到下一题", nr: "第 {i} 题，共 {n} 题", runde: "第 {r} 轮", zur: "上一题", vor: "下一题", jetzt: "回到当前题目", blick: "回顾", fertig: "第 {r} 轮完成：{n} 题中答对 {k} 题", ok: "正确", nein: "错误", offen: "未作答", liste: "本轮题目" },
+    fr: { skip: "Passer à l’exercice suivant", nr: "Exercice {i} sur {n}", runde: "Manche {r}", zur: "Exercice précédent", vor: "Exercice suivant", jetzt: "Revenir à l’exercice actuel", blick: "Retour en arrière", fertig: "Manche {r} terminée : {k} sur {n} justes", ok: "juste", nein: "faux", offen: "sans réponse", liste: "Exercices de cette manche" },
+    ru: { skip: "К следующему заданию", nr: "Задание {i} из {n}", runde: "Раунд {r}", zur: "Предыдущее задание", vor: "Следующее задание", jetzt: "К текущему заданию", blick: "Просмотр", fertig: "Раунд {r} пройден: {k} из {n} верно", ok: "верно", nein: "неверно", offen: "без ответа", liste: "Задания этого раунда" },
+    ar: { skip: "انتقل إلى التمرين التالي", nr: "التمرين {i} من {n}", runde: "الجولة {r}", zur: "التمرين السابق", vor: "التمرين التالي", jetzt: "العودة إلى التمرين الحالي", blick: "مراجعة", fertig: "انتهت الجولة {r}: {k} من {n} صحيحة", ok: "صحيح", nein: "خطأ", offen: "بلا إجابة", liste: "تمارين هذه الجولة" },
+    ja: { skip: "次の問題へ進む", nr: "{n} 問中 {i} 問目", runde: "第 {r} ラウンド", zur: "前の問題", vor: "次の問題", jetzt: "いまの問題にもどる", blick: "ふりかえり", fertig: "第 {r} ラウンド終了：{n} 問中 {k} 問正解", ok: "正解", nein: "不正解", offen: "未回答", liste: "このラウンドの問題" },
+    pt: { skip: "Ir para o próximo exercício", nr: "Exercício {i} de {n}", runde: "Rodada {r}", zur: "Exercício anterior", vor: "Próximo exercício", jetzt: "Voltar ao exercício atual", blick: "Revisão", fertig: "Rodada {r} concluída: {k} de {n} certas", ok: "certo", nein: "errado", offen: "sem resposta", liste: "Exercícios desta rodada" }
   };
   function sprache(){ var l = document.documentElement.lang; if(TX[l]) return l; try { l = localStorage.getItem("msMathLang"); } catch(e){} return TX[l] ? l : "de"; }
   function tx(k, o){ var s = (TX[sprache()] || TX.de)[k]; for(var x in (o || {})) s = s.split("{" + x + "}").join(o[x]); return s; }
@@ -132,7 +133,8 @@
     leiste.dir = sprache() === "ar" ? "rtl" : "ltr";
     var h = '<button type="button" class="mav-pf" data-a="zur" title="' + esc(tx("zur")) + '" aria-label="' + esc(tx("zur")) + '"' + (z <= 0 ? " disabled" : "") + ">‹</button>" +
       '<span class="mav-nr">' + esc(tx("nr", { i: gz % RUNDE + 1, n: RUNDE })) + "</span>" + (r > 0 ? '<span class="mav-rd">' + esc(tx("runde", { r: r + 1 })) + "</span>" : "") +
-      '<button type="button" class="mav-pf" data-a="vor" title="' + esc(tx("vor")) + '" aria-label="' + esc(tx("vor")) + '"' + (z >= akt ? " disabled" : "") + ">›</button>" +
+      // 🆕 › geht immer: im Rückblick eine Aufgabe weiter, bei der aktuellen Aufgabe zur nächsten (überspringen)
+      '<button type="button" class="mav-pf" data-a="vor" title="' + esc(tx(z >= akt ? "skip" : "vor")) + '" aria-label="' + esc(tx(z >= akt ? "skip" : "vor")) + '">›</button>' +
       '<ul class="mav-punkte" aria-label="' + esc(tx("liste")) + '">';
     for(var j = 0; j < RUNDE; j++){
       var idx = start + j, kl = "", zei = "", lab = "";
@@ -161,6 +163,12 @@
     letzter = null; sig = s; spr = l; zeichne();
   }
 
+  // neue Aufgabe holen, auch ohne Antwort: den Weiter-Knopf der Kachel auslösen (auch wenn er gerade versteckt ist)
+  function ueberspringen(){
+    var w = box.querySelector(WEITER); if(!w) return;
+    var aus = w.disabled; if(aus) w.disabled = false;
+    w.click(); if(aus) w.disabled = true;
+  }
   function start(){
     taskEl = document.querySelector("#auftrag,#uAuftrag,#frage");
     var w = document.querySelector(WEITER);
@@ -177,7 +185,7 @@
     leiste.addEventListener("click", function(e){
       var b = e.target.closest("button"); if(!b || b.disabled) return;
       var a = b.getAttribute("data-a"), z = blick >= 0 ? blick : hist.length;
-      if(a === "zur") gehe(z - 1); else if(a === "vor") gehe(z + 1); else if(a === "jetzt") live();
+      if(a === "zur") gehe(z - 1); else if(a === "vor"){ if(blick >= 0) gehe(z + 1); else ueberspringen(); } else if(a === "jetzt") live();
       else if(b.hasAttribute("data-i")) gehe(+b.getAttribute("data-i"));
     });
     // Klick auf „Weiter“ (vor dem Kachel-Code, darum capture)
