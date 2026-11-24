@@ -99,6 +99,21 @@
   /* Fehler */
   #fehlerBox { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 12px; }
   #fehlerBox .karte { margin: 0; }
+  #trKarte { grid-column: 1 / -1; }
+  .trGrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin: 10px 0 8px; }
+  .trRechner { border-radius: 16px; padding: 10px; background: #37474f; color: #fff; }
+  .trRechner.schul { background: #1B3B6F; }
+  .trName { font: 700 14px system-ui, sans-serif; margin-bottom: 6px; color: #ffffff; }
+  .trDisp { background: #d9e8c8; color: #14210c; border-radius: 8px; padding: 6px 10px; min-height: 64px; font-family: "Courier New", monospace; text-align: right; border: 2px solid #b0b0b8; }
+  .trEin { font-size: 15px; min-height: 18px; color: #3f5230; overflow-wrap: anywhere; }
+  .trA { font-size: 30px; font-weight: 800; }
+  .trTasten { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; max-width: 360px; margin: 0 auto; }
+  .trTasten button { font: 700 20px system-ui, sans-serif; padding: 10px 0; border-radius: 10px; border: 2px solid #b0b0b8; background: #ffffff; color: #1a2233; cursor: pointer; }
+  .trTasten button.op { background: #e3eefc; color: #1B3B6F; } .trTasten button.gl { background: #1565c0; color: #ffffff; border-color: #1565c0; } .trTasten button.cl { background: #fde2e1; color: #b71c1c; }
+  .trBsp { display: flex; flex-wrap: wrap; gap: 6px; }
+  .trBsp button { font: 700 16px system-ui, sans-serif; padding: 6px 12px; border-radius: 999px; border: 2px solid #b0b0b8; background: #fff; color: #1B3B6F; cursor: pointer; }
+  .trBsp button[aria-pressed="true"] { background: #1565c0; color: #fff; border-color: #1565c0; }
+  @media (max-width: 560px) { .trGrid { grid-template-columns: 1fr; } .trA { font-size: 26px; } }
   .fz { font-size: 19px; margin: 6px 0; } .fl { font-size: 14px; font-weight: 800; display: inline-block; min-width: 86px; }
   .fz.falsch .fl { color: var(--schlecht); } .fz.richtig .fl { color: var(--gut); }
   .durch { text-decoration: line-through; text-decoration-color: var(--schlecht); text-decoration-thickness: 2px; color: #7f1d1d; }

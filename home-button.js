@@ -273,7 +273,7 @@
   function loesKnopf(b){
     var c = b.parentElement;
     for(var n = 0; c && n < 3; n++, c = c.parentElement){
-      var L = Array.prototype.filter.call(c.querySelectorAll("button, a, details > summary"), function(x){ return x !== b && x.offsetParent !== null && !x.disabled && LRE.test(x.textContent || "") && !/verbergen|ausblenden|hide|ocultar|masquer|скрыть|إخفاء|隠す|esconder|隐藏/i.test(x.textContent || ""); });
+      var L = Array.prototype.filter.call(c.querySelectorAll("button, a, details > summary"), function(x){ return x !== b && !x.classList.contains("ms-loes-btn") && x.offsetParent !== null && !x.disabled && LRE.test(x.textContent || "") && !/verbergen|ausblenden|hide|ocultar|masquer|скрыть|إخفاء|隠す|esconder|隐藏/i.test(x.textContent || ""); });
       if(L.length) return L[0];
     }
     return null;
@@ -285,15 +285,17 @@
     if(!b || b.disabled || !istPruef(b)) return;
     var alle = bereich(b), leer = alle.filter(function(i){ return !String(i.value || "").trim(); });
     if(!leer.length) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    loesung(b, leer);
+  }, true);
+  function loesung(b, leer){
     // 🆕 Chat-Wunsch: Prüfen ohne Eingabe zeigt gleich die Lösung
     var lk = loesKnopf(b);
     if(lk){
-      e.preventDefault(); e.stopImmediatePropagation();
       if(lk.tagName === "SUMMARY"){ lk.parentElement.open = true; try { lk.parentElement.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch(x){} }
       else lk.click();
       return;
     }
-    e.preventDefault(); e.stopImmediatePropagation();
     window.MS_LEER_LOES = true;
     leer.forEach(function(i){ i.value = SENT; });
     var vorher = (b.closest(".karte, section, form, main") || document.body).innerText;
@@ -310,5 +312,41 @@
     window.MS_LEER_LOES = false;
     var m = document.querySelectorAll(".meldung, .feedback, .rueck, [id*=meld], [id*=Msg], [id*=msg]");
     Array.prototype.forEach.call(m, function(x){ if(/987[  .,]?654/.test(x.textContent)) x.textContent = x.textContent.replace(/987[  .,]?654/g, "–"); });
-  }, true);
+  }
+
+  // 🆕 24.11.2026: sichtbarer Knopf „Lösung zeigen“ neben jedem Prüfen-Knopf mit Eingabefeldern, wenn die Kachel
+  // selbst keinen hat – man muss nichts eintragen, um die Lösung zu sehen. Er leert die Felder und löst „Prüfen“
+  // aus; der Leer-Weg oben zeigt dann die Lösung. Abschalten: data-noloes am Knopf oder Bereich.
+  var LT = { de: "Lösung zeigen", en: "Show solution", es: "Ver solución", zh: "显示答案", fr: "Voir la solution", ru: "Показать решение", ar: "عرض الحل", ja: "答えを見る", pt: "Ver solução" };
+  var st2 = document.createElement("style");
+  st2.textContent = ".ms-loes-btn{font:700 14px system-ui,sans-serif;margin:4px 6px;padding:7px 12px;border-radius:10px;border:2px solid #b0b0b8;background:#fff;color:#1B3B6F;cursor:pointer;vertical-align:middle}.ms-loes-btn:hover{background:#eef5ff;border-color:#1565c0}";
+  document.head.appendChild(st2);
+  function knoepfe(){
+    var B = document.querySelectorAll("button");
+    for(var i = 0; i < B.length; i++){
+      var b = B[i];
+      if(b._msLoes){ var lb = b._msLoes; var weg = !b.isConnected || b.offsetParent === null || b.disabled || b._msLoesBenutzt; if(!lb.isConnected && b.isConnected){ b.insertAdjacentElement("afterend", lb); } lb.hidden = weg; lb.textContent = LT[sprache()] || LT.de; continue; }
+      if(b.classList.contains("ms-loes-btn") || b.offsetParent === null || b.disabled || !istPruef(b) || b.closest("[data-noloes], .msa-ov, .b-ov, .msav-host")) continue;
+      if(!bereich(b).length || loesKnopf(b)) continue;
+      var k = document.createElement("button"); k.type = "button"; k.className = "ms-loes-btn"; k.textContent = LT[sprache()] || LT.de;
+      (function(pb){ k.addEventListener("click", function(){
+        pb._msLoesBenutzt = true; k.hidden = true;
+        var fs = bereich(pb).filter(function(f){ return !f.readOnly && !f.disabled; });
+        fs.forEach(function(f){ f.value = ""; });
+        if(fs.length) loesung(pb, fs); else pb.click();
+      }); })(b);
+      b._msLoes = k; b.insertAdjacentElement("afterend", k);
+    }
+  }
+  // nach „Lösung zeigen“ bleibt der Knopf weg, bis eine neue Aufgabe kommt (Weiter/Neue/Nächste … oder Enter)
+  var NEU = /^[\s🔄↻→›]*(neue|nächste|weiter|new|next|nueva|siguiente|otra|nouvelle|suivant|autre|нов|след|дальше|جديد|التالي|新|下一|次|nova|próxim|outra)/i;
+  function zurueck(){ var B = document.querySelectorAll("button"); for(var i = 0; i < B.length; i++) if(B[i]._msLoesBenutzt) B[i]._msLoesBenutzt = false; spaet(); }
+  window.addEventListener("click", function(e){ var x = e.target && e.target.closest && e.target.closest("button"); if(x && !x.classList.contains("ms-loes-btn") && (NEU.test((x.textContent || "").trim()) || /^(weiter|uWeiter|neuAuf|neu|naechste)$/i.test(x.id || ""))) setTimeout(zurueck, 50); }, true);
+  window.addEventListener("keydown", function(e){ if(e.key === "Enter") setTimeout(zurueck, 80); }, true);
+  var kt = 0;
+  function spaet(){ clearTimeout(kt); kt = setTimeout(knoepfe, 120); }
+  if(document.readyState !== "loading") spaet(); else document.addEventListener("DOMContentLoaded", spaet);
+  window.addEventListener("load", spaet);
+  if(window.MutationObserver) new MutationObserver(function(ms){ for(var i = 0; i < ms.length; i++){ var t = ms[i].target; if(t && t.classList && t.classList.contains("ms-loes-btn")) continue; spaet(); return; } }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["hidden", "disabled", "class", "style"] });
+  window.msLoesKnoepfe = knoepfe;
 })();

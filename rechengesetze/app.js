@@ -265,8 +265,82 @@
     $("fehlerBox").innerHTML = FEHLER.map(function(f, i){
       return '<div class="karte fkarte"><h2>' + esc(t(f[0])) + '</h2><p class="fz falsch"><span class="fl">✗ ' + esc(t("f_falsch")) + '</span> <bdi dir="ltr" class="durch">' + esc(f[1]) + '</bdi></p><p class="fz richtig"><span class="fl">✓ ' + esc(t("f_richtig")) + '</span> <bdi dir="ltr">' + esc(f[2]) + '</bdi></p><p class="zeile muted">' + esc(t(f[3])) + '</p><button type="button" class="knopf hell" data-f="' + i + '">' + esc(t("f_rechner")) + "</button></div>";
     }).join("");
+    trKarte();
   }
   $("fehlerBox").addEventListener("click", function(e){ var b = e.target.closest("[data-f]"); if(b) rechnerMit(FEHLER[+b.dataset.f][4]); });
+
+  // 🆕 24.11.2026: Taschenrechner-Karte – einfacher Rechner (rechnet sofort) vs. Schulrechner (Punkt vor Strich)
+  var TR = { tasten: [], bsp: -1 };
+  var TR_BSP = [
+    ["2 + 3 × 4 =", ["2", "+", "3", "×", "4", "="], "tr_e1"],
+    ["4 + 6 ÷ 2 =", ["4", "+", "6", "÷", "2", "="], "tr_e2"],
+    ["(−) 3 x² =", ["(−)", "3", "x²", "="], "tr_e3"]
+  ];
+  var TR_TASTEN = ["7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "−", "0", "(", ")", "+", "(−)", "x²", "C", "="];
+  function trZahl(x){ if(x == null || !isFinite(x)) return "Error"; var r = Math.round(x * 1e9) / 1e9; var s2 = String(r).replace("-", "−"); return /^(de|es|fr|ru|pt)$/.test(lang) ? s2.replace(".", ",") : s2; }
+  function trOp(a, op, b){ return op === "+" ? a + b : op === "−" ? a - b : op === "×" ? a * b : op === "÷" ? (b === 0 ? NaN : a / b) : b; }
+  // einfacher Rechner: jede Operation wird sofort mit dem bisherigen Ergebnis verrechnet; keine Klammern
+  function trEinfach(T){
+    var acc = null, op = null, ein = "", neg = false, anz = "0", fertig = false;
+    function wert(){ return ein === "" ? null : (neg ? -1 : 1) * parseFloat(ein); }
+    T.forEach(function(k){
+      if(/^\d$/.test(k)){ if(fertig){ acc = null; op = null; fertig = false; } ein += k; anz = (neg ? "−" : "") + ein; return; }
+      if(k === "(−)"){ neg = !neg; anz = (neg ? "−" : "") + (ein || "0"); return; }
+      if(k === "(" || k === ")") return;
+      if(k === "x²"){ var w = wert(); if(w == null) w = acc == null ? 0 : acc; w = w * w; if(ein !== "" || acc == null){ ein = String(Math.abs(w)); neg = w < 0; } else acc = w; anz = trZahl(w); return; }
+      var v = wert();
+      if(v != null){ acc = (acc == null || op == null) ? v : trOp(acc, op, v); ein = ""; neg = false; }
+      anz = trZahl(acc == null ? 0 : acc);
+      if(k === "="){ op = null; fertig = true; } else { op = k; fertig = false; }
+    });
+    return anz;
+  }
+  // Schulrechner: Eingabe als Term, „=“ rechnet mit Punkt vor Strich, x² vor Vorzeichen (−3² = −9)
+  function trTerm(T){ return T.filter(function(k){ return k !== "=" && k !== "C"; }).map(function(k){ return k === "(−)" ? "−" : k === "x²" ? "²" : k; }).join("").replace(/([+×÷)])(\d|\()/g, "$1 $2").replace(/(\d|\)|²)([+×÷])/g, "$1 $2").replace(/(\d|\)|²)−/g, "$1 − "); }
+  function trSchul(T){
+    var toks = []; T.forEach(function(k){ if(/^\d$/.test(k) && toks.length && /^\d+$/.test(toks[toks.length - 1])) toks[toks.length - 1] += k; else if(k !== "C") toks.push(k); });
+    var gleich = toks.indexOf("=") >= 0; toks = toks.filter(function(k){ return k !== "="; });
+    if(!gleich) return trTerm(T) || "0";
+    var i = 0;
+    function prim(){ var k = toks[i];
+      if(k === "("){ i++; var v = summe(); if(toks[i] === ")") i++; return v; }
+      if(/^\d+$/.test(k || "")){ i++; return parseFloat(k); }
+      throw 0; }
+    function potenz(){ var v = prim(); while(toks[i] === "x²"){ i++; v = v * v; } return v; }
+    function vorz(){ if(toks[i] === "(−)" || toks[i] === "−"){ i++; return -vorz(); } return potenz(); }
+    function produkt(){ var v = vorz(); while(toks[i] === "×" || toks[i] === "÷"){ var o = toks[i++]; v = trOp(v, o, vorz()); } return v; }
+    function summe(){ var v = produkt(); while(toks[i] === "+" || toks[i] === "−"){ var o = toks[i++]; v = trOp(v, o, produkt()); } return v; }
+    try { var r = summe(); return i === toks.length ? trZahl(r) : "Error"; } catch(x){ return "Error"; }
+  }
+  function trZeichnen(){
+    var box = $("trKarte"); if(!box) return;
+    var ez = TR.tasten.length ? trTerm(TR.tasten) + (TR.tasten[TR.tasten.length - 1] === "=" ? " =" : "") : "";
+    box.querySelectorAll(".trEin").forEach(function(x){ x.textContent = ez; });
+    box.querySelector(".trA1").textContent = trEinfach(TR.tasten);
+    box.querySelector(".trA2").textContent = trSchul(TR.tasten);
+    var e = box.querySelector(".trErk"); e.textContent = TR.bsp >= 0 ? t(TR_BSP[TR.bsp][2]) : ""; e.hidden = TR.bsp < 0;
+    box.querySelectorAll(".trBsp button").forEach(function(b){ b.setAttribute("aria-pressed", +b.dataset.b === TR.bsp ? "true" : "false"); });
+  }
+  function trKarte(){
+    var h = '<div class="karte" id="trKarte"><h2>' + esc(t("tr_h")) + '</h2><p class="zeile">' + esc(t("tr_t")) + '</p>' +
+      '<p class="zeile"><b>' + esc(t("tr_bsp")) + '</b></p><div class="trBsp wahl">' + TR_BSP.map(function(b, i){ return '<button type="button" data-b="' + i + '" dir="ltr">' + esc(b[0]) + "</button>"; }).join("") + "</div>" +
+      '<div class="trGrid"><div class="trRechner"><div class="trName">' + esc(t("tr_einfach")) + '</div><div class="trDisp" dir="ltr"><div class="trEin"></div><div class="trA trA1">0</div></div></div>' +
+      '<div class="trRechner schul"><div class="trName">' + esc(t("tr_schul")) + '</div><div class="trDisp" dir="ltr"><div class="trEin"></div><div class="trA trA2">0</div></div></div></div>' +
+      '<div class="trTasten" dir="ltr">' + TR_TASTEN.map(function(k){ return '<button type="button" data-k="' + k + '" class="' + (/^\d$/.test(k) ? "z" : k === "=" ? "gl" : k === "C" ? "cl" : "op") + '"' + (k === "C" ? ' title="' + esc(t("tr_c")) + '"' : "") + ">" + k + "</button>"; }).join("") + "</div>" +
+      '<p class="merke trErk" hidden></p><p class="zeile muted">' + esc(t("tr_tipp")) + "</p></div>";
+    $("fehlerBox").insertAdjacentHTML("beforeend", h);
+    var box = $("trKarte");
+    box.addEventListener("click", function(e){
+      var k = e.target.closest("[data-k]"), b = e.target.closest("[data-b]");
+      if(b){ TR.bsp = +b.dataset.b; TR.tasten = TR_BSP[TR.bsp][1].slice(); trZeichnen(); return; }
+      if(!k) return;
+      var w = k.dataset.k; TR.bsp = -1;
+      if(w === "C") TR.tasten = [];
+      else { if(TR.tasten[TR.tasten.length - 1] === "=") TR.tasten = []; TR.tasten.push(w); }
+      trZeichnen();
+    });
+    trZeichnen();
+  }
 
   // ---------- Reiter Üben ----------
   var U = { typ: EIN.typ || "aus", stufe: EIN.stufe || 1 };
