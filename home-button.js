@@ -284,7 +284,9 @@
     var b = e.target && e.target.closest && e.target.closest("button, input[type=button], input[type=submit], [role=button]");
     if(!b || b.disabled || !istPruef(b)) return;
     var alle = bereich(b), leer = alle.filter(function(i){ return !String(i.value || "").trim(); });
-    if(!leer.length) return;
+    // nur wenn GAR NICHTS eingetragen ist (25.11.: Schriftlich hat viele Hilfsfelder, die leer bleiben dürfen –
+    // vorher zeigte ein Prüfen mit teils leeren Feldern sofort die Lösung, alles grün)
+    if(!leer.length || leer.length < alle.length) return;
     e.preventDefault(); e.stopImmediatePropagation();
     loesung(b, leer);
   }, true);
